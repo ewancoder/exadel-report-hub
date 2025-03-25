@@ -1,5 +1,5 @@
 ﻿namespace ExportPro.Core.Repositories.CSVRepositry;
 
-public interface ICSVRepository
+internal interface ICSVRepository
 {
 }
