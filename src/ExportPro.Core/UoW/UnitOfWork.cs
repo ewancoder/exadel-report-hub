@@ -1,5 +1,5 @@
 ﻿namespace ExportPro.Core.UoW;
 
-internal class UnitOfWork
+public class UnitOfWork
 {
 }
