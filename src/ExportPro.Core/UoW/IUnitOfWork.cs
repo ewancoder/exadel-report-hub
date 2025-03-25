@@ -4,5 +4,4 @@ namespace ExportPro.Core.UoW;
 
 public interface IUnitOfWork
 {
-
 }

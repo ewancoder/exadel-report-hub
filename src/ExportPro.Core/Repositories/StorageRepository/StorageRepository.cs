@@ -1,5 +1,5 @@
 ﻿namespace ExportPro.Core.Repositories.StorageRepository;
 
-public class StorageRepository : IStorageRepository
+internal class StorageRepository : IStorageRepository
 {
 }
