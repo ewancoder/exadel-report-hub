@@ -1,5 +1,5 @@
 ﻿namespace ExportPro.Core.Repositories.ExcelRepository;
 
-interface IExcelRepository
+public interface IExcelRepository
 {
 }
