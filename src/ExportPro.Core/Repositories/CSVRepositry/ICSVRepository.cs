@@ -1,5 +1,7 @@
-﻿namespace ExportPro.Core.Repositories.CSVRepositry;
+﻿using ExportPro.Core.Abstractions.Interfaces;
 
-public interface ICSVRepository
+namespace ExportPro.Core.Repositories.CSVRepositry;
+
+public interface ICSVRepository: IRepository
 {
 }

@@ -1,5 +1,7 @@
-﻿namespace ExportPro.Core.Repositories.StorageRepository;
+﻿using ExportPro.Core.Abstractions.Interfaces;
 
-public interface IStorageRepository
+namespace ExportPro.Core.Repositories.StorageRepository;
+
+public interface IStorageRepository: IRepository
 {
 }

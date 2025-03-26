@@ -1,5 +1,7 @@
-﻿namespace ExportPro.Core.Repositories.PDFRepository;
+﻿using ExportPro.Core.Abstractions.Interfaces;
 
-public interface IPDFRepository
+namespace ExportPro.Core.Repositories.PDFRepository;
+
+public interface IPDFRepository: IRepository
 {
 }

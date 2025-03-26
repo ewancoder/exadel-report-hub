@@ -1,5 +1,8 @@
-﻿namespace ExportPro.Core.Repositories.ExcelRepository;
+﻿using ExportPro.Core.Abstractions.Interfaces;
 
-public interface IExcelRepository
+
+namespace ExportPro.Core.Repositories.ExcelRepository;
+
+public interface IExcelRepository: IRepository
 {
 }
