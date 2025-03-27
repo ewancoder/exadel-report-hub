@@ -3,7 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Core", "ExportPro.Core\ExportPro.Core.csproj", "{E1EDDB49-69CB-4AD6-ABEB-212AF4A2CEF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Common.Core", "ExportPro.Core\ExportPro.Common.Core.csproj", "{E1EDDB49-69CB-4AD6-ABEB-212AF4A2CEF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Common.DataAccess.MongoDB", "ExportPro.Common.DataAccess.MongoDB\ExportPro.Common.DataAccess.MongoDB.csproj", "{1242078D-203C-4C6F-BE78-2363BA9151FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Common.Models.MongoDB", "ExportPro.Common.Models.MongoDB\ExportPro.Common.Models.MongoDB.csproj", "{92359A6E-5B74-4640-A7A7-98FC5E5D49CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.DataImport.DataAccess", "ExportPro.DataImport.DataAccess\ExportPro.DataImport.DataAccess.csproj", "{44697444-9383-4377-A229-7A9088A70711}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.DataImport.CQRS", "ExportPro.DataImport.CQRS\ExportPro.DataImport.CQRS.csproj", "{A77F7588-1798-4778-A1B2-BE8F67F541D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.DataImport.SDK", "ExportPro.DataImport.SDK\ExportPro.DataImport.SDK.csproj", "{A3E941F9-2ABE-48C3-9CF3-2EBDA9C909CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.DataImport.ServiceHost", "ExportPro.DataImport.ServiceHost\ExportPro.DataImport.ServiceHost.csproj", "{83694D82-3010-43BD-9BB9-2B4E31B39D99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.DataImport.Excel", "ExportPro.DataImport.Excel\ExportPro.DataImport.Excel.csproj", "{6438FD3E-AA8D-4ABD-8AB3-B5CC3C1B6B62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.DataImport.PDF", "ExportPro.DataImport.PDF\ExportPro.DataImport.PDF.csproj", "{A194367A-6CC1-4BF2-9698-744DDFFAEF34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.DataImport.CSV", "ExportPro.DataImport.CSV\ExportPro.DataImport.CSV.csproj", "{DEBA9741-45B2-4826-95DC-C3E0E52F2B8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.DataImport.Gateway", "ExportPro.DataImport.Gateway\ExportPro.DataImport.Gateway.csproj", "{6F3A9DD4-5C39-4F51-8CF2-2AF0E83F06B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +35,46 @@ Global
 		{E1EDDB49-69CB-4AD6-ABEB-212AF4A2CEF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1EDDB49-69CB-4AD6-ABEB-212AF4A2CEF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1EDDB49-69CB-4AD6-ABEB-212AF4A2CEF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1242078D-203C-4C6F-BE78-2363BA9151FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1242078D-203C-4C6F-BE78-2363BA9151FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1242078D-203C-4C6F-BE78-2363BA9151FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1242078D-203C-4C6F-BE78-2363BA9151FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92359A6E-5B74-4640-A7A7-98FC5E5D49CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92359A6E-5B74-4640-A7A7-98FC5E5D49CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92359A6E-5B74-4640-A7A7-98FC5E5D49CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92359A6E-5B74-4640-A7A7-98FC5E5D49CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44697444-9383-4377-A229-7A9088A70711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44697444-9383-4377-A229-7A9088A70711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44697444-9383-4377-A229-7A9088A70711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44697444-9383-4377-A229-7A9088A70711}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A77F7588-1798-4778-A1B2-BE8F67F541D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A77F7588-1798-4778-A1B2-BE8F67F541D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A77F7588-1798-4778-A1B2-BE8F67F541D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A77F7588-1798-4778-A1B2-BE8F67F541D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3E941F9-2ABE-48C3-9CF3-2EBDA9C909CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3E941F9-2ABE-48C3-9CF3-2EBDA9C909CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3E941F9-2ABE-48C3-9CF3-2EBDA9C909CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3E941F9-2ABE-48C3-9CF3-2EBDA9C909CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83694D82-3010-43BD-9BB9-2B4E31B39D99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83694D82-3010-43BD-9BB9-2B4E31B39D99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83694D82-3010-43BD-9BB9-2B4E31B39D99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83694D82-3010-43BD-9BB9-2B4E31B39D99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6438FD3E-AA8D-4ABD-8AB3-B5CC3C1B6B62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6438FD3E-AA8D-4ABD-8AB3-B5CC3C1B6B62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6438FD3E-AA8D-4ABD-8AB3-B5CC3C1B6B62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6438FD3E-AA8D-4ABD-8AB3-B5CC3C1B6B62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A194367A-6CC1-4BF2-9698-744DDFFAEF34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A194367A-6CC1-4BF2-9698-744DDFFAEF34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A194367A-6CC1-4BF2-9698-744DDFFAEF34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A194367A-6CC1-4BF2-9698-744DDFFAEF34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEBA9741-45B2-4826-95DC-C3E0E52F2B8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEBA9741-45B2-4826-95DC-C3E0E52F2B8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEBA9741-45B2-4826-95DC-C3E0E52F2B8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEBA9741-45B2-4826-95DC-C3E0E52F2B8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F3A9DD4-5C39-4F51-8CF2-2AF0E83F06B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F3A9DD4-5C39-4F51-8CF2-2AF0E83F06B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F3A9DD4-5C39-4F51-8CF2-2AF0E83F06B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F3A9DD4-5C39-4F51-8CF2-2AF0E83F06B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

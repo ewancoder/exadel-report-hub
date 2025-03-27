@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExportPro.Common.Models.MongoDB\ExportPro.Common.Models.MongoDB.csproj" />
+    <ProjectReference Include="..\ExportPro.Core\ExportPro.Common.Core.csproj" />
+  </ItemGroup>
+
+</Project>

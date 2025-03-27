@@ -1,0 +1,6 @@
+@ExportPro.DataImport.Excel_HostAddress = http://localhost:5020
+
+GET {{ExportPro.DataImport.Excel_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExportPro.Common.DataAccess.MongoDB\ExportPro.Common.DataAccess.MongoDB.csproj" />
+    <ProjectReference Include="..\ExportPro.Core\ExportPro.Common.Core.csproj" />
+    <ProjectReference Include="..\ExportPro.DataImport.CQRS\ExportPro.DataImport.CQRS.csproj" />
+    <ProjectReference Include="..\ExportPro.DataImport.DataAccess\ExportPro.DataImport.DataAccess.csproj" />
+    <ProjectReference Include="..\ExportPro.DataImport.SDK\ExportPro.DataImport.SDK.csproj" />
+  </ItemGroup>
+
+</Project>
