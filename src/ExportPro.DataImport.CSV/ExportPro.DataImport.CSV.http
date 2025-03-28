@@ -1,6 +1,0 @@
-@ExportPro.DataImport.CSV_HostAddress = http://localhost:5255
-
-GET {{ExportPro.DataImport.CSV_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
