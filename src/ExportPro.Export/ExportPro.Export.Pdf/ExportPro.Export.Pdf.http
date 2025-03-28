@@ -1,6 +1,0 @@
-@ExportPro.Export.Pdf_HostAddress = http://localhost:5263
-
-GET {{ExportPro.Export.Pdf_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

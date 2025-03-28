@@ -1,6 +1,0 @@
-@ExportPro.Export.StorageService_HostAddress = http://localhost:5081
-
-GET {{ExportPro.Export.StorageService_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
