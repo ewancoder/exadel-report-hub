@@ -10,4 +10,10 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Core\ExportPro.Common.Core.csproj" />
+    <ProjectReference Include="..\..\ExportPro.StorageService\ExportPro.StorageService.Excel\ExportPro.StorageService.Excel.csproj" />
+    <ProjectReference Include="..\ExportPro.Export.SDK\ExportPro.Export.SDK.csproj" />
+  </ItemGroup>
+
 </Project>

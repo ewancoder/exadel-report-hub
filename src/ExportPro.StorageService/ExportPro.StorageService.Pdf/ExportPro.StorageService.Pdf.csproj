@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Core\ExportPro.Common.Core.csproj" />
+    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.DataAccess.MongoDB\ExportPro.Common.DataAccess.MongoDB.csproj" />
+    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Models.MongoDB\ExportPro.Common.Models.MongoDB.csproj" />
+  </ItemGroup>
+
 </Project>
