@@ -1,19 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Core\ExportPro.Common.Core.csproj" />
-    <ProjectReference Include="..\..\ExportPro.StorageService\ExportPro.StorageService.Csv\ExportPro.StorageService.Csv.csproj" />
-    <ProjectReference Include="..\ExportPro.Export.SDK\ExportPro.Export.SDK.csproj" />
-  </ItemGroup>
 
 </Project>

@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Core\ExportPro.Common.Shared.csproj" />
-  </ItemGroup>
-
 </Project>

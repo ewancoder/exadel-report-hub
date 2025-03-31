@@ -1,6 +1,0 @@
-@ExportPro.Export.Gateway_HostAddress = http://localhost:5164
-
-GET {{ExportPro.Export.Gateway_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
