@@ -1,3 +1,7 @@
+using ExportPro.Common.DataAccess.MongoDB.Contexts;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+using ExportPro.Common.DataAccess.MongoDB.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
+builder.Services.AddScoped<ExportProMongoContext>();
 
 var app = builder.Build();
 
