@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.SD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.API", "ExportPro.StorageService\ExportPro.StorageService.API\ExportPro.StorageService.API.csproj", "{3C1E614F-64F0-4555-9565-27811F4BF672}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.AuthService", "ExportPro.AuthService", "{BC2EBF6E-33E4-4FD7-9130-B919E6B79779}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.AuthService", "ExportPro.AuthService\ExportPro.AuthService\ExportPro.AuthService.csproj", "{06ADA663-45C4-42CF-9FF2-819CB06FB429}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +99,10 @@ Global
 		{3C1E614F-64F0-4555-9565-27811F4BF672}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C1E614F-64F0-4555-9565-27811F4BF672}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C1E614F-64F0-4555-9565-27811F4BF672}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06ADA663-45C4-42CF-9FF2-819CB06FB429}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06ADA663-45C4-42CF-9FF2-819CB06FB429}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06ADA663-45C4-42CF-9FF2-819CB06FB429}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06ADA663-45C4-42CF-9FF2-819CB06FB429}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +121,7 @@ Global
 		{DE70D432-3309-4719-9C0F-A447B2CAC134} = {983068BC-B50F-4D64-AD6C-5CF31770DEDB}
 		{AF50B13B-0A0D-417E-8BA3-90B7AE88A319} = {983068BC-B50F-4D64-AD6C-5CF31770DEDB}
 		{3C1E614F-64F0-4555-9565-27811F4BF672} = {983068BC-B50F-4D64-AD6C-5CF31770DEDB}
+		{06ADA663-45C4-42CF-9FF2-819CB06FB429} = {BC2EBF6E-33E4-4FD7-9130-B919E6B79779}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3564D6A6-C183-4B6D-89C7-596F1C95733F}
