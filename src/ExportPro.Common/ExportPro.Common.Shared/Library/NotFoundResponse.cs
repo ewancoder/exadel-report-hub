@@ -5,11 +5,9 @@ namespace ExportPro.Common.Shared.Library;
 
 public class NotFoundResponse : BaseResponse
 {
-    public NotFoundResponse(bool isSuccess = false, string message = null)
+    public NotFoundResponse()
      {
          ApiState = HttpStatusCode.NotFound;
-         Messages = [message];
-         IsSuccess = isSuccess;
     }
 }
 

@@ -3,9 +3,9 @@
 
 namespace ExportPro.Common.Shared.Library;
 
-public class SuccessApiServiceResponse<T> : BaseResponseT<T>
+public class SuccessResponse<T> : BaseResponse<T>
 {
-    public SuccessApiServiceResponse(T data, string message = null)
+    public SuccessResponse(T data, string message = null)
     {
        Data = data;
        ApiState = HttpStatusCode.OK;
