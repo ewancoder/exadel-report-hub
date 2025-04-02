@@ -12,6 +12,8 @@ public class ExportProMongoContext
         _database = connectionFactory.GetDatabase();
     }
 
+    public IMongoDatabase Database => _database;
+
     // Collections
     //public IMongoCollection<Invoice> Invoices => _database.GetCollection<Invoice>("Invoices");
     // Add other collections as needed
