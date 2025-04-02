@@ -3,7 +3,7 @@ using MediatR;
 
 namespace ExportPro.Common.Shared.Mediator
 {
-    public interface IQuery<TResponse> : IRequest<Result<TResponse>>
+    public interface IQuery<TResponse> : IRequest<BaseResponseT<TResponse>>
     {
     }
 }

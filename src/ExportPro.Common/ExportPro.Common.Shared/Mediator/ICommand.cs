@@ -4,7 +4,7 @@ using MediatR;
 
 namespace ExportPro.Common.Shared.Mediator
 {
-    public interface ICommand: IRequest<Result>
+    public interface ICommand: IRequest<BaseResponse>
     {
     }
 }

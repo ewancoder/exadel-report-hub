@@ -4,7 +4,7 @@ using MediatR;
 namespace ExportPro.Common.Shared.Mediator
 {
     public interface IQueryHandler<TQuery, TResponse>
-        : IRequestHandler<TQuery, Result<TResponse>>
+        : IRequestHandler<TQuery, BaseResponseT<TResponse>>
         where TQuery : IQuery<TResponse>
     {
     }
