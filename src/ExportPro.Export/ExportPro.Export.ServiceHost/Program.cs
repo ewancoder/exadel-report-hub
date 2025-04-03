@@ -1,9 +1,13 @@
 using ExportPro.Common.Shared.Behaviors;
+using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Middlewares;
 using MediatR;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSharedSerilogAndConfiguration();
 // Add services to the container.
 
 builder.Services.AddControllers();
