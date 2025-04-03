@@ -1,6 +1,6 @@
 ﻿using ExportPro.Common.Shared.Models;
 
-namespace ExportPro.Common.DataAccess.MongoDB.Interfaces;
+namespace ExportPro.AuthService.Repositories;
 
 public interface IUserRepository
 {

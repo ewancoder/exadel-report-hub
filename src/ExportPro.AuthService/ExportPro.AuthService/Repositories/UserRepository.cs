@@ -1,18 +1,12 @@
 ﻿using ExportPro.Common.DataAccess.MongoDB.Contexts;
-using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Shared.Models;
 using MongoDB.Driver;
 
 namespace ExportPro.AuthService.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository(ExportProMongoContext context) : IUserRepository
 {
-    private readonly IMongoCollection<User> _users;
-
-    public UserRepository(ExportProMongoContext context)
-    {
-        _users = context.Database.GetCollection<User>("Users");
-    }
+    private readonly IMongoCollection<User> _users = context.Database.GetCollection<User>("Users");
 
     /// <summary>
     /// Retrieves a user by their username.

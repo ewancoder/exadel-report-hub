@@ -10,14 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ExportPro.AuthService.Services;
 
-public class JwtTokenService : IJwtTokenService
+public class JwtTokenService(IOptions<JwtSettings> jwtOptions) : IJwtTokenService
 {
-    private readonly JwtSettings _jwtSettings;
-
-    public JwtTokenService(IOptions<JwtSettings> jwtOptions)
-    {
-        _jwtSettings = jwtOptions.Value;
-    }
+    private readonly JwtSettings _jwtSettings = jwtOptions.Value;
 
     /// <summary>
     /// Generates a JWT token for the given user.
@@ -29,11 +24,11 @@ public class JwtTokenService : IJwtTokenService
         var expiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes);
         var key = Encoding.UTF8.GetBytes(_jwtSettings.Secret);
 
-        var claims = new List<Claim>
-        {
+        List<Claim> claims =
+        [
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username)
-        };
+        ];
 
         foreach (var role in user.Roles)
         {

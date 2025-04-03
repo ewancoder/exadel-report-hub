@@ -1,9 +1,8 @@
 ﻿using ExportPro.AuthService.Configuration;
+using ExportPro.AuthService.Repositories;
 using ExportPro.AuthService.Services;
-using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Shared.DTOs;
 using ExportPro.Common.Shared.Models;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
@@ -13,18 +12,11 @@ namespace ExportPro.Gateway.Controllers;
 [Produces("application/json")]
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IOptions<JwtSettings> jwtOptions) : ControllerBase
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IJwtTokenService _jwtTokenService;
-    private readonly JwtSettings _jwtSettings;
-
-    public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IOptions<JwtSettings> jwtOptions)
-    {
-        _userRepository = userRepository;
-        _jwtTokenService = jwtTokenService;
-        _jwtSettings = jwtOptions.Value;
-    }
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IJwtTokenService _jwtTokenService = jwtTokenService;
+    private readonly JwtSettings _jwtSettings = jwtOptions.Value;
 
     [HttpPost("register")]
     [SwaggerOperation(
