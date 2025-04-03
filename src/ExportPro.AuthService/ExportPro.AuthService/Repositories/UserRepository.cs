@@ -1,5 +1,6 @@
 ﻿using ExportPro.Common.DataAccess.MongoDB.Contexts;
 using ExportPro.Common.Shared.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace ExportPro.AuthService.Repositories;
@@ -29,6 +30,16 @@ public class UserRepository(ExportProMongoContext context) : IUserRepository
             .Find(u => u.RefreshTokens
                 .Any(rt => rt.Token == refreshToken))
             .FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Retrieves a user by their ID.
+    /// </summary>
+    /// <param name="id">The ObjectId of the user to retrieve.</param>
+    /// <returns>The user, or null if not found.</returns>
+    public async Task<User?> GetByIdAsync(ObjectId id)
+    {
+        return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
     }
 
     /// <summary>

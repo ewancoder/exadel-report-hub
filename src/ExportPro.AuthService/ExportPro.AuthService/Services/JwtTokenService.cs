@@ -27,13 +27,10 @@ public class JwtTokenService(IOptions<JwtSettings> jwtOptions) : IJwtTokenServic
         List<Claim> claims =
         [
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username)
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
+            new Claim("tokenVersion", user.TokenVersion.ToString())
         ];
-
-        foreach (var role in user.Roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
-        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

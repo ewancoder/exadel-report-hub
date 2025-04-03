@@ -39,7 +39,7 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
         {
             Username = registerDto.Username,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-            Roles = new List<UserRole> { UserRole.User }
+            Role = UserRole.User
         };
 
         user = await _userRepository.CreateAsync(user);
@@ -121,19 +121,21 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
             return Ok("User is already logged out.");
         }
 
-        //// header
-        //if (!Request.Headers.TryGetValue("X-Refresh-Token", out var refreshToken))
-        //{
-        //    return Ok("User is already logged out.");
-        //}
-
         var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
 
         if (user != null)
         {
+            // Increment token version to invalidate all existing tokens
+            user.TokenVersion += 1;
+
+            // Clear refresh tokens
+            //user.RefreshTokens.Clear();
             user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
+
             await _userRepository.UpdateAsync(user);
         }
+
+        Response.Cookies.Delete("refreshToken");
 
         return Ok("Logged out successfully.");
     }
