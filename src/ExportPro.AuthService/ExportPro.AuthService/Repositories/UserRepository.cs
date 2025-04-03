@@ -19,9 +19,23 @@ public class UserRepository : IUserRepository
         return await _users.Find(u => u.Username == username).FirstOrDefaultAsync();
     }
 
+    public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
+    {
+        // Look for any user with a matching refresh token in their token list
+        return await _users
+            .Find(u => u.RefreshTokens
+                .Any(rt => rt.Token == refreshToken))
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<User> CreateAsync(User user)
     {
         await _users.InsertOneAsync(user);
         return user;
+    }
+
+    public async Task UpdateAsync(User user)
+    {
+        await _users.ReplaceOneAsync(u => u.Id == user.Id, user);
     }
 }

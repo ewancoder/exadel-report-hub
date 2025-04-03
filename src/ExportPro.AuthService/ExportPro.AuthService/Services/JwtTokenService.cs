@@ -1,11 +1,12 @@
-﻿using ExportPro.AuthService.Configuration;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using ExportPro.AuthService.Configuration;
 using ExportPro.Common.Shared.DTOs;
 using ExportPro.Common.Shared.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace ExportPro.AuthService.Services;
 
@@ -31,7 +32,7 @@ public class JwtTokenService : IJwtTokenService
 
         foreach (var role in user.Roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
         }
 
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -40,9 +41,7 @@ public class JwtTokenService : IJwtTokenService
             Expires = expiresAt,
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -54,5 +53,10 @@ public class JwtTokenService : IJwtTokenService
             Username = user.Username,
             ExpiresAt = expiresAt
         };
+    }
+
+    public string GenerateRefreshToken()
+    {
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }
 }

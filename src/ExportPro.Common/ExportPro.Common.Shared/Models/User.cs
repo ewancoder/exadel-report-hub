@@ -11,5 +11,6 @@ public class User
     public ObjectId Id { get; set; }
     public string Username { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
-    public List<string> Roles { get; set; } = new List<string>();
+    public List<UserRole> Roles { get; set; } = new();
+    public List<RefreshToken> RefreshTokens { get; set; } = new();
 }
