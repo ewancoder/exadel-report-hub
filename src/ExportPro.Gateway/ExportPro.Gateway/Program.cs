@@ -1,26 +1,18 @@
-using ExportPro.Gateway.Extensions;
-using ExportPro.AuthService.Services;
-using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.AuthService.Repositories;
-using ExportPro.Common.DataAccess.MongoDB.Services;
+using ExportPro.AuthService.Services;
 using ExportPro.Common.DataAccess.MongoDB.Contexts;
-using ExportPro.AuthService.Configuration;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+using ExportPro.Common.DataAccess.MongoDB.Services;
+using ExportPro.Gateway.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add controllers, Swagger, etc.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices();
-
-// Configure JwtSettings from configuration
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-
-// Register services and repositories
+builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-// Register MongoDB dependencies
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddScoped<ExportProMongoContext>();
 
@@ -33,6 +25,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
