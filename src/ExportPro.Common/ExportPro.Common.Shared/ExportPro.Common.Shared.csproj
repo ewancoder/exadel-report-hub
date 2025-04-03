@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <Folder Include="ExceptionHandlers\" />
-    <Folder Include="Exceptions\" />
   </ItemGroup>
 
 </Project>
