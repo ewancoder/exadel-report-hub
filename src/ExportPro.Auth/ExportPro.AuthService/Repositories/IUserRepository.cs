@@ -1,7 +1,7 @@
 ﻿using ExportPro.Common.Shared.Models;
 using MongoDB.Bson;
 
-namespace ExportPro.Auth.Repositories;
+namespace ExportPro.AuthService.Repositories;
 
 public interface IUserRepository
 {

@@ -2,13 +2,13 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using ExportPro.Auth.Configuration;
+using ExportPro.AuthService.Configuration;
 using ExportPro.Common.Shared.DTOs;
 using ExportPro.Common.Shared.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace ExportPro.Auth.Services;
+namespace ExportPro.AuthService.Services;
 
 public class JwtTokenService(IOptions<JwtSettings> jwtOptions) : IJwtTokenService
 {

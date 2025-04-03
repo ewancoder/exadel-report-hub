@@ -13,7 +13,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\ExportPro.AuthService\ExportPro.AuthService\ExportPro.AuthService.csproj" />
+		<ProjectReference Include="..\..\ExportPro.Auth\ExportPro.AuthService\ExportPro.AuthService.csproj" />
 		<ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.DataAccess.MongoDB\ExportPro.Common.DataAccess.MongoDB.csproj" />
 	</ItemGroup>
 

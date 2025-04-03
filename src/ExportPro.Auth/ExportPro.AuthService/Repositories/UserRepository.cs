@@ -3,7 +3,7 @@ using ExportPro.Common.Shared.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace ExportPro.Auth.Repositories;
+namespace ExportPro.AuthService.Repositories;
 
 public class UserRepository(ExportProMongoContext context) : IUserRepository
 {

@@ -83,17 +83,10 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
     [ProducesResponseType(401)]
     public async Task<IActionResult> RefreshToken()
     {
-        // cookie
         if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
         {
             return Unauthorized("Refresh token is missing.");
         }
-
-        //// header
-        //if (!Request.Headers.TryGetValue("X-Refresh-Token", out var refreshToken))
-        //{
-        //    return Unauthorized("Refresh token is missing.");
-        //}
 
         User? user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
 
@@ -115,7 +108,6 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        // cookie
         if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
         {
             return Ok("User is already logged out.");
@@ -125,13 +117,8 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
 
         if (user != null)
         {
-            // Increment token version to invalidate all existing tokens
             user.TokenVersion += 1;
-
-            // Clear refresh tokens
-            //user.RefreshTokens.Clear();
             user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
-
             await _userRepository.UpdateAsync(user);
         }
 

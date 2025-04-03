@@ -1,4 +1,4 @@
-﻿namespace ExportPro.Auth.Configuration;
+﻿namespace ExportPro.AuthService.Configuration;
 
 public class JwtSettings
 {

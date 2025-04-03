@@ -33,7 +33,6 @@ public static class AuthenticationExtensions
                 ClockSkew = TimeSpan.Zero
             };
 
-            // Add token version validation
             options.Events = new JwtBearerEvents
             {
                 OnTokenValidated = async context =>
@@ -54,7 +53,6 @@ public static class AuthenticationExtensions
 
                             if (user == null || user.TokenVersion != tokenVersion)
                             {
-                                // Token version doesn't match current user version
                                 context.Fail("Token is no longer valid");
                             }
                         }
