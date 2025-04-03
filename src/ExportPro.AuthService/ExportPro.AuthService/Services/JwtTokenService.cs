@@ -19,6 +19,11 @@ public class JwtTokenService : IJwtTokenService
         _jwtSettings = jwtOptions.Value;
     }
 
+    /// <summary>
+    /// Generates a JWT token for the given user.
+    /// </summary>
+    /// <param name="user">The user to generate the token for.</param>
+    /// <returns>A response containing the generated token, the user's username, and the token's expiration date.</returns>
     public AuthResponseDto GenerateToken(User user)
     {
         var expiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes);
@@ -55,6 +60,10 @@ public class JwtTokenService : IJwtTokenService
         };
     }
 
+    /// <summary>
+    /// Generates a secure random refresh token.
+    /// </summary>
+    /// <returns>A secure random refresh token.</returns>
     public string GenerateRefreshToken()
     {
         return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));

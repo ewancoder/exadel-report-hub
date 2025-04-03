@@ -117,7 +117,6 @@ public class AuthController : ControllerBase
         var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
         if (user != null)
         {
-            // Remove the refresh token from the user's list
             user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
             await _userRepository.UpdateAsync(user);
         }
@@ -126,17 +125,12 @@ public class AuthController : ControllerBase
         return Ok("Logged out successfully.");
     }
 
-    // Private helper to clean expired tokens, generate new tokens and update the user
     private async Task<AuthResponseDto> GenerateTokenAndSetRefreshToken(User user)
     {
-        // Clean up expired tokens
         user.RefreshTokens.RemoveAll(rt => rt.ExpiresAt <= DateTime.UtcNow);
-
-        // Generate new JWT access token
         var authResponse = _jwtTokenService.GenerateToken(user);
-
-        // Generate new refresh token
         var newRefreshTokenValue = _jwtTokenService.GenerateRefreshToken();
+
         var newRefreshToken = new RefreshToken
         {
             Token = newRefreshTokenValue,
@@ -145,11 +139,9 @@ public class AuthController : ControllerBase
             CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"
         };
 
-        // Add new refresh token to the user's list and update the database
         user.RefreshTokens.Add(newRefreshToken);
         await _userRepository.UpdateAsync(user);
 
-        // Set the new refresh token as an HttpOnly, Secure cookie
         Response.Cookies.Append("refreshToken", newRefreshTokenValue, new CookieOptions
         {
             HttpOnly = true,
