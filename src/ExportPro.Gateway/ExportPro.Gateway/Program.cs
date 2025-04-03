@@ -12,6 +12,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>(); // Add this line
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddScoped<ExportProMongoContext>();
@@ -25,7 +26,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

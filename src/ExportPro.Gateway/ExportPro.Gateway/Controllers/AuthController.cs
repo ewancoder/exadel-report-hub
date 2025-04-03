@@ -1,10 +1,7 @@
-﻿using ExportPro.AuthService.Configuration;
-using ExportPro.AuthService.Repositories;
-using ExportPro.AuthService.Services;
+﻿using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.DTOs;
 using ExportPro.Common.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace ExportPro.Gateway.Controllers;
@@ -12,11 +9,10 @@ namespace ExportPro.Gateway.Controllers;
 [Produces("application/json")]
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IOptions<JwtSettings> jwtOptions) : ControllerBase
+public class AuthController(IAuthService authService, IJwtTokenService jwtTokenService) : ControllerBase
 {
-    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IAuthService _authService = authService;
     private readonly IJwtTokenService _jwtTokenService = jwtTokenService;
-    private readonly JwtSettings _jwtSettings = jwtOptions.Value;
 
     [HttpPost("register")]
     [SwaggerOperation(
@@ -28,7 +24,7 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
     [ProducesResponseType(409)]
     public async Task<ActionResult<AuthResponseDto>> Register([FromBody] UserRegisterDto registerDto)
     {
-        var existingUser = await _userRepository.GetByUsernameAsync(registerDto.Username);
+        var existingUser = await _authService.GetUserByUsernameAsync(registerDto.Username);
 
         if (existingUser != null)
         {
@@ -42,9 +38,9 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
             Role = UserRole.User
         };
 
-        user = await _userRepository.CreateAsync(user);
+        user = await _authService.CreateUserAsync(user);
 
-        return Ok(await GenerateTokenAndSetRefreshToken(user));
+        return Ok(await _authService.GenerateTokenAndSetRefreshTokenAsync(user, HttpContext));
     }
 
     [HttpPost("login")]
@@ -57,7 +53,7 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
     [ProducesResponseType(401)]
     public async Task<ActionResult<AuthResponseDto>> Login([FromBody] UserLoginDto loginDto)
     {
-        User? user = await _userRepository.GetByUsernameAsync(loginDto.Username);
+        User? user = await _authService.GetUserByUsernameAsync(loginDto.Username);
 
         if (user == null)
         {
@@ -71,7 +67,7 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
             return Unauthorized("Invalid username or password.");
         }
 
-        return Ok(await GenerateTokenAndSetRefreshToken(user));
+        return Ok(await _authService.GenerateTokenAndSetRefreshTokenAsync(user, HttpContext));
     }
 
     [HttpPost("refresh-token")]
@@ -88,7 +84,7 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
             return Unauthorized("Refresh token is missing.");
         }
 
-        User? user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+        User? user = await _authService.GetUserByRefreshTokenAsync(refreshToken);
 
         if (user == null)
         {
@@ -102,7 +98,7 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
             return Unauthorized("Expired refresh token.");
         }
 
-        return Ok(await GenerateTokenAndSetRefreshToken(user));
+        return Ok(await _authService.GenerateTokenAndSetRefreshTokenAsync(user, HttpContext));
     }
 
     [HttpPost("logout")]
@@ -113,48 +109,17 @@ public class AuthController(IUserRepository userRepository, IJwtTokenService jwt
             return Ok("User is already logged out.");
         }
 
-        var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+        var user = await _authService.GetUserByRefreshTokenAsync(refreshToken);
 
         if (user != null)
         {
             user.TokenVersion += 1;
             user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
-            await _userRepository.UpdateAsync(user);
+            await _authService.UpdateUserAsync(user);
         }
 
         Response.Cookies.Delete("refreshToken");
 
         return Ok("Logged out successfully.");
-    }
-
-    private async Task<AuthResponseDto> GenerateTokenAndSetRefreshToken(User user)
-    {
-        user.RefreshTokens.RemoveAll(rt => rt.ExpiresAt <= DateTime.UtcNow);
-        AuthResponseDto authResponse = _jwtTokenService.GenerateToken(user);
-        string newRefreshTokenValue = _jwtTokenService.GenerateRefreshToken();
-
-        RefreshToken newRefreshToken = new()
-        {
-            Token = newRefreshTokenValue,
-            CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays),
-            CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"
-        };
-
-        user.RefreshTokens.Add(newRefreshToken);
-        await _userRepository.UpdateAsync(user);
-
-        // cookie
-        Response.Cookies.Append("refreshToken", newRefreshTokenValue, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            Expires = newRefreshToken.ExpiresAt
-        });
-
-        //// header.
-        //Response.Headers.Add("X-Refresh-Token", newRefreshTokenValue);
-
-        return authResponse;
     }
 }
