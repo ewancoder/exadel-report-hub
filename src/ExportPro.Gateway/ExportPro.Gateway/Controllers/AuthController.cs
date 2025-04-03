@@ -113,6 +113,26 @@ public class AuthController : ControllerBase
         return Ok(await GenerateTokenAndSetRefreshToken(user));
     }
 
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+        {
+            return Ok("User is already logged out.");
+        }
+
+        var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+        if (user != null)
+        {
+            user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
+            await _userRepository.UpdateAsync(user);
+        }
+
+        Response.Cookies.Delete("refreshToken");
+        return Ok("Logged out successfully.");
+    }
+
+
     private async Task<AuthResponseDto> GenerateTokenAndSetRefreshToken(User user)
     {
         user.RefreshTokens.RemoveAll(rt => rt.ExpiresAt <= DateTime.UtcNow);
