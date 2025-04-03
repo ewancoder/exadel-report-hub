@@ -36,12 +36,13 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponseDto>> Register([FromBody] UserRegisterDto registerDto)
     {
         var existingUser = await _userRepository.GetByUsernameAsync(registerDto.Username);
+
         if (existingUser != null)
         {
             return Conflict("Username is already taken");
         }
 
-        var user = new User
+        User user = new()
         {
             Username = registerDto.Username,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
@@ -63,14 +64,23 @@ public class AuthController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<ActionResult<AuthResponseDto>> Login([FromBody] UserLoginDto loginDto)
     {
-        var user = await _userRepository.GetByUsernameAsync(loginDto.Username);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+        User? user = await _userRepository.GetByUsernameAsync(loginDto.Username);
+
+        if (user == null)
+        {
+            return Unauthorized("Invalid username or password.");
+        }
+
+        bool isValidPassword = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
+
+        if (!isValidPassword)
         {
             return Unauthorized("Invalid username or password.");
         }
 
         return Ok(await GenerateTokenAndSetRefreshToken(user));
     }
+
 
     [HttpPost("refresh-token")]
     [SwaggerOperation(
@@ -86,14 +96,16 @@ public class AuthController : ControllerBase
             return Unauthorized("Refresh token is missing.");
         }
 
-        var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+        User? user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+
         if (user == null)
         {
             return Unauthorized("Invalid refresh token.");
         }
 
-        var tokenObj = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
-        if (tokenObj == null || tokenObj.ExpiresAt <= DateTime.UtcNow)
+        RefreshToken? refreshTokenObject = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
+
+        if (refreshTokenObject == null || refreshTokenObject.ExpiresAt <= DateTime.UtcNow)
         {
             return Unauthorized("Expired refresh token.");
         }
@@ -101,37 +113,13 @@ public class AuthController : ControllerBase
         return Ok(await GenerateTokenAndSetRefreshToken(user));
     }
 
-    [HttpPost("logout")]
-    [SwaggerOperation(
-        Summary = "Logout user",
-        Description = "Removes the refresh token from the user's tokens"
-    )]
-    [ProducesResponseType(200)]
-    public async Task<IActionResult> Logout()
-    {
-        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
-        {
-            return Ok("User is already logged out.");
-        }
-
-        var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
-        if (user != null)
-        {
-            user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
-            await _userRepository.UpdateAsync(user);
-        }
-
-        Response.Cookies.Delete("refreshToken");
-        return Ok("Logged out successfully.");
-    }
-
     private async Task<AuthResponseDto> GenerateTokenAndSetRefreshToken(User user)
     {
         user.RefreshTokens.RemoveAll(rt => rt.ExpiresAt <= DateTime.UtcNow);
-        var authResponse = _jwtTokenService.GenerateToken(user);
-        var newRefreshTokenValue = _jwtTokenService.GenerateRefreshToken();
+        AuthResponseDto authResponse = _jwtTokenService.GenerateToken(user);
+        string newRefreshTokenValue = _jwtTokenService.GenerateRefreshToken();
 
-        var newRefreshToken = new RefreshToken
+        RefreshToken newRefreshToken = new()
         {
             Token = newRefreshTokenValue,
             CreatedAt = DateTime.UtcNow,
