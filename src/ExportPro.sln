@@ -37,9 +37,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.SD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.API", "ExportPro.StorageService\ExportPro.StorageService.API\ExportPro.StorageService.API.csproj", "{3C1E614F-64F0-4555-9565-27811F4BF672}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Auth", "ExportPro.Auth", "{F3DA3612-C897-4730-956D-44606B5B3019}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro", "ExportPro", "{F3DA3612-C897-4730-956D-44606B5B3019}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.AuthService", "ExportPro.Auth\ExportPro.AuthService\ExportPro.AuthService.csproj", "{68EFD010-3139-49C7-8E44-A12882924222}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Tests", "ExportPro.Tests", "{31E2BB3C-D9EF-49BF-B5B0-2980B4417CD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.AuthService.Tests", "ExportPro.Tests\ExportPro.AuthService.Tests\ExportPro.AuthService.Tests.csproj", "{0B6E9D37-69F8-4E57-8B0D-F05BCC2B72E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Gateway.Tests", "ExportPro.Tests\ExportPro.Gateway.Tests\ExportPro.Gateway.Tests.csproj", "{51A053C7-43AB-40DA-82C2-29E28F9DAE16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,6 +109,14 @@ Global
 		{68EFD010-3139-49C7-8E44-A12882924222}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68EFD010-3139-49C7-8E44-A12882924222}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68EFD010-3139-49C7-8E44-A12882924222}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B6E9D37-69F8-4E57-8B0D-F05BCC2B72E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B6E9D37-69F8-4E57-8B0D-F05BCC2B72E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B6E9D37-69F8-4E57-8B0D-F05BCC2B72E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B6E9D37-69F8-4E57-8B0D-F05BCC2B72E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51A053C7-43AB-40DA-82C2-29E28F9DAE16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51A053C7-43AB-40DA-82C2-29E28F9DAE16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51A053C7-43AB-40DA-82C2-29E28F9DAE16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51A053C7-43AB-40DA-82C2-29E28F9DAE16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +136,8 @@ Global
 		{AF50B13B-0A0D-417E-8BA3-90B7AE88A319} = {983068BC-B50F-4D64-AD6C-5CF31770DEDB}
 		{3C1E614F-64F0-4555-9565-27811F4BF672} = {983068BC-B50F-4D64-AD6C-5CF31770DEDB}
 		{68EFD010-3139-49C7-8E44-A12882924222} = {F3DA3612-C897-4730-956D-44606B5B3019}
+		{0B6E9D37-69F8-4E57-8B0D-F05BCC2B72E3} = {31E2BB3C-D9EF-49BF-B5B0-2980B4417CD8}
+		{51A053C7-43AB-40DA-82C2-29E28F9DAE16} = {31E2BB3C-D9EF-49BF-B5B0-2980B4417CD8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3564D6A6-C183-4B6D-89C7-596F1C95733F}
