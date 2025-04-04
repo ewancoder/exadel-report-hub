@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.Json;
 
 namespace ExportPro.Common.Shared.Middlewares;
+
 public class ErrorHandlingMiddleware
 {
     private readonly RequestDelegate _next;

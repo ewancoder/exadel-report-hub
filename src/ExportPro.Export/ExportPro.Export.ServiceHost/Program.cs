@@ -12,8 +12,6 @@ builder.Host.UseSharedSerilogAndConfiguration();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
-builder.Services.AddScoped<ExportProMongoContext>();
 
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
@@ -25,7 +23,6 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

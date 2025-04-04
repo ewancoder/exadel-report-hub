@@ -1,5 +1,6 @@
-﻿using ExportPro.AuthService.Services;
+﻿using ExportPro.AuthService.Commands;
 using ExportPro.Common.Shared.DTOs;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -8,70 +9,59 @@ namespace ExportPro.Gateway.Controllers;
 [Produces("application/json")]
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IMediator mediator) : ControllerBase
 {
-    private readonly IAuthService _authService = authService;
+    private readonly IMediator _mediator = mediator;
 
     [HttpPost("register")]
-    [SwaggerOperation(
-        Summary = "Register a new user",
-        Description = "Creates a new user account and returns a JWT token"
-    )]
+    [SwaggerOperation(Summary = "Register a new user")]
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(409)]
-    public async Task<ActionResult<AuthResponseDto>> Register([FromBody] UserRegisterDto dto)
+    public async Task<IActionResult> Register([FromBody] UserRegisterDto dto)
     {
-        try
-        {
-            var result = await _authService.RegisterAsync(dto);
-            SetRefreshTokenCookie(result);
-            return Ok(result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(ex.Message);
-        }
+        var response = await _mediator.Send(new RegisterCommand(dto));
+        if (!response.IsSuccess || response.Data == null)
+            return BadRequest(response.Messages);
+
+        SetRefreshTokenCookie(response.Data);
+        return Ok(response.Data);
     }
 
     [HttpPost("login")]
-    [SwaggerOperation(
-        Summary = "Login to the system",
-        Description = "Authenticates user credentials and returns a JWT token"
-    )]
+    [SwaggerOperation(Summary = "Login a user")]
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    public async Task<ActionResult<AuthResponseDto>> Login([FromBody] UserLoginDto dto)
+    public async Task<IActionResult> Login([FromBody] UserLoginDto dto)
     {
-        var result = await _authService.LoginAsync(dto);
-        SetRefreshTokenCookie(result);
-        return Ok(result);
+        var response = await _mediator.Send(new LoginCommand(dto));
+        if (!response.IsSuccess || response.Data == null)
+            return Unauthorized(response.Messages);
+
+        SetRefreshTokenCookie(response.Data);
+        return Ok(response.Data);
     }
 
     [HttpPost("refresh-token")]
-    [SwaggerOperation(
-        Summary = "Refresh JWT token",
-        Description = "Generates a new JWT and refresh token if the provided refresh token is valid"
-    )]
+    [SwaggerOperation(Summary = "Refresh token")]
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
-    [ProducesResponseType(401)]
-    public async Task<ActionResult<AuthResponseDto>> RefreshToken()
+    public async Task<IActionResult> RefreshToken()
     {
-        if (!Request.Cookies.TryGetValue("refreshToken", out var token))
+        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
             return Unauthorized("Refresh token is missing.");
 
-        var result = await _authService.RefreshTokenAsync(token);
-        SetRefreshTokenCookie(result);
-        return Ok(result);
+        var response = await _mediator.Send(new RefreshTokenCommand(refreshToken));
+        if (!response.IsSuccess || response.Data == null)
+            return Unauthorized(response.Messages);
+
+        SetRefreshTokenCookie(response.Data);
+        return Ok(response.Data);
     }
 
     [HttpPost("logout")]
+    [SwaggerOperation(Summary = "Logout a user")]
     public async Task<IActionResult> Logout()
     {
         if (Request.Cookies.TryGetValue("refreshToken", out var token))
         {
-            await _authService.LogoutAsync(token);
+            await _mediator.Send(new LogoutCommand(token));
             Response.Cookies.Delete("refreshToken");
         }
 

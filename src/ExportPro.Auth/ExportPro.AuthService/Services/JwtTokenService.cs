@@ -3,8 +3,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using ExportPro.AuthService.Configuration;
+using ExportPro.Common.Models.MongoDB.Models;
 using ExportPro.Common.Shared.DTOs;
-using ExportPro.Common.Shared.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 

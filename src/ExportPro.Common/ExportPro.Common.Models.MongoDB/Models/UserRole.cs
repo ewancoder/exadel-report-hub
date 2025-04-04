@@ -1,4 +1,4 @@
-﻿namespace ExportPro.Common.Shared.Models;
+﻿namespace ExportPro.Common.Models.MongoDB.Models;
 
 public enum UserRole
 {

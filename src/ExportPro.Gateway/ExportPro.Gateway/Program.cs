@@ -1,5 +1,11 @@
+using ExportPro.AuthService.Commands;
 
-using MediatR;
+using ExportPro.AuthService.Repositories;
+using ExportPro.AuthService.Services;
+using ExportPro.Common.DataAccess.MongoDB.Contexts;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+using ExportPro.Common.DataAccess.MongoDB.Services;
+using ExportPro.Gateway.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +19,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddScoped<ExportProMongoContext>();
 
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly);
+});
 
 var app = builder.Build();
 
@@ -27,6 +37,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 
 app.Run();

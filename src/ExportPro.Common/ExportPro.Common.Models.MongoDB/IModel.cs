@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MongoDB.Bson;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-namespace ExportPro.Common.Models.MongoDB
+namespace ExportPro.Common.Models.MongoDB;
+
+public interface IModel
 {
-   public interface IModel
-    {
-        ObjectId Id { get; set; }
-    }
+    [BsonId]
+    ObjectId Id { get; set; }
 }

@@ -1,11 +1,9 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 
-namespace ExportPro.Common.Shared.Models;
+namespace ExportPro.Common.Models.MongoDB.Models;
 
-// TODO: Implement IModel, probably in 'ExportPro.Common.Shared'
-// public class User : IModel
-public class User
+public class User : IModel
 {
     [BsonId]
     public ObjectId Id { get; set; }
