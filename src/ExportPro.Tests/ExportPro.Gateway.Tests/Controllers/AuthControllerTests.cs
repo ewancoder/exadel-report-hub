@@ -16,6 +16,10 @@ public class AuthControllerTests
     private AuthController _controller;
     private IResponseCookies _mockCookies;
     private HttpResponse _mockHttpResponse;
+    private AuthResponseDto authResponse;
+    private UserRegisterDto _userRegisterDto;
+    private UserLoginDto _loginUserDto;
+
     [SetUp]
     public void Setup()
     {
@@ -30,24 +34,31 @@ public class AuthControllerTests
         {
             HttpContext = httpContext
         };
-    }
-    [Test]
-    public async Task Register_WhenRegisteringUser_ReturnsOk()
-    {
-        //Arrange
-        UserRegisterDto user = new()
+        _userRegisterDto = new UserRegisterDto
         {
             Username = "testuser",
-            Email = "testuser@example.com",
+            Email = "estUser2@example.com",
             Password = "password123"
+
         };
-        AuthResponseDto authResponse = new()
+        authResponse = new AuthResponseDto
         {
             RefreshToken = "mockRefreshToken",
             ExpiresAt = DateTime.UtcNow.AddDays(1),
             Token = "mockToken",
             Username = "testuser"
         };
+        _loginUserDto = new UserLoginDto
+        {
+            Email = "TestUser2@example.com",
+            Password = "TestUser2@example.com"
+        };
+
+    }
+    [Test]
+    public async Task Register_WhenUserIsValid_ReturnsOkAndSetsRefreshTokenCookie()
+    {
+        //Arrange
         BaseResponse<AuthResponseDto> response = new()
         {
             IsSuccess = true,
@@ -55,11 +66,12 @@ public class AuthControllerTests
             ApiState = HttpStatusCode.OK,
             Data = authResponse
         };
+
         _mediator.Send(Arg.Any<RegisterCommand>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(response));
 
         //Act
-        var result = await _controller.Register(user);
+        var result = await _controller.Register(_userRegisterDto);
         var okResult = result as ObjectResult;
 
         //Assert
@@ -72,38 +84,77 @@ public class AuthControllerTests
         ));
     }
     [Test]
-    public async Task Register_WhenRegisteringUser_ReturnsBadRequest()
+    public async Task Register_WhenUserIsNotValid_ReturnsBadRequest()
     {
         //Arrange
-        UserRegisterDto user = new()
-        {
-            Username = "testuser",
-            Email = "testuser@example.com",
-            Password = "password123"
-        };
-        AuthResponseDto authResponse = new()
-        {
-            RefreshToken = "mockRefreshToken",
-            ExpiresAt = DateTime.UtcNow.AddDays(1),
-            Token = "mockToken",
-            Username = "testuser"
-        };
         BaseResponse<AuthResponseDto> response = new()
         {
             IsSuccess = false,
-            Messages = ["User registered"],
+            Messages = ["User failed to register"],
             ApiState = HttpStatusCode.BadRequest,
-            Data = authResponse
+            Data = null
         };
         _mediator.Send(Arg.Any<RegisterCommand>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(response));
 
         //Act
-        var result = await _controller.Register(user);
+        var result = await _controller.Register(_userRegisterDto);
         var okResult = result as ObjectResult;
 
         //Assert
         Assert.That(okResult?.StatusCode, Is.EqualTo(400));
+        Assert.That(okResult?.Value, Is.EqualTo(response.Messages));
+    }
+    [Test]
+    public async Task Login_WhenUserIsValid_ReturnsOkAndSetsRefreshTokenCookie()
+    {
+        //Arrange
+        var response = new BaseResponse<AuthResponseDto>
+        {
+            IsSuccess = true,
+            Messages = ["Login successful"],
+            ApiState = HttpStatusCode.OK,
+            Data = authResponse
+        };
+
+        _mediator.Send(Arg.Any<LoginCommand>(), Arg.Any<CancellationToken>())
+                 .Returns(Task.FromResult(response));
+
+        //Act
+        var result = await _controller.Login(_loginUserDto);
+        var okResult = result as ObjectResult;
+
+        //Assert
+        Assert.That(okResult?.StatusCode, Is.EqualTo(200));
+        Assert.That(okResult?.Value, Is.EqualTo(authResponse));
+
+        _mockCookies.Received(1).Append("refreshToken", "mockRefreshToken", Arg.Is<CookieOptions>(options =>
+            options.HttpOnly == true &&
+            options.Secure == true &&
+            options.Expires == authResponse.ExpiresAt
+        ));
+    }
+    [Test]
+    public async Task Login_WhenUserIsNotValid_ReturnsUnauthorized()
+    {
+        //Arrange
+        var response = new BaseResponse<AuthResponseDto>
+        {
+            IsSuccess = false,
+            Messages = ["Login Failed"],
+            ApiState = HttpStatusCode.BadRequest,
+            Data = null
+        };
+
+        _mediator.Send(Arg.Any<LoginCommand>(), Arg.Any<CancellationToken>())
+                 .Returns(Task.FromResult(response));
+
+        //Act
+        var result = await _controller.Login(_loginUserDto);
+        var okResult = result as ObjectResult;
+
+        //Assert
+        Assert.That(okResult?.StatusCode, Is.EqualTo(401));
         Assert.That(okResult?.Value, Is.EqualTo(response.Messages));
     }
 }
