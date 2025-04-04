@@ -1,28 +1,41 @@
+using ExportPro.AuthService.Commands;
 
-using MediatR;
+using ExportPro.AuthService.Repositories;
+using ExportPro.AuthService.Services;
+using ExportPro.Common.DataAccess.MongoDB.Contexts;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+using ExportPro.Common.DataAccess.MongoDB.Services;
+using ExportPro.Gateway.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSwaggerServices();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
+builder.Services.AddScoped<ExportProMongoContext>();
 
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly);
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 
 app.Run();
