@@ -30,6 +30,10 @@ public class AuthControllerTests
         _controller = new AuthController(_mediator);
         var httpContext = Substitute.For<HttpContext>();
         httpContext.Response.Returns(_mockHttpResponse);
+        var mockRequestCookies = Substitute.For<IRequestCookieCollection>();
+        mockRequestCookies.TryGetValue("refreshToken", out Arg.Any<string>())
+                          .Returns(x => { x[1] = "refreshToken"; return true; });
+        httpContext.Request.Cookies.Returns(mockRequestCookies);
         _controller.ControllerContext = new ControllerContext
         {
             HttpContext = httpContext
@@ -37,7 +41,7 @@ public class AuthControllerTests
         _userRegisterDto = new UserRegisterDto
         {
             Username = "testuser",
-            Email = "estUser2@example.com",
+            Email = "TestUser2@example.com",
             Password = "password123"
 
         };
@@ -72,11 +76,11 @@ public class AuthControllerTests
 
         //Act
         var result = await _controller.Register(_userRegisterDto);
-        var okResult = result as ObjectResult;
+        var objectResult = result as ObjectResult;
 
         //Assert
-        Assert.That(okResult?.StatusCode, Is.EqualTo(200));
-        Assert.That(okResult?.Value, Is.EqualTo(authResponse));
+        Assert.That(objectResult?.StatusCode, Is.EqualTo(200));
+        Assert.That(objectResult?.Value, Is.EqualTo(authResponse));
         _mockCookies.Received(1).Append("refreshToken", "mockRefreshToken", Arg.Is<CookieOptions>(options =>
             options.HttpOnly == true &&
             options.Secure == true &&
@@ -99,11 +103,11 @@ public class AuthControllerTests
 
         //Act
         var result = await _controller.Register(_userRegisterDto);
-        var okResult = result as ObjectResult;
+        var objectResult = result as ObjectResult;
 
         //Assert
-        Assert.That(okResult?.StatusCode, Is.EqualTo(400));
-        Assert.That(okResult?.Value, Is.EqualTo(response.Messages));
+        Assert.That(objectResult?.StatusCode, Is.EqualTo(400));
+        Assert.That(objectResult?.Value, Is.EqualTo(response.Messages));
     }
     [Test]
     public async Task Login_WhenUserIsValid_ReturnsOkAndSetsRefreshTokenCookie()
@@ -122,11 +126,11 @@ public class AuthControllerTests
 
         //Act
         var result = await _controller.Login(_loginUserDto);
-        var okResult = result as ObjectResult;
+        var objectResult = result as ObjectResult;
 
         //Assert
-        Assert.That(okResult?.StatusCode, Is.EqualTo(200));
-        Assert.That(okResult?.Value, Is.EqualTo(authResponse));
+        Assert.That(objectResult?.StatusCode, Is.EqualTo(200));
+        Assert.That(objectResult?.Value, Is.EqualTo(authResponse));
 
         _mockCookies.Received(1).Append("refreshToken", "mockRefreshToken", Arg.Is<CookieOptions>(options =>
             options.HttpOnly == true &&
@@ -142,7 +146,7 @@ public class AuthControllerTests
         {
             IsSuccess = false,
             Messages = ["Login Failed"],
-            ApiState = HttpStatusCode.BadRequest,
+            ApiState = HttpStatusCode.Unauthorized,
             Data = null
         };
 
@@ -151,10 +155,23 @@ public class AuthControllerTests
 
         //Act
         var result = await _controller.Login(_loginUserDto);
-        var okResult = result as ObjectResult;
+        var objectResult = result as ObjectResult;
 
         //Assert
-        Assert.That(okResult?.StatusCode, Is.EqualTo(401));
-        Assert.That(okResult?.Value, Is.EqualTo(response.Messages));
+        Assert.That(objectResult?.StatusCode, Is.EqualTo(401));
+        Assert.That(objectResult?.Value, Is.EqualTo(response.Messages));
+    }
+    [Test]
+    public async Task Logout_WhenRefreshTokenExists_ReturnsOkAndDeletesRefreshTokens()
+    {
+        //Act
+        var result = await _controller.Logout();
+        var objectResult = result as ObjectResult;
+       
+        //Assert
+        Assert.That(objectResult?.StatusCode, Is.EqualTo(200));
+        Assert.That(objectResult?.Value, Is.EqualTo("Logged out successfully."));
+        await _mediator.Received(1).Send(Arg.Any<LogoutCommand>(), Arg.Any<CancellationToken>());
+        _mockCookies.Received(1).Delete("refreshToken");
     }
 }
