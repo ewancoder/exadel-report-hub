@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using ExportPro.AuthService.Configuration;
 using ExportPro.AuthService.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,32 +38,41 @@ public static class AuthenticationExtensions
             {
                 OnTokenValidated = async context =>
                 {
-                    try
+                    var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+
+                    var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier);
+                    var tokenVersionClaim = context.Principal?.FindFirst("tokenVersion");
+
+                    if (userIdClaim == null || tokenVersionClaim == null)
                     {
-                        var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-
-                        var userIdClaim = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                        var tokenVersionClaim = context.Principal?.FindFirst("tokenVersion");
-
-                        if (userIdClaim != null && tokenVersionClaim != null)
-                        {
-                            var userId = new ObjectId(userIdClaim.Value);
-                            var tokenVersion = int.Parse(tokenVersionClaim.Value);
-
-                            var user = await userRepository.GetByIdAsync(userId);
-
-                            if (user == null || user.TokenVersion != tokenVersion)
-                            {
-                                context.Fail("Token is no longer valid");
-                            }
-                        }
+                        context.Fail("Missing claims");
+                        return;
                     }
-                    catch (Exception ex)
+
+                    var userId = new ObjectId(userIdClaim.Value);
+                    var tokenVersion = int.Parse(tokenVersionClaim.Value);
+                    var user = await userRepository.GetByIdAsync(userId);
+
+                    if (user == null)
                     {
-                        context.Fail($"Token validation failed: {ex.Message}");
+                        context.Fail("User not found");
+                        return;
+                    }
+
+                    if (!context.HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+                    {
+                        context.Fail("Refresh token missing");
+                        return;
+                    }
+
+                    var token = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
+                    if (token == null || token.TokenVersion != tokenVersion)
+                    {
+                        context.Fail("Token version mismatch");
                     }
                 }
             };
+
         });
 
         return services;

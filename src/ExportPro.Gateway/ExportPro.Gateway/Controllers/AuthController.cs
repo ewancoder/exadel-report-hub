@@ -1,6 +1,5 @@
 ﻿using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.DTOs;
-using ExportPro.Common.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -9,10 +8,9 @@ namespace ExportPro.Gateway.Controllers;
 [Produces("application/json")]
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IAuthService authService, IJwtTokenService jwtTokenService) : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
-    private readonly IJwtTokenService _jwtTokenService = jwtTokenService;
 
     [HttpPost("register")]
     [SwaggerOperation(
@@ -22,25 +20,18 @@ public class AuthController(IAuthService authService, IJwtTokenService jwtTokenS
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(409)]
-    public async Task<ActionResult<AuthResponseDto>> Register([FromBody] UserRegisterDto registerDto)
+    public async Task<ActionResult<AuthResponseDto>> Register([FromBody] UserRegisterDto dto)
     {
-        var existingUser = await _authService.GetUserByUsernameAsync(registerDto.Username);
-
-        if (existingUser != null)
+        try
         {
-            return Conflict("Username is already taken");
+            var result = await _authService.RegisterAsync(dto);
+            SetRefreshTokenCookie(result);
+            return Ok(result);
         }
-
-        User user = new()
+        catch (InvalidOperationException ex)
         {
-            Username = registerDto.Username,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-            Role = UserRole.User
-        };
-
-        user = await _authService.CreateUserAsync(user);
-
-        return Ok(await _authService.GenerateTokenAndSetRefreshTokenAsync(user, HttpContext));
+            return Conflict(ex.Message);
+        }
     }
 
     [HttpPost("login")]
@@ -51,23 +42,11 @@ public class AuthController(IAuthService authService, IJwtTokenService jwtTokenS
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(401)]
-    public async Task<ActionResult<AuthResponseDto>> Login([FromBody] UserLoginDto loginDto)
+    public async Task<ActionResult<AuthResponseDto>> Login([FromBody] UserLoginDto dto)
     {
-        User? user = await _authService.GetUserByUsernameAsync(loginDto.Username);
-
-        if (user == null)
-        {
-            return Unauthorized("Invalid username or password.");
-        }
-
-        bool isValidPassword = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
-
-        if (!isValidPassword)
-        {
-            return Unauthorized("Invalid username or password.");
-        }
-
-        return Ok(await _authService.GenerateTokenAndSetRefreshTokenAsync(user, HttpContext));
+        var result = await _authService.LoginAsync(dto);
+        SetRefreshTokenCookie(result);
+        return Ok(result);
     }
 
     [HttpPost("refresh-token")]
@@ -77,49 +56,35 @@ public class AuthController(IAuthService authService, IJwtTokenService jwtTokenS
     )]
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
     [ProducesResponseType(401)]
-    public async Task<IActionResult> RefreshToken()
+    public async Task<ActionResult<AuthResponseDto>> RefreshToken()
     {
-        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
-        {
+        if (!Request.Cookies.TryGetValue("refreshToken", out var token))
             return Unauthorized("Refresh token is missing.");
-        }
 
-        User? user = await _authService.GetUserByRefreshTokenAsync(refreshToken);
-
-        if (user == null)
-        {
-            return Unauthorized("Invalid refresh token.");
-        }
-
-        RefreshToken? refreshTokenObject = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
-
-        if (refreshTokenObject == null || refreshTokenObject.ExpiresAt <= DateTime.UtcNow)
-        {
-            return Unauthorized("Expired refresh token.");
-        }
-
-        return Ok(await _authService.GenerateTokenAndSetRefreshTokenAsync(user, HttpContext));
+        var result = await _authService.RefreshTokenAsync(token);
+        SetRefreshTokenCookie(result);
+        return Ok(result);
     }
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+        if (Request.Cookies.TryGetValue("refreshToken", out var token))
         {
-            return Ok("User is already logged out.");
+            await _authService.LogoutAsync(token);
+            Response.Cookies.Delete("refreshToken");
         }
-
-        var user = await _authService.GetUserByRefreshTokenAsync(refreshToken);
-
-        if (user != null)
-        {
-            user.TokenVersion += 1;
-            user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
-            await _authService.UpdateUserAsync(user);
-        }
-
-        Response.Cookies.Delete("refreshToken");
 
         return Ok("Logged out successfully.");
+    }
+
+    private void SetRefreshTokenCookie(AuthResponseDto authResponse)
+    {
+        Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            Expires = authResponse.ExpiresAt
+        });
     }
 }

@@ -5,9 +5,26 @@ using MongoDB.Driver;
 
 namespace ExportPro.AuthService.Repositories;
 
-public class UserRepository(ExportProMongoContext context) : IUserRepository
+public class UserRepository : IUserRepository
 {
-    private readonly IMongoCollection<User> _users = context.Database.GetCollection<User>("Users");
+    private readonly IMongoCollection<User> _users;
+
+    public UserRepository(ExportProMongoContext context)
+    {
+        _users = context.Database.GetCollection<User>("Users");
+        EnsureEmailUniqueness();
+    }
+
+    /// <summary>
+    /// Ensures that the email field in the User collection is unique by creating a unique index on it.
+    /// </summary>
+    private void EnsureEmailUniqueness()
+    {
+        var indexKeys = Builders<User>.IndexKeys.Ascending(u => u.Email);
+        var indexOptions = new CreateIndexOptions { Unique = true };
+        var indexModel = new CreateIndexModel<User>(indexKeys, indexOptions);
+        _users.Indexes.CreateOne(indexModel);
+    }
 
     /// <summary>
     /// Retrieves a user by their username.
@@ -20,6 +37,16 @@ public class UserRepository(ExportProMongoContext context) : IUserRepository
     }
 
     /// <summary>
+    /// Retrieves a user by their email.
+    /// </summary>
+    /// <param name="email">The email of the user to retrieve.</param>
+    /// <returns>The user, or null if not found.</returns>
+    public async Task<User?> GetByEmailAsync(string email)
+    {
+        return await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
+    }
+
+    /// <summary>
     /// Retrieves a user by their refresh token.
     /// </summary>
     /// <param name="refreshToken">The refresh token used to find the user.</param>
@@ -27,8 +54,7 @@ public class UserRepository(ExportProMongoContext context) : IUserRepository
     public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
     {
         return await _users
-            .Find(u => u.RefreshTokens
-                .Any(rt => rt.Token == refreshToken))
+            .Find(u => u.RefreshTokens.Any(rt => rt.Token == refreshToken))
             .FirstOrDefaultAsync();
     }
 

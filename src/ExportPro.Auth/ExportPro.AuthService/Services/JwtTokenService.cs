@@ -19,18 +19,10 @@ public class JwtTokenService(IOptions<JwtSettings> jwtOptions) : IJwtTokenServic
     /// </summary>
     /// <param name="user">The user to generate the token for.</param>
     /// <returns>A response containing the generated token, the user's username, and the token's expiration date.</returns>
-    public AuthResponseDto GenerateToken(User user)
+    public AuthResponseDto GenerateToken(User user, List<Claim> claims)
     {
         var expiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes);
         var key = Encoding.UTF8.GetBytes(_jwtSettings.Secret);
-
-        List<Claim> claims =
-        [
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, user.Role.ToString()),
-            new Claim("tokenVersion", user.TokenVersion.ToString())
-        ];
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
