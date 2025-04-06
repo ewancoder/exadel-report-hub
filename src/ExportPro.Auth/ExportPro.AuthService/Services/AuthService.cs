@@ -108,7 +108,6 @@ public class AuthService(
     private async Task<AuthResponseDto> GenerateTokenAndSetRefreshToken(User user)
     {
         user.RefreshTokens.RemoveAll(rt => rt.ExpiresAt <= DateTime.UtcNow);
-
         var newRefreshTokenValue = _jwtTokenService.GenerateRefreshToken();
         var tokenVersion = 0;
 
@@ -131,14 +130,14 @@ public class AuthService(
             new ("tokenVersion", tokenVersion.ToString())
         ];
 
-        var token = _jwtTokenService.GenerateToken(user, claims);
+        var accessToken = _jwtTokenService.GenerateAccessToken(user, claims);
 
         return new AuthResponseDto
         {
-            Token = token.Token,
+            AccessToken = accessToken.AccessToken,
+            RefreshToken = newRefreshTokenValue,
             Username = user.Username,
-            ExpiresAt = token.ExpiresAt,
-            RefreshToken = newRefreshTokenValue
+            ExpiresAt = accessToken.ExpiresAt,
         };
     }
 }

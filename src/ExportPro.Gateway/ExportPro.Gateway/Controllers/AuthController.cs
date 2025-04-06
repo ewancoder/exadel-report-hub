@@ -23,7 +23,7 @@ public class AuthController(IMediator mediator) : ControllerBase
             return BadRequest(response.Messages);
 
         SetRefreshTokenCookie(response.Data);
-        return Ok(response.Data);
+        return Ok("Registered successfully");
     }
 
     [HttpPost("login")]

@@ -6,6 +6,6 @@ namespace ExportPro.AuthService.Services;
 
 public interface IJwtTokenService
 {
-    AuthResponseDto GenerateToken(User user, List<Claim> claims);
+    AuthResponseDto GenerateAccessToken(User user, List<Claim> claims);
     string GenerateRefreshToken();
 }
