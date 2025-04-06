@@ -10,19 +10,7 @@ public class LoginCommandHandler(IAuthService authService)
 {
     public async Task<BaseResponse<AuthResponseDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await authService.LoginAsync(request.LoginDto);
-            return new SuccessResponse<AuthResponseDto>(result);
-        }
-        catch (Exception ex)
-        {
-            return new BaseResponse<AuthResponseDto>
-            {
-                IsSuccess = false,
-                ApiState = System.Net.HttpStatusCode.Unauthorized,
-                Messages = [ex.Message]
-            };
-        }
+        var result = await authService.LoginAsync(request.LoginDto);
+        return new SuccessResponse<AuthResponseDto>(result);
     }
 }

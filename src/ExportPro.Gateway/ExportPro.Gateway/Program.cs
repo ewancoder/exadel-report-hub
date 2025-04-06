@@ -5,6 +5,7 @@ using ExportPro.AuthService.Services;
 using ExportPro.Common.DataAccess.MongoDB.Contexts;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
+using ExportPro.Common.Shared.Middlewares;
 using ExportPro.Gateway.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

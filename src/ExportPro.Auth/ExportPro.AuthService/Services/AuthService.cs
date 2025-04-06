@@ -3,6 +3,7 @@ using ExportPro.AuthService.Configuration;
 using ExportPro.AuthService.Repositories;
 using ExportPro.Common.Models.MongoDB.Models;
 using ExportPro.Common.Shared.DTOs;
+using ExportPro.Common.Shared.Exceptions;
 using Microsoft.Extensions.Options;
 
 namespace ExportPro.AuthService.Services;
@@ -25,9 +26,10 @@ public class AuthService(
     public async Task<AuthResponseDto> RegisterAsync(UserRegisterDto dto)
     {
         var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
+
         if (existingUser != null)
         {
-            throw new InvalidOperationException("Email is already registered");
+            throw new EmailAlreadyExistsException();
         }
 
         var user = new User
