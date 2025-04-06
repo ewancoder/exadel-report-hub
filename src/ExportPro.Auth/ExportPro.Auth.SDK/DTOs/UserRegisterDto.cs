@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace ExportPro.Common.Shared.DTOs;
+namespace ExportPro.Auth.SDK.DTOs;
 
 public class UserRegisterDto
 {

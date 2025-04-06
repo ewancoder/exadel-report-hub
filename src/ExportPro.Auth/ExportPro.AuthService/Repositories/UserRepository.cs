@@ -1,6 +1,5 @@
-﻿using ExportPro.Common.DataAccess.MongoDB.Contexts;
-using ExportPro.Common.Models.MongoDB.Models;
-//using ExportPro.Common.Shared.Models;
+﻿using ExportPro.Auth.SDK.Models;
+using ExportPro.Common.DataAccess.MongoDB.Contexts;
 using MongoDB.Bson;
 using MongoDB.Driver;
 

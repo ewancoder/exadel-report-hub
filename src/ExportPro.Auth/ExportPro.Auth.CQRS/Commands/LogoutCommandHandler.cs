@@ -3,7 +3,7 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using MediatR;
 
-namespace ExportPro.AuthService.Commands;
+namespace ExportPro.Auth.CQRS.Commands;
 
 public record LogoutCommand(string RefreshToken) : ICommand;
 

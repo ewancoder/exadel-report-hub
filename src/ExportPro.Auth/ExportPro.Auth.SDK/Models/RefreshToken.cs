@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace ExportPro.Common.Models.MongoDB.Models;
+namespace ExportPro.Auth.SDK.Models;
 
 [BsonIgnoreExtraElements]
 public class RefreshToken

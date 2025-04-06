@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ExportPro.Gateway.Controllers;
+namespace ExportPro.Auth.ServiceHost.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

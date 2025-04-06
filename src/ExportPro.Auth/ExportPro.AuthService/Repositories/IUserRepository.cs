@@ -1,4 +1,4 @@
-﻿using ExportPro.Common.Models.MongoDB.Models;
+﻿using ExportPro.Auth.SDK.Models;
 using MongoDB.Bson;
 
 namespace ExportPro.AuthService.Repositories;

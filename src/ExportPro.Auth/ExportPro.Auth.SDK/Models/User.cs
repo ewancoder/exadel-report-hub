@@ -1,7 +1,8 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using ExportPro.Common.Models.MongoDB;
 
-namespace ExportPro.Common.Models.MongoDB.Models;
+namespace ExportPro.Auth.SDK.Models;
 
 public class User : IModel
 {

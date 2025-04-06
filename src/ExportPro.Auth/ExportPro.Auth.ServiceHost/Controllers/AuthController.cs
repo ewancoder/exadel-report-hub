@@ -1,10 +1,10 @@
-﻿using ExportPro.AuthService.Commands;
-using ExportPro.Common.Shared.DTOs;
+﻿using ExportPro.Auth.CQRS.Commands;
+using ExportPro.Auth.SDK.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace ExportPro.Gateway.Controllers;
+namespace ExportPro.Auth.ServiceHost.Controllers;
 
 [Produces("application/json")]
 [ApiController]

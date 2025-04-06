@@ -1,9 +1,9 @@
-﻿using ExportPro.AuthService.Services;
-using ExportPro.Common.Shared.DTOs;
+﻿using ExportPro.Auth.SDK.DTOs;
+using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 
-namespace ExportPro.AuthService.Commands;
+namespace ExportPro.Auth.CQRS.Commands;
 
 public record RegisterCommand(UserRegisterDto RegisterDto) : ICommand<AuthResponseDto>;
 

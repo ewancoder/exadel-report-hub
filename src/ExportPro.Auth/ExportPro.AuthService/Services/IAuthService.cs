@@ -1,4 +1,4 @@
-﻿using ExportPro.Common.Shared.DTOs;
+﻿using ExportPro.Auth.SDK.DTOs;
 
 namespace ExportPro.AuthService.Services;
 

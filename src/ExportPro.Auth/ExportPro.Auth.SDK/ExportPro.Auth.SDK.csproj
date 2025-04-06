@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Models.MongoDB\ExportPro.Common.Models.MongoDB.csproj" />
+  </ItemGroup>
+
+</Project>

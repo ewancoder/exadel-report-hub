@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
-using ExportPro.Common.Models.MongoDB.Models;
-using ExportPro.Common.Shared.DTOs;
+using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Auth.SDK.Models;
 
 namespace ExportPro.AuthService.Services;
 

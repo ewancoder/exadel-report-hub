@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
 
-namespace ExportPro.Gateway.Extensions;
+namespace ExportPro.Auth.ServiceHost.Extensions;
 
 public static class AuthenticationExtensions
 {

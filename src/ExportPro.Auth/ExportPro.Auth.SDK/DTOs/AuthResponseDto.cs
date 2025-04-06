@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ExportPro.Common.Shared.DTOs;
+namespace ExportPro.Auth.SDK.DTOs;
 
 public class AuthResponseDto
 {

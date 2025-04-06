@@ -14,6 +14,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.DataAccess.MongoDB\ExportPro.Common.DataAccess.MongoDB.csproj" />
+		<ProjectReference Include="..\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj" />
 	</ItemGroup>
 
 </Project>

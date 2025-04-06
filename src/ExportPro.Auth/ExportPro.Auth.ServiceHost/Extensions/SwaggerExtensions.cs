@@ -1,7 +1,7 @@
 ﻿using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
-namespace ExportPro.Gateway.Extensions;
+namespace ExportPro.Auth.ServiceHost.Extensions;
 
 public static class SwaggerExtensions
 {
