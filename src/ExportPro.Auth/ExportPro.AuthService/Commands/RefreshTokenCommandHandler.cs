@@ -5,6 +5,8 @@ using ExportPro.Common.Shared.Mediator;
 
 namespace ExportPro.AuthService.Commands;
 
+public record RefreshTokenCommand(string RefreshToken) : ICommand<AuthResponseDto>;
+
 public class RefreshTokenCommandHandler(IAuthService authService)
     : ICommandHandler<RefreshTokenCommand, AuthResponseDto>
 {
