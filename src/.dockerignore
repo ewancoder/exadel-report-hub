@@ -1,8 +1,0 @@
-.gitignore
-.gitattributes
-init-db.sql
-README.md
-.vs
-.config
-.csharpierrc
-ExportPro.Tests

@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   mongodb:
     container_name: ExportProDb
@@ -8,8 +7,7 @@ services:
     
   exportpro:
     container_name: ExportPro
-    build: 
-      context: .
+    image: giorgaaa/exadel-export-pro:latest
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDbDocker=mongodb://ExportProDb:27017
