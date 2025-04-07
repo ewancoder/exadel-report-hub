@@ -5,29 +5,38 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 
 namespace ExportPro.Common.DataAccess.MongoDB.Repository;
-public abstract class Repository<TDocument> : IRepository<TDocument> where TDocument : IModel
+public abstract class MongoRepositoryBase<TDocument> : IRepository<TDocument> where TDocument : IModel
 {
-    protected readonly IMongoCollection<TDocument> _collection;
+    private readonly ICollectionProvider _collectionProvider;
+    private readonly Lazy<IMongoCollection<TDocument>> _collectionAccessor;
+    private readonly FilterDefinitionBuilder<TDocument> _fdb;
 
-    protected Repository(IMongoDbConnectionFactory connectionFactory, string collectionName)
+    protected MongoRepositoryBase(ICollectionProvider collectionProvider)
     {
-        _collection = connectionFactory.GetDatabase().GetCollection<TDocument>(collectionName);
+        _collectionProvider = collectionProvider ?? throw new ArgumentNullException(nameof(collectionProvider));
+        _collectionAccessor = new Lazy<IMongoCollection<TDocument>>(
+            () => _collectionProvider.GetCollection<TDocument>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+
+        _fdb = new FilterDefinitionBuilder<TDocument>();
     }
+
+    protected virtual IMongoCollection<TDocument> Collection => _collectionAccessor.Value;
 
     public virtual async Task AddOneAsync(TDocument entity, CancellationToken cancellationToken)
     {
-        await _collection.InsertOneAsync(entity, cancellationToken: cancellationToken);
+        await Collection.InsertOneAsync(entity, cancellationToken: cancellationToken);
     }
 
     public virtual async Task AddManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken)
     {
-        await _collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
+        await Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
     }
 
     public virtual async Task UpdateOneAsync(TDocument entity, CancellationToken cancellationToken)
     {
-        var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, entity.Id);
-        await _collection.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
+        var filter = _fdb.Eq(doc => doc.Id, entity.Id);
+        await Collection.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
     }
 
     public virtual async Task UpdateManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken)
@@ -40,12 +49,25 @@ public abstract class Repository<TDocument> : IRepository<TDocument> where TDocu
 
     public virtual async Task<TDocument> GetByIdAsync(ObjectId id, CancellationToken cancellationToken)
     {
-        var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, id);
-        return await _collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        var filter = _fdb.Eq(doc => doc.Id, id);
+        return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
 
     public virtual async Task<TDocument> GetOneAsync(Expression<Func<TDocument, bool>> filter, CancellationToken cancellationToken)
     {
-        return await _collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public virtual async Task DeleteAsync(ObjectId id, CancellationToken cancellationToken)
+    {
+        var filter = _fdb.Eq(doc => doc.Id, id);
+        await Collection.DeleteOneAsync(filter, cancellationToken);
+    }
+
+    public virtual async Task SoftDeleteAsync(ObjectId id, CancellationToken cancellationToken)
+    {
+        var filter = _fdb.Eq(doc => doc.Id, id);
+        var update = Builders<TDocument>.Update.Set("IsDeleted", true);
+        await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
     }
 }

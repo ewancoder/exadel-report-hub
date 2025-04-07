@@ -7,6 +7,8 @@ namespace ExportPro.Common.DataAccess.MongoDB.Interfaces;
 public interface IRepository<TDocument> where TDocument : IModel
 {
     public Task AddOneAsync(TDocument entity, CancellationToken cancellationToken);
+    public Task DeleteAsync(ObjectId id, CancellationToken cancellationToken);
+    public Task SoftDeleteAsync(ObjectId id, CancellationToken cancellationToken);
     public Task AddManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken);
     public Task UpdateOneAsync(TDocument entity, CancellationToken cancellationToken);
     public Task UpdateManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken);
