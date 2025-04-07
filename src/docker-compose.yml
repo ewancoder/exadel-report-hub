@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  mongodb:
+    container_name: ExportProDb
+    image: mongo
+    ports:
+    - "27017:27017"
+    
+  exportpro:
+    container_name: ExportPro
+    build: 
+      context: .
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=mongodb://ExportProDb:27017
+    ports:
+      - "100:8080"
+      - "5000:8080"
+    depends_on:
+      - mongodb

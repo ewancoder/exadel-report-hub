@@ -19,11 +19,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Common.Shared", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.CQRS", "ExportPro.Export\ExportPro.Export.CQRS\ExportPro.Export.CQRS.csproj", "{59E05E5B-466C-45E3-A6D0-F00890D660B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.CSV", "ExportPro.Export\ExportPro.Export.CSV\ExportPro.Export.CSV.csproj", "{40834649-7C12-4623-ACF1-4B92FBA24C08}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.Csv", "ExportPro.Export\ExportPro.Export.Csv\ExportPro.Export.Csv.csproj", "{40834649-7C12-4623-ACF1-4B92FBA24C08}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.Excel", "ExportPro.Export\ExportPro.Export.Excel\ExportPro.Export.Excel.csproj", "{101C4DF7-B02A-4E29-AE02-A5C0E4B542C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.PDF", "ExportPro.Export\ExportPro.Export.PDF\ExportPro.Export.PDF.csproj", "{CA06E1EC-465C-4838-8470-5593E359B4FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.Pdf", "ExportPro.Export\ExportPro.Export.Pdf\ExportPro.Export.Pdf.csproj", "{CA06E1EC-465C-4838-8470-5593E359B4FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.SDK", "ExportPro.Export\ExportPro.Export.SDK\ExportPro.Export.SDK.csproj", "{AF59CBDF-F8F8-4912-81C7-423F655FCC52}"
 EndProject
