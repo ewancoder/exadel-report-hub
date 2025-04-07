@@ -10,6 +10,7 @@ public static class Configuration
     public static void AddCommonRegistrations(this IServiceCollection services)
     {
         services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
+        services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
         services.AddScoped<ExportProMongoContext>();
     }
 }
