@@ -1,5 +1,6 @@
 ﻿using ExportPro.Auth.SDK.Models;
 using ExportPro.Common.DataAccess.MongoDB.Contexts;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -9,9 +10,9 @@ public class UserRepository : IUserRepository
 {
     private readonly IMongoCollection<User> _users;
 
-    public UserRepository(ExportProMongoContext context)
+    public UserRepository(ExportProMongoContext context, IMongoDbConnectionFactory mongoDbConnectionFactory)
     {
-        _users = context.Database.GetCollection<User>("Users");
+        _users = mongoDbConnectionFactory.GetDatabase().GetCollection<User>("Users");
         EnsureEmailUniqueness();
     }
 
