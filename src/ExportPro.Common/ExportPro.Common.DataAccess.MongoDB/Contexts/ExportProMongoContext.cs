@@ -5,16 +5,5 @@ namespace ExportPro.Common.DataAccess.MongoDB.Contexts;
 
 public class ExportProMongoContext(IMongoDbConnectionFactory connectionFactory)
 {
-    private readonly IMongoDatabase _database;
-
-    public ExportProMongoContext(IMongoDbConnectionFactory connectionFactory)
-    {
-        _database = connectionFactory.GetDatabase();
-    }
-
-    public IMongoDatabase Database => _database;
-
-    // Collections
-    //public IMongoCollection<Invoice> Invoices => _database.GetCollection<Invoice>("Invoices");
-    // Add other collections as needed
+    private readonly IMongoDatabase _database = connectionFactory.GetDatabase();
 }
