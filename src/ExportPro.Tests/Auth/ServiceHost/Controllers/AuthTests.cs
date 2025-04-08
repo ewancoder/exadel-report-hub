@@ -62,8 +62,8 @@ public class AuthTests
     {
         _mediator = Substitute.For<IMediator>();
         _authController = new AuthController(_mediator);
-        SettingHttpContext();
         SettingDtos();
+        SettingHttpContext();
     }
     [Test]
     public async Task Register_WhenUserIsValid_ReturnsOkAndSetsRefreshTokenCookie()
@@ -76,7 +76,7 @@ public class AuthTests
             ApiState = HttpStatusCode.OK,
             Data = _authResponseDto
         };
-        _mediator.Send(Arg.Any<RegisterCommand>(), Arg.Any<CancellationToken>())
+        _mediator.Send(Arg.Is<RegisterCommand>(obj=>obj.RegisterDto.Equals(_registerDto)), Arg.Any<CancellationToken>())
             .Returns(response);
         //Act
         var result = await _authController.Register(_registerDto);
@@ -101,7 +101,7 @@ public class AuthTests
             ApiState = HttpStatusCode.BadRequest,
             Data = null
         };
-        _mediator.Send(Arg.Any<RegisterCommand>(), Arg.Any<CancellationToken>())
+        _mediator.Send(Arg.Is<RegisterCommand>(obj=>obj.RegisterDto.Equals(_registerDto)), Arg.Any<CancellationToken>())
          .Returns(Task.FromResult(response));
         //Act
         var result = await _authController.Register(_registerDto);
@@ -123,7 +123,7 @@ public class AuthTests
             Data = _authResponseDto
         };
 
-        _mediator.Send(Arg.Any<LoginCommand>(), Arg.Any<CancellationToken>())
+        _mediator.Send(Arg.Is<LoginCommand>(obj=>obj.LoginDto.Equals(_loginDto)), Arg.Any<CancellationToken>())
                  .Returns(Task.FromResult(response));
 
         //Act
@@ -151,10 +151,11 @@ public class AuthTests
             ApiState = HttpStatusCode.Unauthorized,
             Data = null
         };
-
-        _mediator.Send(Arg.Any<LoginCommand>(), Arg.Any<CancellationToken>())
+        //
+        _mediator.Send(Arg.Is<LoginCommand>(obj=> obj.LoginDto.Equals(_loginDto)), Arg.Any<CancellationToken>())
                  .Returns(Task.FromResult(response));
-
+        _mediator.Send(Arg.Is<LoginCommand>(obj=>obj.LoginDto.Email==_loginDto.Email && obj.LoginDto.Password==_loginDto.Password ), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(response));
         //Act
         var result = await _authController.Login(_loginDto);
         var objectResult = result as ObjectResult;
@@ -171,7 +172,7 @@ public class AuthTests
         var objectResult = result as ObjectResult;
 
         //Assert
-        await _mediator.Received(1).Send(Arg.Any<LogoutCommand>(), Arg.Any<CancellationToken>());
+        await _mediator.Received(1).Send(Arg.Is<LogoutCommand>(obj=>obj.RefreshToken is string), Arg.Any<CancellationToken>());
         _mockResponseCookies.Received(1).Delete("refreshToken");
         Assert.That(objectResult?.StatusCode, Is.EqualTo(200));
         Assert.That(objectResult?.Value, Is.EqualTo("Logged out successfully."));
