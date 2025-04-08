@@ -3,10 +3,10 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ExportPro.Common.Models.MongoDB.Models;
 
-public class Invoice
+public class Invoice:IModel
 {
     [BsonId]
-    public ObjectId InvoceId { get; set; }
+    public ObjectId Id { get; set; }
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; } 
     public decimal Amount { get; set; }

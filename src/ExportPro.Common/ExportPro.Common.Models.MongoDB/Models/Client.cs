@@ -3,10 +3,10 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ExportPro.Common.Models.MongoDB.Models;
 
-public class Client
+public class Client:IModel
 {
     [BsonId]
-    public ObjectId ClientId { get; set; } 
+    public ObjectId Id { get; set; } 
     public string Name { get; set; }
     public ICollection<ObjectId> InvoiceIds { get; set; }
 }
