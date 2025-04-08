@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Http;
 using ExportPro.Auth.CQRS.Commands;
 using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.ServiceHost.Controllers;
