@@ -36,7 +36,7 @@ public class AuthService(
             Username = dto.Username,
             Email = dto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = UserRole.User
+            Roles = [UserRole.User]
         };
 
         user = await _userRepository.CreateAsync(user);
@@ -127,9 +127,13 @@ public class AuthService(
         [
             new (ClaimTypes.NameIdentifier, user.Id.ToString()),
             new (ClaimTypes.Name, user.Username),
-            new (ClaimTypes.Role, user.Role.ToString()),
             new ("tokenVersion", tokenVersion.ToString())
         ];
+
+        foreach (var role in user.Roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+        }
 
         var accessToken = _jwtTokenService.GenerateAccessToken(user, claims);
 

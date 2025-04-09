@@ -4,7 +4,8 @@ services:
     image: mongo
     ports:
     - "27017:27017"
-    
+    volumes:
+     - /data/db    
   exportpro:
     container_name: ExportPro
     image: giorgaaa/exadel-export-pro:latest
