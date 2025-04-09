@@ -1,4 +1,4 @@
-﻿using ExportPro.Auth.SDK.DTOs;
+﻿using ExportPro.Common.Shared.DTOs;
 using ExportPro.Common.Shared.Library;
 using Refit;
 

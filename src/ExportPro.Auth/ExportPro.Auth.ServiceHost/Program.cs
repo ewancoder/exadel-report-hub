@@ -1,4 +1,5 @@
 using ExportPro.Auth.CQRS.Commands;
+using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Auth.ServiceHost.Extensions;
 using ExportPro.AuthService.Repositories;
 using ExportPro.AuthService.Services;
@@ -7,7 +8,7 @@ using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Middlewares;
 using Refit;
-
+using ExportPro.Common.Shared.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();

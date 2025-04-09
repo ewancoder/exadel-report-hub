@@ -1,6 +1,6 @@
 using System.Net;
 using ExportPro.Auth.CQRS.Commands;
-using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Common.Shared.DTOs;
 using ExportPro.Auth.ServiceHost.Controllers;
 using ExportPro.Common.Shared.Library;
 using MediatR;
