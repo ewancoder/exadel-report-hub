@@ -1,9 +1,8 @@
 ﻿using ExportPro.Auth.CQRS.Commands;
-using ExportPro.Auth.SDK.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-
+using ExportPro.Common.Shared.DTOs;
 namespace ExportPro.Auth.ServiceHost.Controllers;
 
 [Produces("application/json")]

@@ -1,5 +1,4 @@
-﻿using ExportPro.Auth.SDK.DTOs;
-
+﻿using ExportPro.Common.Shared.DTOs;
 namespace ExportPro.AuthService.Services;
 
 public interface IAuthService

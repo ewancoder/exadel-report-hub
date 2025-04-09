@@ -6,6 +6,7 @@ using ExportPro.Common.DataAccess.MongoDB.Contexts;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Middlewares;
+using ExportPro.Common.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ExportPro.Auth.SDK.DTOs;
-
+namespace ExportPro.Common.Shared.DTOs;
 public class AuthResponseDto
 {
     public string AccessToken { get; set; } = null!;
