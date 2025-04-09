@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using ExportPro.Auth.CQRS.Commands;
 using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.ServiceHost.Controllers;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 
-namespace ExportPro.Tests.Auth.ServiceHost.Controllers;
+namespace ExportPro.Auth.Tests.ServiceHost.Controllers;
 [TestFixture]
 public class AuthTests
 {
