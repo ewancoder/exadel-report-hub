@@ -16,6 +16,9 @@ public class Item : IModel
     public string CustomerId { get; set; }
     public Status Status { get; set; }
     public string Currency {  get; set; } //maybe can be made into enum as well?
+    public bool IsDeleted { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt {  get; set; }
 
 }
 
