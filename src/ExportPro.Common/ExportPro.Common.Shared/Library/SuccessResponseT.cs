@@ -10,6 +10,7 @@ public class SuccessResponse<T> : BaseResponse<T>
        Data = data;
        ApiState = HttpStatusCode.OK;
        Messages = [message];
+       IsSuccess = true;
     }
 }
 

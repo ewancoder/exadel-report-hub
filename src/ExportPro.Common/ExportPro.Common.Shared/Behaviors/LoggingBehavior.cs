@@ -1,5 +1,6 @@
 ﻿using ExportPro.Common.Shared.Library;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
@@ -23,7 +24,7 @@ public class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior<TReque
         var result = await next();
 
         if (!result.IsSuccess)
-            _logger.LogError($"Starting request: {requestName} {JsonSerializer.Serialize(result.Messages)} at {DateTime.UtcNow}");
+            _logger.LogError($"Request failure: {requestName} {JsonSerializer.Serialize(result.Messages)} at {DateTime.UtcNow}");
         else
             _logger.LogInformation($"Finish request: {requestName} {JsonSerializer.Serialize(result)} at {DateTime.UtcNow}");
         return result;
