@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Auth.ServiceHost"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Auth.CQRS", "ExportPro.Auth\ExportPro.Auth.CQRS\ExportPro.Auth.CQRS.csproj", "{0BA4615A-43E0-49FF-83B3-87CF926EC15D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Auth.Tests", "ExportPro.Auth\ExportPro.Auth.Tests\ExportPro.Auth.Tests.csproj", "{DC51D98F-D9E8-405C-B233-B71B7FE17128}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,10 @@ Global
 		{0BA4615A-43E0-49FF-83B3-87CF926EC15D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BA4615A-43E0-49FF-83B3-87CF926EC15D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BA4615A-43E0-49FF-83B3-87CF926EC15D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC51D98F-D9E8-405C-B233-B71B7FE17128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC51D98F-D9E8-405C-B233-B71B7FE17128}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC51D98F-D9E8-405C-B233-B71B7FE17128}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC51D98F-D9E8-405C-B233-B71B7FE17128}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,6 +149,7 @@ Global
 		{8F073FAF-43E1-42E0-AA3A-6972A80B9C9F} = {F3DA3612-C897-4730-956D-44606B5B3019}
 		{890A26FC-ADC9-4BF5-B594-9331893A0FDD} = {F3DA3612-C897-4730-956D-44606B5B3019}
 		{0BA4615A-43E0-49FF-83B3-87CF926EC15D} = {F3DA3612-C897-4730-956D-44606B5B3019}
+		{DC51D98F-D9E8-405C-B233-B71B7FE17128} = {F3DA3612-C897-4730-956D-44606B5B3019}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3564D6A6-C183-4B6D-89C7-596F1C95733F}
