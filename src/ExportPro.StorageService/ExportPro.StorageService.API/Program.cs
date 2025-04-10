@@ -1,12 +1,10 @@
 using ExportPro.Common.Shared.Behaviors;
-using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Middlewares;
-using ExportPro.StorageService.API.Refit;
 using MediatR;
 using Refit;
 using ExportPro.Common.Shared.Extensions;
 using Microsoft.AspNetCore.Builder;
-
+using ExportPro.StorageService.SDK.Refit;
 var builder = WebApplication.CreateBuilder(args);
 
 

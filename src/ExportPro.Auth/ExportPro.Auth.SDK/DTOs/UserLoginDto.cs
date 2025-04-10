@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ExportPro.Common.Shared.DTOs;
+namespace ExportPro.Auth.SDK.DTOs;
 
 public class UserLoginDto
 {

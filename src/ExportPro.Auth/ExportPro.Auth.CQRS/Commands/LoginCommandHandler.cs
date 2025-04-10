@@ -1,7 +1,7 @@
 ﻿using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.Common.Shared.DTOs;
+using ExportPro.Auth.SDK.DTOs;
 namespace ExportPro.Auth.CQRS.Commands;
 
 public record LoginCommand(UserLoginDto LoginDto) : ICommand<AuthResponseDto>;

@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.0" />
+    <PackageReference Include="Refit" Version="8.0.0" />
+  </ItemGroup>
+
 </Project>

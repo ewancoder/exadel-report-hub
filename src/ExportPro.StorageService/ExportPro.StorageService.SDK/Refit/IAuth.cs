@@ -1,8 +1,8 @@
-﻿using ExportPro.Common.Shared.DTOs;
+﻿using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Common.Shared.Library;
 using Refit;
 
-namespace ExportPro.StorageService.API.Refit;
+namespace ExportPro.StorageService.SDK.Refit;
 
 public interface IAuth
 {

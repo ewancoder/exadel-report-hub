@@ -4,7 +4,7 @@ using ExportPro.AuthService.Configuration;
 using ExportPro.AuthService.Repositories;
 using ExportPro.Common.Shared.Exceptions;
 using Microsoft.Extensions.Options;
-using ExportPro.Common.Shared.DTOs;
+using ExportPro.Auth.SDK.DTOs;
 namespace ExportPro.AuthService.Services;
 
 public class AuthService(

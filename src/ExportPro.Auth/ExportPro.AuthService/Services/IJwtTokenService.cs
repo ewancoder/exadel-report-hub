@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using ExportPro.Auth.SDK.Models;
-using ExportPro.Common.Shared.DTOs;
+using ExportPro.Auth.SDK.DTOs;
 namespace ExportPro.AuthService.Services;
 
 public interface IJwtTokenService

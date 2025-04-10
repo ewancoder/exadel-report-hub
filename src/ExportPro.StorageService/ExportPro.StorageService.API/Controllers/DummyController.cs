@@ -1,5 +1,5 @@
-﻿using ExportPro.Common.Shared.DTOs;
-using ExportPro.StorageService.API.Refit;
+﻿using ExportPro.Auth.SDK.DTOs;
+using ExportPro.StorageService.SDK.Refit;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -13,7 +13,7 @@ public class DummyController : ControllerBase
 
     public DummyController(IAuth authApi)
     {
-        _auth= authApi;
+        _auth = authApi;
     }
     [HttpPost("dummyregister")]
     [SwaggerOperation(Summary = "Register a new user")]
@@ -28,7 +28,7 @@ public class DummyController : ControllerBase
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
     public async Task<IActionResult> DummyLogin([FromBody] UserLoginDto dto)
     {
-        var response =await _auth.LoginAsync(dto);
+        var response = await _auth.LoginAsync(dto);
         return Ok(response);
     }
 }
