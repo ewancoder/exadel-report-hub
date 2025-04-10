@@ -13,4 +13,6 @@ public class Client:IModel
     public DateTime UpdatedAt { get; set; }
     public bool IsDeleted { get; set; }
     public ICollection<ObjectId>? InvoiceIds { get; set; }
+    [BsonRepresentation(BsonType.ObjectId)]
+    public List<string> CustomerIds { get; set; }
 }
