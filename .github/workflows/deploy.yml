@@ -2,9 +2,9 @@ name: ExportPro Testing
 on:
   workflow_dispatch:
   pull_request:
+    branches: ["main"]
   push:
-    branches:
-      - main
+    branches: ["main"]
 jobs:
   build:
     runs-on: ubuntu-latest
