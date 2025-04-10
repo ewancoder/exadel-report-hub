@@ -20,7 +20,7 @@ builder.Services.AddSwaggerServices();
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services
     .AddRefitClient<IAuth>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://localhost:5000"));
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));
 
 var app = builder.Build();
 app.UseMiddleware<ErrorHandlingMiddleware>();

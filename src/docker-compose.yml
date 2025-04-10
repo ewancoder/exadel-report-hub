@@ -3,17 +3,27 @@ services:
     container_name: ExportProDb
     image: mongo
     ports:
-    - "27017:27017"
+      - "27017:27017"
     volumes:
-     - /data/db    
-  exportpro:
-    container_name: ExportPro
-    image: giorgaaa/exadel-export-pro:latest
+      - /data/db    
+
+  authservice:
+    container_name: authservice
+    image: giorgaaa/exportpro.authservice:latest
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDbDocker=mongodb://ExportProDb:27017
     ports:
-      - "100:8080"
       - "5000:8080"
     depends_on:
       - mongodb
+     
+  storageservice:
+    container_name: storageservice
+    image: giorgaaa/exportpro.storageservice:latest
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "1500:8080"
+    depends_on:
+      - authservice
