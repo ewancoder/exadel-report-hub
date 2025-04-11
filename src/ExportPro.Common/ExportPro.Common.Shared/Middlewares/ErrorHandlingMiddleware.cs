@@ -34,7 +34,6 @@ public class ErrorHandlingMiddleware
     private static Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         context.Response.ContentType = "application/json";
-        //
         switch (ex)
         {
             case ValidationException validationException:
