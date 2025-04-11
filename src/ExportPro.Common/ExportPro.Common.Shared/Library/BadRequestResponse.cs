@@ -7,7 +7,8 @@ public class BadRequestResponse : BaseResponse
 {
    public BadRequestResponse()
    {
-      ApiState = HttpStatusCode.BadRequest;
+        ApiState = HttpStatusCode.BadRequest;
+        IsSuccess = false;
    }
 }
 
