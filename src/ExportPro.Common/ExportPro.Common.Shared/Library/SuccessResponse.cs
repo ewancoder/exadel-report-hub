@@ -6,7 +6,7 @@ namespace ExportPro.Common.Shared.Library;
 
 public class SuccessResponse : BaseResponse
 {
-    public SuccessResponse(string message = null)
+    public SuccessResponse(string? message = null)
     {
         ApiState = HttpStatusCode.Accepted;
         Messages = [message];

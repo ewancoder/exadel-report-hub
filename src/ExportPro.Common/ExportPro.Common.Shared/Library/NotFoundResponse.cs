@@ -23,7 +23,7 @@ public class NotFoundResponse<T> : BaseResponse<T>
     public NotFoundResponse(string message)
         : this()
     {
-        Messages.Add(message);
+        Messages?.Add(message);
     }
 }
 
