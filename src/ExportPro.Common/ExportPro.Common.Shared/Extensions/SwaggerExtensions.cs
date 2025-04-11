@@ -1,7 +1,8 @@
-﻿using Microsoft.OpenApi.Any;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
-namespace ExportPro.Auth.ServiceHost.Extensions;
+namespace ExportPro.Common.Shared.Extensions;
 
 public static class SwaggerExtensions
 {

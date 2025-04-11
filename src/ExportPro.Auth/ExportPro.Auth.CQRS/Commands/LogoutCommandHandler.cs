@@ -13,6 +13,6 @@ public class LogoutCommandHandler(IAuthService authService)
     public async Task<BaseResponse> Handle(LogoutCommand request, CancellationToken cancellationToken)
     {
         await authService.LogoutAsync(request.RefreshToken);
-        return new SuccessApiResponse("Logged out successfully.");
+        return new SuccessResponse("Logged out successfully.");
     }
 }
