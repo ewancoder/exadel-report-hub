@@ -9,10 +9,7 @@ services:
 
   authservice:
     container_name: authservice
-    # image: giorgaaa/exportpro.authservice:latest
-    build: 
-      context: .
-      dockerfile: ExportPro.Auth/Dockerfile
+    image: giorgaaa/exportpro.authservice:latest
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDbDocker=mongodb://ExportProDb:27017
@@ -23,10 +20,7 @@ services:
      
   storageservice:
     container_name: storageservice
-    # image: giorgaaa/exportpro.storageservice:latest
-    build: 
-      context: .
-      dockerfile: ExportPro.StorageService/Dockerfile
+    image: giorgaaa/exportpro.storageservice:latest
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
