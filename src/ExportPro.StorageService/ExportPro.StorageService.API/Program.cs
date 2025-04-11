@@ -2,9 +2,9 @@ using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Middlewares;
 using MediatR;
 using Refit;
-using ExportPro.Common.Shared.Extensions;
 using Microsoft.AspNetCore.Builder;
 using ExportPro.Auth.SDK.Interfaces;
+using ExportPro.Common.Shared.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 
