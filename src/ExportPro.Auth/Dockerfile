@@ -1,4 +1,4 @@
-#to build this dockerfile from /src  docker build -f ExportPro.Auth/Dockerfile .  
+#to build this dockerfile from /src  docker build -f ExportPro.Auth/Dockerfile .  -t giorgaaa/exportpro.authservice
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER app
 WORKDIR /app

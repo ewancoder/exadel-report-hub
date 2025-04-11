@@ -4,7 +4,7 @@ using MediatR;
 using Refit;
 using ExportPro.Common.Shared.Extensions;
 using Microsoft.AspNetCore.Builder;
-using ExportPro.StorageService.SDK.Refit;
+using ExportPro.Auth.SDK.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 

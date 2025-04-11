@@ -26,7 +26,7 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly);
 });
 
-builder.Services.AddRefitClient<IAuthApi>()
+builder.Services.AddRefitClient<IAuth>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7067"));
 
 var app = builder.Build();

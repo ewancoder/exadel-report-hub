@@ -1,4 +1,4 @@
-#to build this dockerfile from /src  docker build -f ExportPro.StorageService/Dockerfile .  
+#to build this dockerfile from /src  docker build -f ExportPro.StorageService/Dockerfile . -t giorgaaa/exportpro.storageservice
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER app
 WORKDIR /app

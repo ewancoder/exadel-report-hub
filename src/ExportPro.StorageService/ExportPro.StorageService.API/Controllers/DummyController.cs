@@ -1,8 +1,8 @@
 ﻿using ExportPro.Auth.SDK.DTOs;
-using ExportPro.StorageService.SDK.Refit;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-
+using ExportPro.Auth.SDK;
+using ExportPro.Auth.SDK.Interfaces;
 namespace ExportPro.StorageService.API.Controllers;
 
 [Route("api/[controller]")]
