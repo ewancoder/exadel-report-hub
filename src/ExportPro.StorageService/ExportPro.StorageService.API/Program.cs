@@ -3,6 +3,7 @@ using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Middlewares;
 using MediatR;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -14,13 +15,17 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
+builder.Services.AddSwaggerGen();
+//builder.Services.UseSwaggerUI();
 var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseMiddleware<ErrorHandlingMiddleware>();
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+
+app.MapOpenApi();
+
+
 
 app.UseHttpsRedirection();
 

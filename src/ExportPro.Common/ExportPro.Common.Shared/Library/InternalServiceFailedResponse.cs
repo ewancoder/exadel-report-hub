@@ -8,6 +8,7 @@ namespace ExportPro.Common.Shared.Library
         {
             ApiState = System.Net.HttpStatusCode.InternalServerError;
             Messages = [ex.Message];
+            IsSuccess = false;
 
         }
     }
