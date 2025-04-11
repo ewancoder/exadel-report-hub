@@ -17,9 +17,4 @@
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
-  </ItemGroup>
-
 </Project>
