@@ -11,6 +11,7 @@ namespace ExportPro.Common.Shared.Library
         public ValidationFailedResponse()
         {
             ApiState = System.Net.HttpStatusCode.UnprocessableEntity;
+            IsSuccess = false;
         }
     }
 }

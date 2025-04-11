@@ -20,16 +20,17 @@ builder.Services
     .AddRefitClient<IAuth>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));
 
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
-app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
