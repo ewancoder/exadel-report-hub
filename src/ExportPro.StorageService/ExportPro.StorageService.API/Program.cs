@@ -20,7 +20,7 @@ builder.Services.AddSwaggerGen();
 //builder.Services.UseSwaggerUI();
 var app = builder.Build();
 app.UseSwagger();
-app.UseSwaggerUI();
+//app.UseSwaggerUI();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.MapOpenApi();
