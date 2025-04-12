@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.4" />
+    <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj" />
   </ItemGroup>
 
