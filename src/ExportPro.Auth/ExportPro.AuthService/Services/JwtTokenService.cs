@@ -2,10 +2,10 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Models;
 using ExportPro.AuthService.Configuration;
 using Microsoft.Extensions.Options;
+using ExportPro.Auth.SDK.DTOs;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ExportPro.AuthService.Services;
