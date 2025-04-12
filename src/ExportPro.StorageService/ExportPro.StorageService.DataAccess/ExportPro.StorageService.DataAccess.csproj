@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj" />
+    <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
   </ItemGroup>
 
 </Project>

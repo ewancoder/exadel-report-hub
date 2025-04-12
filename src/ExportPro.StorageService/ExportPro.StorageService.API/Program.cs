@@ -1,11 +1,12 @@
 using System.Text;
 using ExportPro.Auth.SDK.Interfaces;
+using ExportPro.AuthService.Configuration;
 using ExportPro.Common.DataAccess.MongoDB.Configurations;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
-using ExportPro.StorageService.CQRS.Queries;
 using ExportPro.StorageService.DataAccess.Repositories;
+using ExportPro.StorageService.DataAccess.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -38,17 +39,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddCommonRegistrations();
 builder.Services.AddScoped<ClientRepository>();
 builder.Services
     .AddRefitClient<IAuth>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));
-
-builder.Services.AddMediatR(cfg =>
-{
-    cfg.RegisterServicesFromAssembly(typeof(GetClientsHandler).Assembly);
-});
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();

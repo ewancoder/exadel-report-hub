@@ -10,4 +10,14 @@
     <ProjectReference Include="..\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Swashbuckle.AspNetCore.Annotations">
+      <HintPath>..\..\..\..\..\.nuget\packages\swashbuckle.aspnetcore.annotations\8.1.0\lib\net9.0\Swashbuckle.AspNetCore.Annotations.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
+  </ItemGroup>
+
 </Project>

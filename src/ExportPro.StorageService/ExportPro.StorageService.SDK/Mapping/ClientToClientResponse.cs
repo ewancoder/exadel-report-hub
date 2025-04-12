@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
+using MongoDB.Bson;
 
 namespace ExportPro.StorageService.SDK.Mapping
 {
@@ -23,6 +24,21 @@ namespace ExportPro.StorageService.SDK.Mapping
             clientResponse.CustomerIds = client.CustomerIds;
             clientResponse.ItemIds = client.ItemIds;
             return clientResponse;
+        }
+
+        public static Client ClientResponseToClient(ClientResponse clientResponse)
+        {   
+            Client client = new();
+            client.Id = ObjectId.Parse(clientResponse.Id);
+            client.Name = clientResponse.Name;  
+            client.Description = clientResponse.Description;
+            client.CreatedAt = clientResponse.CreatedAt;
+            client.UpdatedAt = clientResponse.UpdatedAt;
+            client.IsDeleted = clientResponse.IsDeleted;
+            client.InvoiceIds = clientResponse.InvoiceIds;
+            client.CustomerIds = clientResponse.CustomerIds;
+            client.ItemIds = clientResponse.ItemIds;
+            return client;
         }
     }
 }
