@@ -23,7 +23,7 @@ builder.Services
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 var app = builder.Build();
 app.UseSwagger();
-//app.UseSwaggerUI();
+app.UseSwaggerUI();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
