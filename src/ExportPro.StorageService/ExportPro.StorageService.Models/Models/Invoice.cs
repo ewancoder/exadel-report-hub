@@ -1,7 +1,8 @@
+using ExportPro.Common.Models.MongoDB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ExportPro.Common.Models.MongoDB.Models;
+namespace ExportPro.StorageService.Models.Models;
 
 public class Invoice : IModel
 {

@@ -1,9 +1,9 @@
-﻿using ExportPro.Common.Models.MongoDB.Enums;
+﻿using ExportPro.Common.Models.MongoDB;
+using ExportPro.StorageService.Models.Enums;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-
-namespace ExportPro.Common.Models.MongoDB.Models;
+namespace ExportPro.StorageService.Models.Models;
 
 public class Item : IModel
 {
