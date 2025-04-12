@@ -7,14 +7,17 @@ namespace ExportPro.StorageService.Models.Models;
 
 public class Client:IModel
 {
-    [BsonId]
-    public ObjectId Id { get; set; } 
+    public ObjectId Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }=DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public bool IsDeleted { get; set; }=false;
-    public ICollection<ObjectId>? InvoiceIds { get; set; }
     [BsonRepresentation(BsonType.ObjectId)]
-    public List<string>? CustomerIds { get; set; }
+    public List<string>? InvoiceIds { get; set; } = new();
+    [BsonRepresentation(BsonType.ObjectId)]
+    public List<string>? CustomerIds { get; set; } = new();
+    [BsonRepresentation(BsonType.ObjectId)]
+    public List<string>? ItemIds { get; set; } = new();
+
 }

@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.4" />
+    <PackageReference Include="ExportPro.Auth.Service" Version="1.0.1" />
+    <PackageReference Include="MediatR" Version="12.5.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
     <PackageReference Include="Refit" Version="8.0.0" />
     <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
@@ -19,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ExportPro.StorageService.CQRS\ExportPro.StorageService.CQRS.csproj" />
     <ProjectReference Include="..\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj" />
     <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
   </ItemGroup>

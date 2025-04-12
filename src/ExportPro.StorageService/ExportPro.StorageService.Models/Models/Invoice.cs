@@ -7,7 +7,7 @@ namespace ExportPro.StorageService.Models.Models;
 
 public class Invoice : IModel
 {
-    [BsonId]
+
     public ObjectId Id { get; set; }
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }=DateTime.Now;
