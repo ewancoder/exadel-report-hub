@@ -34,7 +34,6 @@ public class ErrorHandlingMiddleware
     private static Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         context.Response.ContentType = "application/json";
-
         switch (ex)
         {
             case ValidationException validationException:
@@ -42,7 +41,7 @@ public class ErrorHandlingMiddleware
                 var validationResponse = new ValidationFailedResponse();
                 foreach (var item in validationException.Failures)
                 {
-                    validationResponse.Messages.Add($"{item.Key} {item.Value}");
+                    validationResponse.Messages?.Add($"{item.Key} {item.Value}");
                 }
                 return context.Response.WriteAsync(JsonSerializer.Serialize(validationResponse));
 

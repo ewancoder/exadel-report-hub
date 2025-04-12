@@ -26,7 +26,7 @@ public class AuthTests
         var mockHttpContext = Substitute.For<HttpContext>();
         mockHttpContext.Response.Returns(mockHttpResponse);
         var mockRequestCookies = Substitute.For<IRequestCookieCollection>();
-        mockRequestCookies.TryGetValue("refreshToken", out Arg.Any<string>())
+        mockRequestCookies.TryGetValue("refreshToken", out Arg.Any<string?>())
                           .Returns(x => { x[1] = "refreshToken"; return true; });
         mockHttpContext.Request.Cookies.Returns(mockRequestCookies);
         _authController.ControllerContext = new ControllerContext
