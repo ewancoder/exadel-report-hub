@@ -11,7 +11,7 @@ public interface IClientService
     Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto);
     Task<ClientResponse> GetClientById(string Clientid);
     Task<List<ClientResponse>> GetAllCLientsIncludingSoftDeleted();
-    Task<ClientResponse> UpdateClient(Client client);
+    Task<ClientResponse> UpdateClient(ClientUpdateDto client,string clientid);
     Task<string> SoftDeleteClient(ObjectId Clientid);
     Task<string> DeleteClient(ObjectId Clientid);
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.Intrinsics.X86;
 using ExportPro.Auth.SDK.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -58,7 +59,7 @@ public class ClientController : ControllerBase
         {
             return BadRequest();
         }
-        var exists = await _clientRepository.GetOneAsync(x=>x.Name == clientdto.Name, CancellationToken.None);
+        var exists = await _clientRepository.GetOneAsync(x=>x.Name == clientdto.Name && x.IsDeleted==false, CancellationToken.None);
         if (exists != null)
         {
             return BadRequest(new BadRequestResponse{Messages = ["Client already exists"]});
@@ -98,7 +99,7 @@ public class ClientController : ControllerBase
     [HttpPut("update/client")]
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
-    public async Task<IActionResult> UpdateClient([Required]string clientid,[FromBody] ClientResponse clientdto)
+    public async Task<IActionResult> UpdateClient([Required]string clientid,[FromBody] ClientUpdateDto clientdto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         if (!ObjectId.TryParse(clientid, out var objectId))
@@ -108,13 +109,13 @@ public class ClientController : ControllerBase
                 Messages =["Invalid client id format"]
             });
         }
-        var client = await _clientRepository.GetOneAsync(x=>x.Id ==ObjectId.Parse(clientid), CancellationToken.None);
+        var client = await _clientRepository.GetOneAsync(x=>x.Id ==objectId, CancellationToken.None);
         if(client == null) return BadRequest(new BadRequestResponse{Messages = ["Client id does not exists"]});
-        ClientResponse afterUpdate=await _clientService.UpdateClient(client);
+        ClientResponse afterUpdate=await _clientService.UpdateClient(clientdto,clientid);
         var response = new
         {
             before = new Response{Message = "Before The Update",ClientResponse = ClientToClientResponse.ClientToClientReponse(client)},
-            after = new Response{Message = "after The Update",ClientResponse = clientdto}
+            after = new Response{Message = "after The Update",ClientResponse = afterUpdate}
         };
         return Ok(new SuccessResponse<object>(response,"Updated"));
     }
@@ -129,24 +130,25 @@ public class ClientController : ControllerBase
             {
                 Messages =["Invalid client id format"]
             });
-        }      
+        }       
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var exists = await _clientRepository.GetOneAsync(x => x.Id == objectId, CancellationToken.None);
+        var exists = await _clientService.GetClientById(Clientid);
         if(exists == null) return BadRequest(new BadRequestResponse{Messages = ["Client does not exists"]});
         string messege =await _clientService.SoftDeleteClient(objectId);
+        exists.IsDeleted = true;
         Response response = new()
         {
             Message = messege,
-            ClientResponse = ClientToClientResponse.ClientToClientReponse(exists)
+            ClientResponse = exists
         };
         return Ok(new SuccessResponse<Response>(response));
     }
     [HttpDelete("delete/client/{ClientId}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]
     [ProducesResponseType(typeof(Response), 200)]
-    public async Task<IActionResult> DeleteClient([Required] string Clientid)
+    public async Task<IActionResult> DeleteClient([Required]string ClientId)
     {
-        if (!ObjectId.TryParse(Clientid, out var objectId))
+        if (!ObjectId.TryParse(ClientId, out var objectId))
         {
             return BadRequest(new BadRequestResponse
             {
@@ -154,9 +156,9 @@ public class ClientController : ControllerBase
             });
         }      
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var messege = await _clientService.DeleteClient(objectId);
         var exists = await _clientRepository.GetOneAsync(x=>x.Id == objectId, CancellationToken.None);
         if(exists == null) return BadRequest(new BadRequestResponse{Messages = ["Client does not exists"]});
+        var messege = await _clientService.DeleteClient(objectId);
         Response response = new()
         {
             Message = messege,

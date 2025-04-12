@@ -4,6 +4,7 @@ using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Mapping;
 using ExportPro.StorageService.SDK.Responses;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using SharpCompress.Readers.Rar;
 
 namespace ExportPro.StorageService.DataAccess.Services;
@@ -36,9 +37,8 @@ public class ClientService:IClientService
     public async Task<ClientResponse> GetClientById(string Clientid)
     {
         var client =await _clientRepository.GetOneAsync(x=>x.Id.ToString()==Clientid && x.IsDeleted==false, CancellationToken.None);
-        if(client==null) return null;
+        if (client == null) return null;
         var clientresponse= ClientToClientResponse.ClientToClientReponse(client) ;
-        
         return clientresponse;
     }
 
@@ -49,9 +49,15 @@ public class ClientService:IClientService
         return clientresponses;
     }
 
-    public async Task<ClientResponse> UpdateClient(Client client)
+    public async Task<ClientResponse> UpdateClient(ClientUpdateDto clientUpdateDto,string clientid)
     {
-         await _clientRepository.UpdateOneAsync(client, CancellationToken.None);
+     
+     Client client = await _clientRepository.GetOneAsync(x=>x.Id.ToString()==clientid, CancellationToken.None);
+        if (clientUpdateDto.Name != null)  client.Name=clientUpdateDto.Name;
+        if (clientUpdateDto.Description != null) client.Description = clientUpdateDto.Description;
+        if (clientUpdateDto.IsDeleted) client.IsDeleted = true;
+        client.UpdatedAt=DateTime.UtcNow;
+        await _clientRepository.UpdateOneAsync(client, CancellationToken.None);
         var after = ClientToClientResponse.ClientToClientReponse(client);
         return after;
     }
