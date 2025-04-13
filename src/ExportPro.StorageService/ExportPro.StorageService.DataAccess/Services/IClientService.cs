@@ -15,4 +15,7 @@ public interface IClientService
     Task<string> SoftDeleteClient(ObjectId Clientid);
     Task<string> DeleteClient(ObjectId Clientid);
     Task<ClientResponse> GetClientByIdIncludingSoftDeleted(ObjectId ClientId);
+    Task<ClientResponse> AddItemIds(string Clientid, List<string> ItemIds);
+    Task<ClientResponse> AddInvoiceIds(string Clientid, List<string> InvoiceIds);
+    Task<ClientResponse> AddCustomerIds(string Clientid, List<string> customerids);
 }

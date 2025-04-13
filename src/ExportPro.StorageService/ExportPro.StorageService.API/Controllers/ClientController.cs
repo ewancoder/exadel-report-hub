@@ -149,4 +149,54 @@ public class ClientController : ControllerBase
         };
         return Ok(new SuccessResponse<Response>(response));
     }
+    [HttpPost("add/itemids/{clientId}")]
+    [SwaggerOperation(Summary = "Add multiple item IDs to a client")]
+    [ProducesResponseType(typeof(ClientResponse), 200)]
+    public async Task<IActionResult> AddItemIds(
+        [Required] string clientId,
+        [FromBody, Required] List<string> itemIds)
+    {
+        if (!ObjectId.TryParse(clientId, out var objId))
+            return BadRequest(new BadRequestResponse { Messages = ["Invalid client ID format"] });
+
+        var client = await _clientRepository.GetOneAsync(x => x.Id == objId,CancellationToken.None);
+        if (client is null)
+            return BadRequest(new BadRequestResponse { Messages = ["Client ID does not exist"] });
+        var responseClient = await _clientService.AddItemIds(clientId, itemIds);
+        return Ok(new SuccessResponse<ClientResponse>(responseClient, "Item IDs added successfully"));
+    }
+
+    [HttpPost("add/customerids/{clientId}")]
+    [SwaggerOperation(Summary = "Add multiple customer IDs to a client")]
+    [ProducesResponseType(typeof(ClientResponse), 200)]
+    public async Task<IActionResult> AddCustomerIds(
+        [Required] string clientId,
+        [FromBody, Required] List<string> customerIds,
+        CancellationToken cancellationToken)
+    {
+        if (!ObjectId.TryParse(clientId, out var objId))
+            return BadRequest(new BadRequestResponse { Messages = ["Invalid client ID format"] });
+
+        var client = await _clientRepository.GetOneAsync(x => x.Id == objId, cancellationToken);
+        if (client is null)
+            return BadRequest(new BadRequestResponse { Messages = ["Client ID does not exist"] });
+        var responseClient =await _clientService.AddItemIds(clientId,customerIds);
+        return Ok(new SuccessResponse<ClientResponse>(responseClient, "Customer IDs added successfully"));
+    }
+     [HttpPost("add/invoiceids/{clientId}")]
+     [SwaggerOperation(Summary = "Add multiple invoice IDs to a client")]
+     [ProducesResponseType(typeof(ClientResponse), 200)]
+     public async Task<IActionResult> AddInvoiceIds(
+         [Required] string clientId,
+         [FromBody, Required] List<string> invoiceIds,
+         CancellationToken cancellationToken)
+     {
+         if (!ObjectId.TryParse(clientId, out var objId))
+             return BadRequest(new BadRequestResponse { Messages = ["Invalid client ID format"] });
+         var client = await _clientRepository.GetOneAsync(x => x.Id == objId, cancellationToken);
+         if (client is null)
+             return BadRequest(new BadRequestResponse { Messages = ["Client ID does not exist"] });
+         var responseClient = await _clientService.AddInvoiceIds(clientId, invoiceIds);
+         return Ok(new SuccessResponse<ClientResponse>(responseClient, "Invoice IDs added successfully"));
+    }
 }

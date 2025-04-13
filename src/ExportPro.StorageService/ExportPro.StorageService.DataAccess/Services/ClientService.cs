@@ -1,3 +1,4 @@
+using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -12,8 +13,10 @@ namespace ExportPro.StorageService.DataAccess.Services;
 public class ClientService:IClientService
 {
     private readonly ClientRepository _clientRepository;
-    public ClientService(ClientRepository clientRepository)
+    private readonly IInvoiceRepository _invoiceRepository;
+    public ClientService(ClientRepository clientRepository, IInvoiceRepository invoiceRepository)
     {
+        _invoiceRepository = invoiceRepository;
         _clientRepository = clientRepository;
     }
 
@@ -41,10 +44,71 @@ public class ClientService:IClientService
         var clientresponse= ClientToClientResponse.ClientToClientReponse(client) ;
         return clientresponse;
     }
+
+    public async Task<ClientResponse> AddItemIds(string Clientid, List<string> ItemIds)
+    {
+        var client = await _clientRepository.GetOneAsync(x => x.Id.ToString() == Clientid,CancellationToken.None);
+        foreach (var id in ItemIds)
+        {
+            if (!client.ItemIds.Contains(id))
+                client.ItemIds.Add(id);
+        }
+        client.UpdatedAt = DateTime.UtcNow;
+        await _clientRepository.UpdateOneAsync(client, CancellationToken.None);
+        return ClientToClientResponse.ClientToClientReponse(client);
+    }
+    public async Task<ClientResponse> AddInvoiceIds(string Clientid, List<string> InvoiceIds)
+    {
+        var client = await _clientRepository.GetOneAsync(x => x.Id.ToString() == Clientid,CancellationToken.None);
+        foreach (var id in InvoiceIds)
+        {
+            if (!client.InvoiceIds.Contains(id))
+                client.InvoiceIds.Add(id);
+        }
+        client.UpdatedAt = DateTime.UtcNow;
+        await _clientRepository.UpdateOneAsync(client, CancellationToken.None);
+        return ClientToClientResponse.ClientToClientReponse(client);
+    }
+
+    public async Task<ClientResponse> AddCustomerIds(string Clientid, List<string> customerids)
+    {
+        var client = await _clientRepository.GetOneAsync(x => x.Id.ToString() == Clientid,CancellationToken.None);
+        foreach (var id in customerids)
+        {
+            if (!client.CustomerIds.Contains(id))
+                client.InvoiceIds.Add(id);
+        }
+        client.UpdatedAt = DateTime.UtcNow;
+        await _clientRepository.UpdateOneAsync(client, CancellationToken.None);
+        return ClientToClientResponse.ClientToClientReponse(client);
+    }
+
     public async Task<ClientResponse> GetClientById(string Clientid)
     {
         var client =await _clientRepository.GetOneAsync(x=>x.Id.ToString()==Clientid && x.IsDeleted==false, CancellationToken.None);
         if (client == null) return null;
+        // List<InvoiceResponse> res = resp.Select(x => new InvoiceResponse()
+        // {
+        //     Id = x.Id.ToString(),
+        //     InvoiceNumber = x.InvoiceNumber,
+        //     DueDate = x.DueDate,
+        //     Amount = x.Amount,
+        //     Currency = x.Currency,
+        //     PaymentStatus = x.PaymentStatus,
+        //     BankAccountNumber = x.BankAccountNumber,
+        //     ClientId = x.ClientId,
+        //     ItemIds = x.ItemIds
+        // }).ToList();
+        // foreach (var i in client.InvoiceIds)
+        // {
+        //     foreach (var j in res)
+        //     {
+        //         if (j.Id == i)
+        //         {
+        //             
+        //         }
+        //     }
+        // }
         var clientresponse= ClientToClientResponse.ClientToClientReponse(client) ;
         return clientresponse;
     }
