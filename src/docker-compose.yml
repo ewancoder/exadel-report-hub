@@ -1,4 +1,12 @@
 services:
+  reverse-proxy:
+    container_name: ngix
+    image: giorgaaa/customnginx:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - authservice
+      - storageservice
   mongodb:
     container_name: ExportProDb
     image: mongo
