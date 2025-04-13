@@ -1,5 +1,7 @@
 ﻿using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 using ExportPro.StorageService.CQRS.Queries.invoice;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -20,8 +22,20 @@ public class InvoiceController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateInvoiceCommand command, CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(command, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
+        var response = await _mediator.Send(command, cancellationToken);    
+        var res = new InvoiceResponse()
+        {
+            Id = response.Data.Id.ToString(),
+            InvoiceNumber = response.Data.InvoiceNumber,
+            DueDate = response.Data.DueDate,
+            Amount = response.Data.Amount,
+            Currency = response.Data.Currency,
+            PaymentStatus = response.Data.PaymentStatus,
+            BankAccountNumber = response.Data.BankAccountNumber,
+            ClientId = response.Data.ClientId,
+            ItemIds = response.Data.ItemIds,
+        };
+        return StatusCode((int)response.ApiState, res);
     }
 
     [HttpPut("{id}")]
@@ -32,7 +46,19 @@ public class InvoiceController : ControllerBase
 
         command.Id = objectId;
         var response = await _mediator.Send(command, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
+        var res = new InvoiceResponse()
+        {
+            Id = response.Data.Id.ToString(),
+            InvoiceNumber = response.Data.InvoiceNumber,
+            DueDate = response.Data.DueDate,
+            Amount = response.Data.Amount,
+            Currency = response.Data.Currency,
+            PaymentStatus = response.Data.PaymentStatus,
+            BankAccountNumber = response.Data.BankAccountNumber,
+            ClientId = response.Data.ClientId,
+            ItemIds = response.Data.ItemIds,
+        };
+        return StatusCode((int)response.ApiState, res);
     }
 
     [HttpDelete("{id}")]
@@ -51,16 +77,40 @@ public class InvoiceController : ControllerBase
     {
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid invoice ID.");
-
         var query = new GetInvoiceByIdQuery { Id = objectId };
         var response = await _mediator.Send(query, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
+        var res = new InvoiceResponse()
+        {
+            Id = response.Data.Id.ToString(),
+            InvoiceNumber = response.Data.InvoiceNumber,
+            DueDate = response.Data.DueDate,
+            Amount = response.Data.Amount,
+            Currency = response.Data.Currency,
+            PaymentStatus = response.Data.PaymentStatus,
+            BankAccountNumber = response.Data.BankAccountNumber,
+            ClientId = response.Data.ClientId,
+            ItemIds = response.Data.ItemIds,
+        };
+        return StatusCode((int)response.ApiState,res);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(new GetAllInvoicesQuery(), cancellationToken);
-        return StatusCode((int)response.ApiState, response);
+       var res =  response.Data.Select(x => new InvoiceResponse()
+        {
+            Id = x.Id.ToString(),
+            InvoiceNumber = x.InvoiceNumber,
+            DueDate = x.DueDate,
+            Amount = x.Amount,
+            Currency = x.Currency,
+            PaymentStatus = x.PaymentStatus,
+            BankAccountNumber = x.BankAccountNumber,
+            ClientId = x.ClientId,
+            ItemIds = x.ItemIds,
+
+        }).ToList();
+        return StatusCode((int)response.ApiState, res);
     }
 }

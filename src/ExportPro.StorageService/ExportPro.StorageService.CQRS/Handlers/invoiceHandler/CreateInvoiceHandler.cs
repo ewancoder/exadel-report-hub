@@ -24,8 +24,8 @@ public class CreateInvoiceHandler(IRepository<Invoice> repository) : ICommandHan
             Currency = request.Currency,
             PaymentStatus = request.PaymentStatus,
             BankAccountNumber = request.BankAccountNumber,
-            ClientId = request.ClientId,
-            ItemIds = request.ItemIds ?? new List<string>()
+            // ClientId = request.ClientId,
+            // ItemIds = request.ItemIds ?? new List<string>()
         };
 
         await _repository.AddOneAsync(invoice, cancellationToken);

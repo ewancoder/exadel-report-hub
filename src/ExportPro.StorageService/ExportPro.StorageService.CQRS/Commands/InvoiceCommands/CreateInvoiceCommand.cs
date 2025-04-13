@@ -12,6 +12,6 @@ public class CreateInvoiceCommand : ICommand<Models.Models.Invoice>
     public string? Currency { get; set; }
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
-    public string? ClientId { get; set; }
-    public List<string>? ItemIds { get; set; }
+    // public string? ClientId { get; set; }
+    // public List<string>? ItemIds { get; set; }
 }
