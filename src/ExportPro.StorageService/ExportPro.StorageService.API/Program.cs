@@ -5,6 +5,8 @@ using ExportPro.Common.DataAccess.MongoDB.Configurations;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
+using ExportPro.StorageService.CQRS.Commands;
+using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.DataAccess.Services;
 using MediatR;
@@ -42,6 +44,11 @@ builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddCommonRegistrations();
 builder.Services.AddScoped<ClientRepository>();
+
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateCustomerCommand>());
+
+
 builder.Services
     .AddRefitClient<IAuth>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));
