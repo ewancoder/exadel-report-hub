@@ -34,6 +34,13 @@ public class ClientService:IClientService
         return ClientToClientResponse.ClientToClientReponse(client);
     }
 
+    public async Task<ClientResponse> GetClientByIdIncludingSoftDeleted(ObjectId ClientId)
+    {
+        var client =await _clientRepository.GetOneAsync(x=>x.Id==ClientId,CancellationToken.None);
+        if (client == null) return null;
+        var clientresponse= ClientToClientResponse.ClientToClientReponse(client) ;
+        return clientresponse;
+    }
     public async Task<ClientResponse> GetClientById(string Clientid)
     {
         var client =await _clientRepository.GetOneAsync(x=>x.Id.ToString()==Clientid && x.IsDeleted==false, CancellationToken.None);
@@ -55,7 +62,7 @@ public class ClientService:IClientService
      Client client = await _clientRepository.GetOneAsync(x=>x.Id.ToString()==clientid, CancellationToken.None);
         if (clientUpdateDto.Name != null)  client.Name=clientUpdateDto.Name;
         if (clientUpdateDto.Description != null) client.Description = clientUpdateDto.Description;
-        if (clientUpdateDto.IsDeleted) client.IsDeleted = true;
+        client.IsDeleted =clientUpdateDto.IsDeleted;
         client.UpdatedAt=DateTime.UtcNow;
         await _clientRepository.UpdateOneAsync(client, CancellationToken.None);
         var after = ClientToClientResponse.ClientToClientReponse(client);
