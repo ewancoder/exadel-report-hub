@@ -1,5 +1,5 @@
-﻿using ExportPro.StorageService.CQRS.Commands;
-using ExportPro.StorageService.CQRS.Queries;
+﻿using ExportPro.StorageService.CQRS.Commands.Customer;
+using ExportPro.StorageService.CQRS.Queries.Customer;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;

@@ -1,0 +1,66 @@
+﻿using ExportPro.StorageService.CQRS.Commands.Invoice;
+using ExportPro.StorageService.CQRS.Queries.Invoice;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+
+namespace ExportPro.StorageService.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class InvoiceController : ControllerBase
+{
+    private readonly IMediator _mediator;
+
+    public InvoiceController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateInvoiceCommand command, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(command, cancellationToken);
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] UpdateInvoiceCommand command, CancellationToken cancellationToken)
+    {
+        if (!ObjectId.TryParse(id, out var objectId))
+            return BadRequest("Invalid invoice ID.");
+
+        command.Id = objectId;
+        var response = await _mediator.Send(command, cancellationToken);
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
+    {
+        if (!ObjectId.TryParse(id, out var objectId))
+            return BadRequest("Invalid invoice ID.");
+
+        var command = new DeleteInvoiceCommand { Id = objectId };
+        var response = await _mediator.Send(command, cancellationToken);
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken)
+    {
+        if (!ObjectId.TryParse(id, out var objectId))
+            return BadRequest("Invalid invoice ID.");
+
+        var query = new GetInvoiceByIdQuery { Id = objectId };
+        var response = await _mediator.Send(query, cancellationToken);
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(new GetAllInvoicesQuery(), cancellationToken);
+        return StatusCode((int)response.ApiState, response);
+    }
+}

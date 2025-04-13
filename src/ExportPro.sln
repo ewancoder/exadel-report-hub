@@ -28,6 +28,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Gateway", "ExportPro.Gateway\ExportPro.Gateway\ExportPro.Gateway.csproj", "{AD8DF6DF-60A2-4B3F-BD59-B326D417E2F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.CQRS", "ExportPro.StorageService\ExportPro.StorageService.CQRS\ExportPro.StorageService.CQRS.csproj", "{DE70D432-3309-4719-9C0F-A447B2CAC134}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6FE60513-416B-429B-A669-3E940FEC80DC} = {6FE60513-416B-429B-A669-3E940FEC80DC}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.SDK", "ExportPro.StorageService\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj", "{AF50B13B-0A0D-417E-8BA3-90B7AE88A319}"
 EndProject

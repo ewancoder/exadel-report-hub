@@ -5,7 +5,8 @@ using ExportPro.Common.DataAccess.MongoDB.Configurations;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
-using ExportPro.StorageService.CQRS.Commands;
+using ExportPro.StorageService.CQRS.Commands.Customer;
+using ExportPro.StorageService.CQRS.Handlers.Invoice;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.DataAccess.Services;
@@ -48,6 +49,8 @@ builder.Services.AddScoped<ClientRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateCustomerCommand>());
 
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateInvoiceHandler).Assembly));
 
 builder.Services
     .AddRefitClient<IAuth>()

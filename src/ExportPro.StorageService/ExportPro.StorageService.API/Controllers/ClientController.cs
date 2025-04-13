@@ -1,25 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.Intrinsics.X86;
 using ExportPro.Auth.SDK.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
-using ExportPro.StorageService.Models.Models;
-using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Shared.Library;
-using ExportPro.StorageService.CQRS.Commands;
-using ExportPro.StorageService.CQRS.Queries;
 using ExportPro.StorageService.SDK.DTOs;
 using MongoDB.Bson;
-using Refit;
-using Microsoft.AspNetCore.Authorization;
 using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Mapping;
 using MediatR;
 using ExportPro.StorageService.DataAccess.Services;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
-using MongoDB.Driver;
+using ExportPro.StorageService.CQRS.Queries.Client;
+using ExportPro.StorageService.CQRS.Commands.Client;
 
 namespace ExportPro.StorageService.API.Controllers;
 
