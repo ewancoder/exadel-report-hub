@@ -1,19 +1,20 @@
-﻿using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+﻿using System.Net;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Commands.Invoice;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 using MongoDB.Bson;
-using System.Net;
 
-namespace ExportPro.StorageService.CQRS.Handlers.Invoice;
+namespace ExportPro.StorageService.CQRS.Handlers.invoiceHandler;
 
-public class CreateInvoiceHandler(IRepository<Models.Models.Invoice> repository) : ICommandHandler<CreateInvoiceCommand, Models.Models.Invoice>
+public class CreateInvoiceHandler(IRepository<Invoice> repository) : ICommandHandler<CreateInvoiceCommand, Invoice>
 {
-    private readonly IRepository<Models.Models.Invoice> _repository = repository;
+    private readonly IRepository<Invoice> _repository = repository;
 
-    public async Task<BaseResponse<Models.Models.Invoice>> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<Invoice>> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)
     {
-        var invoice = new Models.Models.Invoice
+        var invoice = new Invoice
         {
             Id = ObjectId.GenerateNewId(),
             InvoiceNumber = request.InvoiceNumber,
@@ -28,7 +29,7 @@ public class CreateInvoiceHandler(IRepository<Models.Models.Invoice> repository)
         };
 
         await _repository.AddOneAsync(invoice, cancellationToken);
-        return new BaseResponse<Models.Models.Invoice>
+        return new BaseResponse<Invoice>
         {
             Data = invoice,
             ApiState = HttpStatusCode.Created,

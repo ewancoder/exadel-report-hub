@@ -1,10 +1,11 @@
 ﻿using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.Models.Enums;
+using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.CQRS.Commands.Invoice;
+namespace ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 
-public class UpdateInvoiceCommand : ICommand<Models.Models.Invoice>
+public class UpdateInvoiceCommand : ICommand<Invoice>
 {
     public ObjectId Id { get; set; }
     public string? InvoiceNumber { get; set; }

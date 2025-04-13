@@ -1,16 +1,17 @@
-﻿using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+﻿using System.Net;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Commands.Invoice;
-using System.Net;
+using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
+using ExportPro.StorageService.Models.Models;
 
-namespace ExportPro.StorageService.CQRS.Handlers.Invoice;
+namespace ExportPro.StorageService.CQRS.Handlers.invoiceHandler;
 
 public class UpdateInvoiceHandler(IRepository<Models.Models.Invoice> repository) : ICommandHandler<UpdateInvoiceCommand, Models.Models.Invoice>
 {
     private readonly IRepository<Models.Models.Invoice> _repository = repository;
 
-    public async Task<BaseResponse<Models.Models.Invoice>> Handle(UpdateInvoiceCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<Invoice>> Handle(UpdateInvoiceCommand request, CancellationToken cancellationToken)
     {
         var existing = await _repository.GetByIdAsync(request.Id, cancellationToken);
         if (existing == null)

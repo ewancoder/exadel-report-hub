@@ -1,10 +1,10 @@
-﻿using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+﻿using System.Net;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Commands.Invoice;
-using System.Net;
+using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 
-namespace ExportPro.StorageService.CQRS.Handlers.Invoice;
+namespace ExportPro.StorageService.CQRS.Handlers.invoiceHandler;
 
 public class DeleteInvoiceHandler(IRepository<Models.Models.Invoice> repository) : ICommandHandler<DeleteInvoiceCommand, bool>
 {

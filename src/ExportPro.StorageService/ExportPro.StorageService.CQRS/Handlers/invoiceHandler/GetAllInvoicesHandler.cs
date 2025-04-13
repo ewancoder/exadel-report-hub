@@ -1,11 +1,10 @@
-﻿using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+﻿using System.Net;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Queries.Invoice;
+using ExportPro.StorageService.CQRS.Queries.invoice;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using System.Net;
 
-namespace ExportPro.StorageService.CQRS.Handlers.Invoice;
+namespace ExportPro.StorageService.CQRS.Handlers.invoiceHandler;
 
 public class GetAllInvoicesHandler(IInvoiceRepository repository) : IQueryHandler<GetAllInvoicesQuery, List<Models.Models.Invoice>>
 {

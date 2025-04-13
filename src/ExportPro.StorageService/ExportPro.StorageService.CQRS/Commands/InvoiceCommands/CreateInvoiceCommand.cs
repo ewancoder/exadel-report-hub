@@ -1,7 +1,7 @@
 ﻿using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.Models.Enums;
 
-namespace ExportPro.StorageService.CQRS.Commands.Invoice;
+namespace ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 
 public class CreateInvoiceCommand : ICommand<Models.Models.Invoice>
 {
