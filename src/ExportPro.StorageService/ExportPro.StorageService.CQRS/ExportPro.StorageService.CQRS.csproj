@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExportPro.Common.Shared" Version="1.0.5" />
-    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="ExportPro.Common.Shared" Version="1.0.8" />
+    <PackageReference Include="MediatR" Version="12.5.0" />
   </ItemGroup>
 
   <ItemGroup>

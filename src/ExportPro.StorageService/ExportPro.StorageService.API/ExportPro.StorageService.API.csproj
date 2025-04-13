@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.5" />
+    <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.7" />
     <PackageReference Include="ExportPro.Auth.Service" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
     <PackageReference Include="Refit" Version="8.0.0" />
