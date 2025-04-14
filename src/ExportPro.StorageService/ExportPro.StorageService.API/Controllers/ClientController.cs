@@ -85,6 +85,15 @@ public class ClientController : ControllerBase
         var clients = await _mediator.Send(new GetAllCLientsIncludingSoftDeletedQuery());
         return Ok( clients);
     }
+    [HttpGet("get/clients/fullclient/{clientId}")]
+    [SwaggerOperation(Summary = "Getting  clients. including soft deleted ")]
+    [ProducesResponseType(typeof(List<ClientResponse>), 200)]
+    public async Task<IActionResult> GetFullClient(string clientId)
+    {
+        var clients = await _clientService.GetFullClient(clientId);
+        return Ok(clients);
+    }
+
     [HttpPut("update/client")]
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]

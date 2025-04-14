@@ -18,6 +18,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Refit;
+using ExportPro.StorageService.CQRS.Handlers.Client;
+using ExportPro.Common.DataAccess.MongoDB.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -45,26 +47,28 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
     });
+builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddCommonRegistrations();
+builder.Services.AddScoped<IRepository<Client>>(
+    provider => provider.GetRequiredService<ClientRepository>());
+builder.Services.AddScoped<IRepository<Item>>(
+    provider => provider.GetRequiredService<IItemRepository>());
+builder.Services.AddScoped<IItemRepository, ItemRepository>();
+builder.Services.AddScoped<ItemRepository>();
 builder.Services.AddScoped<ClientRepository>();
+builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IRepository<Invoice>>(
     provider => provider.GetRequiredService<IInvoiceRepository>());
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
-
-
-
+builder.Services.AddMediatR(cfg =>
+      cfg.RegisterServicesFromAssemblies(typeof(GetClientsQueryHandler).Assembly)); builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
-builder.Services.AddScoped<IItemRepository, ItemRepository>();  
 builder.Services
     .AddRefitClient<IAuth>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));
 var app = builder.Build();
+
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseMiddleware<ErrorHandlingMiddleware>();

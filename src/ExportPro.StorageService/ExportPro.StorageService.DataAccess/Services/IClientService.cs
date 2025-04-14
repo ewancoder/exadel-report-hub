@@ -18,4 +18,6 @@ public interface IClientService
     Task<ClientResponse> AddItemIds(string Clientid, List<string> ItemIds);
     Task<ClientResponse> AddInvoiceIds(string Clientid, List<string> InvoiceIds);
     Task<ClientResponse> AddCustomerIds(string Clientid, List<string> customerids);
+    Task<FullClientResponse> GetFullClient(string clientid);
+    Task<FullClientResponse> GetAllFullClients(string clientid);
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
@@ -87,30 +88,73 @@ public class ClientService:IClientService
     {
         var client =await _clientRepository.GetOneAsync(x=>x.Id.ToString()==Clientid && x.IsDeleted==false, CancellationToken.None);
         if (client == null) return null;
-        // List<InvoiceResponse> res = resp.Select(x => new InvoiceResponse()
-        // {
-        //     Id = x.Id.ToString(),
-        //     InvoiceNumber = x.InvoiceNumber,
-        //     DueDate = x.DueDate,
-        //     Amount = x.Amount,
-        //     Currency = x.Currency,
-        //     PaymentStatus = x.PaymentStatus,
-        //     BankAccountNumber = x.BankAccountNumber,
-        //     ClientId = x.ClientId,
-        //     ItemIds = x.ItemIds
-        // }).ToList();
-        // foreach (var i in client.InvoiceIds)
-        // {
-        //     foreach (var j in res)
-        //     {
-        //         if (j.Id == i)
-        //         {
-        //             
-        //         }
-        //     }
-        // }
+        //List<InvoiceResponse> res = client.Select(x => new InvoiceResponse()
+        //{
+        //    Id = x.Id.ToString(),
+        //    InvoiceNumber = x.InvoiceNumber,
+        //    DueDate = x.DueDate,
+        //    Amount = x.Amount,
+        //    Currency = x.Currency,
+        //    PaymentStatus = x.PaymentStatus,
+        //    BankAccountNumber = x.BankAccountNumber,
+        //    ClientId = x.ClientId,
+        //    ItemIds = x.ItemIds
+        //}).ToList();
+        //foreach (var i in client.InvoiceIds)
+        //{
+        //    foreach (var j in res)
+        //    {
+        //        if (j.Id == i)
+        //        {
+
+        //        }
+        //    }
+        //}
         var clientresponse= ClientToClientResponse.ClientToClientReponse(client) ;
         return clientresponse;
+    }
+    public async Task<FullClientResponse> GetFullClient(string clientid)
+    {
+        var client = await GetClientById(clientid);
+        var invoices = await _invoiceRepository.GetAllAsync(CancellationToken.None);
+        var invoiceResponses = invoices.Select(x => new InvoiceResponse()
+        {
+            Id = x.Id.ToString(),
+            InvoiceNumber = x.InvoiceNumber,
+            DueDate = x.DueDate,
+            Amount = x.Amount,
+            Currency = x.Currency,
+            PaymentStatus = x.PaymentStatus,
+            BankAccountNumber = x.BankAccountNumber,
+            ClientId = x.ClientId,
+            ItemIds = x.ItemIds
+        }).ToList();
+        List<InvoiceResponse> invoicesresponse = new();
+        foreach (var i in client.InvoiceIds)
+        {
+            foreach (var j in invoiceResponses)
+            {
+                if (j.Id == i)
+                {
+                    invoicesresponse.Add(j);
+                }
+            }
+        }
+        FullClientResponse fullClientResponse = new()
+        {
+            Id = client.Id,
+            Name = client.Name,
+            Description = client.Description,
+            CreatedAt = client.CreatedAt,
+            UpdatedAt = client.UpdatedAt,
+            IsDeleted = client.IsDeleted,
+            invoices =invoiceResponses,
+        };
+        return fullClientResponse;
+    }
+    public Task<FullClientResponse> GetAllFullClients(string clientid)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<List<ClientResponse>> GetAllCLientsIncludingSoftDeleted()
@@ -144,4 +188,5 @@ public class ClientService:IClientService
         await _clientRepository.DeleteAsync(Clientid,CancellationToken.None);
         return "Deleted";
     }
+
 }   
