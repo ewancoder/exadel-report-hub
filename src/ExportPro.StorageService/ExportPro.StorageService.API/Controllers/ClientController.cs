@@ -12,6 +12,7 @@ using ExportPro.StorageService.SDK.Mapping;
 using MediatR;
 using ExportPro.StorageService.DataAccess.Services;
 using ExportPro.StorageService.CQRS.Handlers.Client;
+using ExportPro.StorageService.DataAccess.Interfaces;
 
 
 
@@ -19,20 +20,12 @@ namespace ExportPro.StorageService.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ClientController : ControllerBase
+public class ClientController(IAuth auth,IClientRepository clientRepository,IClientService clientService,IMediator mediator) : ControllerBase
 {
-    private readonly IAuth _auth;
-    private readonly ClientRepository _clientRepository;
-    private readonly IClientService _clientService;
-    private readonly IMediator _mediator;
-    public ClientController(IAuth authApi,
-        IMediator mediator,ClientRepository clientRepository, IClientService clientService)
-    {
-        _auth = authApi;
-        _clientRepository = clientRepository;
-        _mediator = mediator;
-        _clientService = clientService;
-    }
+    private readonly IAuth _auth = auth;
+    private readonly IClientRepository _clientRepository=clientRepository;
+    private readonly IClientService _clientService=clientService;
+    private readonly IMediator _mediator=mediator;
     [HttpPost("dummyregister")]
     [SwaggerOperation(Summary = "Register a new user")]
     [ProducesResponseType(typeof(AuthResponseDto), 200)]

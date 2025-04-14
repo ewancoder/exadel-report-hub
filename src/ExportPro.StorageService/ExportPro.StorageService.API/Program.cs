@@ -52,7 +52,7 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<ItemRepository>();
 builder.Services.AddScoped<CustomerRepository>();
 builder.Services.AddCommonRegistrations();
-builder.Services.AddScoped<ClientRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IRepository<Invoice>>(
     provider => provider.GetRequiredService<IInvoiceRepository>());
 builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();

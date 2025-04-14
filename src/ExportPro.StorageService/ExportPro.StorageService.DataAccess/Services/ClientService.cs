@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using AutoMapper;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
@@ -11,18 +12,12 @@ using SharpCompress.Readers.Rar;
 
 namespace ExportPro.StorageService.DataAccess.Services;
 
-public class ClientService:IClientService
+public class ClientService(IMapper mapper,IClientRepository clientRepository,IInvoiceRepository invoiceRepository,CustomerRepository customerRepository):IClientService
 {
-    private readonly ClientRepository _clientRepository;
-    private readonly IInvoiceRepository _invoiceRepository;
-    private readonly CustomerRepository _customerRepository;
-    public ClientService(ClientRepository clientRepository, IInvoiceRepository invoiceRepository,CustomerRepository customerRepository)
-    {
-        _invoiceRepository = invoiceRepository;
-        _clientRepository = clientRepository;
-        _customerRepository = customerRepository;
-    }
-
+    private readonly IClientRepository _clientRepository= clientRepository;
+    private readonly IInvoiceRepository _invoiceRepository=invoiceRepository;
+    private readonly CustomerRepository _customerRepository=customerRepository;
+    private readonly IMapper _mapper = mapper;  
     public async Task<List<ClientResponse>> GetClientsService()
     {
         var clients = await _clientRepository.GetClients();
@@ -31,23 +26,17 @@ public class ClientService:IClientService
     }
     public async Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto)
     {
-        Client client = new()
-        {
-            Name = clientDto.Name,
-            Description = clientDto.Description
-        };
+        Client client = _mapper.Map<Client>(clientDto);
         await _clientRepository.AddOneAsync(client, CancellationToken.None);
-        return ClientToClientResponse.ClientToClientReponse(client);
+        return _mapper.Map<ClientResponse>(client);
     }
-
     public async Task<ClientResponse> GetClientByIdIncludingSoftDeleted(ObjectId ClientId)
     {
         var client =await _clientRepository.GetOneAsync(x=>x.Id==ClientId,CancellationToken.None);
         if (client == null) return null;
-        var clientresponse= ClientToClientResponse.ClientToClientReponse(client) ;
+        var clientresponse= _mapper.Map<ClientResponse>(client);
         return clientresponse;
     }
-
     public async Task<ClientResponse> AddItemIds(string Clientid, List<string> ItemIds)
     {
         var client = await _clientRepository.GetOneAsync(x => x.Id.ToString() == Clientid,CancellationToken.None);
@@ -58,7 +47,7 @@ public class ClientService:IClientService
         }
         client.UpdatedAt = DateTime.UtcNow;
         await _clientRepository.UpdateOneAsync(client, CancellationToken.None);
-        return ClientToClientResponse.ClientToClientReponse(client);
+        return _mapper.Map<ClientResponse>(client);
     }
     public async Task<ClientResponse> AddInvoiceIds(string Clientid, List<string> InvoiceIds)
     {
@@ -70,7 +59,7 @@ public class ClientService:IClientService
         }
         client.UpdatedAt = DateTime.UtcNow;
         await _clientRepository.UpdateOneAsync(client, CancellationToken.None);
-        return ClientToClientResponse.ClientToClientReponse(client);
+        return _mapper.Map<ClientResponse>(client);
     }
 
     public async Task<ClientResponse> AddCustomerIds(string Clientid, List<string> customerids)
@@ -83,14 +72,14 @@ public class ClientService:IClientService
         }
         client.UpdatedAt = DateTime.UtcNow;
         await _clientRepository.UpdateOneAsync(client, CancellationToken.None);
-        return ClientToClientResponse.ClientToClientReponse(client);
+        return _mapper.Map<ClientResponse>(client);
     }
 
     public async Task<ClientResponse> GetClientById(string Clientid)
     {
         var client =await _clientRepository.GetOneAsync(x=>x.Id.ToString()==Clientid && x.IsDeleted==false, CancellationToken.None);
         if (client == null) return null;
-        var clientresponse= ClientToClientResponse.ClientToClientReponse(client) ;
+        var clientresponse= _mapper.Map<ClientResponse>(client) ;
         return clientresponse;
     }
     public async Task<FullClientResponse> GetFullClient(string clientid)

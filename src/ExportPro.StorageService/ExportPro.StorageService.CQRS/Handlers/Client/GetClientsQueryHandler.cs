@@ -6,14 +6,10 @@ using ExportPro.StorageService.SDK.Responses;
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
 public record GetClientsQuery : IQuery<List<ClientResponse>>;
 
-public class GetClientsQueryHandler : IQueryHandler<GetClientsQuery, List<ClientResponse>>
+public class GetClientsQueryHandler(IClientService clientService) : IQueryHandler<GetClientsQuery, List<ClientResponse>>
 {
-    private readonly IClientService _clientService;
+    private readonly IClientService _clientService =clientService;
 
-    public GetClientsQueryHandler(IClientService clientService)
-    {
-        _clientService = clientService;
-    }
     public async Task<BaseResponse<List<ClientResponse>>> Handle(GetClientsQuery request, CancellationToken cancellationToken)
     {
         var clientresponse = await _clientService.GetClientsService();

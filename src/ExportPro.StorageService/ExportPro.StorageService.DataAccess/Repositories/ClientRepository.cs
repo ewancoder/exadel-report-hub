@@ -1,10 +1,11 @@
 ﻿using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
+using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using MongoDB.Driver;
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class ClientRepository : MongoRepositoryBase<Client>
+public class ClientRepository : MongoRepositoryBase<Client>,IClientRepository
 {
     private  IMongoCollection<Client> _clients;
     private readonly IMongoDbConnectionFactory _mongoDbConnectionFactory;
