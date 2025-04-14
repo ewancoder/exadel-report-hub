@@ -1,11 +1,11 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Commands.Client;
+
 using ExportPro.StorageService.DataAccess.Services;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
-
+public record DeleteClientCommand(ObjectId ClientId) : ICommand<string>;
 public class DeleteClientCommandHandler(IClientService clientService) : ICommandHandler<DeleteClientCommand, string>
 {
     private readonly IClientService _clientService = clientService;

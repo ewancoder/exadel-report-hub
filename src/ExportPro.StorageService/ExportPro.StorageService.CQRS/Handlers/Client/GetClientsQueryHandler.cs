@@ -1,10 +1,10 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Queries.Client;
 using ExportPro.StorageService.DataAccess.Services;
 using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
+public record GetClientsQuery : IQuery<List<ClientResponse>>;
 
 public class GetClientsQueryHandler : IQueryHandler<GetClientsQuery, List<ClientResponse>>
 {

@@ -1,10 +1,11 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Queries.Client;
+
 using ExportPro.StorageService.DataAccess.Services;
 using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
+public record GetAllCLientsIncludingSoftDeletedQuery : IQuery<List<ClientResponse>>;
 
 public class GetAllCLientsIncludingSoftDeletedQueryHandler(IClientService clientService) : IQueryHandler<GetAllCLientsIncludingSoftDeletedQuery, List<ClientResponse>>
 {

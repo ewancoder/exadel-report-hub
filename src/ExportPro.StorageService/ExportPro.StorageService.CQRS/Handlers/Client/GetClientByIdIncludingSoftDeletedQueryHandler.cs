@@ -1,10 +1,11 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Queries.Client;
 using ExportPro.StorageService.DataAccess.Services;
 using ExportPro.StorageService.SDK.Responses;
+using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
+public record GetClientByIdIncludingSoftDeletedQuery(ObjectId Id) : IQuery<ClientResponse>;
 
 public class GetClientByIdIncludingSoftDeletedQueryHandler(IClientService clientService) : IQueryHandler<GetClientByIdIncludingSoftDeletedQuery, ClientResponse>
 {

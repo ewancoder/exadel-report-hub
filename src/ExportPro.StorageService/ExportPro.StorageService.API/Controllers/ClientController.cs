@@ -11,8 +11,9 @@ using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Mapping;
 using MediatR;
 using ExportPro.StorageService.DataAccess.Services;
-using ExportPro.StorageService.CQRS.Queries.Client;
-using ExportPro.StorageService.CQRS.Commands.Client;
+using ExportPro.StorageService.CQRS.Handlers.Client;
+
+
 
 namespace ExportPro.StorageService.API.Controllers;
 

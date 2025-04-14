@@ -1,10 +1,12 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Commands.Client;
+
 using ExportPro.StorageService.DataAccess.Services;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
+public record UpdateClientCommand(ClientUpdateDto clientUpdateDto, string ClientId) : ICommand<ClientResponse>;
 
 public class UpdateClientCommandHandler(IClientService clientService) : ICommandHandler<UpdateClientCommand, ClientResponse>
 {
