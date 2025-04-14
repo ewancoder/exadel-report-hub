@@ -44,14 +44,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddAutoMapper(typeof(ExportPro.StorageService.CQRS.Profiles.MappingProfile));
 builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<ItemRepository>();
+builder.Services.AddScoped<CustomerRepository>();
 builder.Services.AddCommonRegistrations();
 builder.Services.AddScoped<ClientRepository>();
 builder.Services.AddScoped<IRepository<Invoice>>(
     provider => provider.GetRequiredService<IInvoiceRepository>());
 builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
 builder.Services.AddScoped<IItemRepository,ItemRepository>();
-builder.Services.AddScoped<ItemRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
