@@ -86,11 +86,19 @@ public class ClientController : ControllerBase
         return Ok( clients);
     }
     [HttpGet("get/clients/fullclient/{clientId}")]
-    [SwaggerOperation(Summary = "Getting  clients. including soft deleted ")]
+    [SwaggerOperation(Summary = "Getting  client by id including invoices,customers,items")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     public async Task<IActionResult> GetFullClient(string clientId)
     {
         var clients = await _clientService.GetFullClient(clientId);
+        return Ok(clients);
+    }
+    [HttpGet("get/clients/fullclient/all")]
+    [SwaggerOperation(Summary = "Getting  clients including invoices,customers,items")]
+    [ProducesResponseType(typeof(List<ClientResponse>), 200)]
+    public async Task<IActionResult> GetAllFullClients()
+    {
+        var clients = await _clientService.GetAllFullClients();
         return Ok(clients);
     }
 

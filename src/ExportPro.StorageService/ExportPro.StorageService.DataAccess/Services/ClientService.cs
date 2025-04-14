@@ -15,10 +15,12 @@ public class ClientService:IClientService
 {
     private readonly ClientRepository _clientRepository;
     private readonly IInvoiceRepository _invoiceRepository;
-    public ClientService(ClientRepository clientRepository, IInvoiceRepository invoiceRepository)
+    private readonly CustomerRepository _customerRepository;
+    public ClientService(ClientRepository clientRepository, IInvoiceRepository invoiceRepository,CustomerRepository customerRepository)
     {
         _invoiceRepository = invoiceRepository;
         _clientRepository = clientRepository;
+        _customerRepository = customerRepository;
     }
 
     public async Task<List<ClientResponse>> GetClientsService()
@@ -88,28 +90,6 @@ public class ClientService:IClientService
     {
         var client =await _clientRepository.GetOneAsync(x=>x.Id.ToString()==Clientid && x.IsDeleted==false, CancellationToken.None);
         if (client == null) return null;
-        //List<InvoiceResponse> res = client.Select(x => new InvoiceResponse()
-        //{
-        //    Id = x.Id.ToString(),
-        //    InvoiceNumber = x.InvoiceNumber,
-        //    DueDate = x.DueDate,
-        //    Amount = x.Amount,
-        //    Currency = x.Currency,
-        //    PaymentStatus = x.PaymentStatus,
-        //    BankAccountNumber = x.BankAccountNumber,
-        //    ClientId = x.ClientId,
-        //    ItemIds = x.ItemIds
-        //}).ToList();
-        //foreach (var i in client.InvoiceIds)
-        //{
-        //    foreach (var j in res)
-        //    {
-        //        if (j.Id == i)
-        //        {
-
-        //        }
-        //    }
-        //}
         var clientresponse= ClientToClientResponse.ClientToClientReponse(client) ;
         return clientresponse;
     }
@@ -130,6 +110,30 @@ public class ClientService:IClientService
             ItemIds = x.ItemIds
         }).ToList();
         List<InvoiceResponse> invoicesresponse = new();
+        var customers  = await _customerRepository.GetAllAsync(CancellationToken.None);
+        var customerresponse = customers.Select(x => new CustomerResponse()
+        {
+            Id = x.Id.ToString(),
+            Name = x.Name,
+            Country= x.Country,
+            Email=x.Email,
+            CreatedAt = x.CreatedAt,
+            UpdatedAt = x.UpdatedAt,
+            IsDeleted = x.IsDeleted
+        }).ToList();
+        if(client.CustomerIds==null) client.CustomerIds = new List<string>();
+        if(client.InvoiceIds == null) client.InvoiceIds = new List<string>();
+        List<CustomerResponse> customerresponses = new();
+        foreach (var i in client.CustomerIds)
+        {
+            foreach (var j in customerresponse)
+            {
+                if (j.Id == i)
+                {
+                    customerresponses.Add(j);
+                }
+            }
+        }
         foreach (var i in client.InvoiceIds)
         {
             foreach (var j in invoiceResponses)
@@ -148,13 +152,55 @@ public class ClientService:IClientService
             CreatedAt = client.CreatedAt,
             UpdatedAt = client.UpdatedAt,
             IsDeleted = client.IsDeleted,
-            invoices =invoiceResponses,
+            invoices = invoiceResponses,
+            customers = customerresponses,
+            items = new List<Item>()
         };
         return fullClientResponse;
     }
-    public Task<FullClientResponse> GetAllFullClients(string clientid)
+    public async Task<List<FullClientResponse>> GetAllFullClients()
     {
-        throw new NotImplementedException();
+        var clients = await GetClientsService();
+        var invoices = await _invoiceRepository.GetAllAsync(CancellationToken.None);
+        var customers = await _customerRepository.GetAllAsync(CancellationToken.None);
+       List<FullClientResponse> fullclients = new();
+        foreach (var i in clients)
+        {
+            var fullclient = new FullClientResponse
+            {
+                Id = i.Id,
+                Name = i.Name,
+                Description = i.Description,
+                CreatedAt = i.CreatedAt,
+                UpdatedAt = i.UpdatedAt,
+                IsDeleted = i.IsDeleted,
+                invoices = invoices.Where(x => i.InvoiceIds.Contains(x.Id.ToString())).Select(x => new InvoiceResponse()
+                {
+                    Id = x.Id.ToString(),
+                    InvoiceNumber = x.InvoiceNumber,
+                    DueDate = x.DueDate,
+                    Amount = x.Amount,
+                    Currency = x.Currency,
+                    PaymentStatus = x.PaymentStatus,
+                    BankAccountNumber = x.BankAccountNumber,
+                    ClientId = x.ClientId,
+                    ItemIds = x.ItemIds
+                }).ToList(),
+                customers = customers.Where(x=>i.InvoiceIds.Contains(x.Id.ToString())).Select(x => new CustomerResponse()
+                {
+                    Id = x.Id.ToString(),
+                    Name = x.Name,
+                    Country = x.Country,
+                    Email = x.Email,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    IsDeleted = x.IsDeleted
+                }).ToList(),
+                items = new List<Item>()
+            };
+            fullclients.Add(fullclient);
+        }
+        return fullclients;
     }
 
     public async Task<List<ClientResponse>> GetAllCLientsIncludingSoftDeleted()
