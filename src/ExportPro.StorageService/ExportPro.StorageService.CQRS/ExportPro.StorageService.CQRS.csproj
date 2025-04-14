@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="ExportPro.Common.Shared" Version="1.0.8" />
     <PackageReference Include="MediatR" Version="12.5.0" />
   </ItemGroup>
