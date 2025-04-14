@@ -8,7 +8,7 @@ namespace ExportPro.StorageService.DataAccess.Repositories;
 
 public class ItemRepository(ICollectionProvider collectionProvider) : MongoRepositoryBase<Item>(collectionProvider), IItemRepository
 {
-    
+
     public Task<List<Item>> GetFilteredItemsAsync(string? invoiceId = null, string? clientId = null, string? customerId = null, CancellationToken cancellationToken = default)
     {
         var filter = Builders<Item>.Filter.Empty;
