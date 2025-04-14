@@ -1,5 +1,7 @@
-﻿using ExportPro.StorageService.CQRS.Commands;
-using ExportPro.StorageService.CQRS.Queries;
+﻿using ExportPro.StorageService.CQRS.Commands.Customer;
+using ExportPro.StorageService.CQRS.Queries.Customer;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -24,7 +26,16 @@ public class CustomerController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateCustomerCommand command, CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(command, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
+        var res = new CustomerResponse()
+        {
+            Id = response.Data.Id.ToString(),
+            Name = response.Data.Name,
+            Email = response.Data.Email,
+            Country = response.Data.Country,
+            CreatedAt = response.Data.CreatedAt,
+            UpdatedAt = response.Data.UpdatedAt,
+        };
+        return StatusCode((int)response.ApiState, res);
     }
 
     /// <summary>
@@ -67,7 +78,16 @@ public class CustomerController : ControllerBase
 
         var query = new GetCustomerByIdQuery { Id = objectId };
         var response = await _mediator.Send(query, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
+        var res = new CustomerResponse()
+        {
+            Id = response.Data.Id.ToString(),
+            Name = response.Data.Name,
+            Email = response.Data.Email,
+            Country = response.Data.Country,
+            CreatedAt = response.Data.CreatedAt,
+            UpdatedAt = response.Data.UpdatedAt,
+        };
+        return StatusCode((int)response.ApiState, res);
     }
 
     /// <summary>
@@ -77,6 +97,15 @@ public class CustomerController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(new GetAllCustomersQuery(), cancellationToken);
-        return StatusCode((int)response.ApiState, response);
+        var res =  response.Data.Select(response => new CustomerResponse()
+        {
+            Id = response.Id.ToString(),
+            Name = response.Name,
+            Email = response.Email,
+            Country = response.Country,
+            CreatedAt = response.CreatedAt,
+            UpdatedAt = response.UpdatedAt,
+        }).ToList();
+        return StatusCode((int)response.ApiState, res);
     }
 }

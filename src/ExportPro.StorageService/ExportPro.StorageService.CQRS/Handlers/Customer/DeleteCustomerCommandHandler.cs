@@ -1,10 +1,10 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Commands;
+using ExportPro.StorageService.CQRS.Commands.Customer;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using System.Net;
 
-namespace ExportPro.StorageService.CQRS.Handlers;
+namespace ExportPro.StorageService.CQRS.Handlers.Customer;
 
 public class DeleteCustomerCommandHandler(ICustomerRepository repository) : ICommandHandler<DeleteCustomerCommand, bool>
 {

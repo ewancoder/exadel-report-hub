@@ -1,13 +1,12 @@
-using ExportPro.Common.Models.MongoDB;
 using ExportPro.StorageService.Models.Enums;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ExportPro.StorageService.Models.Models;
+namespace ExportPro.StorageService.SDK.Responses;
 
-public class Invoice : IModel
+public class InvoiceResponse
 {
-    public ObjectId Id { get; set; }
+    public string Id { get; set; }
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; } = DateTime.Now;
     public DateTime DueDate { get; set; } = DateTime.Now;
@@ -18,5 +17,5 @@ public class Invoice : IModel
     [BsonRepresentation(BsonType.ObjectId)] 
     public string? ClientId { get; set; }
     [BsonRepresentation(BsonType.ObjectId)]
-    public List<string>? ItemIds { get; set; }
+    public List<string>? ItemIds { get; set; } = new();
 }

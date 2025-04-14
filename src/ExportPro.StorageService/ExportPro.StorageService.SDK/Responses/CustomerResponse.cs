@@ -1,11 +1,8 @@
-﻿using ExportPro.Common.Models.MongoDB;
-using MongoDB.Bson;
+namespace ExportPro.StorageService.SDK.Responses;
 
-namespace ExportPro.StorageService.Models.Models;
-
-public class Customer : IModel
+public class CustomerResponse
 {
-    public ObjectId Id { get; set; }
+    public string Id { get; set; }
     public string? Name { get; set; }
     public string? Email { get; set; }
     public string? Country { get; set; }

@@ -1,22 +1,21 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Commands;
+using ExportPro.StorageService.CQRS.Commands.Customer;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using System.Net;
 
-namespace ExportPro.StorageService.CQRS.Handlers;
+namespace ExportPro.StorageService.CQRS.Handlers.Customer;
 
-public class UpdateCustomerCommandHandler(ICustomerRepository repository) : ICommandHandler<UpdateCustomerCommand, Customer>
+public class UpdateCustomerCommandHandler(ICustomerRepository repository) : ICommandHandler<UpdateCustomerCommand, Models.Models.Customer>
 {
     private readonly ICustomerRepository _repository = repository;
 
-    public async Task<BaseResponse<Customer>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<Models.Models.Customer>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
     {
         var customer = await _repository.GetByIdAsync(request.Id, cancellationToken);
         if (customer is null || customer.IsDeleted)
         {
-            return new BaseResponse<Customer>
+            return new BaseResponse<Models.Models.Customer>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.NotFound,
@@ -31,6 +30,6 @@ public class UpdateCustomerCommandHandler(ICustomerRepository repository) : ICom
 
         await _repository.UpdateOneAsync(customer, cancellationToken);
 
-        return new BaseResponse<Customer> { Data = customer };
+        return new BaseResponse<Models.Models.Customer> { Data = customer };
     }
 }

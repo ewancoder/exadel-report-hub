@@ -2,9 +2,9 @@
 using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.CQRS.Queries;
+namespace ExportPro.StorageService.CQRS.Queries.invoice;
 
-public class GetCustomerByIdQuery : IQuery<Customer>
+public class GetInvoiceByIdQuery : IQuery<Invoice>
 {
     public ObjectId Id { get; set; }
 }

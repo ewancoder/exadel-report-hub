@@ -1,10 +1,9 @@
 ﻿using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.CQRS.Commands;
+namespace ExportPro.StorageService.CQRS.Commands.Customer;
 
-public class UpdateCustomerCommand : ICommand<Customer>
+public class UpdateCustomerCommand : ICommand<Models.Models.Customer>
 {
     public ObjectId Id { get; set; }
     public string Name { get; set; }

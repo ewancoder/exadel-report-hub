@@ -1,22 +1,20 @@
-using ExportPro.Common.Models.MongoDB;
+﻿using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.Models.Enums;
+using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
-namespace ExportPro.StorageService.Models.Models;
+namespace ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 
-public class Invoice : IModel
+public class UpdateInvoiceCommand : ICommand<Invoice>
 {
     public ObjectId Id { get; set; }
     public string? InvoiceNumber { get; set; }
-    public DateTime IssueDate { get; set; } = DateTime.Now;
-    public DateTime DueDate { get; set; } = DateTime.Now;
+    public DateTime IssueDate { get; set; }
+    public DateTime DueDate { get; set; }
     public decimal Amount { get; set; }
     public string? Currency { get; set; }
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
-    [BsonRepresentation(BsonType.ObjectId)] 
     public string? ClientId { get; set; }
-    [BsonRepresentation(BsonType.ObjectId)]
     public List<string>? ItemIds { get; set; }
 }

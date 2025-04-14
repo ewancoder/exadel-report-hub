@@ -1,19 +1,18 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Commands;
+using ExportPro.StorageService.CQRS.Commands.Customer;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.CQRS.Handlers;
+namespace ExportPro.StorageService.CQRS.Handlers.Customer;
 
-public class CreateCustomerCommandHandler(ICustomerRepository repository) : ICommandHandler<CreateCustomerCommand, Customer>
+public class CreateCustomerCommandHandler(ICustomerRepository repository) : ICommandHandler<CreateCustomerCommand, Models.Models.Customer>
 {
     private readonly ICustomerRepository _repository = repository;
 
-    public async Task<BaseResponse<Customer>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<Models.Models.Customer>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
     {
-        var customer = new Customer
+        var customer = new Models.Models.Customer
         {
             Id = ObjectId.GenerateNewId(),
             Name = request.Name,
@@ -26,6 +25,6 @@ public class CreateCustomerCommandHandler(ICustomerRepository repository) : ICom
 
         await _repository.AddOneAsync(customer, cancellationToken);
 
-        return new BaseResponse<Customer> { Data = customer };
+        return new BaseResponse<Models.Models.Customer> { Data = customer };
     }
 }

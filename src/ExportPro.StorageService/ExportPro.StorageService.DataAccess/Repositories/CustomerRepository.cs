@@ -6,10 +6,8 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class CustomerRepository : MongoRepositoryBase<Customer>, ICustomerRepository
+public class CustomerRepository(ICollectionProvider collectionProvider) : MongoRepositoryBase<Customer>(collectionProvider), ICustomerRepository
 {
-    public CustomerRepository(ICollectionProvider collectionProvider) : base(collectionProvider) { }
-
     public async Task<List<Customer>> GetAllAsync(CancellationToken cancellationToken)
     {
         var filter = Builders<Customer>.Filter.Eq(c => c.IsDeleted, false);

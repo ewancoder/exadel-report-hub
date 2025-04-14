@@ -1,22 +1,21 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Queries;
+using ExportPro.StorageService.CQRS.Queries.Customer;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using System.Net;
 
-namespace ExportPro.StorageService.CQRS.Handlers;
+namespace ExportPro.StorageService.CQRS.Handlers.Customer;
 
-public class GetCustomerByIdQueryHandler(ICustomerRepository repository) : IQueryHandler<GetCustomerByIdQuery, Customer>
+public class GetCustomerByIdQueryHandler(ICustomerRepository repository) : IQueryHandler<GetCustomerByIdQuery, Models.Models.Customer>
 {
     private readonly ICustomerRepository _repository = repository;
 
-    public async Task<BaseResponse<Customer>> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<Models.Models.Customer>> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
     {
         var customer = await _repository.GetByIdAsync(request.Id, cancellationToken);
         if (customer == null || customer.IsDeleted)
         {
-            return new BaseResponse<Customer>
+            return new BaseResponse<Models.Models.Customer>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.NotFound,
@@ -24,6 +23,6 @@ public class GetCustomerByIdQueryHandler(ICustomerRepository repository) : IQuer
             };
         }
 
-        return new BaseResponse<Customer> { Data = customer };
+        return new BaseResponse<Models.Models.Customer> { Data = customer };
     }
 }

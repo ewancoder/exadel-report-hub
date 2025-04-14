@@ -1,23 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.Intrinsics.X86;
 using ExportPro.Auth.SDK.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
-using ExportPro.StorageService.Models.Models;
-using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.SDK.DTOs;
 using MongoDB.Bson;
-using Refit;
-using Microsoft.AspNetCore.Authorization;
 using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Mapping;
 using MediatR;
 using ExportPro.StorageService.DataAccess.Services;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
-using MongoDB.Driver;
+using ExportPro.StorageService.CQRS.Queries.Client;
+using ExportPro.StorageService.CQRS.Commands.Client;
 
 namespace ExportPro.StorageService.API.Controllers;
 
@@ -28,10 +23,13 @@ public class ClientController : ControllerBase
     private readonly IAuth _auth;
     private readonly ClientRepository _clientRepository;
     private readonly IClientService _clientService;
-    public ClientController(IAuth authApi, ClientRepository clientRepository, IClientService clientService)
+    private readonly IMediator _mediator;
+    public ClientController(IAuth authApi,
+        IMediator mediator,ClientRepository clientRepository, IClientService clientService)
     {
         _auth = authApi;
         _clientRepository = clientRepository;
+        _mediator = mediator;
         _clientService = clientService;
     }
     [HttpPost("dummyregister")]
@@ -55,25 +53,19 @@ public class ClientController : ControllerBase
     [ProducesResponseType(typeof(ClientResponse), 200)]
     public async Task<IActionResult> CreateClient([FromBody] ClientDto clientdto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest();
-        }
+        if (!ModelState.IsValid) return BadRequest();
         var exists = await _clientRepository.GetOneAsync(x=>x.Name == clientdto.Name && x.IsDeleted==false, CancellationToken.None);
-        if (exists != null)
-        {
-            return BadRequest(new BadRequestResponse{Messages = ["Client already exists"]});
-        }
-        var clientResponse =await _clientService.AddClientFromClientDto(clientdto);
-        return Ok(new SuccessResponse<ClientResponse>(clientResponse));
+        if (exists != null) return BadRequest(new BadRequestResponse{Messages = ["Client already exists"]});
+        var clientResponse =await _mediator.Send(new AddClientFromClientDtoCommand(clientdto));
+        return Ok(clientResponse);
     }
     [HttpGet("get/clients")]
     [SwaggerOperation(Summary = "Getting  clients which are not soft deleted")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     public async Task<IActionResult> GetClients()
     {
-        var clients = await _clientService.GetClientsService();
-        return Ok(new SuccessResponse<List<ClientResponse>>(clients));
+        var clients = await _mediator.Send(new GetClientsQuery());
+        return Ok(clients);
     }
     [HttpGet("get/client/{Clientid}")]
     [SwaggerOperation(Summary = "Getting  client by client id which is not soft deleted")]
@@ -81,20 +73,17 @@ public class ClientController : ControllerBase
     public async Task<IActionResult> GetClientById([Required] string Clientid)
     {
         if (!ModelState.IsValid) return BadRequest(new BadRequestResponse());
-        var clientresponse = await _clientService.GetClientById(Clientid);
-        if(clientresponse == null) return BadRequest(new BadRequestResponse
-        {
-            Messages = ["Client Id does not exist"]
-        });
-        return Ok(new SuccessResponse<ClientResponse>(clientresponse));
+        var clientresponse = await _mediator.Send(new GetClientByIdQuery(Clientid));
+        if(clientresponse.Data == null) return BadRequest(new BadRequestResponse{Messages = ["Client Id does not exist"]});
+        return Ok(clientresponse);
     }
     [HttpGet("get/clients/includesoftdeleted")]
     [SwaggerOperation(Summary = "Getting  clients. including soft deleted ")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     public async Task<IActionResult> GetAllCLientsIncludingSoftDeleted()
     {
-        var clients = await _clientService.GetAllCLientsIncludingSoftDeleted();
-        return Ok( new SuccessResponse<List<ClientResponse>>(clients));
+        var clients = await _mediator.Send(new GetAllCLientsIncludingSoftDeletedQuery());
+        return Ok( clients);
     }
     [HttpPut("update/client")]
     [SwaggerOperation(Summary = "Updating the client")]
@@ -103,18 +92,16 @@ public class ClientController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         if (!ObjectId.TryParse(clientid, out var objectId))
-        {
             return BadRequest(new BadRequestResponse
             {
                 Messages =["Invalid client id format"]
             });
-        }
         var client = await _clientRepository.GetOneAsync(x=>x.Id ==objectId, CancellationToken.None);
         if(client == null) return BadRequest(new BadRequestResponse{Messages = ["Client id does not exists"]});
-        ClientResponse afterUpdate=await _clientService.UpdateClient(clientdto,clientid);
+        BaseResponse<ClientResponse> afterUpdate=await _mediator.Send(new UpdateClientCommand(clientdto,clientid));
         var response = new
         {
-            before = new Response{Message = "Before The Update",ClientResponse = ClientToClientResponse.ClientToClientReponse(client)},
+            before =new Response{Message = "before the update",ClientResponse = new BaseResponse<ClientResponse> { Data = ClientToClientResponse.ClientToClientReponse(client)}},
             after = new Response{Message = "after The Update",ClientResponse = afterUpdate}
         };
         return Ok(new SuccessResponse<object>(response,"Updated"));
@@ -125,23 +112,21 @@ public class ClientController : ControllerBase
     public async Task<IActionResult> SoftDeleteClient([Required]string Clientid)
     {
         if (!ObjectId.TryParse(Clientid, out var objectId))
-        {
             return BadRequest(new BadRequestResponse
             {
                 Messages =["Invalid client id format"]
             });
-        }       
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var exists = await _clientService.GetClientById(Clientid);
-        if(exists == null) return BadRequest(new BadRequestResponse{Messages = ["Client does not exists"]});
-        string messege =await _clientService.SoftDeleteClient(objectId);
-        exists.IsDeleted = true;
+        var client_exists=await _mediator.Send(new GetClientByIdQuery(Clientid));
+        if(client_exists.Data  == null) return BadRequest(new BadRequestResponse{Messages = ["Client does not exists"]});
+        var message = await _mediator.Send(new SoftDeleteClientCommand(objectId));
+        client_exists.Data.IsDeleted = true;
         Response response = new()
         {
-            Message = messege,
-            ClientResponse = exists
+            Message =message.Data,
+            ClientResponse = new BaseResponse<ClientResponse>{Data = client_exists.Data}
         };
-        return Ok(new SuccessResponse<Response>(response));
+        return Ok(response);
     }
     [HttpDelete("delete/client/{ClientId}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]
@@ -149,21 +134,69 @@ public class ClientController : ControllerBase
     public async Task<IActionResult> DeleteClient([Required]string ClientId)
     {
         if (!ObjectId.TryParse(ClientId, out var objectId))
-        {
             return BadRequest(new BadRequestResponse
             {
                 Messages =["Invalid client id format"]
             });
-        }      
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var exists = await _clientRepository.GetOneAsync(x=>x.Id == objectId, CancellationToken.None);
-        if(exists == null) return BadRequest(new BadRequestResponse{Messages = ["Client does not exists"]});
-        var messege = await _clientService.DeleteClient(objectId);
+        var client_exists=await _mediator.Send(new GetClientByIdIncludingSoftDeletedQuery(objectId));
+        if(client_exists  == null) return BadRequest(new BadRequestResponse{Messages = ["Client does not exists"]});
+        var messege = await  _mediator.Send(new DeleteClientCommand(objectId));
         Response response = new()
         {
-            Message = messege,
-            ClientResponse = ClientToClientResponse.ClientToClientReponse(exists)
+            Message = messege.Data,
+            ClientResponse = new BaseResponse<ClientResponse>{Data = client_exists.Data}
         };
         return Ok(new SuccessResponse<Response>(response));
+    }
+    [HttpPost("add/itemids/{clientId}")]
+    [SwaggerOperation(Summary = "Add multiple item IDs to a client")]
+    [ProducesResponseType(typeof(ClientResponse), 200)]
+    public async Task<IActionResult> AddItemIds(
+        [Required] string clientId,
+        [FromBody, Required] List<string> itemIds)
+    {
+        if (!ObjectId.TryParse(clientId, out var objId))
+            return BadRequest(new BadRequestResponse { Messages = ["Invalid client ID format"] });
+
+        var client = await _clientRepository.GetOneAsync(x => x.Id == objId,CancellationToken.None);
+        if (client is null)
+            return BadRequest(new BadRequestResponse { Messages = ["Client ID does not exist"] });
+        var responseClient = await _clientService.AddItemIds(clientId, itemIds);
+        return Ok(new SuccessResponse<ClientResponse>(responseClient, "Item IDs added successfully"));
+    }
+
+    [HttpPost("add/customerids/{clientId}")]
+    [SwaggerOperation(Summary = "Add multiple customer IDs to a client")]
+    [ProducesResponseType(typeof(ClientResponse), 200)]
+    public async Task<IActionResult> AddCustomerIds(
+        [Required] string clientId,
+        [FromBody, Required] List<string> customerIds,
+        CancellationToken cancellationToken)
+    {
+        if (!ObjectId.TryParse(clientId, out var objId))
+            return BadRequest(new BadRequestResponse { Messages = ["Invalid client ID format"] });
+
+        var client = await _clientRepository.GetOneAsync(x => x.Id == objId, cancellationToken);
+        if (client is null)
+            return BadRequest(new BadRequestResponse { Messages = ["Client ID does not exist"] });
+        var responseClient =await _clientService.AddItemIds(clientId,customerIds);
+        return Ok(new SuccessResponse<ClientResponse>(responseClient, "Customer IDs added successfully"));
+    }
+     [HttpPost("add/invoiceids/{clientId}")]
+     [SwaggerOperation(Summary = "Add multiple invoice IDs to a client")]
+     [ProducesResponseType(typeof(ClientResponse), 200)]
+     public async Task<IActionResult> AddInvoiceIds(
+         [Required] string clientId,
+         [FromBody, Required] List<string> invoiceIds,
+         CancellationToken cancellationToken)
+     {
+         if (!ObjectId.TryParse(clientId, out var objId))
+             return BadRequest(new BadRequestResponse { Messages = ["Invalid client ID format"] });
+         var client = await _clientRepository.GetOneAsync(x => x.Id == objId, cancellationToken);
+         if (client is null)
+             return BadRequest(new BadRequestResponse { Messages = ["Client ID does not exist"] });
+         var responseClient = await _clientService.AddInvoiceIds(clientId, invoiceIds);
+         return Ok(new SuccessResponse<ClientResponse>(responseClient, "Invoice IDs added successfully"));
     }
 }

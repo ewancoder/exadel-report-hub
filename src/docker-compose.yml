@@ -14,7 +14,7 @@ services:
       - "27017:27017"
     volumes:
       - /data/db    
-
+ 
   authservice:
     container_name: authservice
     #image: giorgaaa/exportpro.authservice:latest
