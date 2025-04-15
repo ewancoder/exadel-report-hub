@@ -1,17 +1,18 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Commands.Client;
-using ExportPro.StorageService.DataAccess.Services;
+using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
+public record AddClientFromClientDtoCommand(ClientDto Clientdto) : ICommand<ClientResponse>;
 
-public class AddClientFromClientDtoCommandHandler(IClientService clientService) : ICommandHandler<AddClientFromClientDtoCommand, ClientResponse>
+public class AddClientFromClientDtoCommandHandler(IClientRepository clientRepository) : ICommandHandler<AddClientFromClientDtoCommand, ClientResponse>
 {
-    private readonly IClientService _clientService = clientService;
+    private readonly IClientRepository _clientRepository = clientRepository;
     public async Task<BaseResponse<ClientResponse>> Handle(AddClientFromClientDtoCommand request, CancellationToken cancellationToken)
     {
-        var CreatingClient = await _clientService.AddClientFromClientDto(request.Clientdto);
+        var CreatingClient = await _clientRepository.AddClientFromClientDto(request.Clientdto);
 
         return new SuccessResponse<ClientResponse>(CreatingClient, message: "Successfully added client");
     }

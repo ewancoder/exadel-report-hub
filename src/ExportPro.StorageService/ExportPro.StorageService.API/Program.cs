@@ -8,10 +8,9 @@ using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
-using ExportPro.StorageService.CQRS.Commands.Customer;
+using ExportPro.StorageService.CQRS.Handlers.Client;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
-using ExportPro.StorageService.DataAccess.Services;
 using ExportPro.StorageService.Models.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -46,21 +45,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddAutoMapper(typeof(ExportPro.StorageService.CQRS.Profiles.MappingProfile));
-builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<ItemRepository>();
 builder.Services.AddScoped<CustomerRepository>();
 builder.Services.AddCommonRegistrations();
-builder.Services.AddScoped<ClientRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IRepository<Invoice>>(
     provider => provider.GetRequiredService<IInvoiceRepository>());
 builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
-builder.Services.AddScoped<IItemRepository,ItemRepository>();
+builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(AddClientFromClientDtoCommand)));
 builder.Services
     .AddRefitClient<IAuth>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));
