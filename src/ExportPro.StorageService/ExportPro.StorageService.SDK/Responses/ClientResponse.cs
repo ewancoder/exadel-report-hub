@@ -6,16 +6,16 @@ namespace ExportPro.StorageService.SDK.Responses;
 
 public class ClientResponse
 {
+    
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; } 
-    public bool IsDeleted { get; set; } = false;
-    [BsonRepresentation(BsonType.ObjectId)]
-    public List<string>? InvoiceIds { get; set; } 
-    [BsonRepresentation(BsonType.ObjectId)]
-    public List<string>? CustomerIds { get; set; } 
-    [BsonRepresentation(BsonType.ObjectId)]
-    public List<string>? ItemIds { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public bool IsDeleted { get; set; } 
+    public string? CreatedBy { get; set; }
+    public string? UpdatedBy { get; set; }
+    public List<ItemResponse> itemResponses { get; set; }
 }
