@@ -31,16 +31,10 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
     [ProducesResponseType(typeof(ClientResponse), 200)]
     public async Task<IActionResult> CreateClient([FromBody] ClientDto clientdto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
-        var exists = await _clientRepository.GetOneAsync(
-            x => x.Name == clientdto.Name && x.IsDeleted == false,
-            CancellationToken.None
-        );
-        if (exists != null)
-            return BadRequest(new BadRequestResponse { Messages = ["Client already exists"] });
-        var clientResponse = await _mediator.Send(new AddClientFromClientDtoCommand(clientdto));
-        return Ok(clientResponse);
+        var clientResponse = await _mediator.Send(new CreateClientCommand(clientdto));
+        if (clientResponse.Data.Item2 != null)
+            return BadRequest(clientResponse.Data.Item2);
+        return Ok(clientResponse.Data.Item1);
     }
 
     [HttpGet]
@@ -50,7 +44,6 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
-
         var clients = await _mediator.Send(new GetClientsQuery(top, skip));
         return Ok(clients);
     }

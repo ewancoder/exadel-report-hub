@@ -12,22 +12,26 @@ using ExportPro.StorageService.CQRS.Handlers.Client;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.Validations.Validations;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Refit;
-var builder = WebApplication.CreateBuilder(args);
 
+var builder = WebApplication.CreateBuilder(args);
 
 //builder.Host.UseSharedSerilogAndConfiguration();
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Storage Service");
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
@@ -40,17 +44,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = jwtSettings.Issuer,
             ValidateAudience = true,
             ValidAudience = jwtSettings.Audience,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
         };
     });
+builder.Services.AddValidatorsFromAssembly(typeof(CreateClientCommandValidator).Assembly);
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddAutoMapper(typeof(ExportPro.StorageService.CQRS.Profiles.MappingProfile));
 builder.Services.AddScoped<ItemRepository>();
 builder.Services.AddScoped<CustomerRepository>();
 builder.Services.AddCommonRegistrations();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
-builder.Services.AddScoped<IRepository<Invoice>>(
-    provider => provider.GetRequiredService<IInvoiceRepository>());
+builder.Services.AddScoped<IRepository<Invoice>>(provider => provider.GetRequiredService<IInvoiceRepository>());
 builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -59,14 +63,13 @@ builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(AddClientFromClientDtoCommand)));
-builder.Services
-    .AddRefitClient<IAuth>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(CreateClientCommand)));
+builder.Services.AddRefitClient<IAuth>().ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));
 var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseMiddleware<ErrorHandlingMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

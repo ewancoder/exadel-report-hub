@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
 
-public record GetClientsQuery(int client_size, int page) : IQuery<List<ClientResponse>>;
+public record GetClientsQuery(int top, int skip) : IQuery<List<ClientResponse>>;
 
 public class GetClientsQueryHandler(IClientRepository clientRepository, IMapper mapper)
     : IQueryHandler<GetClientsQuery, List<ClientResponse>>
@@ -21,7 +21,7 @@ public class GetClientsQueryHandler(IClientRepository clientRepository, IMapper 
         CancellationToken cancellationToken
     )
     {
-        var clientresponse = _clientRepository.GetClients(request.client_size, request.page);
+        var clientresponse = _clientRepository.GetClients(request.top, request.skip);
         var message = clientresponse.Messages;
         if (message[0] == "There is no such document")
         {

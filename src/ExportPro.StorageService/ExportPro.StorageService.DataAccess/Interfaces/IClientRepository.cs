@@ -23,4 +23,6 @@ public interface IClientRepository : IRepository<Client>
     Task<ClientResponse> AddCustomerIds(string Clientid, List<string> customerids);
     Task<FullClientResponse> GetFullClient(string clientid);
     Task<List<FullClientResponse>> GetAllFullClients();
+    Task<bool> ClientExists(string Name);
+    Task<bool> HigherThanMaxSize(int skip);
 }
