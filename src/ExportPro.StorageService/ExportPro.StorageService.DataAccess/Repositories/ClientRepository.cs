@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using AutoMapper;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using ZstdSharp.Unsafe;
+
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
 public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
@@ -19,11 +21,18 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     private IMongoCollection<Client> _clients;
     private readonly IMongoDbConnectionFactory _mongoDbConnectionFactory;
     private readonly IMapper _mapper;
-    public ClientRepository(IMapper mapper,IMongoDbConnectionFactory mongoDbConnectionFactory, ICollectionProvider collectionProvider) : base(collectionProvider)
+
+    public ClientRepository(
+        IMapper mapper,
+        IMongoDbConnectionFactory mongoDbConnectionFactory,
+        ICollectionProvider collectionProvider
+    )
+        : base(collectionProvider)
     {
         _mapper = mapper;
         _clients = collectionProvider.GetCollection<Client>("Client");
     }
+
     //public (string Messege, Task<List<Client>>) GetClients(int client_size=5,int page=1)
     //{
     //    var clients = _clients.Find(_ => true);
@@ -34,33 +43,40 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     //    var paginated= clients.Skip((page-1) * client_size).Limit(client_size).ToListAsync();
     //    return (Messege,paginated);
     //}
-    
+
     public Task<Client> GetClientByName(string name)
     {
         return _clients.Find(x => x.Name == name).FirstOrDefaultAsync();
     }
-    public BaseResponse<Task<List<Client>>> GetClients(int client_size, int page, bool soft_deleted)
+
+    public BaseResponse<Task<List<Client>>> GetClients(int top, int skip)
     {
-        var clients = _clients.Find(_ => true && _.IsDeleted == soft_deleted);
+        var clients = _clients.Find(_ => true);
         string message = "Clients Retrieved";
         var size = clients.CountDocuments();
-        if(size == 0)
+        if (size == 0)
         {
             message = $"There is no such document";
             return new BaseResponse<Task<List<Client>>> { Messages = [message], Data = null };
-        };
-        int max_page = (int)Math.Ceiling(size / (double)client_size);
-        if (max_page < page)
-        {
-            message = $"Page Size Exceeded.Retriving Last Page Number {max_page}";
-            page = max_page;
         }
-        var paginated = clients.Skip((page - 1) * client_size).Limit(client_size).ToListAsync();
-        return new BaseResponse<Task<List<Client>>> { Messages = [message], Data =paginated,ApiState=HttpStatusCode.Accepted,IsSuccess=true};
+        if (skip > size)
+        {
+            message = $"Skip Exceeded the size {size}";
+            skip = (int)size;
+        }
+        var paginated = clients.Skip(skip).Limit(top).ToListAsync();
+        return new BaseResponse<Task<List<Client>>>
+        {
+            Messages = [message],
+            Data = paginated,
+            ApiState = HttpStatusCode.Accepted,
+            IsSuccess = true,
+        };
     }
+
     public Task<Client> GetClientById(string Clientid)
     {
-        var client = GetOneAsync(x=>x.Id == ObjectId.Parse(Clientid), CancellationToken.None);
+        var client = GetOneAsync(x => x.Id == ObjectId.Parse(Clientid), CancellationToken.None);
         return client;
     }
 
@@ -69,9 +85,8 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         throw new NotImplementedException();
     }
 
-    public  async Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto)
+    public async Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto)
     {
-
         Client client = _mapper.Map<Client>(clientDto);
         foreach (var item in client.Items)
         {
@@ -81,9 +96,10 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         client.UpdatedAt = null;
         await AddOneAsync(client, CancellationToken.None);
         var clientresp = _mapper.Map<ClientResponse>(client);
-        clientresp.itemResponses=_mapper.Map<List<ItemResponse>>(client.Items);
+        clientresp.itemResponses = _mapper.Map<List<ItemResponse>>(client.Items);
         return clientresp;
     }
+
     public Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid)
     {
         var item = new Item();

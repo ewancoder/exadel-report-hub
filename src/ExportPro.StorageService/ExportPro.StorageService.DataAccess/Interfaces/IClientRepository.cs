@@ -10,7 +10,7 @@ namespace ExportPro.StorageService.DataAccess.Interfaces;
 public interface IClientRepository : IRepository<Client>
 {
     Task<Client> GetClientByName(string name);
-    BaseResponse<Task<List<Client>>> GetClients(int client_size, int page,bool soft_deleted);
+    BaseResponse<Task<List<Client>>> GetClients(int top, int skip);
     Task<Client> GetClientById(string Clientid);
     Task<List<ClientResponse>> GetAllCLientsIncludingSoftDeleted();
     Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto);
