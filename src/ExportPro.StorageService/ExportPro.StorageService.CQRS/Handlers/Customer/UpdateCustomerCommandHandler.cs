@@ -25,7 +25,7 @@ public class UpdateCustomerCommandHandler(ICustomerRepository repository) : ICom
 
         customer.Name = request.Name;
         customer.Email = request.Email;
-        customer.Country = request.Country;
+        customer.CountryId = request.CountryId;
         customer.UpdatedAt = DateTime.UtcNow;
 
         await _repository.UpdateOneAsync(customer, cancellationToken);

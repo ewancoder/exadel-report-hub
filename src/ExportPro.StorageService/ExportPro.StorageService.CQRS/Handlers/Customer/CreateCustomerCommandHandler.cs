@@ -17,7 +17,7 @@ public class CreateCustomerCommandHandler(ICustomerRepository repository) : ICom
             Id = ObjectId.GenerateNewId(),
             Name = request.Name,
             Email = request.Email,
-            Country = request.Country,
+            CountryId = request.CountryId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             IsDeleted = false

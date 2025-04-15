@@ -1,6 +1,5 @@
 ﻿using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 using ExportPro.StorageService.CQRS.Queries.invoice;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -94,7 +93,7 @@ public class InvoiceController : ControllerBase
         return StatusCode((int)response.ApiState,res);
     }
 
-    [HttpGet]
+    [HttpGet("getInvoices")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(new GetAllInvoicesQuery(), cancellationToken);
