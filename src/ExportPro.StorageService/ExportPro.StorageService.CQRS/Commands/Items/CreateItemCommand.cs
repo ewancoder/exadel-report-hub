@@ -1,6 +1,8 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Repositories;
+using ExportPro.StorageService.Models.Enums;
+using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Commands.Items;
@@ -8,31 +10,33 @@ namespace ExportPro.StorageService.CQRS.Commands.Items;
 public record CreateItemCommand(string Name,
     string Description, 
     double Price, 
-    string CustomerId, 
-    string InvoiceId, 
+    Status Status,
+    Currency Currency,
     string ClientId): ICommand<string>;
 
-public class CreateItemCommandHandler(ItemRepository repository, CustomerRepository customerRepository) : ICommandHandler<CreateItemCommand, string>
+public class CreateItemCommandHandler(ClientRepository clientRepository) : ICommandHandler<CreateItemCommand, string>
 {
-    private readonly ItemRepository _repository = repository;
-    private readonly CustomerRepository _customerRepository = customerRepository;
+    private readonly ClientRepository _clientRepository = clientRepository;
     public async Task<BaseResponse<string>> Handle(CreateItemCommand request, CancellationToken cancellationToken)
     {
-        var customer = await _customerRepository.GetByIdAsync(new ObjectId(request.CustomerId), cancellationToken);
-        if(customer == null)
-        {
-            return new NotFoundResponse<string>("Customer not found");
-        }
+        if (!ObjectId.TryParse(request.ClientId, out var objectId))
+            return new NotFoundResponse<string>("Invalid client ID format");
+        var client = await _clientRepository.GetByIdAsync(objectId, cancellationToken);
+        if (client == null || client.IsDeleted)
+            return new NotFoundResponse<string>("Client not found");
         var item = new Models.Models.Item
         {
+            Id = ObjectId.GenerateNewId(),
             Name = request.Name,
             Description = request.Description,
             Price = request.Price,
-            CustomerId = request.CustomerId,
-            InvoiceId = request.InvoiceId,
-            ClientId = request.ClientId
+            Status = request.Status,
+            Currency = request.Currency
         };
-        await _repository.AddOneAsync(item, cancellationToken);
+        client.Items ??= new List<Item>();
+        client.Items.Add(item);
+        client.UpdatedAt = DateTime.UtcNow;
+        await _clientRepository.AddItem(client.Id, client, cancellationToken);
         return new SuccessResponse<string>(item.Id.ToString());
     }
 }

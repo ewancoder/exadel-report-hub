@@ -51,18 +51,15 @@ builder
 builder.Services.AddValidatorsFromAssembly(typeof(CreateClientCommandValidator).Assembly);
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddAutoMapper(typeof(ExportPro.StorageService.CQRS.Profiles.MappingProfile));
-builder.Services.AddScoped<ItemRepository>();
 builder.Services.AddScoped<CustomerRepository>();
 builder.Services.AddCommonRegistrations();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IRepository<Invoice>>(provider => provider.GetRequiredService<IInvoiceRepository>());
 builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
-builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddCQRS();
 builder.Services.AddRefitClient<IAuth>().ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));
 var app = builder.Build();

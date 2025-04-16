@@ -10,8 +10,8 @@ public class ItemDtoForClient
     [Required]
     public string? Description { get; set; }
     [Required]
-    public decimal Price { get; set; }
+    public double Price { get; set; }
     public Status Status { get; set; }
-    public Currency? Currency { get; set; } //maybe can be made into enum as well?
+    public Currency Currency { get; set; } //maybe can be made into enum as well?
     
 }

@@ -161,4 +161,39 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
             return Task.FromResult(true);
         return Task.FromResult(false);
     }
+    public async Task AddItem(ObjectId id, Client updatedClient, CancellationToken cancellationToken = default)
+    {
+        var result = await _clients.ReplaceOneAsync(
+            client => client.Id == id,
+            updatedClient,
+            cancellationToken: cancellationToken
+        );
+
+        if (result.MatchedCount == 0)
+        {
+            throw new InvalidOperationException($"No client found with ID {id} to replace.");
+        }
+    }
+
+    public async Task AddItems(ObjectId clientId, List<Item> items, CancellationToken cancellationToken = default)
+    {
+        foreach (var item in items)
+        {
+            item.Id = ObjectId.GenerateNewId();
+            item.CreatedAt = DateTime.UtcNow;
+        }
+
+        var update = Builders<Client>.Update.PushEach(x => x.Items, items);
+
+        var result = await _clients.UpdateOneAsync(
+            x => x.Id == clientId,
+            update,
+            cancellationToken: cancellationToken
+        );
+
+        if(result.ModifiedCount > 0)
+        {
+            throw new InvalidOperationException($"No items were added to {clientId} client");
+        }
+    }
 }

@@ -25,4 +25,6 @@ public interface IClientRepository : IRepository<Client>
     Task<List<FullClientResponse>> GetAllFullClients();
     Task<bool> ClientExists(string Name);
     Task<bool> HigherThanMaxSize(int skip);
+    Task AddItem(ObjectId id, Client updatedClient, CancellationToken cancellationToken = default);
+    Task AddItems(ObjectId clientId, List<Item> items, CancellationToken cancellationToken = default);
 }

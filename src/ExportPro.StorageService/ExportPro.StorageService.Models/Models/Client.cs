@@ -1,7 +1,5 @@
 using ExportPro.Common.Models.MongoDB;
-using Microsoft.VisualBasic;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace ExportPro.StorageService.Models.Models;
 
@@ -15,5 +13,5 @@ public class Client:IModel
     public string? CreatedBy { get; set; }
     public string? UpdatedBy { get; set; }
     public bool IsDeleted { get; set; }=false;
-    public List<Item>? Items { get; set; } = new();
+    public List<Item>? Items { get; set; } = [];
 }
