@@ -10,5 +10,5 @@ public class Country : IModel
     public string Code { get; set; } = string.Empty; // e.g. "US", "DE", "FR"
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
 }

@@ -19,7 +19,7 @@ public class CreateCustomerCommandHandler(ICustomerRepository repository) : ICom
             Email = request.Email,
             CountryId = request.CountryId,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
+            UpdatedAt = null,
             IsDeleted = false
         };
 
