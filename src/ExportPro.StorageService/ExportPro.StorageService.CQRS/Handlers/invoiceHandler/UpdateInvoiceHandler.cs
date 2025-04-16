@@ -28,7 +28,7 @@ public class UpdateInvoiceHandler(IRepository<Models.Models.Invoice> repository)
         existing.IssueDate = request.IssueDate;
         existing.DueDate = request.DueDate;
         existing.Amount = request.Amount;
-        existing.Currency = request.Currency;
+        existing.CurrencyId = request.CurrencyId;
         existing.PaymentStatus = request.PaymentStatus;
         existing.BankAccountNumber = request.BankAccountNumber;
         existing.ClientId = request.ClientId;

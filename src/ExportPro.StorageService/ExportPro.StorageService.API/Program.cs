@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text;
 using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.AuthService.Configuration;
@@ -59,9 +58,9 @@ builder.Services.AddScoped<IRepository<Invoice>>(provider => provider.GetRequire
 builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddCQRS();
 builder.Services.AddRefitClient<IAuth>().ConfigureHttpClient(c => c.BaseAddress = new Uri("http://authservice:8080"));

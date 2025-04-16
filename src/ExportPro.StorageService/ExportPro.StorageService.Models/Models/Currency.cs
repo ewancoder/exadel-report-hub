@@ -1,18 +1,13 @@
 ﻿using ExportPro.Common.Models.MongoDB;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace ExportPro.StorageService.Models.Models;
 
-public class Customer : IModel
+public class Currency : IModel
 {
     public ObjectId Id { get; set; }
-    public string? Name { get; set; }
-    public string? Email { get; set; }
-
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? CountryId { get; set; }
-
+    public required string Name { get; set; }   // e.g. "US Dollar"
+    public required string Code { get; set; }   // e.g. "USD"
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }

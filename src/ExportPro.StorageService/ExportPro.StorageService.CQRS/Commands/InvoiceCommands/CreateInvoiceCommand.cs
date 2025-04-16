@@ -9,7 +9,7 @@ public class CreateInvoiceCommand : ICommand<Models.Models.Invoice>
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
     public decimal Amount { get; set; }
-    public string? Currency { get; set; }
+    public string? CurrencyId { get; set; }
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
     // public string? ClientId { get; set; }

@@ -21,7 +21,7 @@ public class CreateInvoiceHandler(IRepository<Invoice> repository) : ICommandHan
             IssueDate = request.IssueDate,
             DueDate = request.DueDate,
             Amount = request.Amount,
-            Currency = request.Currency,
+            CurrencyId = request.CurrencyId,
             PaymentStatus = request.PaymentStatus,
             BankAccountNumber = request.BankAccountNumber,
             // ClientId = request.ClientId,
@@ -37,4 +37,3 @@ public class CreateInvoiceHandler(IRepository<Invoice> repository) : ICommandHan
         };
     }
 }
-
