@@ -1,5 +1,6 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
@@ -9,9 +10,9 @@ namespace ExportPro.StorageService.CQRS.Commands.Items;
 
 public record UpdateItemsCommand(string ClientId, List<Item> Items) : ICommand<bool>;
 
-public class UpdateItemsCommandHandler(ClientRepository repository) : ICommandHandler<UpdateItemsCommand, bool>
+public class UpdateItemsCommandHandler(IClientRepository repository) : ICommandHandler<UpdateItemsCommand, bool>
 {
-    private readonly ClientRepository _repository = repository;
+    private readonly IClientRepository _repository = repository;
     public async Task<BaseResponse<bool>> Handle(UpdateItemsCommand request, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(request.ClientId, out var clientObjectId))

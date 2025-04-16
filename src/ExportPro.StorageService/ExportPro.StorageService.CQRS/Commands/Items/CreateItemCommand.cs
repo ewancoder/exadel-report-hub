@@ -1,5 +1,6 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
@@ -14,9 +15,9 @@ public record CreateItemCommand(string Name,
     Currency Currency,
     string ClientId): ICommand<string>;
 
-public class CreateItemCommandHandler(ClientRepository clientRepository) : ICommandHandler<CreateItemCommand, string>
+public class CreateItemCommandHandler(IClientRepository clientRepository) : ICommandHandler<CreateItemCommand, string>
 {
-    private readonly ClientRepository _clientRepository = clientRepository;
+    private readonly IClientRepository  _clientRepository = clientRepository;
     public async Task<BaseResponse<string>> Handle(CreateItemCommand request, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(request.ClientId, out var objectId))

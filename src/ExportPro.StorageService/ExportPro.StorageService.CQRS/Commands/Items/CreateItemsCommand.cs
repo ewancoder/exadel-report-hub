@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -9,9 +10,9 @@ using MongoDB.Bson;
 namespace ExportPro.StorageService.CQRS.Commands.Items
 {
     public record CreateItemsCommand(string ClientId, List<ItemDtoForClient> Items) : ICommand<bool>;
-    public class CreateItemsCommandHandler(ClientRepository repository, IMapper mapper) : ICommandHandler<CreateItemsCommand, bool>
+    public class CreateItemsCommandHandler(IClientRepository repository, IMapper mapper) : ICommandHandler<CreateItemsCommand, bool>
     {
-        private readonly ClientRepository _repository = repository;
+        private readonly IClientRepository _repository = repository;
         private readonly IMapper _mapper = mapper;
         public async Task<BaseResponse<bool>> Handle(CreateItemsCommand request, CancellationToken cancellationToken)
         {

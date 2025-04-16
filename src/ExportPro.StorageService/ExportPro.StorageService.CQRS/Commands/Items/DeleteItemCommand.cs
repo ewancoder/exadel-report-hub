@@ -1,5 +1,6 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
@@ -10,9 +11,9 @@ namespace ExportPro.StorageService.CQRS.Commands.Items;
 
 public record DeleteItemCommand(string Id, string ClientId) : ICommand<bool>;
 
-public class DeleteItemCommandHandler(ClientRepository repository) : ICommandHandler<DeleteItemCommand, bool>
+public class DeleteItemCommandHandler(IClientRepository repository) : ICommandHandler<DeleteItemCommand, bool>
 {
-    private readonly ClientRepository _repository = repository;
+    private readonly IClientRepository _repository = repository;
     public async Task<BaseResponse<bool>> Handle(DeleteItemCommand request, CancellationToken cancellationToken)
     {
 
