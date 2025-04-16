@@ -2,29 +2,48 @@
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
+using MongoDB.Bson;
+using System.Net;
 
 namespace ExportPro.StorageService.CQRS.Commands.Items;
 
-public record UpdateItemsCommand(List<Item> Items) : ICommand<bool>;
+public record UpdateItemsCommand(string ClientId, List<Item> Items) : ICommand<bool>;
 
-public class UpdateItemsCommandHandler(ItemRepository repository) : ICommandHandler<UpdateItemsCommand, bool>
+public class UpdateItemsCommandHandler(ClientRepository repository) : ICommandHandler<UpdateItemsCommand, bool>
 {
-    private readonly ItemRepository _repository = repository;
+    private readonly ClientRepository _repository = repository;
     public async Task<BaseResponse<bool>> Handle(UpdateItemsCommand request, CancellationToken cancellationToken)
     {
+        if (!ObjectId.TryParse(request.ClientId, out var clientObjectId))
+        {
+            return new BaseResponse<bool>
+            {
+                IsSuccess = false,
+                ApiState = HttpStatusCode.BadRequest,
+                Messages = ["Invalid ClientId format."]
+            };
+        }
+
         if (request.Items == null || request.Items.Count == 0)
         {
-            return new NotFoundResponse<bool>("No items provided for update");
-        }
-        foreach (var item in request.Items)
-        {
-            var existingItem = await _repository.GetByIdAsync(item.Id, cancellationToken);
-            if (existingItem == null)
+            return new BaseResponse<bool>
             {
-                return new NotFoundResponse<bool>($"Item with ID {item.Id} not found");
-            }
+                IsSuccess = false,
+                ApiState = HttpStatusCode.BadRequest,
+                Messages = ["No items provided for update."]
+            };
         }
-        await _repository.UpdateManyAsync(request.Items, cancellationToken);
-        return new SuccessResponse<bool>(true);
+
+        var updatedCount = await _repository.UpdateItemsInClient(clientObjectId, request.Items, cancellationToken);
+
+        if (updatedCount < request.Items.Count)
+        {
+            return new NotFoundResponse<bool>($"Not all of the items were found or updated. Num of updated item: {updatedCount}");
+        }
+
+        return new SuccessResponse<bool>(true)
+        {
+            Messages = [$"{updatedCount} items successfully updated."]
+        };
     }
 }

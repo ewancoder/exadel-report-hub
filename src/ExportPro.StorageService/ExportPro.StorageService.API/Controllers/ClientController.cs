@@ -133,6 +133,14 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
         var response = await _mediator.Send(new UpdateItemCommand(clientId, item));
         return StatusCode((int)response.ApiState, response);
     }
+
+    [HttpPut("{clientId}/items")]
+    [SwaggerOperation(Summary = "update many items in client")]
+    public async Task<IActionResult> UpdateItemsInClient(string clientId, [FromBody] List<Item> items)
+    {
+        var response = await _mediator.Send(new UpdateItemsCommand(clientId, items));
+        return StatusCode((int)response.ApiState, response);
+    }
     //[HttpDelete("delete/client/{ClientId}")]
     //[SwaggerOperation(Summary = "deleting the client by clientid")]
     //[ProducesResponseType(typeof(Response<BaseResponse<ClientResponse>>), 200)]
