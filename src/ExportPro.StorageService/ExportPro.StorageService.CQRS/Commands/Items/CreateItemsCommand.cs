@@ -20,7 +20,9 @@ namespace ExportPro.StorageService.CQRS.Commands.Items
             var client = await _repository.GetByIdAsync(objectId, cancellationToken);
             if (client == null || client.IsDeleted)
                 return new NotFoundResponse<bool>("Client not found");
-            await _repository.AddItems(objectId, _mapper.Map<List<Item>>(request.Items), cancellationToken);
+            var result = await _repository.AddItems(objectId, _mapper.Map<List<Item>>(request.Items), cancellationToken);
+            if (!result)
+                return new NotFoundResponse<bool>("Failed to add items to client");
             return new SuccessResponse<bool>(true);
         }
     }
