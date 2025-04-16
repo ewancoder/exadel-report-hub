@@ -15,7 +15,7 @@ public interface IClientRepository : IRepository<Client>
     Task<List<ClientResponse>> GetAllCLientsIncludingSoftDeleted();
     Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto);
     Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid);
-    Task<string> SoftDeleteClient(ObjectId Clientid);
+    Task SoftDeleteClient(string clientId);
     Task<string> DeleteClient(ObjectId Clientid);
     Task<ClientResponse> GetClientByIdIncludingSoftDeleted(ObjectId ClientId);
     Task<ClientResponse> AddItemIds(string Clientid, List<string> ItemIds);

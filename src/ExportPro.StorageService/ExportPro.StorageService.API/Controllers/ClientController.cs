@@ -46,29 +46,22 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
         var clientresponse = await _mediator.Send(new GetClientByIdQuery(clientId));
         return Ok(clientresponse);
     }
-    [HttpPatch("update/client")]
+    [HttpPatch("{clientId}")]
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
-    public async Task<IActionResult> UpdateClient([Required] string clientid, [FromBody] ClientUpdateDto clientdto)
+    public async Task<IActionResult> UpdateClient([Required] string clientId, [FromBody] ClientUpdateDto clientdto)
     {
-       var afterUpdate = await _mediator.Send(new UpdateClientCommand(clientdto, clientid));
+       var afterUpdate = await _mediator.Send(new UpdateClientCommand(clientdto, clientId));
         return Ok(afterUpdate);
     }
-    [HttpDelete("{client_id}")]
+    [HttpDelete("{clientId}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]
     [ProducesResponseType(typeof(BaseResponse<ClientResponse>), 200)]
-    public async Task<IActionResult> SoftDeleteClient([Required] string client_id)
+    public async Task<IActionResult> SoftDeleteClient([Required] string clientId)
     {
-        if (!ObjectId.TryParse(client_id, out var objectId))
-            return BadRequest(new BadRequestResponse { Messages = ["Invalid client id format"] });
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-        var clientDeleting = await _mediator.Send(new SoftDeleteClientCommand(objectId));
-        if (clientDeleting.Messages[0] == "Client does not exist")
-            return BadRequest(clientDeleting);
+        var clientDeleting = await _mediator.Send(new SoftDeleteClientCommand(clientId));
         return Ok(clientDeleting);
     }
-
     [HttpPatch("{clientId}/item")]
     [SwaggerOperation(Summary = "add single item to client")]
     public async Task<IActionResult> AddItemToClient(string clientId, [FromBody] ItemDtoForClient item)

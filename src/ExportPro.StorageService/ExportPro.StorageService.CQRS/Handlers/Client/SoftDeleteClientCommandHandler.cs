@@ -1,26 +1,37 @@
 using System.Net;
+using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.Responses;
+using FluentValidation;
 using MongoDB.Bson;
-
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
-public record SoftDeleteClientCommand(ObjectId ClientId) : ICommand<string>;
+public record SoftDeleteClientCommand(string ClientId) : ICommand<ValidationModel<ClientResponse>>;
 
-public class SoftDeleteClientCommandHandler(IClientRepository clientRepository) : ICommandHandler<SoftDeleteClientCommand, string>
+public class SoftDeleteClientCommandHandler(IClientRepository clientRepository,
+    IMapper _mapper,IValidator<SoftDeleteClientCommand> validator) : ICommandHandler<SoftDeleteClientCommand, ValidationModel<ClientResponse>>
 {
     private IClientRepository _clientRepository = clientRepository;
-    public async Task<BaseResponse<string>> Handle(SoftDeleteClientCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<ValidationModel<ClientResponse>>> Handle(SoftDeleteClientCommand request, CancellationToken cancellationToken)
     {
-        var client = await _clientRepository.GetOneAsync(x=>x.Id==request.ClientId,CancellationToken.None);
-        if (client == null)
-            return new BaseResponse<string>
+        var validres = await validator.ValidateAsync(request,CancellationToken.None);
+        if (!validres.IsValid)
+        {
+            return new BaseResponse<ValidationModel<ClientResponse>>
             {
+                Data = new ValidationModel<ClientResponse>(validres),
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = ["Client does not exist"],
-                IsSuccess = false
+                IsSuccess = false,
             };
-        var res = _clientRepository.SoftDeleteAsync(request.ClientId,CancellationToken.None);
-        return new BaseResponse<string> { ApiState = HttpStatusCode.OK, Messages = ["Successfully deleted"], IsSuccess = true };
+        }
+        var client = await _clientRepository.GetClientById(request.ClientId);
+        await _clientRepository.SoftDeleteClient(request.ClientId);
+        return new BaseResponse<ValidationModel<ClientResponse>>
+        {
+            Data = new(_mapper.Map<ClientResponse>(client)),
+            ApiState = HttpStatusCode.OK, Messages = ["Successfully deleted"], IsSuccess = true
+        };
     }
 }

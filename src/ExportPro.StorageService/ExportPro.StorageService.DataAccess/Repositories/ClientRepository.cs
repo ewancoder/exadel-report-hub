@@ -45,11 +45,11 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     //}
     public Task<Client> GetClientByName(string name)
     {
-        return _clients.Find(x => x.Name == name).FirstOrDefaultAsync();
+        return _clients.Find(x => x.Name == name && x.IsDeleted==false).FirstOrDefaultAsync();
     }
     public BaseResponse<Task<List<Client>>> GetClients(int top, int skip)
     {
-        var clients = _clients.Find(_ => true);
+        var clients = _clients.Find(_ => _.IsDeleted==false);
         string message = "Clients Retrieved";
         var max_size = clients.CountDocuments();
         if (max_size == 0)
@@ -69,7 +69,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
     public Task<Client> GetClientById(string Clientid)
     {
-        var client = GetOneAsync(x => x.Id == ObjectId.Parse(Clientid), CancellationToken.None);
+        var client = GetOneAsync(x => x.Id == ObjectId.Parse(Clientid) && x.IsDeleted==false, CancellationToken.None);
         return client;
     }
     public Task<List<ClientResponse>> GetAllCLientsIncludingSoftDeleted()
@@ -100,11 +100,11 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         await UpdateOneAsync(clientGet, CancellationToken.None);
         return _mapper.Map<ClientResponse>(clientGet);
     }
-    public Task<string> SoftDeleteClient(string client_id)
+    public   Task SoftDeleteClient(string clientId)
     {
-        throw new NotImplementedException();
+        return SoftDeleteAsync(ObjectId.Parse(clientId),CancellationToken.None);
+        
     }
-
     public Task<string> DeleteClient(ObjectId Clientid)
     {
         throw new NotImplementedException();
@@ -140,14 +140,10 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         throw new NotImplementedException();
     }
 
-    public Task<string> SoftDeleteClient(ObjectId Clientid)
-    {
-        throw new NotImplementedException();
-    }
 
     public async Task<bool> ClientExists(string Name)
     {
-        var client = await GetOneAsync(x => x.Name == Name, CancellationToken.None);
+        var client = await GetOneAsync(x => x.Name == Name && x.IsDeleted==false, CancellationToken.None);
         if (client == null)
             return false;
         return true;
@@ -155,7 +151,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
     public Task<bool> HigherThanMaxSize(int skip)
     {
-        var max_size = _clients.Find(_ => true).CountDocuments();
+        var max_size = _clients.Find(_ => _.IsDeleted==false).CountDocuments();
         if (skip > max_size)
             return Task.FromResult(true);
         return Task.FromResult(false);

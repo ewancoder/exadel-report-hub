@@ -15,7 +15,6 @@ public class ValidationModel<T>
         TModel = Request;
         ValidationErrors = null;
     }
-
     public ValidationModel(ValidationResult validationResult)
     {
         ValidationErrors = validationResult
@@ -32,11 +31,9 @@ public class ValidationModel<T>
             {
                 break;
             }
-            else
-            {
-                ind++;
-            }
+             ind++;
         }
+        if(ind >= propName.Length) return 0;
         return ind+1;
     }
     public T TModel { get; set; }
