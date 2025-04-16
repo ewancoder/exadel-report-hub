@@ -91,13 +91,15 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         clientresp.itemResponses = _mapper.Map<List<ItemResponse>>(client.Items);
         return clientresp;
     }
-
-    public Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid)
+    public async Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid)
     {
-        var item = new Item();
-        throw new NotImplementedException();
+        var clientGet = await GetClientById(clientid);
+        clientGet.Name = client.Name;
+        clientGet.IsDeleted = client.IsDeleted;
+        clientGet.Description = client.Description;
+        await UpdateOneAsync(clientGet, CancellationToken.None);
+        return _mapper.Map<ClientResponse>(clientGet);
     }
-
     public Task<string> SoftDeleteClient(string client_id)
     {
         throw new NotImplementedException();
@@ -190,7 +192,6 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
         return result.ModifiedCount > 0;
     }
-
     public async Task<bool> RemoveItemFromClient(ObjectId clientId, ObjectId itemId, CancellationToken cancellationToken = default)
     {
         var update = Builders<Client>.Update.PullFilter(c => c.Items, i => i.Id == itemId);
@@ -203,7 +204,6 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
         return result.ModifiedCount > 0;
     }
-
     public async Task<bool> UpdateItemInClient(ObjectId clientId, Item updatedItem, CancellationToken cancellationToken = default)
     {
         var filter = Builders<Client>.Filter.And(

@@ -46,33 +46,13 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
         var clientresponse = await _mediator.Send(new GetClientByIdQuery(clientId));
         return Ok(clientresponse);
     }
-    [HttpPut("update/client")]
+    [HttpPatch("update/client")]
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     public async Task<IActionResult> UpdateClient([Required] string clientid, [FromBody] ClientUpdateDto clientdto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-        if (!ObjectId.TryParse(clientid, out var objectId))
-            return BadRequest(new BadRequestResponse { Messages = ["Invalid client id format"] });
-        var client = await _clientRepository.GetOneAsync(x => x.Id == objectId, CancellationToken.None);
-        if (client == null)
-            return BadRequest(new BadRequestResponse { Messages = ["Client id does not exists"] });
-        BaseResponse<ClientResponse> afterUpdate = await _mediator.Send(new UpdateClientCommand(clientdto, clientid));
-        var response = new
-        {
-            before = new BaseResponse<ClientResponse>
-            {
-                Messages = ["before the update"],
-                Data = _mapper.Map<ClientResponse>(client),
-            },
-            after = new BaseResponse<BaseResponse<ClientResponse>>
-            {
-                Messages = ["after The Update"],
-                Data = afterUpdate,
-            },
-        };
-        return Ok(new SuccessResponse<object>(response, "Updated"));
+       var afterUpdate = await _mediator.Send(new UpdateClientCommand(clientdto, clientid));
+        return Ok(afterUpdate);
     }
     [HttpDelete("{client_id}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]

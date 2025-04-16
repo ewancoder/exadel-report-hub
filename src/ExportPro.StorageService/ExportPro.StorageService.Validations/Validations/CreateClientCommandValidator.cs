@@ -11,10 +11,12 @@ namespace ExportPro.StorageService.Validations.Validations;
 
 public sealed class CreateClientCommandValidator : AbstractValidator<CreateClientCommand>
 {
+
     public CreateClientCommandValidator(IClientRepository clientRepository)
     {
         RuleFor(x => x.Clientdto.Name)
             .NotEmpty()
+            .WithMessage("Name must not be empty")
             .MinimumLength(5)
             .WithMessage("Name must be higher than 5 characters")
             .MaximumLength(50)
