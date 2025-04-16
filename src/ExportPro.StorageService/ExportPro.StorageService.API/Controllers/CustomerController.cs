@@ -31,7 +31,7 @@ public class CustomerController : ControllerBase
             Id = response.Data.Id.ToString(),
             Name = response.Data.Name,
             Email = response.Data.Email,
-            Country = response.Data.Country,
+            Country = response.Data.CountryId,
             CreatedAt = response.Data.CreatedAt,
             UpdatedAt = response.Data.UpdatedAt,
         };
@@ -83,7 +83,7 @@ public class CustomerController : ControllerBase
             Id = response.Data.Id.ToString(),
             Name = response.Data.Name,
             Email = response.Data.Email,
-            Country = response.Data.Country,
+            Country = response.Data.CountryId,
             CreatedAt = response.Data.CreatedAt,
             UpdatedAt = response.Data.UpdatedAt,
         };
@@ -102,7 +102,7 @@ public class CustomerController : ControllerBase
             Id = response.Id.ToString(),
             Name = response.Name,
             Email = response.Email,
-            Country = response.Country,
+            Country = response.CountryId,
             CreatedAt = response.CreatedAt,
             UpdatedAt = response.UpdatedAt,
         }).ToList();
