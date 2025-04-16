@@ -9,7 +9,5 @@ public class ClientUpdateDto
     public string? Name { get; set; }
     [BsonIgnoreIfNull]
     public string? Description { get; set; }
-    [BsonIgnoreIfNull]
-    public bool IsDeleted { get; set; } = false;
    
 }

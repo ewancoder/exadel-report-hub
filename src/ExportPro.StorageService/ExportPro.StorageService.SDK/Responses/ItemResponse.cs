@@ -24,7 +24,6 @@ public class ItemResponse
     public string? InvoiceId { get; set; }
     public Status? Status { get; set; }
     public Currency? Currency { get; set; } //maybe can be made into enum as well?
-    public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 }

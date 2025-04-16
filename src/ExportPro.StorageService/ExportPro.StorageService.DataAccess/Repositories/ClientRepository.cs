@@ -95,7 +95,6 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     {
         var clientGet = await GetClientById(clientid);
         clientGet.Name = client.Name;
-        clientGet.IsDeleted = client.IsDeleted;
         clientGet.Description = client.Description;
         await UpdateOneAsync(clientGet, CancellationToken.None);
         return _mapper.Map<ClientResponse>(clientGet);
@@ -103,7 +102,6 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     public   Task SoftDeleteClient(string clientId)
     {
         return SoftDeleteAsync(ObjectId.Parse(clientId),CancellationToken.None);
-        
     }
     public Task<string> DeleteClient(ObjectId Clientid)
     {
