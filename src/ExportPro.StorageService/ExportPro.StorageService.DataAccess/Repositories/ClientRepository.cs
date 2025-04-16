@@ -161,4 +161,93 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
             return Task.FromResult(true);
         return Task.FromResult(false);
     }
+    public async Task AddItem(ObjectId id, Client updatedClient, CancellationToken cancellationToken = default)
+    {
+        var result = await _clients.ReplaceOneAsync(
+            client => client.Id == id,
+            updatedClient,
+            cancellationToken: cancellationToken
+        );
+
+        if (result.MatchedCount == 0)
+        {
+            throw new InvalidOperationException($"No client found with ID {id} to replace.");
+        }
+    }
+
+    public async Task<bool> AddItems(ObjectId clientId, List<Item> items, CancellationToken cancellationToken = default)
+    {
+        foreach (var item in items)
+        {
+            item.Id = ObjectId.GenerateNewId();
+            item.CreatedAt = DateTime.UtcNow;
+        }
+
+        var update = Builders<Client>.Update.PushEach(x => x.Items, items);
+
+        var result = await _clients.UpdateOneAsync(
+            x => x.Id == clientId,
+            update,
+            cancellationToken: cancellationToken
+        );
+
+        return result.ModifiedCount > 0;
+    }
+
+    public async Task<bool> RemoveItemFromClient(ObjectId clientId, ObjectId itemId, CancellationToken cancellationToken = default)
+    {
+        var update = Builders<Client>.Update.PullFilter(c => c.Items, i => i.Id == itemId);
+
+        var result = await _clients.UpdateOneAsync(
+            c => c.Id == clientId,
+            update,
+            cancellationToken: cancellationToken
+        );
+
+        return result.ModifiedCount > 0;
+    }
+
+    public async Task<bool> UpdateItemInClient(ObjectId clientId, Item updatedItem, CancellationToken cancellationToken = default)
+    {
+        var filter = Builders<Client>.Filter.And(
+            Builders<Client>.Filter.Eq(c => c.Id, clientId),
+            Builders<Client>.Filter.ElemMatch(c => c.Items, i => i.Id == updatedItem.Id)
+        );
+
+        var update = Builders<Client>.Update
+            .Set(c => c.Items[-1].Name, updatedItem.Name)
+            .Set(c => c.Items[-1].Description, updatedItem.Description)
+            .Set(c => c.Items[-1].Price, updatedItem.Price)
+            .Set(c => c.Items[-1].Currency, updatedItem.Currency)
+            .Set(c => c.Items[-1].Status, updatedItem.Status)
+            .Set(c => c.Items[-1].UpdatedAt, DateTime.UtcNow);
+
+        var result = await _clients.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        return result.ModifiedCount > 0;
+    }
+
+    public async Task<int> UpdateItemsInClient(ObjectId clientId, List<Item> updatedItems, CancellationToken cancellationToken = default)
+    {
+        int successCount = 0;
+        foreach (var item in updatedItems)
+        {
+            var filter = Builders<Client>.Filter.And(
+                Builders<Client>.Filter.Eq(c => c.Id, clientId),
+                Builders<Client>.Filter.ElemMatch(c => c.Items, i => i.Id == item.Id)
+            );
+
+            var update = Builders<Client>.Update
+                .Set(c => c.Items[-1].Name, item.Name)
+                .Set(c => c.Items[-1].Description, item.Description)
+                .Set(c => c.Items[-1].Price, item.Price)
+                .Set(c => c.Items[-1].Currency, item.Currency)
+                .Set(c => c.Items[-1].Status, item.Status)
+                .Set(c => c.Items[-1].UpdatedAt, DateTime.UtcNow);
+
+            var result = await _clients.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+            if (result.ModifiedCount > 0) successCount++;
+        }
+
+        return successCount;
+    }
 }

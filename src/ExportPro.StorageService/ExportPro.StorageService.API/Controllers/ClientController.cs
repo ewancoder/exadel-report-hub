@@ -3,6 +3,7 @@ using AutoMapper;
 using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Common.Shared.Library;
+using ExportPro.StorageService.CQRS.Commands.Items;
 using ExportPro.StorageService.CQRS.Handlers.Client;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
@@ -99,6 +100,38 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
         if (clientDeleting.Messages[0] == "Client does not exist")
             return BadRequest(clientDeleting);
         return Ok(clientDeleting);
+    }
+
+    [HttpPatch("{clientId}/item")]
+    [SwaggerOperation(Summary = "add single item to client")]
+    public async Task<IActionResult> AddItemToClient(string clientId, [FromBody] ItemDtoForClient item)
+    {
+        var response = await _mediator.Send(new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.Currency, clientId));
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpPatch("{clientId}/items")]
+    [SwaggerOperation(Summary = "add many items to client")]
+    public async Task<IActionResult> AddItemsToClient(string clientId, [FromBody] List<ItemDtoForClient> items)
+    {
+        var response = await _mediator.Send(new CreateItemsCommand(clientId, items));
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpDelete("{clientId}/item/{itemId}")]
+    [SwaggerOperation(Summary = "remove item from client")]
+    public async Task<IActionResult> RemoveItemFromClient(string clientId, string itemId)
+    {
+        var response = await _mediator.Send(new DeleteItemCommand(itemId, clientId));
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpPut("{clientId}/item")]
+    [SwaggerOperation(Summary = "update item in client")]
+    public async Task<IActionResult> UpdateItemInClient(string clientId, [FromBody] Item item)
+    {
+        var response = await _mediator.Send(new UpdateItemCommand(clientId, item));
+        return StatusCode((int)response.ApiState, response);
     }
     //[HttpDelete("delete/client/{ClientId}")]
     //[SwaggerOperation(Summary = "deleting the client by clientid")]
