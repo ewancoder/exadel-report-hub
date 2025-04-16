@@ -12,12 +12,9 @@ public interface IClientRepository : IRepository<Client>
     Task<Client> GetClientByName(string name);
     BaseResponse<Task<List<Client>>> GetClients(int top, int skip);
     Task<Client> GetClientById(string Clientid);
-    Task<List<ClientResponse>> GetAllCLientsIncludingSoftDeleted();
     Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto);
     Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid);
     Task SoftDeleteClient(string clientId);
-    Task<string> DeleteClient(ObjectId Clientid);
-    Task<ClientResponse> GetClientByIdIncludingSoftDeleted(ObjectId ClientId);
     Task<bool> ClientExists(string Name);
     Task<bool> HigherThanMaxSize(int skip);
     Task AddItem(ObjectId id, Client updatedClient, CancellationToken cancellationToken = default);
