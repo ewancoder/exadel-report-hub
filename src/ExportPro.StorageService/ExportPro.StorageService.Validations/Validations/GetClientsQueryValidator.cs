@@ -19,12 +19,17 @@ public class GetClientsQueryValidator : AbstractValidator<GetClientsQuery>
             .WithMessage("Skip must be not empty")
             .GreaterThanOrEqualTo(0)
             .WithMessage("Skip must be greater than or equal to 0")
-            .MustAsync(
-                async (skip, _) =>
-                {
-                    var res = await clientRepository.HigherThanMaxSize(skip);
-                    return res;
-                }
-            );
+            .DependentRules(() =>
+            {
+                RuleFor(x => x.skip)
+                    .MustAsync(
+                        async (skip, _) =>
+                        {
+                            var res = await clientRepository.HigherThanMaxSize(skip);
+                            return !res;
+                        }
+                    )
+                    .WithMessage("Skip can't be higher than the max size");
+            });
     }
 }

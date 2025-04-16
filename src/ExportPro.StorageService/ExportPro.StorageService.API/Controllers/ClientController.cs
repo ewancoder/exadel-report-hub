@@ -32,9 +32,7 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
     public async Task<IActionResult> CreateClient([FromBody] ClientDto clientdto)
     {
         var clientResponse = await _mediator.Send(new CreateClientCommand(clientdto));
-        if (clientResponse.Data.Item2 != null)
-            return BadRequest(clientResponse.Data.Item2);
-        return Ok(clientResponse.Data.Item1);
+        return Ok(clientResponse);
     }
 
     [HttpGet]
@@ -42,8 +40,6 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     public async Task<IActionResult> GetClients([FromQuery] int top = 5, [FromQuery] int skip = 1)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
         var clients = await _mediator.Send(new GetClientsQuery(top, skip));
         return Ok(clients);
     }

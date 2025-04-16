@@ -2,6 +2,7 @@ using System.Net;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
@@ -12,14 +13,14 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
 
-public record CreateClientCommand(ClientDto Clientdto) : ICommand<(ClientResponse?, Dictionary<string, string[]>?)>;
+public record CreateClientCommand(ClientDto Clientdto) : ICommand<ValidationModel<ClientResponse>>;
 
 public class CreateClientCommandHandler(IClientRepository clientRepository, IValidator<CreateClientCommand> validator)
-    : ICommandHandler<CreateClientCommand, (ClientResponse?, Dictionary<string, string[]>)>
+    : ICommandHandler<CreateClientCommand, ValidationModel<ClientResponse>>
 {
     private readonly IClientRepository _clientRepository = clientRepository;
 
-    public async Task<BaseResponse<(ClientResponse?, Dictionary<string, string[]>)>> Handle(
+    public async Task<BaseResponse<ValidationModel<ClientResponse>>> Handle(
         CreateClientCommand request,
         CancellationToken cancellationToken
     )
@@ -27,15 +28,17 @@ public class CreateClientCommandHandler(IClientRepository clientRepository, IVal
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
-            var validation = validationResult
-                .Errors.GroupBy(x => x.PropertyName.Replace("Clientdto.", ""))
-                .ToDictionary(g => g.Key, g => g.Select(x => x.ErrorMessage).ToArray());
-            return new BaseResponse<(ClientResponse?, Dictionary<string, string[]>?)> { Data = (null, validation) };
+            return new BaseResponse<ValidationModel<ClientResponse>>
+            {
+                Data = new(validationResult),
+                ApiState = HttpStatusCode.BadRequest,
+                IsSuccess = false,
+            };
         }
         var CreatingClient = await _clientRepository.AddClientFromClientDto(request.Clientdto);
-        return new BaseResponse<(ClientResponse?, Dictionary<string, string[]>)>
+        return new BaseResponse<ValidationModel<ClientResponse>>
         {
-            Data = (CreatingClient, null),
+            Data = new(CreatingClient),
             Messages = ["Client Created Successfully"],
             ApiState = HttpStatusCode.Created,
             IsSuccess = true,

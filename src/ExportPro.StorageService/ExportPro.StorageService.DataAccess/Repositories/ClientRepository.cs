@@ -21,7 +21,6 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     private IMongoCollection<Client> _clients;
     private readonly IMongoDbConnectionFactory _mongoDbConnectionFactory;
     private readonly IMapper _mapper;
-    private long max_size;
 
     public ClientRepository(
         IMapper mapper,
@@ -54,7 +53,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     {
         var clients = _clients.Find(_ => true);
         string message = "Clients Retrieved";
-        max_size = clients.CountDocuments();
+        var max_size = clients.CountDocuments();
         if (max_size == 0)
         {
             message = $"There is no such document";
@@ -157,6 +156,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
     public Task<bool> HigherThanMaxSize(int skip)
     {
+        var max_size = _clients.Find(_ => true).CountDocuments();
         if (skip > max_size)
             return Task.FromResult(true);
         return Task.FromResult(false);
