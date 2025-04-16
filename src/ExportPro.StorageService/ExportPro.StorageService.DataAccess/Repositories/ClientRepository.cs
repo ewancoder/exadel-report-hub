@@ -53,16 +53,11 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     {
         var clients = _clients.Find(_ => true);
         string message = "Clients Retrieved";
-        var size = clients.CountDocuments();
-        if (size == 0)
+        var max_size = clients.CountDocuments();
+        if (max_size == 0)
         {
             message = $"There is no such document";
             return new BaseResponse<Task<List<Client>>> { Messages = [message], Data = null };
-        }
-        if (skip > size)
-        {
-            message = $"Skip Exceeded the size {size}";
-            skip = (int)size;
         }
         var paginated = clients.Skip(skip).Limit(top).ToListAsync();
         return new BaseResponse<Task<List<Client>>>
@@ -149,5 +144,21 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     public Task<string> SoftDeleteClient(ObjectId Clientid)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<bool> ClientExists(string Name)
+    {
+        var client = await GetOneAsync(x => x.Name == Name, CancellationToken.None);
+        if (client == null)
+            return false;
+        return true;
+    }
+
+    public Task<bool> HigherThanMaxSize(int skip)
+    {
+        var max_size = _clients.Find(_ => true).CountDocuments();
+        if (skip > max_size)
+            return Task.FromResult(true);
+        return Task.FromResult(false);
     }
 }

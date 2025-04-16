@@ -56,6 +56,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.DataAccess", "ExportPro.StorageService\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj", "{1FBDA56C-7748-482C-B399-577E21BF41CB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.Validations", "ExportPro.StorageService\ExportPro.StorageService.Validations\ExportPro.StorageService.Validations.csproj", "{CA77A304-69FD-4386-80B1-9EAFE4A9758F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -306,6 +308,18 @@ Global
 		{1FBDA56C-7748-482C-B399-577E21BF41CB}.Release|x64.Build.0 = Release|Any CPU
 		{1FBDA56C-7748-482C-B399-577E21BF41CB}.Release|x86.ActiveCfg = Release|Any CPU
 		{1FBDA56C-7748-482C-B399-577E21BF41CB}.Release|x86.Build.0 = Release|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Debug|x64.Build.0 = Debug|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Debug|x86.Build.0 = Debug|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Release|x64.ActiveCfg = Release|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Release|x64.Build.0 = Release|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Release|x86.ActiveCfg = Release|Any CPU
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -331,6 +345,7 @@ Global
 		{AB6A0351-2A1A-4068-B566-2C2552AF61BB} = {D60A68F1-98AF-4E46-BE20-CD4AD30A3526}
 		{6FE60513-416B-429B-A669-3E940FEC80DC} = {983068BC-B50F-4D64-AD6C-5CF31770DEDB}
 		{1FBDA56C-7748-482C-B399-577E21BF41CB} = {983068BC-B50F-4D64-AD6C-5CF31770DEDB}
+		{CA77A304-69FD-4386-80B1-9EAFE4A9758F} = {983068BC-B50F-4D64-AD6C-5CF31770DEDB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3564D6A6-C183-4B6D-89C7-596F1C95733F}

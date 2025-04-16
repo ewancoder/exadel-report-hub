@@ -3,38 +3,59 @@ using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
+using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
 
-public record GetClientsQuery(int client_size, int page) : IQuery<List<ClientResponse>>;
+public record GetClientsQuery(int top, int skip) : IQuery<ValidationModel<List<ClientResponse>>>;
 
-public class GetClientsQueryHandler(IClientRepository clientRepository, IMapper mapper)
-    : IQueryHandler<GetClientsQuery, List<ClientResponse>>
+public class GetClientsQueryHandler(
+    IClientRepository clientRepository,
+    IMapper mapper,
+    IValidator<GetClientsQuery> validator
+) : IQueryHandler<GetClientsQuery, ValidationModel<List<ClientResponse>>>
 {
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<BaseResponse<List<ClientResponse>>> Handle(
+    public async Task<BaseResponse<ValidationModel<List<ClientResponse>>>> Handle(
         GetClientsQuery request,
         CancellationToken cancellationToken
     )
     {
-        var clientresponse = _clientRepository.GetClients(request.client_size, request.page);
-        var message = clientresponse.Messages;
-        if (message[0] == "There is no such document")
+        var validate = await validator.ValidateAsync(request);
+        if (!validate.IsValid)
         {
-            return new BaseResponse<List<ClientResponse>>
+            return new BaseResponse<ValidationModel<List<ClientResponse>>>
             {
-                Messages = message,
-                Data = null,
+                Data = new(validate),
                 ApiState = HttpStatusCode.BadRequest,
                 IsSuccess = false,
             };
         }
+        var clientresponse = _clientRepository.GetClients(request.top, request.skip);
+        var message = clientresponse.Messages;
+        if (message[0] == "There is no such document")
+        {
+            return new BaseResponse<ValidationModel<List<ClientResponse>>>
+            {
+                Data = new(),
+                ApiState = HttpStatusCode.BadRequest,
+                IsSuccess = false,
+                Messages = message,
+            };
+        }
         var clients = await clientresponse.Data;
         var clientresp = clients.Select(x => _mapper.Map<ClientResponse>(x)).ToList();
-        return new SuccessResponse<List<ClientResponse>>(clientresp, message: message[0]);
+        return new BaseResponse<ValidationModel<List<ClientResponse>>>
+        {
+            Data = new(clientresp),
+            ApiState = HttpStatusCode.OK,
+            IsSuccess = true,
+            Messages = message,
+        };
     }
 }

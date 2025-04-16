@@ -7,8 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExportPro.Common.Models.MongoDB" Version="1.0.2" />
     <PackageReference Include="FluentValidation" Version="12.0.0-preview1" />
-    <PackageReference Include="MongoDB.Bson" Version="3.3.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExportPro.StorageService.CQRS\ExportPro.StorageService.CQRS.csproj" />
+    <ProjectReference Include="..\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj" />
+  </ItemGroup>
+
 </Project>
