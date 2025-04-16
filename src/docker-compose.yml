@@ -1,4 +1,17 @@
 services:
+  api-gateway:
+    container_name: ocelot
+    # image: giorgaaa/exportproocelot:latest
+    build:
+      context: .
+      dockerfile: ExportPro.Gateway\ExportPro.Gateway.ServiceHost\Dockerfile
+    depends_on:
+      - authservice
+      - storageservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "1200:8080"
   reverse-proxy:
     container_name: ngix
     image: giorgaaa/customnginx:latest
@@ -31,10 +44,10 @@ services:
      
   storageservice:
     container_name: storageservice
-    # image: giorgaaa/exportpro.storageservice:latest
-    build:
-      context: .
-      dockerfile: ExportPro.StorageService/Dockerfile
+    image: giorgaaa/exportpro.storageservice:latest
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.StorageService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDbDocker=mongodb://ExportProDb:27017
