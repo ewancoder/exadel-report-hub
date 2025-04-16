@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
-using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.Commands.Items;
 using ExportPro.StorageService.CQRS.Handlers.Client;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
@@ -14,7 +12,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Swashbuckle.AspNetCore.Annotations;
-
 namespace ExportPro.StorageService.API.Controllers;
 
 [Route("api/client/")]
@@ -22,11 +19,9 @@ namespace ExportPro.StorageService.API.Controllers;
 public class ClientController(IMapper mapper, IAuth auth, IClientRepository clientRepository, IMediator mediator)
     : ControllerBase
 {
-    private readonly IAuth _auth = auth;
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IMediator _mediator = mediator;
     private readonly IMapper _mapper = mapper;
-
     [HttpPost]
     [SwaggerOperation(Summary = "Creating a client")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
@@ -35,29 +30,22 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
         var clientResponse = await _mediator.Send(new CreateClientCommand(clientdto));
         return Ok(clientResponse);
     }
-
     [HttpGet]
     [SwaggerOperation(Summary = "Getting  clients")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
-    public async Task<IActionResult> GetClients([FromQuery] int top = 5, [FromQuery] int skip = 1)
+    public async Task<IActionResult> GetClients([FromQuery] int top = 5, [FromQuery] int skip = 0)
     {
         var clients = await _mediator.Send(new GetClientsQuery(top, skip));
         return Ok(clients);
     }
-
     [HttpGet("{clientId}")]
-    [SwaggerOperation(Summary = "Getting  client by client id which is not soft deleted")]
-    [ProducesResponseType(typeof(List<ClientResponse>), 200)]
+    [SwaggerOperation(Summary = "Getting  client by client id")]
+    [ProducesResponseType(typeof(ClientResponse), 200)]
     public async Task<IActionResult> GetClientById([Required] string clientId)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(new BadRequestResponse());
         var clientresponse = await _mediator.Send(new GetClientByIdQuery(clientId));
-        if (clientresponse.Data == null)
-            return BadRequest(new BadRequestResponse { Messages = ["Client Id does not exist"] });
         return Ok(clientresponse);
     }
-
     [HttpPut("update/client")]
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
@@ -86,7 +74,6 @@ public class ClientController(IMapper mapper, IAuth auth, IClientRepository clie
         };
         return Ok(new SuccessResponse<object>(response, "Updated"));
     }
-
     [HttpDelete("{client_id}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]
     [ProducesResponseType(typeof(BaseResponse<ClientResponse>), 200)]

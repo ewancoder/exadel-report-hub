@@ -13,5 +13,6 @@ public class ItemDtoForClient
     public double Price { get; set; }
     public Status Status { get; set; }
     public Currency Currency { get; set; } //maybe can be made into enum as well?
+
     
 }

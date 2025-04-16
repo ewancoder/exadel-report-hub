@@ -1,21 +1,43 @@
+using System.Net;
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
-using ZstdSharp.Unsafe;
+using FluentValidation;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
-public record GetClientByIdQuery(string Id) : IQuery<ClientResponse>;
+public record GetClientByIdQuery(string Id) : IQuery<ValidationModel<ClientResponse>>;
 
-public class GetClientByIdQueryHandler(IClientRepository clientRepository,IMapper mapper) : IQueryHandler<GetClientByIdQuery, ClientResponse>
+public class GetClientByIdQueryHandler(IClientRepository clientRepository,
+    IMapper mapper, 
+    IValidator<GetClientByIdQuery> validator)
+    : IQueryHandler<GetClientByIdQuery, ValidationModel<ClientResponse>>
 {
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IMapper _mapper = mapper;
-    public async Task<BaseResponse<ClientResponse>> Handle(GetClientByIdQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<ValidationModel<ClientResponse>>> Handle(GetClientByIdQuery request,
+      CancellationToken cancellationToken)
     {
+        var validres = await validator.ValidateAsync(request, cancellationToken);
+        if (!validres.IsValid)
+        {
+            return new BaseResponse<ValidationModel<ClientResponse>>
+            {
+                Data = new ValidationModel<ClientResponse>(validres),
+                ApiState = HttpStatusCode.BadRequest,
+                IsSuccess = false,
+            };
+        }
         var client = await _clientRepository.GetClientById(request.Id);
         var clientrep = _mapper.Map<ClientResponse>(client);
-        return new SuccessResponse<ClientResponse>(clientrep, message: "Client found");
+        return new BaseResponse<ValidationModel<ClientResponse>>
+        {
+            Data = new(clientrep),
+            Messages = ["Client Created Successfully"],
+            ApiState = HttpStatusCode.Created,
+            IsSuccess = true,
+        };
     }
 }

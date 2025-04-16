@@ -19,8 +19,7 @@ public class ItemResponse
     public double Price { get; set; }
     [BsonRepresentation(BsonType.ObjectId)]
     public string? CustomerId { get; set; }
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? ClientId { get; set; }
+ 
     [BsonRepresentation(BsonType.ObjectId)]
     public string? InvoiceId { get; set; }
     public Status? Status { get; set; }

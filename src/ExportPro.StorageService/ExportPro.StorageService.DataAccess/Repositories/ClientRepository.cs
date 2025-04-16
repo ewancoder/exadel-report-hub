@@ -43,12 +43,10 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     //    var paginated= clients.Skip((page-1) * client_size).Limit(client_size).ToListAsync();
     //    return (Messege,paginated);
     //}
-
     public Task<Client> GetClientByName(string name)
     {
         return _clients.Find(x => x.Name == name).FirstOrDefaultAsync();
     }
-
     public BaseResponse<Task<List<Client>>> GetClients(int top, int skip)
     {
         var clients = _clients.Find(_ => true);
@@ -74,7 +72,6 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         var client = GetOneAsync(x => x.Id == ObjectId.Parse(Clientid), CancellationToken.None);
         return client;
     }
-
     public Task<List<ClientResponse>> GetAllCLientsIncludingSoftDeleted()
     {
         throw new NotImplementedException();
