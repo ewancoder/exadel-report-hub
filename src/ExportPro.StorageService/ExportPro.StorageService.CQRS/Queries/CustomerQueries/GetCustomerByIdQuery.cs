@@ -1,10 +1,10 @@
 ﻿using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
+using MediatR;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Queries.CustomerQueries;
-
-public class GetCustomerByIdQuery : IQuery<Customer>
+public class GetCustomerByIdQuery : IQuery<CustomerDto>
 {
     public ObjectId Id { get; set; }
 }

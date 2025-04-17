@@ -1,21 +1,25 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using AutoMapper;
+using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Commands.CustomerCommand;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
 using System.Net;
 
 namespace ExportPro.StorageService.CQRS.Handlers.CustomerHandlers;
 
-public class UpdateCustomerCommandHandler(ICustomerRepository repository) : ICommandHandler<UpdateCustomerCommand, Models.Models.Customer>
+public class UpdateCustomerCommandHandler(ICustomerRepository repository, IMapper mapper)
+    : ICommandHandler<UpdateCustomerCommand, Customer>
 {
     private readonly ICustomerRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
-    public async Task<BaseResponse<Models.Models.Customer>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<Customer>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
     {
-        var customer = await _repository.GetByIdAsync(request.Id, cancellationToken);
-        if (customer is null || customer.IsDeleted)
+        var existingCustomer = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        if (existingCustomer is null || existingCustomer.IsDeleted)
         {
-            return new BaseResponse<Models.Models.Customer>
+            return new BaseResponse<Customer>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.NotFound,
@@ -23,13 +27,10 @@ public class UpdateCustomerCommandHandler(ICustomerRepository repository) : ICom
             };
         }
 
-        customer.Name = request.Name;
-        customer.Email = request.Email;
-        customer.CountryId = request.CountryId;
-        customer.UpdatedAt = DateTime.UtcNow;
+        _mapper.Map(request, existingCustomer); // updates only relevant fields (Name, Email, CountryId, UpdatedAt)
 
-        await _repository.UpdateOneAsync(customer, cancellationToken);
+        await _repository.UpdateOneAsync(existingCustomer, cancellationToken);
 
-        return new BaseResponse<Models.Models.Customer> { Data = customer };
+        return new BaseResponse<Customer> { Data = existingCustomer };
     }
 }
