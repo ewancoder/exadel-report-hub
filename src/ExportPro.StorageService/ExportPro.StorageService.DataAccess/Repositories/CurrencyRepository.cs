@@ -14,4 +14,9 @@ public class CurrencyRepository(ICollectionProvider collectionProvider) : MongoR
         var filter = Builders<Currency>.Filter.Eq(c => c.IsDeleted, false);
         return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<List<Currency>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        return await Collection.Find(x => !x.IsDeleted).ToListAsync(cancellationToken);
+    }
 }

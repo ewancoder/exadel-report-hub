@@ -1,5 +1,5 @@
 ﻿using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
-using ExportPro.StorageService.CQRS.Queries.invoice;
+using ExportPro.StorageService.CQRS.Queries.InvoiceQueries;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +28,7 @@ public class InvoiceController : ControllerBase
             InvoiceNumber = response.Data.InvoiceNumber,
             DueDate = response.Data.DueDate,
             Amount = response.Data.Amount,
-            Currency = response.Data.Currency,
+            CurrencyId = response.Data.CurrencyId,
             PaymentStatus = response.Data.PaymentStatus,
             BankAccountNumber = response.Data.BankAccountNumber,
             ClientId = response.Data.ClientId,

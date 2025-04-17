@@ -1,9 +1,10 @@
 ﻿using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.Models.Enums;
+using ExportPro.StorageService.Models.Models;
 
 namespace ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 
-public class CreateInvoiceCommand : ICommand<Models.Models.Invoice>
+public class CreateInvoiceCommand : ICommand<Invoice>
 {
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }

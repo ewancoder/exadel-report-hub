@@ -5,5 +5,5 @@ namespace ExportPro.StorageService.DataAccess.Interfaces;
 
 public interface ICurrencyRepository : IRepository<Currency>
 {
-    Task<Currency?> GetByCodeAsync(string code);
+    Task<List<Currency>> GetAllAsync(CancellationToken cancellationToken);
 }
