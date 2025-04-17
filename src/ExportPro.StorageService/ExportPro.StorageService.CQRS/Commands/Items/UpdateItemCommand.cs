@@ -1,36 +1,47 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.DataAccess.Repositories;
+using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
+using System.Net;
 
 namespace ExportPro.StorageService.CQRS.Commands.Items;
 
-public record UpdateItemCommand(
-    ObjectId Id,
-    string Name,
-    string Description,
-    double Price,
-    string CustomerId,
-    string InvoiceId,
-    string ClientId) : ICommand<bool>;
+public record UpdateItemCommand(string ClientId, Item Item) : ICommand<bool>;
 
-public class UpdateItemCommandHandler(ItemRepository repository) : ICommandHandler<UpdateItemCommand, bool>
+public class UpdateItemCommandHandler(IClientRepository repository) : ICommandHandler<UpdateItemCommand, bool>
 {
-    private readonly ItemRepository _repository = repository;
+    private readonly IClientRepository _repository = repository;
+
     public async Task<BaseResponse<bool>> Handle(UpdateItemCommand request, CancellationToken cancellationToken)
     {
-        var item = await _repository.GetByIdAsync(request.Id, cancellationToken);
-        if (item == null)
+        if (!ObjectId.TryParse(request.ClientId, out var clientObjectId))
         {
-            return new NotFoundResponse<bool>("Item not found");
+            return new BaseResponse<bool>
+            {
+                IsSuccess = false,
+                ApiState = HttpStatusCode.BadRequest,
+                Messages = ["Invalid ClientId format."]
+            };
         }
-        item.Name = request.Name;
-        item.Description = request.Description;
-        item.Price = request.Price;
-        item.CustomerId = request.CustomerId;
-        item.InvoiceId = request.InvoiceId;
-        item.ClientId = request.ClientId;
-        await _repository.UpdateOneAsync(item, cancellationToken);
+
+        if (request.Item is null || request.Item.Id == ObjectId.Empty)
+        {
+            return new BaseResponse<bool>
+            {
+                IsSuccess = false,
+                ApiState = HttpStatusCode.BadRequest,
+                Messages = ["Item is null or missing valid Id."]
+            };
+        }
+
+        var updated = await _repository.UpdateItemInClient(clientObjectId, request.Item, cancellationToken);
+
+        if (!updated)
+        {
+            return new NotFoundResponse<bool>($"Item with ID {request.Item.Id} not found in client.");
+        }
+
         return new SuccessResponse<bool>(true);
     }
 }

@@ -12,17 +12,14 @@ public interface IClientRepository : IRepository<Client>
     Task<Client> GetClientByName(string name);
     BaseResponse<Task<List<Client>>> GetClients(int top, int skip);
     Task<Client> GetClientById(string Clientid);
-    Task<List<ClientResponse>> GetAllCLientsIncludingSoftDeleted();
     Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto);
     Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid);
-    Task<string> SoftDeleteClient(ObjectId Clientid);
-    Task<string> DeleteClient(ObjectId Clientid);
-    Task<ClientResponse> GetClientByIdIncludingSoftDeleted(ObjectId ClientId);
-    Task<ClientResponse> AddItemIds(string Clientid, List<string> ItemIds);
-    Task<ClientResponse> AddInvoiceIds(string Clientid, List<string> InvoiceIds);
-    Task<ClientResponse> AddCustomerIds(string Clientid, List<string> customerids);
-    Task<FullClientResponse> GetFullClient(string clientid);
-    Task<List<FullClientResponse>> GetAllFullClients();
+    Task SoftDeleteClient(string clientId);
     Task<bool> ClientExists(string Name);
     Task<bool> HigherThanMaxSize(int skip);
+    Task AddItem(ObjectId id, Client updatedClient, CancellationToken cancellationToken = default);
+    Task<bool> AddItems(ObjectId clientId, List<Item> items, CancellationToken cancellationToken = default);
+    Task<bool> RemoveItemFromClient(ObjectId clientId, ObjectId itemId, CancellationToken cancellationToken = default);
+    Task<bool> UpdateItemInClient(ObjectId clientId, Item updatedItem, CancellationToken cancellationToken = default);
+    Task<int> UpdateItemsInClient(ObjectId clientId, List<Item> updatedItems, CancellationToken cancellationToken = default);
 }

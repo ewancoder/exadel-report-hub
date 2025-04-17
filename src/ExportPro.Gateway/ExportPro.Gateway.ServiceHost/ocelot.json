@@ -1,0 +1,67 @@
+{
+    "Routes": [
+        {
+            "UpstreamPathTemplate": "/api/client",
+            "UpstreamHttpMethod": [ "Get", "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "storageservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/client",
+            "SwaggerKey": "StorageService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/Auth/register",
+            "UpstreamHttpMethod": [ "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "authservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Auth/register",
+            "SwaggerKey": "AuthService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/Auth/login",
+            "UpstreamHttpMethod": [ "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "authservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Auth/login",
+            "SwaggerKey": "AuthService"
+        }
+    ],
+    "GlobalConfiguration": {
+        "BaseUrl": "http://localhost:1200"
+    },
+    "SwaggerEndPoints": [
+        {
+            "Key": "StorageService",
+            "Config": [
+                {
+                    "Url": " http://storageservice:8080/swagger/v1/swagger.json",
+                    "Name": "Storage Service"
+                }
+            ]
+        },
+        {
+            "Key": "AuthService",
+            "Config": [
+                {
+                    "Name": "Auth Service",
+                    "Version": "v1",
+                    "Url": "http://authservice:8080/swagger/v1/swagger.json"
+                }
+            ]
+        }
+    ]
+}
