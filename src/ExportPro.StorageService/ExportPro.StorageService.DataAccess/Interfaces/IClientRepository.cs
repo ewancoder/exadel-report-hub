@@ -3,6 +3,7 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.DataAccess.Interfaces;
@@ -31,4 +32,5 @@ public interface IClientRepository : IRepository<Client>
         string planId,
         CancellationToken cancellationToken = default
     );
+    Task<PlansResponse> UpdateClientPlan(string clientId, string planId, PlansDto plansDto); 
 }

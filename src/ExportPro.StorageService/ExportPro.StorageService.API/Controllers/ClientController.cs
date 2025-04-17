@@ -1,17 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using AutoMapper;
-using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.Commands.Items;
 using ExportPro.StorageService.CQRS.Handlers.Client;
 using ExportPro.StorageService.CQRS.Handlers.Plans;
-using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace ExportPro.StorageService.API.Controllers;
@@ -122,6 +118,13 @@ public class ClientController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> RemovePlanFromClient(string clientId, string planId)
     {
         var response = await _mediator.Send(new RemovePlanFromClientCommand(clientId, planId));
+        return Ok(response);
+    }
+    [HttpPatch("{clientId}/plan/{planId}")]
+    [SwaggerOperation(Summary = "Update Client's Plan")]
+    public async Task<IActionResult> UpdateClientPlan(string clientId, string planId, [FromBody] PlansDto plansDto)
+    {
+        var response = await _mediator.Send(new UpdateClientPlanCommand(clientId, planId, plansDto));
         return Ok(response);
     }
 }

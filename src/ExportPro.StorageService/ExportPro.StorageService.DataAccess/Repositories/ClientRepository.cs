@@ -253,4 +253,30 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         var planResp = _mapper.Map<PlansResponse>(plan);
         return planResp;
     }
+
+    public async Task<PlansResponse> UpdateClientPlan(string clientId, string planId, PlansDto plansDto)
+    {
+        var client = await GetClientById(clientId);
+        Plans plans = new(); 
+        foreach (var i in client.Plans)
+            {
+                if (i.Id.ToString() == planId)
+                {
+                    plans = i;
+                }
+            }
+        plans.StartDate = plansDto.StartDate;
+        plans.EndDate = plansDto.EndDate;
+        for(int i = 0; i < plansDto.Items.Count; ++i)
+        {
+            plans.items[i].Name = plansDto.Items[i].Name;
+            plans.items[i].Description = plansDto.Items[i].Description;
+            plans.items[i].Price = plansDto.Items[i].Price;
+            plans.items[i].Currency = plansDto.Items[i].Currency;
+            plans.items[i].Status = plansDto.Items[i].Status;
+        }
+        await UpdateOneAsync(client, CancellationToken.None);
+        var planResp = _mapper.Map<PlansResponse>(plans);
+        return planResp;
+    }
 }

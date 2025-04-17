@@ -1,26 +1,21 @@
-using System.Net;
+﻿using System.Net;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
+using MediatR;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Plans;
-
-public record RemovePlanFromClientCommand(string clientId, string planId) : ICommand<ValidationModel<PlansResponse>>;
-
-public class RemovePlanFromClientCommandHandler(
-    IClientRepository clientRepository,
-    IValidator<RemovePlanFromClientCommand> validator
-) : ICommandHandler<RemovePlanFromClientCommand, ValidationModel<PlansResponse>>
+public record UpdateClientPlanCommand(string clientId, string planId, PlansDto plansDto) : ICommand<ValidationModel<PlansResponse>>;
+public class UpdateClientPlanCommandHandler(
+    IClientRepository clientRepository
+    ,IValidator<UpdateClientPlanCommand> validator) : ICommandHandler<UpdateClientPlanCommand, ValidationModel<PlansResponse>>
 {
-    private readonly IClientRepository _clientRepository = clientRepository;
-
-    public async Task<BaseResponse<ValidationModel<PlansResponse>>> Handle(
-        RemovePlanFromClientCommand request,
-        CancellationToken cancellationToken
-    )
+    private readonly IClientRepository _clientRepository=clientRepository;
+    public async Task<BaseResponse<ValidationModel<PlansResponse>>> Handle(UpdateClientPlanCommand request, CancellationToken cancellationToken)
     {
         var validResult = await validator.ValidateAsync(request);
         if (!validResult.IsValid)
@@ -32,7 +27,7 @@ public class RemovePlanFromClientCommandHandler(
                 IsSuccess = false,
             };
         }
-        var plan = await _clientRepository.RemovePlanFromClient(request.clientId, request.planId);
+        var plan = await _clientRepository.UpdateClientPlan(request.clientId, request.planId, request.plansDto);
         return new BaseResponse<ValidationModel<PlansResponse>>
         {
             Data = new(plan),
