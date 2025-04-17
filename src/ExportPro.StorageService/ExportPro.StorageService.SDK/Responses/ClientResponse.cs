@@ -16,4 +16,5 @@ public class ClientResponse
     public string? CreatedBy { get; set; }
     public string? UpdatedBy { get; set; }
     public List<ItemResponse> Items { get; set; }
+    public List<PlansResponse> Plans { get; set; }
 }

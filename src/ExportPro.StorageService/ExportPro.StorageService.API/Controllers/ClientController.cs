@@ -4,6 +4,7 @@ using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.Commands.Items;
 using ExportPro.StorageService.CQRS.Handlers.Client;
+using ExportPro.StorageService.CQRS.Handlers.Plans;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -12,16 +13,15 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Swashbuckle.AspNetCore.Annotations;
+
 namespace ExportPro.StorageService.API.Controllers;
 
 [Route("api/client/")]
 [ApiController]
-public class ClientController(IMapper mapper,IClientRepository clientRepository, IMediator mediator)
-    : ControllerBase
+public class ClientController(IMediator mediator) : ControllerBase
 {
-    private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IMediator _mediator = mediator;
-    private readonly IMapper _mapper = mapper;
+
     [HttpPost]
     [SwaggerOperation(Summary = "Creating a client")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
@@ -30,6 +30,7 @@ public class ClientController(IMapper mapper,IClientRepository clientRepository,
         var clientResponse = await _mediator.Send(new CreateClientCommand(clientdto));
         return Ok(clientResponse);
     }
+
     [HttpGet]
     [SwaggerOperation(Summary = "Getting  clients")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
@@ -38,6 +39,7 @@ public class ClientController(IMapper mapper,IClientRepository clientRepository,
         var clients = await _mediator.Send(new GetClientsQuery(top, skip));
         return Ok(clients);
     }
+
     [HttpGet("{clientId}")]
     [SwaggerOperation(Summary = "Getting  client by client id")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
@@ -46,14 +48,16 @@ public class ClientController(IMapper mapper,IClientRepository clientRepository,
         var clientresponse = await _mediator.Send(new GetClientByIdQuery(clientId));
         return Ok(clientresponse);
     }
+
     [HttpPatch("{clientId}")]
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     public async Task<IActionResult> UpdateClient([Required] string clientId, [FromBody] ClientUpdateDto clientdto)
     {
-       var afterUpdate = await _mediator.Send(new UpdateClientCommand(clientdto, clientId));
+        var afterUpdate = await _mediator.Send(new UpdateClientCommand(clientdto, clientId));
         return Ok(afterUpdate);
     }
+
     [HttpDelete("{clientId}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]
     [ProducesResponseType(typeof(BaseResponse<ClientResponse>), 200)]
@@ -62,11 +66,14 @@ public class ClientController(IMapper mapper,IClientRepository clientRepository,
         var clientDeleting = await _mediator.Send(new SoftDeleteClientCommand(clientId));
         return Ok(clientDeleting);
     }
+
     [HttpPatch("{clientId}/item")]
     [SwaggerOperation(Summary = "add single item to client")]
     public async Task<IActionResult> AddItemToClient(string clientId, [FromBody] ItemDtoForClient item)
     {
-        var response = await _mediator.Send(new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.Currency, clientId));
+        var response = await _mediator.Send(
+            new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.Currency, clientId)
+        );
         return StatusCode((int)response.ApiState, response);
     }
 
@@ -100,5 +107,21 @@ public class ClientController(IMapper mapper,IClientRepository clientRepository,
     {
         var response = await _mediator.Send(new UpdateItemsCommand(clientId, items));
         return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpPatch("{clientId}/plan")]
+    [SwaggerOperation(Summary = "add single plan to client")]
+    public async Task<IActionResult> AddPlanToClient(string clientId, [FromBody] PlansDto plan)
+    {
+        var response = await _mediator.Send(new AddPlanToClientCommand(clientId, plan));
+        return Ok(response);
+    }
+
+    [HttpDelete("{clientId}/plan/{planId}")]
+    [SwaggerOperation(Summary = "remove plan from client")]
+    public async Task<IActionResult> RemovePlanFromClient(string clientId, string planId)
+    {
+        var response = await _mediator.Send(new RemovePlanFromClientCommand(clientId, planId));
+        return Ok(response);
     }
 }

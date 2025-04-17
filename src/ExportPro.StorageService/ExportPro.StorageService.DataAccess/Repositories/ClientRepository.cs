@@ -32,13 +32,10 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         _mapper = mapper;
         _clients = collectionProvider.GetCollection<Client>("Client");
     }
-    public Task<Client> GetClientByName(string name)
-    {
-        return _clients.Find(x => x.Name == name && x.IsDeleted==false).FirstOrDefaultAsync();
-    }
+
     public BaseResponse<Task<List<Client>>> GetClients(int top, int skip)
     {
-        var clients = _clients.Find(_ => _.IsDeleted==false);
+        var clients = _clients.Find(_ => _.IsDeleted == false);
         string message = "Clients Retrieved";
         var max_size = clients.CountDocuments();
         if (max_size == 0)
@@ -58,15 +55,28 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
     public Task<Client> GetClientById(string Clientid)
     {
-        var client = GetOneAsync(x => x.Id == ObjectId.Parse(Clientid) && x.IsDeleted==false, CancellationToken.None);
+        var client = GetOneAsync(x => x.Id == ObjectId.Parse(Clientid) && x.IsDeleted == false, CancellationToken.None);
         return client;
     }
+
     public async Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto)
     {
         Client client = _mapper.Map<Client>(clientDto);
         foreach (var item in client.Items)
         {
             item.Id = ObjectId.GenerateNewId();
+        }
+
+        foreach (var i in client.Plans)
+        {
+            int ind = 0;
+            i.Id = ObjectId.GenerateNewId();
+            foreach (var j in i.items)
+            {
+                j.Id = ObjectId.GenerateNewId();
+                ind++;
+            }
+            i.Amount = ind;
         }
         client.CreatedAt = DateTime.UtcNow;
         client.UpdatedAt = null;
@@ -75,6 +85,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         clientresp.Items = _mapper.Map<List<ItemResponse>>(client.Items);
         return clientresp;
     }
+
     public async Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid)
     {
         var clientGet = await GetClientById(clientid);
@@ -83,24 +94,28 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         await UpdateOneAsync(clientGet, CancellationToken.None);
         return _mapper.Map<ClientResponse>(clientGet);
     }
-    public   Task SoftDeleteClient(string clientId)
+
+    public Task SoftDeleteClient(string clientId)
     {
-        return SoftDeleteAsync(ObjectId.Parse(clientId),CancellationToken.None);
+        return SoftDeleteAsync(ObjectId.Parse(clientId), CancellationToken.None);
     }
+
     public async Task<bool> ClientExists(string Name)
     {
-        var client = await GetOneAsync(x => x.Name == Name && x.IsDeleted==false, CancellationToken.None);
+        var client = await GetOneAsync(x => x.Name == Name && x.IsDeleted == false, CancellationToken.None);
         if (client == null)
             return false;
         return true;
     }
+
     public Task<bool> HigherThanMaxSize(int skip)
     {
-        var max_size = _clients.Find(_ => _.IsDeleted==false).CountDocuments();
+        var max_size = _clients.Find(_ => _.IsDeleted == false).CountDocuments();
         if (skip > max_size)
             return Task.FromResult(true);
         return Task.FromResult(false);
     }
+
     public async Task AddItem(ObjectId id, Client updatedClient, CancellationToken cancellationToken = default)
     {
         var result = await _clients.ReplaceOneAsync(
@@ -125,35 +140,37 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
         var update = Builders<Client>.Update.PushEach(x => x.Items, items);
 
-        var result = await _clients.UpdateOneAsync(
-            x => x.Id == clientId,
-            update,
-            cancellationToken: cancellationToken
-        );
+        var result = await _clients.UpdateOneAsync(x => x.Id == clientId, update, cancellationToken: cancellationToken);
 
         return result.ModifiedCount > 0;
     }
-    public async Task<bool> RemoveItemFromClient(ObjectId clientId, ObjectId itemId, CancellationToken cancellationToken = default)
+
+    public async Task<bool> RemoveItemFromClient(
+        ObjectId clientId,
+        ObjectId itemId,
+        CancellationToken cancellationToken = default
+    )
     {
         var update = Builders<Client>.Update.PullFilter(c => c.Items, i => i.Id == itemId);
 
-        var result = await _clients.UpdateOneAsync(
-            c => c.Id == clientId,
-            update,
-            cancellationToken: cancellationToken
-        );
+        var result = await _clients.UpdateOneAsync(c => c.Id == clientId, update, cancellationToken: cancellationToken);
 
         return result.ModifiedCount > 0;
     }
-    public async Task<bool> UpdateItemInClient(ObjectId clientId, Item updatedItem, CancellationToken cancellationToken = default)
+
+    public async Task<bool> UpdateItemInClient(
+        ObjectId clientId,
+        Item updatedItem,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<Client>.Filter.And(
             Builders<Client>.Filter.Eq(c => c.Id, clientId),
             Builders<Client>.Filter.ElemMatch(c => c.Items, i => i.Id == updatedItem.Id)
         );
 
-        var update = Builders<Client>.Update
-            .Set(c => c.Items[-1].Name, updatedItem.Name)
+        var update = Builders<Client>
+            .Update.Set(c => c.Items[-1].Name, updatedItem.Name)
             .Set(c => c.Items[-1].Description, updatedItem.Description)
             .Set(c => c.Items[-1].Price, updatedItem.Price)
             .Set(c => c.Items[-1].Currency, updatedItem.Currency)
@@ -164,7 +181,11 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         return result.ModifiedCount > 0;
     }
 
-    public async Task<int> UpdateItemsInClient(ObjectId clientId, List<Item> updatedItems, CancellationToken cancellationToken = default)
+    public async Task<int> UpdateItemsInClient(
+        ObjectId clientId,
+        List<Item> updatedItems,
+        CancellationToken cancellationToken = default
+    )
     {
         int successCount = 0;
         foreach (var item in updatedItems)
@@ -174,8 +195,8 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
                 Builders<Client>.Filter.ElemMatch(c => c.Items, i => i.Id == item.Id)
             );
 
-            var update = Builders<Client>.Update
-                .Set(c => c.Items[-1].Name, item.Name)
+            var update = Builders<Client>
+                .Update.Set(c => c.Items[-1].Name, item.Name)
                 .Set(c => c.Items[-1].Description, item.Description)
                 .Set(c => c.Items[-1].Price, item.Price)
                 .Set(c => c.Items[-1].Currency, item.Currency)
@@ -183,9 +204,53 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
                 .Set(c => c.Items[-1].UpdatedAt, DateTime.UtcNow);
 
             var result = await _clients.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
-            if (result.ModifiedCount > 0) successCount++;
+            if (result.ModifiedCount > 0)
+                successCount++;
         }
 
         return successCount;
+    }
+
+    public async Task<Plans> AddPlanToClient(
+        string clientId,
+        PlansDto plan,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var client = await GetClientById(clientId);
+        var plans = _mapper.Map<Plans>(plan);
+        plans.Id = ObjectId.GenerateNewId();
+        int ind = 0;
+        foreach (var i in plans.items)
+        {
+            ind++;
+            i.Id = ObjectId.GenerateNewId();
+        }
+        client.Plans.Add(plans);
+        plans.Amount = ind;
+        UpdateOneAsync(client, cancellationToken);
+        return plans;
+    }
+
+    public async Task<PlansResponse> RemovePlanFromClient(
+        string clientId,
+        string planId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var client = await GetClientById(clientId);
+        var plan = new Plans();
+        foreach (var i in client.Plans)
+        {
+            if (i.Id.ToString() == planId)
+            {
+                plan = i;
+                i.isDeleted = true;
+                break;
+            }
+        }
+        await UpdateOneAsync(client, cancellationToken);
+        var planResp = _mapper.Map<PlansResponse>(plan);
+        return planResp;
     }
 }

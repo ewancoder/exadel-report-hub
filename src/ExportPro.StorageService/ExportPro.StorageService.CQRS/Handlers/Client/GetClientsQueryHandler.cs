@@ -49,6 +49,18 @@ public class GetClientsQueryHandler(
             };
         }
         var clients = await clientresponse.Data;
+        var plans = new List<Models.Models.Plans>();
+        foreach (var client in clients)
+        {
+            foreach (var j in client.Plans)
+            {
+                if (j.isDeleted == false)
+                {
+                    plans.Add(j);
+                }
+            }
+            client.Plans = plans;
+        }
         var clientresp = clients.Select(x => _mapper.Map<ClientResponse>(x)).ToList();
         return new BaseResponse<ValidationModel<List<ClientResponse>>>
         {
