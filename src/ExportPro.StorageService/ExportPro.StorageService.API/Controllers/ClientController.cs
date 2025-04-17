@@ -17,7 +17,6 @@ namespace ExportPro.StorageService.API.Controllers;
 public class ClientController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
-
     [HttpPost]
     [SwaggerOperation(Summary = "Creating a client")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
