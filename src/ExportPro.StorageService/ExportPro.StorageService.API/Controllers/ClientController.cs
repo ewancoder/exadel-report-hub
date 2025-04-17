@@ -66,7 +66,7 @@ public class ClientController(IMapper mapper,IClientRepository clientRepository,
     [SwaggerOperation(Summary = "add single item to client")]
     public async Task<IActionResult> AddItemToClient(string clientId, [FromBody] ItemDtoForClient item)
     {
-        var response = await _mediator.Send(new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.Currency, clientId));
+        var response = await _mediator.Send(new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.CurrencyId, clientId));
         return StatusCode((int)response.ApiState, response);
     }
 

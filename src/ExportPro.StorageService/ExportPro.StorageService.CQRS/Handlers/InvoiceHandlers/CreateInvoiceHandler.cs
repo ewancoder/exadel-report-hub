@@ -1,16 +1,16 @@
 ﻿using System.Net;
-using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 using MongoDB.Bson;
+using ExportPro.StorageService.DataAccess.Interfaces;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
 
-public class CreateInvoiceHandler(IRepository<Invoice> repository) : ICommandHandler<CreateInvoiceCommand, Invoice>
+public class CreateInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<CreateInvoiceCommand, Invoice>
 {
-    private readonly IRepository<Invoice> _repository = repository;
+    private readonly IInvoiceRepository _repository = repository;
 
     public async Task<BaseResponse<Invoice>> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)
     {

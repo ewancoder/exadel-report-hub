@@ -51,7 +51,7 @@ public class InvoiceController : ControllerBase
             InvoiceNumber = response.Data.InvoiceNumber,
             DueDate = response.Data.DueDate,
             Amount = response.Data.Amount,
-            Currency = response.Data.Currency,
+            CurrencyId = response.Data.CurrencyId,
             PaymentStatus = response.Data.PaymentStatus,
             BankAccountNumber = response.Data.BankAccountNumber,
             ClientId = response.Data.ClientId,
@@ -84,7 +84,7 @@ public class InvoiceController : ControllerBase
             InvoiceNumber = response.Data.InvoiceNumber,
             DueDate = response.Data.DueDate,
             Amount = response.Data.Amount,
-            Currency = response.Data.Currency,
+            CurrencyId = response.Data.CurrencyId,
             PaymentStatus = response.Data.PaymentStatus,
             BankAccountNumber = response.Data.BankAccountNumber,
             ClientId = response.Data.ClientId,
@@ -93,7 +93,7 @@ public class InvoiceController : ControllerBase
         return StatusCode((int)response.ApiState,res);
     }
 
-    [HttpGet("getInvoices")]
+    [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(new GetAllInvoicesQuery(), cancellationToken);
@@ -103,7 +103,7 @@ public class InvoiceController : ControllerBase
             InvoiceNumber = x.InvoiceNumber,
             DueDate = x.DueDate,
             Amount = x.Amount,
-            Currency = x.Currency,
+            CurrencyId = x.CurrencyId,
             PaymentStatus = x.PaymentStatus,
             BankAccountNumber = x.BankAccountNumber,
             ClientId = x.ClientId,

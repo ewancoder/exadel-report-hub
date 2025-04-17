@@ -12,7 +12,7 @@ public record CreateItemCommand(string Name,
     string Description, 
     double Price, 
     Status Status,
-    Currency Currency,
+    string CurrencyId,
     string ClientId): ICommand<string>;
 
 public class CreateItemCommandHandler(IClientRepository clientRepository) : ICommandHandler<CreateItemCommand, string>
@@ -32,7 +32,7 @@ public class CreateItemCommandHandler(IClientRepository clientRepository) : ICom
             Description = request.Description,
             Price = request.Price,
             Status = request.Status,
-            Currency = request.Currency
+            CurrencyId = request.CurrencyId
         };
         client.Items ??= new List<Item>();
         client.Items.Add(item);

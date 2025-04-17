@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ExportPro.StorageService.Models.Enums;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using ExportPro.StorageService.Models.Models;
 
 namespace ExportPro.StorageService.SDK.Responses;
 
@@ -23,7 +24,7 @@ public class ItemResponse
     [BsonRepresentation(BsonType.ObjectId)]
     public string? InvoiceId { get; set; }
     public Status? Status { get; set; }
-    public Currency? Currency { get; set; } //maybe can be made into enum as well?
+    public string? CurrencyId { get; set; } //maybe can be made into enum as well?
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 }

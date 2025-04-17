@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ExportPro.StorageService.Models.Enums;
+using ExportPro.StorageService.Models.Models;
 
 namespace ExportPro.StorageService.SDK.DTOs;
 
@@ -12,7 +13,5 @@ public class ItemDtoForClient
     [Required]
     public double Price { get; set; }
     public Status Status { get; set; }
-    public Currency Currency { get; set; } //maybe can be made into enum as well?
-
-    
+    public string CurrencyId { get; set; } //maybe can be made into enum as well?
 }

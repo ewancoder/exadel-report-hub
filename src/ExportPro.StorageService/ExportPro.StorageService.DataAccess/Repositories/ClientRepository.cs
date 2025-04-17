@@ -156,7 +156,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
             .Set(c => c.Items[-1].Name, updatedItem.Name)
             .Set(c => c.Items[-1].Description, updatedItem.Description)
             .Set(c => c.Items[-1].Price, updatedItem.Price)
-            .Set(c => c.Items[-1].Currency, updatedItem.Currency)
+            .Set(c => c.Items[-1].CurrencyId, updatedItem.CurrencyId)
             .Set(c => c.Items[-1].Status, updatedItem.Status)
             .Set(c => c.Items[-1].UpdatedAt, DateTime.UtcNow);
 
@@ -178,7 +178,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
                 .Set(c => c.Items[-1].Name, item.Name)
                 .Set(c => c.Items[-1].Description, item.Description)
                 .Set(c => c.Items[-1].Price, item.Price)
-                .Set(c => c.Items[-1].Currency, item.Currency)
+                .Set(c => c.Items[-1].CurrencyId, item.CurrencyId)
                 .Set(c => c.Items[-1].Status, item.Status)
                 .Set(c => c.Items[-1].UpdatedAt, DateTime.UtcNow);
 

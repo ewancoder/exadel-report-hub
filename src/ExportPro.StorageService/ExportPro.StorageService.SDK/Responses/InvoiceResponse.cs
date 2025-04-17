@@ -11,7 +11,7 @@ public class InvoiceResponse
     public DateTime IssueDate { get; set; } = DateTime.Now;
     public DateTime DueDate { get; set; } = DateTime.Now;
     public decimal Amount { get; set; }
-    public string? Currency { get; set; }
+    public string? CurrencyId { get; set; }
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
     [BsonRepresentation(BsonType.ObjectId)] 
