@@ -3,7 +3,7 @@ using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.Validations.Validations;
+namespace ExportPro.StorageService.Validations.Validations.Client;
 
 public sealed class GetClientByIdValidator:AbstractValidator<GetClientByIdQuery>
 {

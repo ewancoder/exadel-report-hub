@@ -1,5 +1,3 @@
-using ExportPro.Auth.SDK.Interfaces;
-using ExportPro.AuthService.Configuration;
 using ExportPro.Common.DataAccess.MongoDB.Configurations;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
@@ -10,10 +8,9 @@ using ExportPro.StorageService.CQRS;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
-using ExportPro.StorageService.Validations.Validations;
+using ExportPro.StorageService.Validations.Validations.Client;
 using FluentValidation;
 using MediatR;
-using Refit;
 var builder = WebApplication.CreateBuilder(args);
 
 //builder.Host.UseSharedSerilogAndConfiguration();

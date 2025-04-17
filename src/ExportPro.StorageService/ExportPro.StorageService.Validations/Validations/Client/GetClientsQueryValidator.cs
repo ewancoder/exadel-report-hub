@@ -2,7 +2,7 @@
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations;
+namespace ExportPro.StorageService.Validations.Validations.Client;
 
 public class GetClientsQueryValidator : AbstractValidator<GetClientsQuery>
 {

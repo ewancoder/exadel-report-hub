@@ -7,7 +7,7 @@ using ExportPro.StorageService.CQRS.Handlers.Client;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations;
+namespace ExportPro.StorageService.Validations.Validations.Client;
 
 public sealed class CreateClientCommandValidator : AbstractValidator<CreateClientCommand>
 {

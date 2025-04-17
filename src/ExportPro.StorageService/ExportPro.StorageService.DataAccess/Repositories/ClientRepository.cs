@@ -72,7 +72,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         client.UpdatedAt = null;
         await AddOneAsync(client, CancellationToken.None);
         var clientresp = _mapper.Map<ClientResponse>(client);
-        clientresp.itemResponses = _mapper.Map<List<ItemResponse>>(client.Items);
+        clientresp.Items = _mapper.Map<List<ItemResponse>>(client.Items);
         return clientresp;
     }
     public async Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid)

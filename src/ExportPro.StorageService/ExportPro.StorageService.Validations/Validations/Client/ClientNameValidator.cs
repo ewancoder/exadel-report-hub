@@ -1,7 +1,7 @@
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations;
+namespace ExportPro.StorageService.Validations.Validations.Client;
 
 public sealed class ClientNameValidator:AbstractValidator<string>
 {

@@ -15,5 +15,5 @@ public class ClientResponse
     public DateTime? UpdatedAt { get; set; }
     public string? CreatedBy { get; set; }
     public string? UpdatedBy { get; set; }
-    public List<ItemResponse> itemResponses { get; set; }
+    public List<ItemResponse> Items { get; set; }
 }
