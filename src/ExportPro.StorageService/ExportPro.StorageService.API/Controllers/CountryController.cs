@@ -30,5 +30,5 @@ public class CountryController(IMediator mediator) : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
-        => Ok(await _mediator.Send(new GetAllCountriesQuery()));
+        => Ok(await _mediator.Send(new GetPaginatedCountriesQuery()));
 }

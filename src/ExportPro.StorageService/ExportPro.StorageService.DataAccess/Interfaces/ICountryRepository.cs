@@ -1,10 +1,10 @@
 ﻿using ExportPro.Common.DataAccess.MongoDB.Interfaces;
-using ExportPro.Common.DataAccess.MongoDB.Repository;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.PaginationParams;
 
 namespace ExportPro.StorageService.DataAccess.Interfaces;
 
 public interface ICountryRepository : IRepository<Country>
 {
-    Task<List<Country>> GetAllAsync(CancellationToken cancellationToken);
+    Task<PaginatedList<Country>> GetAllPaginatedAsync(PaginationParameters parameters, bool includeDeleted, CancellationToken cancellationToken);
 }

@@ -11,14 +11,9 @@ namespace ExportPro.StorageService.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class InvoiceController : ControllerBase
+public class InvoiceController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public InvoiceController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
+    private readonly IMediator _mediator = mediator;
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateInvoiceCommand command, CancellationToken cancellationToken)

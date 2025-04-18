@@ -3,4 +3,4 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Commands.CountryCommand;
 
-public record UpdateCountryCommand(ObjectId Id, string Name, string? Code) : ICommand<bool>;
+public record UpdateCountryCommand(string Id, string Name, string? Code) : ICommand<bool>;

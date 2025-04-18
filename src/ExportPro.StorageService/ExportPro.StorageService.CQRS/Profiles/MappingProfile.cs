@@ -2,6 +2,7 @@
 using ExportPro.StorageService.CQRS.Commands.CustomerCommand;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.Responses;
 using Microsoft.AspNetCore.Routing.Constraints;
@@ -34,5 +35,11 @@ public class MappingProfile : Profile
         CreateMap<Customer, CustomerDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
             .ForMember(dest => dest.CountryId, opt => opt.MapFrom(src => src.CountryId.ToString()));
+
+        CreateMap<Country, CountryDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()));
+
+        CreateMap<CountryDto, Country>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.Parse(src.Id)));
     }
 }

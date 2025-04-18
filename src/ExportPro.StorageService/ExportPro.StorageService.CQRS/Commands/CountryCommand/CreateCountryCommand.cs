@@ -1,9 +1,9 @@
 ﻿using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 
 namespace ExportPro.StorageService.CQRS.Commands.CountryCommand;
 
-public class CreateCountryCommand : ICommand<Country>
+public class CreateCountryCommand : ICommand<CountryDto>
 {
     public string Name { get; set; }
     public string? Code { get; set; }

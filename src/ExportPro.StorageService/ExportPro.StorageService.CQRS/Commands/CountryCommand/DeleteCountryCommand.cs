@@ -2,4 +2,4 @@
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Commands.CountryCommand;
-public record DeleteCountryCommand(ObjectId Id) : ICommand<bool>;
+public record DeleteCountryCommand(string Id) : ICommand<bool>;
