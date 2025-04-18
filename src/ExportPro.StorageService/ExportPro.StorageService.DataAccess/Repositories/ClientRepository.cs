@@ -18,15 +18,10 @@ namespace ExportPro.StorageService.DataAccess.Repositories;
 
 public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 {
-    private IMongoCollection<Client> _clients;
-    private readonly IMongoDbConnectionFactory _mongoDbConnectionFactory;
+    private readonly IMongoCollection<Client> _clients;
     private readonly IMapper _mapper;
 
-    public ClientRepository(
-        IMapper mapper,
-        IMongoDbConnectionFactory mongoDbConnectionFactory,
-        ICollectionProvider collectionProvider
-    )
+    public ClientRepository(IMapper mapper, ICollectionProvider collectionProvider)
         : base(collectionProvider)
     {
         _mapper = mapper;
@@ -35,7 +30,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
     public BaseResponse<Task<List<Client>>> GetClients(int top, int skip)
     {
-        var clients = _clients.Find(_ => _.IsDeleted == false);
+        var clients = _clients.Find(_ => !_.IsDeleted);
         string message = "Clients Retrieved";
         var max_size = clients.CountDocuments();
         if (max_size == 0)
@@ -55,7 +50,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
     public Task<Client> GetClientById(string Clientid)
     {
-        var client = GetOneAsync(x => x.Id == ObjectId.Parse(Clientid) && x.IsDeleted == false, CancellationToken.None);
+        var client = GetOneAsync(x => x.Id == ObjectId.Parse(Clientid) && !x.IsDeleted, CancellationToken.None);
         return client;
     }
 
@@ -102,7 +97,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
     public async Task<bool> ClientExists(string Name)
     {
-        var client = await GetOneAsync(x => x.Name == Name && x.IsDeleted == false, CancellationToken.None);
+        var client = await GetOneAsync(x => x.Name == Name && !x.IsDeleted, CancellationToken.None);
         if (client == null)
             return false;
         return true;
@@ -110,7 +105,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
     public Task<bool> HigherThanMaxSize(int skip)
     {
-        var max_size = _clients.Find(_ => _.IsDeleted == false).CountDocuments();
+        var max_size = _clients.Find(_ => !_.IsDeleted).CountDocuments();
         if (skip > max_size)
             return Task.FromResult(true);
         return Task.FromResult(false);
@@ -245,7 +240,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
             if (i.Id.ToString() == planId)
             {
                 plan = i;
-                i.isDeleted = true;
+                i.IsDeleted = true;
                 break;
             }
         }
@@ -257,17 +252,17 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     public async Task<PlansResponse> UpdateClientPlan(string clientId, string planId, PlansDto plansDto)
     {
         var client = await GetClientById(clientId);
-        Plans plans = new(); 
+        Plans plans = new();
         foreach (var i in client.Plans)
+        {
+            if (i.Id.ToString() == planId)
             {
-                if (i.Id.ToString() == planId)
-                {
-                    plans = i;
-                }
+                plans = i;
             }
+        }
         plans.StartDate = plansDto.StartDate;
         plans.EndDate = plansDto.EndDate;
-        for(int i = 0; i < plansDto.Items.Count; ++i)
+        for (int i = 0; i < plansDto.Items.Count; ++i)
         {
             plans.items[i].Name = plansDto.Items[i].Name;
             plans.items[i].Description = plansDto.Items[i].Description;

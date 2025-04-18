@@ -18,7 +18,7 @@ public sealed class RemovePlanFromClientCommandValidator : AbstractValidator<Rem
                             async (plan, _) =>
                             {
                                 var client = await clientRepository.GetClientById(plan.clientId);
-                                if (client.Plans.Any(x => x.Id.ToString() == plan.planId && x.isDeleted == false))
+                                if (client.Plans.Any(x => x.Id.ToString() == plan.planId && !x.IsDeleted))
                                     return true;
                                 return false;
                             }

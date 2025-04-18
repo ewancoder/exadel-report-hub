@@ -19,18 +19,19 @@ public class GetClientByIdQueryHandler(
 {
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IMapper _mapper = mapper;
+    private readonly IValidator<GetClientByIdQuery> _validator = validator;
 
     public async Task<BaseResponse<ValidationModel<ClientResponse>>> Handle(
         GetClientByIdQuery request,
         CancellationToken cancellationToken
     )
     {
-        var validres = await validator.ValidateAsync(request, cancellationToken);
-        if (!validres.IsValid)
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
         {
             return new BaseResponse<ValidationModel<ClientResponse>>
             {
-                Data = new ValidationModel<ClientResponse>(validres),
+                Data = new ValidationModel<ClientResponse>(validationResult),
                 ApiState = HttpStatusCode.BadRequest,
                 IsSuccess = false,
             };
@@ -39,7 +40,7 @@ public class GetClientByIdQueryHandler(
         var plans = new List<Models.Models.Plans>();
         foreach (var i in client.Plans)
         {
-            if (i.isDeleted == false)
+            if (!i.IsDeleted)
             {
                 plans.Add(i);
             }
@@ -49,7 +50,7 @@ public class GetClientByIdQueryHandler(
         return new BaseResponse<ValidationModel<ClientResponse>>
         {
             Data = new(clientrep),
-            Messages = ["Client Created Successfully"],
+            Messages = ["Client Retrieved Successfully"],
             ApiState = HttpStatusCode.Created,
             IsSuccess = true,
         };
