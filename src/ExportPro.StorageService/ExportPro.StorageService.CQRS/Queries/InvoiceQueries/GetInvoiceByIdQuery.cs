@@ -1,10 +1,9 @@
 ﻿using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.Models.Models;
-using MongoDB.Bson;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.StorageService.CQRS.Queries.InvoiceQueries;
 
-public class GetInvoiceByIdQuery : IQuery<Invoice>
+public class GetInvoiceByIdQuery : IQuery<InvoiceDto>
 {
-    public ObjectId Id { get; set; }
+    public string Id { get; set; }
 }

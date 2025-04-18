@@ -1,5 +1,8 @@
-﻿using ExportPro.StorageService.CQRS.Commands.CustomerCommand;
+﻿using ExportPro.Common.Shared.Library;
+using ExportPro.StorageService.CQRS.Commands.CustomerCommand;
 using ExportPro.StorageService.CQRS.Queries.CustomerQueries;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.PaginationParams;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -22,7 +25,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid customer ID format.");
 
-        command.Id = objectId;
+        command.Id = id;
         return Ok(await _mediator.Send(command, cancellationToken));
     }
 
@@ -45,6 +48,20 @@ public class CustomerController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
-        => Ok(await _mediator.Send(new GetAllCustomersQuery(), cancellationToken));
+    public async Task<ActionResult<BaseResponse<PaginatedList<Customer>>>> GetAll(
+        CancellationToken cancellationToken, 
+        [FromQuery] int pageNumber = 1, 
+        [FromQuery] int pageSize = 10, 
+        [FromQuery] bool includeDeleted = false)
+    {
+        var query = new GetPaginatedCustomersQuery
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            IncludeDeleted = includeDeleted
+        };
+
+        var response = await _mediator.Send(query);
+        return StatusCode((int)response.ApiState, response);
+    }
 }

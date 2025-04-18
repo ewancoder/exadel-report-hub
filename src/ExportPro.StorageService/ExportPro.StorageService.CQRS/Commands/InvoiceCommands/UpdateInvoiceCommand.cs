@@ -1,13 +1,12 @@
 ﻿using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 
 public class UpdateInvoiceCommand : ICommand<Invoice>
 {
-    public ObjectId Id { get; set; }
+    public string Id { get; set; }
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }

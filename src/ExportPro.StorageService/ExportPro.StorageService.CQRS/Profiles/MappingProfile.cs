@@ -30,26 +30,9 @@ public class MappingProfile : Profile
             y => ObjectId.Parse(y.Id)));
         CreateMap<ItemDtoForClient, Item>().ReverseMap();
 
-
         // Customer -> CustomerDto
         CreateMap<Customer, CustomerDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
             .ForMember(dest => dest.CountryId, opt => opt.MapFrom(src => src.CountryId.ToString()));
-
-        // CreateCustomerDto -> CreateCustomerCommand
-        CreateMap<CreateUpdateCustomerDto, CreateCustomerCommand>();
-
-        // UpdateCustomerDto -> UpdateCustomerCommand
-        CreateMap<CreateUpdateCustomerDto, UpdateCustomerCommand>();
-
-        // Commands -> Customer entity
-        CreateMap<CreateCustomerCommand, Customer>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => ObjectId.GenerateNewId()))
-            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
-            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => (DateTime?)null))
-            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(_ => false));
-
-        CreateMap<UpdateCustomerCommand, Customer>()
-            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
     }
 }

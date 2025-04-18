@@ -1,13 +1,12 @@
-﻿using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.Models.Enums;
-using ExportPro.StorageService.Models.Models;
+﻿using ExportPro.StorageService.Models.Enums;
 
-namespace ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
+namespace ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
-public class CreateInvoiceCommand : ICommand<Invoice>
+public class InvoiceDto
 {
+    public string Id { get; set; }
     public string? InvoiceNumber { get; set; }
-    public DateTime IssueDate { get; set; } = DateTime.UtcNow;
+    public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
     public decimal Amount { get; set; }
     public string? CurrencyId { get; set; }

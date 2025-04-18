@@ -1,10 +1,10 @@
 ﻿using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 
-namespace ExportPro.StorageService.CQRS.Queries.InvoiceQueries;
+namespace ExportPro.StorageService.CQRS.Queries.CustomerQueries;
 
-public class GetAllInvoicesQuery : IQuery<PaginatedListDto<InvoiceDto>>
+public class GetPaginatedCustomersQuery : IQuery<PaginatedListDto<CustomerDto>>
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
