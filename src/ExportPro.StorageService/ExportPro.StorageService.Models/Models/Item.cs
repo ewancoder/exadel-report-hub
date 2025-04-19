@@ -14,7 +14,6 @@ public class Item : IModel
     [BsonRepresentation(BsonType.ObjectId)]
     public string? CustomerId { get; set; }
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? InvoiceId { get; set; }
     public Status? Status { get; set; }
     public string? CurrencyId {  get; set; } //maybe can be made into enum as well?
     public bool IsDeleted { get; set; } = false;

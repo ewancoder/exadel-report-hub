@@ -5,12 +5,14 @@ using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 using MongoDB.Bson;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using AutoMapper;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
 
-public class CreateInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<CreateInvoiceCommand, Invoice>
+public class CreateInvoiceHandler(IInvoiceRepository repository,IMapper mapper) : ICommandHandler<CreateInvoiceCommand, Invoice>
 {
     private readonly IInvoiceRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<BaseResponse<Invoice>> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)
     {
@@ -37,7 +39,7 @@ public class CreateInvoiceHandler(IInvoiceRepository repository) : ICommandHandl
             PaymentStatus = request.PaymentStatus,
             BankAccountNumber = request.BankAccountNumber,
             ClientId = request.ClientId,
-            ItemIds = request.ItemIds ?? new List<string>()
+            Items = request.Items.Select(_=>_mapper.Map<Item>(_)).ToList(),
         };
 
         await _repository.AddOneAsync(invoice, cancellationToken);
@@ -72,8 +74,6 @@ public class CreateInvoiceHandler(IInvoiceRepository repository) : ICommandHandl
         if (!string.IsNullOrWhiteSpace(request.ClientId) && !ObjectId.TryParse(request.ClientId, out _))
             errors.Add("Invalid client ID format.");
 
-        if (request.ItemIds != null && request.ItemIds.Any(id => !string.IsNullOrWhiteSpace(id) && !ObjectId.TryParse(id, out _)))
-            errors.Add("One or more item IDs are in an invalid format.");
 
         return errors;
     }

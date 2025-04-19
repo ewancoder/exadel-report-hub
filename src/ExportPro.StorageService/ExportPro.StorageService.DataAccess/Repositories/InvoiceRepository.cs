@@ -55,4 +55,9 @@ public class InvoiceRepository(ICollectionProvider collectionProvider) : MongoRe
         var filter = Builders<Invoice>.Filter.Eq(x => x.Id, id);
         return await Collection.Find(filter).AnyAsync(cancellationToken);
     }
+
+    public Task<List<Invoice>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 }

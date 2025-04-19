@@ -19,5 +19,6 @@ public class Invoice : IModel
     [BsonRepresentation(BsonType.ObjectId)]
     public string? ClientId { get; set; }
     [BsonRepresentation(BsonType.ObjectId)]
-    public List<string>? ItemIds { get; set; }
+    public string? CustomerId{ get; set; }
+    public List<Item>? Items { get; set; }
 }

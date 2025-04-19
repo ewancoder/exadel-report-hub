@@ -23,12 +23,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Id, src => src.MapFrom(x => x.Id.ToString()))
             .ReverseMap()
             .ForMember(dest => dest.Id, src => src.MapFrom(y => ObjectId.Parse(y.Id)));
+        CreateMap<ItemDtoForClient, Item>().ReverseMap();
         CreateMap<Client, ClientDto>().ReverseMap();
         CreateMap<Invoice, InvoiceResponse>()
             .ForMember(dest => dest.Id, src => src.MapFrom(x => x.Id.ToString()))
             .ReverseMap()
             .ForMember(dest => dest.Id, src => src.MapFrom(y => ObjectId.Parse(y.Id)));
-        CreateMap<ItemDtoForClient, Item>().ReverseMap();
 
         // Customer -> CustomerDto
         CreateMap<Customer, CustomerDto>()
@@ -40,5 +40,14 @@ public class MappingProfile : Profile
 
         CreateMap<CountryDto, Country>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.Parse(src.Id)));
+        CreateMap<ItemDtoForClient, ItemResponse>().ReverseMap();
+        CreateMap<Plans, PlansResponse>()
+            .ForMember(dest => dest.Id, src => src.MapFrom(x => x.Id.ToString()))
+            .ReverseMap()
+            .ForMember(dest => dest.Id, src => src.MapFrom(x => ObjectId.Parse(x.Id)));
+        CreateMap<Plans, PlansDto>().ReverseMap();
+        CreateMap<PlansResponse, PlansDto>().ReverseMap();
+        CreateMap<Currency,CurrencyResponse>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+            .ReverseMap().ForMember(dest=>dest.Id,opt=>opt.MapFrom(src=>ObjectId.Parse(src.Id)));
     }
 }

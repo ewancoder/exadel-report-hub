@@ -14,8 +14,6 @@ public record ItemDTO
     public string? CustomerId { get; set; }
     [Required]
     public string? ClientId { get; set; }
-    [Required]
-    public string? InvoiceId { get; set; }
 
 }
 

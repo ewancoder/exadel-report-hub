@@ -24,8 +24,7 @@ public class UpdateCurrencyHandler(ICurrencyRepository repository) : IRequestHan
             };
         }
 
-        currency.Name = request.Name;
-        currency.Code = request.Code;
+        currency.CurrencyCode = request.Code;
         currency.UpdatedAt = DateTime.UtcNow;
 
         await _repository.UpdateOneAsync(currency,cancellationToken);

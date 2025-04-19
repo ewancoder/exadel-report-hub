@@ -44,7 +44,7 @@ public class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandl
         existing.PaymentStatus = request.PaymentStatus;
         existing.BankAccountNumber = request.BankAccountNumber;
         existing.ClientId = request.ClientId;
-        existing.ItemIds = request.ItemIds ?? new List<string>();
+        //existing.ItemIds = request.ItemIds ?? new List<string>();
 
         await _repository.UpdateOneAsync(existing, cancellationToken);
 

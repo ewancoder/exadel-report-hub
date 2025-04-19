@@ -1,17 +1,22 @@
 ﻿using System.Net;
+using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Queries.InvoiceQueries;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using Microsoft.AspNetCore.Http.Features;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
 
-public class GetInvoiceByIdHandler(IInvoiceRepository repository)
+public class GetInvoiceByIdHandler(IInvoiceRepository repository,IMapper mapper)
     : IQueryHandler<GetInvoiceByIdQuery, InvoiceDto>
 {
     private readonly IInvoiceRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<BaseResponse<InvoiceDto>> Handle(GetInvoiceByIdQuery request, CancellationToken cancellationToken)
     {
@@ -47,7 +52,7 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository)
             PaymentStatus = invoice.PaymentStatus,
             BankAccountNumber = invoice.BankAccountNumber,
             ClientId = invoice.ClientId,
-            ItemIds = invoice.ItemIds
+            Items = invoice.Items.Select(x=>_mapper.Map<ItemDtoForClient>(x)).ToList()
         };
 
         return new BaseResponse<InvoiceDto>

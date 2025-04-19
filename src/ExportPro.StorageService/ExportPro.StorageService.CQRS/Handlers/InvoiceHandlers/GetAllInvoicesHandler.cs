@@ -1,17 +1,22 @@
 ﻿using System.Net;
+using System.Runtime.CompilerServices;
+using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Queries.InvoiceQueries;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
+using ZstdSharp.Unsafe;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
 
-public class GetAllInvoicesHandler(IInvoiceRepository repository)
+public class GetAllInvoicesHandler(IInvoiceRepository repository,IMapper mapper)
     : IQueryHandler<GetAllInvoicesQuery, PaginatedListDto<InvoiceDto>>
 {
     private readonly IInvoiceRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<BaseResponse<PaginatedListDto<InvoiceDto>>> Handle(GetAllInvoicesQuery request, CancellationToken cancellationToken)
     {
@@ -54,7 +59,7 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository)
             PaymentStatus = invoice.PaymentStatus,
             BankAccountNumber = invoice.BankAccountNumber,
             ClientId = invoice.ClientId,
-            ItemIds = invoice.ItemIds
+            Items= invoice.Items.Select(_=>_mapper.Map<ItemDtoForClient>(_)).ToList(),
         }).ToList();
 
 

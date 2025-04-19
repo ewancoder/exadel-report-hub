@@ -1,6 +1,7 @@
 ﻿using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs;
 
 namespace ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 
@@ -14,5 +15,5 @@ public class CreateInvoiceCommand : ICommand<Invoice>
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
     public string? ClientId { get; set; }
-    public List<string>? ItemIds { get; set; }
+    public List<ItemDtoForClient>? Items { get; set; }
 }

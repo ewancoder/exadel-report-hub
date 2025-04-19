@@ -13,5 +13,5 @@ public class ItemDtoForClient
     [Required]
     public double Price { get; set; }
     public Status Status { get; set; }
-    public string CurrencyId { get; set; } //maybe can be made into enum as well?
+    public string? CurrencyId { get; set; } //maybe can be made into enum as well?
 }
