@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ExportPro.StorageService.Models.Enums;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
 using ExportPro.StorageService.Models.Models;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace ExportPro.StorageService.SDK.Responses;
 
@@ -18,11 +18,9 @@ public class ItemResponse
     public string? Name { get; set; }
     public string? Description { get; set; }
     public double Price { get; set; }
+
     [BsonRepresentation(BsonType.ObjectId)]
     public string? CustomerId { get; set; }
- 
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? InvoiceId { get; set; }
     public Status? Status { get; set; }
     public string? CurrencyId { get; set; } //maybe can be made into enum as well?
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -11,14 +11,17 @@ public class Invoice : IModel
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; } = DateTime.Now;
     public DateTime DueDate { get; set; } = DateTime.Now;
-    public decimal Amount { get; set; }
+    public double? Amount { get; set; }
+
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? CurrencyId { get; set; }  
+    public string? CurrencyId { get; set; }
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
+
     [BsonRepresentation(BsonType.ObjectId)]
     public string? ClientId { get; set; }
+
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? CustomerId{ get; set; }
+    public string? CustomerId { get; set; }
     public List<Item>? Items { get; set; }
 }

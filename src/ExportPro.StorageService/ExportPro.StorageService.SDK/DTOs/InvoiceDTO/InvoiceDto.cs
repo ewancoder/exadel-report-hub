@@ -13,5 +13,6 @@ public class InvoiceDto
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
     public string? ClientId { get; set; }
+    public string? CustomerId { get; set; }
     public List<ItemDtoForClient>? Items { get; set; }
 }

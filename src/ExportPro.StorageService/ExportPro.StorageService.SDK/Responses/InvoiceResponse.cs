@@ -11,7 +11,8 @@ public class InvoiceResponse
     public decimal Amount { get; set; }
     public string CurrencyId { get; set; }
     public Status? PaymentStatus { get; set; }
+    public string CustomerId { get; set; }
     public string BankAccountNumber { get; set; }
     public string ClientId { get; set; }
-    public List<string> ItemIds { get; set; }
+    public List<ItemResponse> Items { get; set; }
 }

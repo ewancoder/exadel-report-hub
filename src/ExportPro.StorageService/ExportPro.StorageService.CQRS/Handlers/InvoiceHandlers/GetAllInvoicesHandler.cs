@@ -12,13 +12,16 @@ using ZstdSharp.Unsafe;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
 
-public class GetAllInvoicesHandler(IInvoiceRepository repository,IMapper mapper)
+public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper)
     : IQueryHandler<GetAllInvoicesQuery, PaginatedListDto<InvoiceDto>>
 {
     private readonly IInvoiceRepository _repository = repository;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<BaseResponse<PaginatedListDto<InvoiceDto>>> Handle(GetAllInvoicesQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<PaginatedListDto<InvoiceDto>>> Handle(
+        GetAllInvoicesQuery request,
+        CancellationToken cancellationToken
+    )
     {
         if (request.PageNumber < 1)
         {
@@ -26,7 +29,7 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository,IMapper mapper)
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Page number must be greater than zero." }
+                Messages = new List<string> { "Page number must be greater than zero." },
             };
         }
 
@@ -36,32 +39,32 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository,IMapper mapper)
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Page size must be greater than zero." }
+                Messages = new List<string> { "Page size must be greater than zero." },
             };
         }
 
-        var parameters = new PaginationParameters
-        {
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize
-        };
+        var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
 
-        var paginatedInvoices = await _repository.GetAllPaginatedAsync(parameters, request.IncludeDeleted, cancellationToken);
+        var paginatedInvoices = await _repository.GetAllPaginatedAsync(
+            parameters,
+            request.IncludeDeleted,
+            cancellationToken
+        );
 
-        var invoiceDtos = paginatedInvoices.Items.Select(invoice => new InvoiceDto
-        {
-            Id = invoice.Id.ToString(),
-            InvoiceNumber = invoice.InvoiceNumber,
-            IssueDate = invoice.IssueDate,
-            DueDate = invoice.DueDate,
-            Amount = invoice.Amount,
-            CurrencyId = invoice.CurrencyId,
-            PaymentStatus = invoice.PaymentStatus,
-            BankAccountNumber = invoice.BankAccountNumber,
-            ClientId = invoice.ClientId,
-            Items= invoice.Items.Select(_=>_mapper.Map<ItemDtoForClient>(_)).ToList(),
-        }).ToList();
-
+        var invoiceDtos = paginatedInvoices
+            .Items.Select(invoice => new InvoiceDto
+            {
+                Id = invoice.Id.ToString(),
+                InvoiceNumber = invoice.InvoiceNumber,
+                IssueDate = invoice.IssueDate,
+                DueDate = invoice.DueDate,
+                CurrencyId = invoice.CurrencyId,
+                PaymentStatus = invoice.PaymentStatus,
+                BankAccountNumber = invoice.BankAccountNumber,
+                ClientId = invoice.ClientId,
+                Items = invoice.Items.Select(_ => _mapper.Map<ItemDtoForClient>(_)).ToList(),
+            })
+            .ToList();
 
         var paginatedDto = new PaginatedListDto<InvoiceDto>(
             invoiceDtos,
@@ -74,7 +77,7 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository,IMapper mapper)
         {
             Data = paginatedDto,
             IsSuccess = true,
-            ApiState = HttpStatusCode.OK
+            ApiState = HttpStatusCode.OK,
         };
     }
 }

@@ -1,19 +1,23 @@
-﻿using AutoMapper;
+﻿using System.Net;
+using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Commands.CountryCommand;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
-using System.Net;
 
 namespace ExportPro.StorageService.CQRS.Handlers.CountryHandlers;
 
-public class CreateCountryCommandHandler(ICountryRepository repository, IMapper mapper) : ICommandHandler<CreateCountryCommand, CountryDto>
+public class CreateCountryCommandHandler(ICountryRepository repository, IMapper mapper)
+    : ICommandHandler<CreateCountryCommand, CountryDto>
 {
     private readonly ICountryRepository _repository = repository;
 
-    public async Task<BaseResponse<CountryDto>> Handle(CreateCountryCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<CountryDto>> Handle(
+        CreateCountryCommand request,
+        CancellationToken cancellationToken
+    )
     {
         if (string.IsNullOrWhiteSpace(request.Name))
         {
@@ -21,14 +25,15 @@ public class CreateCountryCommandHandler(ICountryRepository repository, IMapper 
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Country name is required." }
+                Messages = new List<string> { "Country name is required." },
             };
         }
 
         var country = new Country
         {
             Name = request.Name,
-            Code = request.Code
+            Code = request.Code,
+            CurrencyId = request.currencyId,
         };
 
         await _repository.AddOneAsync(country, cancellationToken);
@@ -37,7 +42,7 @@ public class CreateCountryCommandHandler(ICountryRepository repository, IMapper 
         {
             IsSuccess = true,
             ApiState = HttpStatusCode.Created,
-            Data = mapper.Map<CountryDto>(country)
+            Data = mapper.Map<CountryDto>(country),
         };
     }
 }

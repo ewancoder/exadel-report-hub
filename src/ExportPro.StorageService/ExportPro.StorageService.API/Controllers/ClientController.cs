@@ -63,15 +63,15 @@ public class ClientController(IMediator mediator) : ControllerBase
         return StatusCode((int)clientDeleting.ApiState, clientDeleting);
     }
 
-    //[HttpPatch("{clientId}/item")]
-    //[SwaggerOperation(Summary = "add single item to client")]
-    //public async Task<IActionResult> AddItemToClient(string clientId, [FromBody] ItemDtoForClient item)
-    //{
-    //    var response = await _mediator.Send(
-    //        new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.Currency, clientId)
-    //    );
-    //    return StatusCode((int)response.ApiState, response);
-    //}
+    [HttpPatch("{clientId}/item")]
+    [SwaggerOperation(Summary = "add single item to client")]
+    public async Task<IActionResult> AddItemToClient(string clientId, [FromBody] ItemDtoForClient item)
+    {
+        var response = await _mediator.Send(
+            new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.CurrencyId, clientId)
+        );
+        return StatusCode((int)response.ApiState, response);
+    }
 
     [HttpPatch("{clientId}/items")]
     [SwaggerOperation(Summary = "add many items to client")]

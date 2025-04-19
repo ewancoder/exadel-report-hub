@@ -1,30 +1,47 @@
 ﻿using System.Net;
+using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
-using MongoDB.Bson;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using AutoMapper;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.Refit;
+using ExportPro.StorageService.SDK.Responses;
+using ExportPro.StorageService.SDK.Services;
+using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
 
-public class CreateInvoiceHandler(IInvoiceRepository repository,IMapper mapper) : ICommandHandler<CreateInvoiceCommand, Invoice>
+public class CreateInvoiceHandler(
+    IInvoiceRepository repository,
+    IMapper mapper,
+    ICurrencyExchangeService currencyExchangeService,
+    ICurrencyRepository currencyRepository,
+    ICustomerRepository customerRepository,
+    ICountryRepository countryRepository
+) : ICommandHandler<CreateInvoiceCommand, InvoiceResponse>
 {
     private readonly IInvoiceRepository _repository = repository;
     private readonly IMapper _mapper = mapper;
+    private readonly ICurrencyExchangeService _currencyExchangeService = currencyExchangeService;
+    private readonly ICurrencyRepository _currencyRepository = currencyRepository;
+    private readonly ICustomerRepository _customerRepository = customerRepository;
+    private readonly ICountryRepository _countryRepository = countryRepository;
 
-    public async Task<BaseResponse<Invoice>> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<InvoiceResponse>> Handle(
+        CreateInvoiceCommand request,
+        CancellationToken cancellationToken
+    )
     {
         // Validate required fields
         var validationErrors = ValidateCreateInvoiceCommand(request);
         if (validationErrors.Any())
         {
-            return new BaseResponse<Invoice>
+            return new BaseResponse<InvoiceResponse>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = validationErrors
+                Messages = validationErrors,
             };
         }
 
@@ -34,22 +51,51 @@ public class CreateInvoiceHandler(IInvoiceRepository repository,IMapper mapper) 
             InvoiceNumber = request.InvoiceNumber,
             IssueDate = request.IssueDate,
             DueDate = request.DueDate,
-            Amount = request.Amount,
             CurrencyId = request.CurrencyId,
             PaymentStatus = request.PaymentStatus,
             BankAccountNumber = request.BankAccountNumber,
             ClientId = request.ClientId,
-            Items = request.Items.Select(_=>_mapper.Map<Item>(_)).ToList(),
+            CustomerId = request.CustomerId,
+            Items = request.Items.Select(_ => _mapper.Map<Item>(_)).ToList(),
         };
+        foreach (var i in invoice.Items)
+        {
+            i.Id = ObjectId.GenerateNewId();
+        }
+        var customer = await _customerRepository.GetOneAsync(
+            x => x.Id.ToString() == invoice.CustomerId,
+            CancellationToken.None
+        );
+        var country = await _countryRepository.GetOneAsync(
+            x => x.Id.ToString() == customer.CountryId,
+            CancellationToken.None
+        );
+
+        var customer_currency = await _currencyRepository.GetCurrencyCodeById(country.CurrencyId);
+        invoice.Amount = 0;
+        foreach (var i in invoice.Items)
+        {
+            var currency = await _currencyRepository.GetCurrencyCodeById(i.CurrencyId);
+            string currencyCode = currency.CurrencyCode;
+            CurrenyExchangeModel currencyExchangeModel = new()
+            {
+                From = currencyCode,
+                To = customer_currency.CurrencyCode,
+                Date = invoice.IssueDate,
+            };
+            var exchangeRate = await _currencyExchangeService.ExchangeRate(currencyExchangeModel);
+            i.Price = i.Price * exchangeRate;
+            invoice.Amount += i.Price;
+        }
 
         await _repository.AddOneAsync(invoice, cancellationToken);
 
-        return new BaseResponse<Invoice>
+        return new BaseResponse<InvoiceResponse>
         {
-            Data = invoice,
+            Data = _mapper.Map<InvoiceResponse>(invoice),
             ApiState = HttpStatusCode.Created,
             IsSuccess = true,
-            Messages = new List<string> { "Invoice created successfully." }
+            Messages = new List<string> { "Invoice created successfully." },
         };
     }
 
@@ -61,9 +107,6 @@ public class CreateInvoiceHandler(IInvoiceRepository repository,IMapper mapper) 
         if (string.IsNullOrWhiteSpace(request.InvoiceNumber))
             errors.Add("Invoice number is required.");
 
-        if (request.Amount <= 0)
-            errors.Add("Amount must be greater than zero.");
-
         if (request.DueDate < request.IssueDate)
             errors.Add("Due date cannot be earlier than issue date.");
 
@@ -73,7 +116,6 @@ public class CreateInvoiceHandler(IInvoiceRepository repository,IMapper mapper) 
 
         if (!string.IsNullOrWhiteSpace(request.ClientId) && !ObjectId.TryParse(request.ClientId, out _))
             errors.Add("Invalid client ID format.");
-
 
         return errors;
     }

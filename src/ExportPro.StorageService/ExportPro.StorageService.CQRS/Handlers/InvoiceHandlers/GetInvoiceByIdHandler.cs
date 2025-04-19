@@ -12,7 +12,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
 
-public class GetInvoiceByIdHandler(IInvoiceRepository repository,IMapper mapper)
+public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper)
     : IQueryHandler<GetInvoiceByIdQuery, InvoiceDto>
 {
     private readonly IInvoiceRepository _repository = repository;
@@ -26,7 +26,7 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository,IMapper mapper)
             {
                 ApiState = HttpStatusCode.BadRequest,
                 IsSuccess = false,
-                Messages = new List<string> { "Invalid invoice ID format." }
+                Messages = new List<string> { "Invalid invoice ID format." },
             };
         }
 
@@ -37,7 +37,7 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository,IMapper mapper)
             {
                 ApiState = HttpStatusCode.NotFound,
                 IsSuccess = false,
-                Messages = new List<string> { "Invoice not found." }
+                Messages = new List<string> { "Invoice not found." },
             };
         }
 
@@ -47,19 +47,18 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository,IMapper mapper)
             InvoiceNumber = invoice.InvoiceNumber,
             IssueDate = invoice.IssueDate,
             DueDate = invoice.DueDate,
-            Amount = invoice.Amount,
             CurrencyId = invoice.CurrencyId,
             PaymentStatus = invoice.PaymentStatus,
             BankAccountNumber = invoice.BankAccountNumber,
             ClientId = invoice.ClientId,
-            Items = invoice.Items.Select(x=>_mapper.Map<ItemDtoForClient>(x)).ToList()
+            Items = invoice.Items.Select(x => _mapper.Map<ItemDtoForClient>(x)).ToList(),
         };
 
         return new BaseResponse<InvoiceDto>
         {
             ApiState = HttpStatusCode.OK,
             IsSuccess = true,
-            Data = dto
+            Data = dto,
         };
     }
 }

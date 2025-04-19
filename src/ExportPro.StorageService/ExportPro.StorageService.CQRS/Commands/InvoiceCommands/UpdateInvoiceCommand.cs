@@ -10,7 +10,7 @@ public class UpdateInvoiceCommand : ICommand<Invoice>
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
-    public decimal Amount { get; set; }
+    public double Amount { get; set; }
     public string? CurrencyId { get; set; }
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
