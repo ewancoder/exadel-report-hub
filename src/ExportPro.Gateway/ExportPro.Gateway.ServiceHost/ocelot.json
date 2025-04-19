@@ -1,6 +1,5 @@
 {
     "Routes": [
-        // Invoice
         {
             "UpstreamPathTemplate": "/api/invoice",
             "UpstreamHttpMethod": [ "Get", "Post" ],
@@ -28,7 +27,6 @@
             "SwaggerKey": "StorageService"
         },
 
-        // Client
         {
             "UpstreamPathTemplate": "/api/client",
             "UpstreamHttpMethod": [ "Get", "Post" ],
@@ -122,7 +120,6 @@
             "SwaggerKey": "StorageService"
         },
 
-        // Customer
         {
             "UpstreamPathTemplate": "/api/customer",
             "UpstreamHttpMethod": [ "Post" ],
@@ -163,7 +160,6 @@
             "SwaggerKey": "StorageService"
         },
 
-        // Auth
         {
             "UpstreamPathTemplate": "/api/Auth/register",
             "UpstreamHttpMethod": [ "Post" ],
