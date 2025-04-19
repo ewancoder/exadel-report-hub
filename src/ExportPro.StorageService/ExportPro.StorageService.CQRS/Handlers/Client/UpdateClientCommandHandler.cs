@@ -8,14 +8,22 @@ using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
 
 namespace ExportPro.StorageService.CQRS.Handlers.Client;
-public record UpdateClientCommand(ClientUpdateDto clientUpdateDto, string ClientId) : ICommand<ValidationModel<ClientResponse>>;
 
-public class UpdateClientCommandHandler(IClientRepository clientRepository,IValidator<UpdateClientCommand> validator) : ICommandHandler<UpdateClientCommand, ValidationModel<ClientResponse>>
+public record UpdateClientCommand(ClientUpdateDto clientUpdateDto, string ClientId)
+    : ICommand<ValidationModel<ClientResponse>>;
+
+public class UpdateClientCommandHandler(IClientRepository clientRepository, IValidator<UpdateClientCommand> validator)
+    : ICommandHandler<UpdateClientCommand, ValidationModel<ClientResponse>>
 {
     private readonly IClientRepository _clientRepository = clientRepository;
-    public async Task<BaseResponse<ValidationModel<ClientResponse>>> Handle(UpdateClientCommand request, CancellationToken cancellationToken)
+    private readonly IValidator<UpdateClientCommand> _validator = validator;
+
+    public async Task<BaseResponse<ValidationModel<ClientResponse>>> Handle(
+        UpdateClientCommand request,
+        CancellationToken cancellationToken
+    )
     {
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
             return new BaseResponse<ValidationModel<ClientResponse>>
@@ -26,13 +34,13 @@ public class UpdateClientCommandHandler(IClientRepository clientRepository,IVali
             };
         }
         var updatedClient = await _clientRepository.UpdateClient(request.clientUpdateDto, request.ClientId);
-        
+
         return new BaseResponse<ValidationModel<ClientResponse>>
         {
             Data = new(updatedClient),
             ApiState = HttpStatusCode.OK,
             IsSuccess = true,
             Messages = ["Client Updated Successfully"],
-        }; 
+        };
     }
 }

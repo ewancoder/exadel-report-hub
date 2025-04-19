@@ -9,4 +9,5 @@ public class ClientDto
 
     public string? Description { get; set; }
     public List<ItemDtoForClient>? Items { get; set; }
+    public List<PlansDto>? Plans { get; set; }
 }

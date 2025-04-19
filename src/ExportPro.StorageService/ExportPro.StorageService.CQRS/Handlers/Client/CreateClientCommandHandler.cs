@@ -19,13 +19,14 @@ public class CreateClientCommandHandler(IClientRepository clientRepository, IVal
     : ICommandHandler<CreateClientCommand, ValidationModel<ClientResponse>>
 {
     private readonly IClientRepository _clientRepository = clientRepository;
+    private readonly IValidator<CreateClientCommand> _validator = validator;
 
     public async Task<BaseResponse<ValidationModel<ClientResponse>>> Handle(
         CreateClientCommand request,
         CancellationToken cancellationToken
     )
     {
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
             return new BaseResponse<ValidationModel<ClientResponse>>
@@ -35,10 +36,10 @@ public class CreateClientCommandHandler(IClientRepository clientRepository, IVal
                 IsSuccess = false,
             };
         }
-        var CreatingClient = await _clientRepository.AddClientFromClientDto(request.Clientdto);
+        var creatingClient = await _clientRepository.AddClientFromClientDto(request.Clientdto);
         return new BaseResponse<ValidationModel<ClientResponse>>
         {
-            Data = new(CreatingClient),
+            Data = new(creatingClient),
             Messages = ["Client Created Successfully"],
             ApiState = HttpStatusCode.Created,
             IsSuccess = true,

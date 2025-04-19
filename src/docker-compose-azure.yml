@@ -1,12 +1,14 @@
 services:
-  reverse-proxy:
-    container_name: ngix
-    image: giorgaaa/customnginx:latest
-    ports:
-      - "80:80"
+  api-gateway:
+    container_name: ocelot
+    image: giorgaaa/exportproocelot:latest
     depends_on:
       - authservice
       - storageservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "1200:8080"
   authservice:
     container_name: authservice
     image: giorgaaa/exportpro.authservice:latest

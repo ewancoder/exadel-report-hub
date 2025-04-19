@@ -20,18 +20,19 @@ public class GetClientsQueryHandler(
 {
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IMapper _mapper = mapper;
+    private readonly IValidator<GetClientsQuery> _validator = validator;
 
     public async Task<BaseResponse<ValidationModel<List<ClientResponse>>>> Handle(
         GetClientsQuery request,
         CancellationToken cancellationToken
     )
     {
-        var validate = await validator.ValidateAsync(request);
-        if (!validate.IsValid)
+        var validationResult = await _validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
         {
             return new BaseResponse<ValidationModel<List<ClientResponse>>>
             {
-                Data = new(validate),
+                Data = new(validationResult),
                 ApiState = HttpStatusCode.BadRequest,
                 IsSuccess = false,
             };
@@ -49,6 +50,18 @@ public class GetClientsQueryHandler(
             };
         }
         var clients = await clientresponse.Data;
+        var plans = new List<Models.Models.Plans>();
+        foreach (var client in clients)
+        {
+            foreach (var j in client.Plans)
+            {
+                if (!j.IsDeleted)
+                {
+                    plans.Add(j);
+                }
+            }
+            client.Plans = plans;
+        }
         var clientresp = clients.Select(x => _mapper.Map<ClientResponse>(x)).ToList();
         return new BaseResponse<ValidationModel<List<ClientResponse>>>
         {

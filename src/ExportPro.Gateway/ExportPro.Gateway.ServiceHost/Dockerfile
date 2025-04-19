@@ -1,4 +1,4 @@
-#to build this dockerfile from /src  docker build -f ExportPro.Gateway/ExportPro.Gateway/Dockerfile . -t giorgaaa/exportproocelot
+#to build this dockerfile from /src  docker build -f ExportPro.Gateway/ExportPro.Gateway.ServiceHost/Dockerfile . -t giorgaaa/exportproocelot
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER app
 WORKDIR /app
