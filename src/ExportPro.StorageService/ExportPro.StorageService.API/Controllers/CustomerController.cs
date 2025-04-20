@@ -1,4 +1,5 @@
-﻿using ExportPro.StorageService.CQRS.Commands.Customer;
+﻿using ExportPro.Common.Shared.Attributes;
+using ExportPro.StorageService.CQRS.Commands.Customer;
 using ExportPro.StorageService.CQRS.Queries.Customer;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
@@ -23,6 +24,7 @@ public class CustomerController : ControllerBase
     /// Create a new customer
     /// </summary>
     [HttpPost]
+    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Create)]
     public async Task<IActionResult> Create([FromBody] CreateCustomerCommand command, CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(command, cancellationToken);
@@ -42,6 +44,7 @@ public class CustomerController : ControllerBase
     /// Update an existing customer
     /// </summary>
     [HttpPut("{id}")]
+    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Update)]
     public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateCustomerCommand command, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -57,6 +60,7 @@ public class CustomerController : ControllerBase
     /// Soft delete a customer
     /// </summary>
     [HttpDelete("{id}")]
+    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Delete)]
     public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -71,6 +75,7 @@ public class CustomerController : ControllerBase
     /// Get a customer by ID
     /// </summary>
     [HttpGet("{id}")]
+    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -94,6 +99,7 @@ public class CustomerController : ControllerBase
     /// Get all customers
     /// </summary>
     [HttpGet("getCustomers")]
+    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(new GetAllCustomersQuery(), cancellationToken);

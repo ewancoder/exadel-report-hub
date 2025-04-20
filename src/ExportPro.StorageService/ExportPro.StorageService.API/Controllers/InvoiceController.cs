@@ -1,4 +1,5 @@
-﻿using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
+﻿using ExportPro.Common.Shared.Attributes;
+using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 using ExportPro.StorageService.CQRS.Queries.invoice;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
@@ -20,6 +21,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Create)]
     public async Task<IActionResult> Create([FromBody] CreateInvoiceCommand command, CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(command, cancellationToken);    
@@ -39,6 +41,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Update)]
     public async Task<IActionResult> Update(string id, [FromBody] UpdateInvoiceCommand command, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -62,6 +65,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Delete)]
     public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -73,6 +77,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -95,6 +100,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(new GetAllInvoicesQuery(), cancellationToken);

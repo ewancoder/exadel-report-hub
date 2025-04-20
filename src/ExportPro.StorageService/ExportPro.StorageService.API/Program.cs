@@ -3,6 +3,7 @@ using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.StorageService.CQRS;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -11,12 +12,16 @@ using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.Validations.Validations.Client;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 //builder.Host.UseSharedSerilogAndConfiguration();
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<PermissionFilter>();
+});
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

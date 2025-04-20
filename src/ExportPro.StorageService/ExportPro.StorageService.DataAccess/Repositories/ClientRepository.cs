@@ -59,9 +59,8 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         return client;
     }
 
-    public async Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto)
+    public async Task<ClientResponse> AddClientFromClientDto(Client client)
     {
-        Client client = _mapper.Map<Client>(clientDto);
         foreach (var item in client.Items)
         {
             item.Id = ObjectId.GenerateNewId();

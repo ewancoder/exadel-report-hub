@@ -12,7 +12,7 @@ public interface IClientRepository : IRepository<Client>
 {
     BaseResponse<Task<List<Client>>> GetClients(int top, int skip);
     Task<Client> GetClientById(string Clientid);
-    Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto);
+    Task<ClientResponse> AddClientFromClientDto(Client client);
     Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid);
     Task SoftDeleteClient(string clientId);
     Task<bool> ClientExists(string Name);
