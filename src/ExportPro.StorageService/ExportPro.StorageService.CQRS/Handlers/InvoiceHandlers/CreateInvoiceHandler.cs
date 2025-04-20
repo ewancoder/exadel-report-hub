@@ -104,12 +104,20 @@ public class CreateInvoiceHandler(
                 To = customer_currency.CurrencyCode,
                 Date = invoice.IssueDate,
             };
-
+            var validateCurrency = await _validator.ValidateAsync(currencyExchangeModel);
+            if(validateCurrency.IsValid)
+            {
+                return new BaseResponse<InvoiceResponse>
+                {
+                    ApiState = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    Messages = validateCurrency.Errors.Select(x => x.ErrorMessage).ToList()
+                };
+            }
             var exchangeRate = await _currencyExchangeService.ExchangeRate(currencyExchangeModel);
             i.Price = i.Price * exchangeRate;
             invoice.Amount += i.Price;
         }
-
         await _repository.AddOneAsync(invoice, cancellationToken);
 
         return new BaseResponse<InvoiceResponse>
