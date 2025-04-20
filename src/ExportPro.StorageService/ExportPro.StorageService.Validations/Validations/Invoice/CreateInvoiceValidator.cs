@@ -37,7 +37,7 @@ public sealed class CreateInvoiceValidator:AbstractValidator<CreateInvoiceComman
                         var client = await customerRepository.GetByIdAsync(ObjectId.Parse(customer),_);
                         return client != null;
                     }
-                    ).WithMessage("The Client Id does not exist"));
+                    ).WithMessage("The Customer Id does not exist"));
         RuleFor(x => x.ClientId).SetValidator(new ClientIdValidator(clientRepository));
         RuleFor(x => x.CurrencyId).NotEmpty()
             .WithMessage("Currency Id  cannot be empty.")
