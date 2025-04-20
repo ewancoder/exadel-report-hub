@@ -27,6 +27,7 @@ public sealed class CurrencyExchangeServiceValidator:AbstractValidator<CurrenyEx
                 return false;
                 }
                 return true;
-            }).WithMessage(x=> $"Currency [{x.From}] or [{x.To}] is not supported by the  European Central Bank for conversion.");
+            }).WithMessage(x=> $"Currency [{x.From}] is not supported by the  European Central Bank for conversion.");
+
     }
 }
