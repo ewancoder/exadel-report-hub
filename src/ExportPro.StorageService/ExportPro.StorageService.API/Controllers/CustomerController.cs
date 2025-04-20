@@ -28,7 +28,6 @@ public class CustomerController(IMediator mediator) : ControllerBase
         command.Id = id;
         return Ok(await _mediator.Send(command, cancellationToken));
     }
-
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
     {
@@ -37,7 +36,6 @@ public class CustomerController(IMediator mediator) : ControllerBase
 
         return Ok(await _mediator.Send(new DeleteCustomerCommand { Id = objectId }, cancellationToken));
     }
-
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
     {
@@ -46,7 +44,6 @@ public class CustomerController(IMediator mediator) : ControllerBase
 
         return Ok(await _mediator.Send(new GetCustomerByIdQuery { Id = objectId }, cancellationToken));
     }
-
     [HttpGet]
     public async Task<ActionResult<BaseResponse<PaginatedList<Customer>>>> GetAll(
         CancellationToken cancellationToken, 
@@ -60,7 +57,6 @@ public class CustomerController(IMediator mediator) : ControllerBase
             PageSize = pageSize,
             IncludeDeleted = includeDeleted
         };
-
         var response = await _mediator.Send(query);
         return StatusCode((int)response.ApiState, response);
     }

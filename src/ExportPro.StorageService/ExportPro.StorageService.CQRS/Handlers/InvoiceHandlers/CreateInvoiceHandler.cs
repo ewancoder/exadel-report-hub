@@ -8,6 +8,7 @@ using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Services;
+using FluentValidation;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
@@ -18,7 +19,9 @@ public class CreateInvoiceHandler(
     ICurrencyExchangeService currencyExchangeService,
     ICurrencyRepository currencyRepository,
     ICustomerRepository customerRepository,
-    ICountryRepository countryRepository
+    ICountryRepository countryRepository,
+    IValidator<CurrenyExchangeModel> validator,
+    IValidator<CreateInvoiceCommand> validatorInvoice
 ) : ICommandHandler<CreateInvoiceCommand, InvoiceResponse>
 {
     private readonly IInvoiceRepository _repository = repository;
@@ -27,21 +30,22 @@ public class CreateInvoiceHandler(
     private readonly ICurrencyRepository _currencyRepository = currencyRepository;
     private readonly ICustomerRepository _customerRepository = customerRepository;
     private readonly ICountryRepository _countryRepository = countryRepository;
-
+    private readonly IValidator<CurrenyExchangeModel> _validator = validator;
+    private readonly IValidator<CreateInvoiceCommand> _validatorInvoice = validatorInvoice;
     public async Task<BaseResponse<InvoiceResponse>> Handle(
         CreateInvoiceCommand request,
         CancellationToken cancellationToken
     )
     {
-        // Validate required fields
-        var validationErrors = ValidateCreateInvoiceCommand(request);
-        if (validationErrors.Any())
+        var validateInvoice = await _validatorInvoice.ValidateAsync(request);
+
+        if (!validateInvoice.IsValid)
         {
             return new BaseResponse<InvoiceResponse>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = validationErrors,
+                Messages = validateInvoice.Errors.Select(x=>x.ErrorMessage).ToList(),
             };
         }
 
@@ -58,6 +62,7 @@ public class CreateInvoiceHandler(
             CustomerId = request.CustomerId,
             Items = request.Items.Select(_ => _mapper.Map<Item>(_)).ToList(),
         };
+
         foreach (var i in invoice.Items)
         {
             i.Id = ObjectId.GenerateNewId();
@@ -72,6 +77,22 @@ public class CreateInvoiceHandler(
         );
 
         var customer_currency = await _currencyRepository.GetCurrencyCodeById(country.CurrencyId);
+        CurrenyExchangeModel cur = new()
+        {
+            From = customer_currency.CurrencyCode,
+            To = "EUR",
+            Date = new DateTime(2024, 4, 17)
+        };
+        var validate =await _validator.ValidateAsync(cur);
+        if(!validate.IsValid)
+        {
+            return new BaseResponse<InvoiceResponse>
+            {
+                ApiState = HttpStatusCode.BadRequest,
+                IsSuccess = false,
+                Messages = validate.Errors.Select(x => x.ErrorMessage).ToList()
+            };
+        }
         invoice.Amount = 0;
         foreach (var i in invoice.Items)
         {
@@ -83,6 +104,7 @@ public class CreateInvoiceHandler(
                 To = customer_currency.CurrencyCode,
                 Date = invoice.IssueDate,
             };
+
             var exchangeRate = await _currencyExchangeService.ExchangeRate(currencyExchangeModel);
             i.Price = i.Price * exchangeRate;
             invoice.Amount += i.Price;
@@ -97,26 +119,5 @@ public class CreateInvoiceHandler(
             IsSuccess = true,
             Messages = new List<string> { "Invoice created successfully." },
         };
-    }
-
-    private List<string> ValidateCreateInvoiceCommand(CreateInvoiceCommand request)
-    {
-        var errors = new List<string>();
-
-        // Validate required fields
-        if (string.IsNullOrWhiteSpace(request.InvoiceNumber))
-            errors.Add("Invoice number is required.");
-
-        if (request.DueDate < request.IssueDate)
-            errors.Add("Due date cannot be earlier than issue date.");
-
-        // Validate ObjectId formats
-        if (!string.IsNullOrWhiteSpace(request.CurrencyId) && !ObjectId.TryParse(request.CurrencyId, out _))
-            errors.Add("Invalid currency ID format.");
-
-        if (!string.IsNullOrWhiteSpace(request.ClientId) && !ObjectId.TryParse(request.ClientId, out _))
-            errors.Add("Invalid client ID format.");
-
-        return errors;
     }
 }
