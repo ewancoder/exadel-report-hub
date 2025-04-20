@@ -97,6 +97,15 @@ public class CreateInvoiceHandler(
         foreach (var i in invoice.Items)
         {
             var currency = await _currencyRepository.GetCurrencyCodeById(i.CurrencyId);
+            if (currency == null)
+            {
+                return new BaseResponse<InvoiceResponse>
+                {
+                    ApiState = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    Messages = ["Currency not found."]
+                };
+            }
             string currencyCode = currency.CurrencyCode;
             CurrenyExchangeModel currencyExchangeModel = new()
             {
@@ -104,6 +113,16 @@ public class CreateInvoiceHandler(
                 To = customer_currency.CurrencyCode,
                 Date = invoice.IssueDate,
             };
+            var validateCurrency = await _validator.ValidateAsync(currencyExchangeModel);
+            if(validateCurrency.IsValid)
+            {
+                return new BaseResponse<InvoiceResponse>
+                {
+                    ApiState = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    Messages = validateCurrency.Errors.Select(x => x.ErrorMessage).ToList()
+                };
+            }
             var exchangeRate = await _currencyExchangeService.ExchangeRate(currencyExchangeModel);
             i.Price = i.Price * exchangeRate;
             invoice.Amount += i.Price;
