@@ -6,29 +6,33 @@ using ExportPro.StorageService.CQRS.Commands.CountryCommand;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
+using FluentValidation;
 
 namespace ExportPro.StorageService.CQRS.Handlers.CountryHandlers;
 
-public class CreateCountryCommandHandler(ICountryRepository repository, IMapper mapper)
+public class CreateCountryCommandHandler(
+    ICountryRepository repository
+    , IMapper mapper
+    ,IValidator<CreateCountryCommand> validator)
     : ICommandHandler<CreateCountryCommand, CountryDto>
 {
     private readonly ICountryRepository _repository = repository;
-
+    private readonly IValidator<CreateCountryCommand> _validator= validator;
     public async Task<BaseResponse<CountryDto>> Handle(
         CreateCountryCommand request,
         CancellationToken cancellationToken
     )
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
+        var validate = await _validator.ValidateAsync(request, cancellationToken);
+        if (!validate.IsValid)
         {
             return new BaseResponse<CountryDto>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Country name is required." },
+                Messages = validate.Errors.Select(x => x.ErrorMessage).ToList(),
             };
         }
-
         var country = new Country
         {
             Name = request.Name,

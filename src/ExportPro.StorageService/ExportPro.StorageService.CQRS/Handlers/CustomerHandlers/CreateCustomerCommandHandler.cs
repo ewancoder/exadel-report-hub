@@ -6,37 +6,36 @@ using ExportPro.StorageService.CQRS.Commands.CustomerCommand;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
+using FluentValidation;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace ExportPro.StorageService.CQRS.Handlers.CustomerHandlers;
 
-public class CreateCustomerCommandHandler(ICustomerRepository repository, IMapper mapper)
+public class CreateCustomerCommandHandler(ICustomerRepository repository
+    
+    , IMapper mapper,IValidator<CreateCustomerCommand> validator)
     : ICommandHandler<CreateCustomerCommand, CustomerResponse>
 {
     private readonly IMapper _mapper = mapper;
     private readonly ICustomerRepository _repository = repository;
-
+    private readonly IValidator<CreateCustomerCommand> _validator = validator;
     public async Task<BaseResponse<CustomerResponse>> Handle(
         CreateCustomerCommand request,
         CancellationToken cancellationToken
     )
     {
-        // Validate CountryId format if provided
-        string countryIdString = null;
-        if (!string.IsNullOrEmpty(request.CountryId))
-        {
-            if (!ObjectId.TryParse(request.CountryId, out var parsedCountryId))
+        var validate = await _validator.ValidateAsync(request, cancellationToken);
+            if (!validate.IsValid)
             {
                 return new BaseResponse<CustomerResponse>
                 {
                     IsSuccess = false,
                     ApiState = HttpStatusCode.BadRequest,
-                    Messages = new() { "Invalid CountryId format. Must be a valid MongoDB ObjectId." },
+                    Messages = validate.Errors.Select(x=>x.ErrorMessage).ToList(),
                 };
             }
-            countryIdString = parsedCountryId.ToString();
-        }
+        var countryIdString = request.CountryId.ToString();
 
         var customer = new Customer
         {

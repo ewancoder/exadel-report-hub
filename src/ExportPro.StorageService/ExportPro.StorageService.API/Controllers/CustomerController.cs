@@ -1,6 +1,7 @@
 ﻿using ExportPro.Common.Shared.Attributes;
-using ExportPro.StorageService.CQRS.Commands.Customer;
-using ExportPro.StorageService.CQRS.Queries.Customer;
+using ExportPro.Common.Shared.Library;
+using ExportPro.StorageService.CQRS.Commands.CustomerCommand;
+using ExportPro.StorageService.CQRS.Queries.CustomerQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using MediatR;
@@ -48,19 +49,16 @@ public class CustomerController(IMediator mediator) : ControllerBase
 
         return Ok(await _mediator.Send(new GetCustomerByIdQuery { Id = objectId }, cancellationToken));
     }
+    /// <summary>
+    /// Get all customers
+    /// </summary>
+    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
     [HttpGet]
     public async Task<ActionResult<BaseResponse<PaginatedList<Customer>>>> GetAll(
         CancellationToken cancellationToken, 
         [FromQuery] int pageNumber = 1, 
         [FromQuery] int pageSize = 10, 
         [FromQuery] bool includeDeleted = false)
-
-    /// <summary>
-    /// Get all customers
-    /// </summary>
-    [HttpGet("getCustomers")]
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var query = new GetPaginatedCustomersQuery
         {

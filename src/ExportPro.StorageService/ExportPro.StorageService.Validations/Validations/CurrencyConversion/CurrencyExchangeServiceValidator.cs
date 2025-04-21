@@ -16,7 +16,7 @@ public sealed class CurrencyExchangeServiceValidator:AbstractValidator<CurrenyEx
                 {
                     From = from,
                     To = "EUR",
-                    Date = DateTime.Now
+                    Date = new DateTime(2024, 04, 17)
                 };
                 try
                 {

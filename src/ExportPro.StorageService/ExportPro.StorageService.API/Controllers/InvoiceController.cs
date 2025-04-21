@@ -60,7 +60,6 @@ public class InvoiceController(IMediator mediator) : ControllerBase
 
     [HttpGet]
     [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Read)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     public async Task<ActionResult<BaseResponse<PaginatedList<Invoice>>>> GetInvoices(
         CancellationToken cancellationToken,
         [FromQuery] int pageNumber = 1,
