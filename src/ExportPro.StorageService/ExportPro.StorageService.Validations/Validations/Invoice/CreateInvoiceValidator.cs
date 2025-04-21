@@ -25,7 +25,7 @@ public sealed class CreateInvoiceValidator:AbstractValidator<CreateInvoiceComman
                 return true;
             }
             return false;
-        }).WithMessage("Issue date cannot be later than due date.");
+        }).WithMessage("Issue date cannot be earlier than due date.");
         RuleFor(x => x.CustomerId)
             .NotEmpty()
             .WithMessage("Customer  Id  cannot be empty.")
