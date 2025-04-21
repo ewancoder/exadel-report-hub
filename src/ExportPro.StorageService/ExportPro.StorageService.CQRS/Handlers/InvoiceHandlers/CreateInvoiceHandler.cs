@@ -78,10 +78,25 @@ public class CreateInvoiceHandler(
         CurrenyExchangeModel cur = new()
         {
             From = customer_currency.CurrencyCode,
-            To = "EUR",
             Date = new DateTime(2024, 4, 17)
         };
-   
+
+        var to_euro_echange_rate = 1.0;
+        var validat = _validator.ValidateAsync(cur);
+        if (!validat.Result.IsValid)
+        {
+            return new BaseResponse<InvoiceResponse>
+            {
+                IsSuccess = false,
+                ApiState = HttpStatusCode.BadRequest,
+                Messages = validat.Result.Errors.Select(x => x.ErrorMessage).ToList(),
+            };
+        }
+        if (customer_currency.CurrencyCode != "EUR")
+        {
+            var exchangeRate = await _currencyExchangeService.ExchangeRate(cur);
+            to_euro_echange_rate = exchangeRate;
+        }
         invoice.Amount = 0;
         foreach (var i in invoice.Items)
         {
@@ -99,12 +114,27 @@ public class CreateInvoiceHandler(
             CurrenyExchangeModel currencyExchangeModel = new()
             {
                 From = currencyCode,
-                To = customer_currency.CurrencyCode,
                 Date = invoice.IssueDate,
             };
+            var validateCurrency = await _validator.ValidateAsync(currencyExchangeModel);
+            if (!validateCurrency.IsValid)
+            {
+                return new BaseResponse<InvoiceResponse>
+                {
+                    IsSuccess = false,
+                    ApiState = HttpStatusCode.BadRequest,
+                    Messages = validateCurrency.Errors.Select(x => x.ErrorMessage).ToList(),
+                };
+            }
+            var exchangeRate = 1.0;
+            if (currencyCode != "EUR")
+            {
+
+             exchangeRate = await _currencyExchangeService.ExchangeRate(currencyExchangeModel);
+            }
           
-            var exchangeRate = await _currencyExchangeService.ExchangeRate(currencyExchangeModel);
-            i.Price = i.Price * exchangeRate;
+            var exc = to_euro_echange_rate / exchangeRate;
+            i.Price = i.Price * exc;
             invoice.Amount += i.Price;
         }
         await _repository.AddOneAsync(invoice, cancellationToken);

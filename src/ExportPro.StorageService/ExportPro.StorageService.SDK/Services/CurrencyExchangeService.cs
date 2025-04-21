@@ -35,14 +35,14 @@ public class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeService
             currenyExchangeModel.Date = currenyExchangeModel.Date.AddDays(-2);
         }
         var dateCorrectFormat = currenyExchangeModel.Date.ToString("yyyy-MM-dd");
-        var data_exists = await DataExists("USD", "EUR", dateCorrectFormat);
+        var data_exists = await DataExists("USD",dateCorrectFormat);
         int sub = -1;
         int ind = 7;
         while (!data_exists && ind > 0)
         {
             currenyExchangeModel.Date = currenyExchangeModel.Date.AddDays(sub);
             dateCorrectFormat = currenyExchangeModel.Date.ToString("yyyy-MM-dd");
-            data_exists = await DataExists("USD", "EUR", dateCorrectFormat);
+            data_exists = await DataExists("USD", dateCorrectFormat);
             if (data_exists)
             {
                 break;
@@ -52,7 +52,6 @@ public class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeService
         }
         var xmlDocument = await _ecbApi.GetXmlDocument(
             currenyExchangeModel.From,
-            currenyExchangeModel.To,
             dateCorrectFormat
         );
         var namespaceManager = new XmlNamespaceManager(xmlDocument.NameTable);
@@ -62,9 +61,9 @@ public class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeService
         return currencyValue != null ? Convert.ToDouble(currencyValue) : 0;
     }
 
-    public async Task<bool> DataExists(string from, string to, string date)
+    public async Task<bool> DataExists(string from, string date)
     {
-        var response = await _ecbApi.DataExists(from, to, date);
+        var response = await _ecbApi.DataExists(from, date);
         string content = await response.Content.ReadAsStringAsync();
 
         if (string.IsNullOrWhiteSpace(content))
