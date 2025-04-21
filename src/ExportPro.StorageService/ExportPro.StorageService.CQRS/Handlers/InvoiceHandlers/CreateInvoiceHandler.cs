@@ -81,16 +81,7 @@ public class CreateInvoiceHandler(
             To = "EUR",
             Date = new DateTime(2024, 4, 17)
         };
-        var validate = await _validator.ValidateAsync(cur);
-        if (!validate.IsValid)
-        {
-            return new BaseResponse<InvoiceResponse>
-            {
-                ApiState = HttpStatusCode.BadRequest,
-                IsSuccess = false,
-                Messages = validate.Errors.Select(x => x.ErrorMessage).ToList()
-            };
-        }
+   
         invoice.Amount = 0;
         foreach (var i in invoice.Items)
         {
@@ -111,16 +102,7 @@ public class CreateInvoiceHandler(
                 To = customer_currency.CurrencyCode,
                 Date = invoice.IssueDate,
             };
-            var validateCurrency = await _validator.ValidateAsync(currencyExchangeModel);
-            if (validateCurrency.IsValid)
-            {
-                return new BaseResponse<InvoiceResponse>
-                {
-                    ApiState = HttpStatusCode.BadRequest,
-                    IsSuccess = false,
-                    Messages = validateCurrency.Errors.Select(x => x.ErrorMessage).ToList()
-                };
-            }
+          
             var exchangeRate = await _currencyExchangeService.ExchangeRate(currencyExchangeModel);
             i.Price = i.Price * exchangeRate;
             invoice.Amount += i.Price;
