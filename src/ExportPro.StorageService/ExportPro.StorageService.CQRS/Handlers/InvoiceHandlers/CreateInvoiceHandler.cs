@@ -5,14 +5,12 @@ using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
-using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Services;
 using FluentValidation;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
-
 public class CreateInvoiceHandler(
     IInvoiceRepository repository,
     IMapper mapper,
@@ -45,7 +43,7 @@ public class CreateInvoiceHandler(
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = validateInvoice.Errors.Select(x=>x.ErrorMessage).ToList(),
+                Messages = validateInvoice.Errors.Select(x => x.ErrorMessage).ToList(),
             };
         }
 
@@ -83,8 +81,8 @@ public class CreateInvoiceHandler(
             To = "EUR",
             Date = new DateTime(2024, 4, 17)
         };
-        var validate =await _validator.ValidateAsync(cur);
-        if(!validate.IsValid)
+        var validate = await _validator.ValidateAsync(cur);
+        if (!validate.IsValid)
         {
             return new BaseResponse<InvoiceResponse>
             {
@@ -114,7 +112,7 @@ public class CreateInvoiceHandler(
                 Date = invoice.IssueDate,
             };
             var validateCurrency = await _validator.ValidateAsync(currencyExchangeModel);
-            if(validateCurrency.IsValid)
+            if (validateCurrency.IsValid)
             {
                 return new BaseResponse<InvoiceResponse>
                 {

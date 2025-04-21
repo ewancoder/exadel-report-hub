@@ -16,7 +16,7 @@ public sealed class CurrencyExchangeServiceValidator : AbstractValidator<Curreny
                 {
                     From = from,
                     To = "EUR",
-                    Date = DateTime.Now
+                    Date = new DateTime(2024, 04, 17)
                 };
                 try
                 {
@@ -28,5 +28,6 @@ public sealed class CurrencyExchangeServiceValidator : AbstractValidator<Curreny
                 }
                 return true;
             }).WithMessage(x => $"Currency [{x.From}] is not supported by the  European Central Bank for conversion.");
+
     }
 }
