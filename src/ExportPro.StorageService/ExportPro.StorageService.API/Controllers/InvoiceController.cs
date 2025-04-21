@@ -1,4 +1,5 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Attributes;
+using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.Commands.InvoiceCommands;
 using ExportPro.StorageService.CQRS.Queries.InvoiceQueries;
 using ExportPro.StorageService.Models.Models;
@@ -16,6 +17,7 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     private readonly IMediator _mediator = mediator;
 
     [HttpPost]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Create)]
     public async Task<IActionResult> Create([FromBody] CreateInvoiceCommand command, CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(command, cancellationToken);
@@ -23,6 +25,7 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     }
    
     [HttpPut("{id}")]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Update)]
     public async Task<IActionResult> Update(string id, [FromBody] UpdateInvoiceCommand command, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(id) || !ObjectId.TryParse(id, out _))
@@ -35,6 +38,7 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Delete)]
     public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -46,6 +50,7 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken)
     {
         var query = new GetInvoiceByIdQuery { Id = id };
@@ -54,6 +59,8 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Read)]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     public async Task<ActionResult<BaseResponse<PaginatedList<Invoice>>>> GetInvoices(
         CancellationToken cancellationToken,
         [FromQuery] int pageNumber = 1,
