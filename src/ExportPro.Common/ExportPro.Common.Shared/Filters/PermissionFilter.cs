@@ -10,13 +10,6 @@ namespace ExportPro.Common.Shared.Filters;
 
 public class PermissionFilter : IAsyncActionFilter
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public PermissionFilter(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var user = context.HttpContext.User;
