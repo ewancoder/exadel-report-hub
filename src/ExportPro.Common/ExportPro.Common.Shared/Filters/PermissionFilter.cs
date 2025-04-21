@@ -29,7 +29,6 @@ public class PermissionFilter : IAsyncActionFilter
             return;
         }
 
-
         var endpoint = context.ActionDescriptor.EndpointMetadata;
         var permissionAttributes = endpoint.OfType<HasPermissionAttribute>();
 
@@ -37,7 +36,13 @@ public class PermissionFilter : IAsyncActionFilter
         {
             if (!PermissionChecker.HasPermission(userRole, attr.Resource, attr.Action))
             {
-                context.Result = new ForbidResult($"No permission for {attr.Resource} - {attr.Action}");
+                context.Result = new ObjectResult(new
+                {
+                    Error = $"No permission for {attr.Resource} - {attr.Action}"
+                })
+                {
+                    StatusCode = StatusCodes.Status403Forbidden
+                };
                 return;
             }
         }

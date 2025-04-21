@@ -8,12 +8,14 @@ using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace ExportPro.StorageService.API.Controllers;
 
 [Route("api/client/")]
+[Authorize]
 [ApiController]
 public class ClientController(IMediator mediator) : ControllerBase
 {
