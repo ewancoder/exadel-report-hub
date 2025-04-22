@@ -1,5 +1,4 @@
 ﻿using ExportPro.Auth.SDK.Models;
-using ExportPro.Common.DataAccess.MongoDB.Contexts;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
 using MongoDB.Bson;
@@ -13,6 +12,14 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
         EnsureEmailUniqueness();
     }
+
+    //private readonly IMongoCollection<User> _users;
+
+    //public UserRepository(ExportProMongoContext context, IMongoDbConnectionFactory mongoDbConnectionFactory)
+    //{
+    //    _users = mongoDbConnectionFactory.GetDatabase().GetCollection<User>("Users");
+    //    EnsureEmailUniqueness();
+    //}
 
     /// <summary>
     /// Ensures that the email field in the User collection is unique by creating a unique index on it.
@@ -56,4 +63,9 @@ public class UserRepository : BaseRepository<User>, IUserRepository
             .Find(u => u.RefreshTokens.Any(rt => rt.Token == refreshToken))
             .FirstOrDefaultAsync();
     }
+
+    public Task<List<User>> GetUsersAsync(CancellationToken cancellationToken) =>
+       Collection
+      .Find(_ => true)
+      .ToListAsync(cancellationToken: cancellationToken);
 }

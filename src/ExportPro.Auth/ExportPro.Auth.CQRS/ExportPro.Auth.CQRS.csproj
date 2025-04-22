@@ -7,10 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
     <ProjectReference Include="..\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj" />
     <ProjectReference Include="..\ExportPro.AuthService\ExportPro.AuthService.csproj" />
   </ItemGroup>

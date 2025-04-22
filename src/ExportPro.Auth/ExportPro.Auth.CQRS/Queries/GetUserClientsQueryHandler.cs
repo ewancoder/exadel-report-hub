@@ -17,8 +17,8 @@ namespace ExportPro.Auth.CQRS.Queries
             if (user == null)
                 return new BadRequestResponse<List<Guid>>("User context not found.");
 
-            var clientObjectIds = await aclService.GetAccessibleClientIdsAsync(TokenHelper.GetUserId(user), cancellationToken);
-            var clientIds = clientObjectIds.Select(id => id.ToGuid()).ToList();
+            var clientObjectIds = await aclService.GetAccessibleUserRolesAsync(TokenHelper.GetUserId(user), cancellationToken);
+            var clientIds = clientObjectIds.Select(id => id.ClientId.ToGuid()).ToList();
 
             return new SuccessResponse<List<Guid>>(clientIds);
         }

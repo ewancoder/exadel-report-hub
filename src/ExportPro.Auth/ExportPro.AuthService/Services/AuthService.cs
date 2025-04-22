@@ -5,6 +5,9 @@ using ExportPro.AuthService.Repositories;
 using ExportPro.Common.Shared.Exceptions;
 using Microsoft.Extensions.Options;
 using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Common.Shared.Models;
+using Microsoft.AspNetCore.Identity;
+using ExportPro.Common.Shared.Helpers;
 namespace ExportPro.AuthService.Services;
 
 public class AuthService(
@@ -30,7 +33,6 @@ public class AuthService(
         {
             throw new EmailAlreadyExistsException();
         }
-
         var user = new User
         {
             Username = dto.Username,

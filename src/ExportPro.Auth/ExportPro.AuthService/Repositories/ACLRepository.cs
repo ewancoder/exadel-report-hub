@@ -1,5 +1,4 @@
-﻿
-using ExportPro.Auth.SDK.Models;
+﻿using ExportPro.Auth.SDK.Models;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
 using ExportPro.Common.Shared.Enums;
@@ -29,16 +28,21 @@ public class ACLRepository(ICollectionProvider collectionProvider) : BaseReposit
         );
 
     }
-    public async Task<List<ObjectId>> GetClientIdsForUserAsync(ObjectId userId, CancellationToken cancellationToken = default)
+
+    public Task DeleteRolesAsync(ObjectId userId, CancellationToken cancellationToken = default)
+    {
+        return Collection.DeleteManyAsync(
+            x => x.UserId == userId,
+            cancellationToken
+        );
+    }
+    public async Task<List<UserClientRoles>> GetClientIdsForUserAsync(ObjectId userId, CancellationToken cancellationToken = default)
     {
         var filter = Builders<UserClientRoles>.Filter.Eq(x => x.UserId, userId);
 
-        var clientIds = await Collection
+        return await Collection
             .Find(filter)
-            .Project(x => x.ClientId)
             .ToListAsync(cancellationToken);
-
-        return clientIds;
     }
 
     public async Task<bool> UpdateUserClientRoleAsync(

@@ -7,7 +7,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.AuthService.Services;
 
-public sealed class ACLService(ACLRepository aclRepository) : IACLService
+public sealed class ACLService(IACLRepository aclRepository) : IACLService
 {
 
     public async Task<List<PermissionDTO>> GetPermissions(ObjectId userId, ObjectId clientId = default, CancellationToken cancellationToken = default)
@@ -69,7 +69,7 @@ public sealed class ACLService(ACLRepository aclRepository) : IACLService
     public  Task<bool> UpdateUserRole(ObjectId userId, ObjectId clientId, UserRole newRole, CancellationToken cancellationToken = default) => 
         aclRepository.UpdateUserClientRoleAsync(userId, clientId, newRole, cancellationToken);
 
-    public  Task<List<ObjectId>> GetAccessibleClientIdsAsync(ObjectId userId, CancellationToken cancellationToken = default) =>
+    public  Task<List<UserClientRoles>> GetAccessibleUserRolesAsync(ObjectId userId, CancellationToken cancellationToken = default) =>
         aclRepository.GetClientIdsForUserAsync(userId, cancellationToken);
  
 
@@ -82,7 +82,7 @@ public sealed class ACLService(ACLRepository aclRepository) : IACLService
         return await aclRepository.GetUserRolesAsync(userId, cancellationToken);
     }
 
-
-
+    public Task DeleteAllRoles(ObjectId userId, CancellationToken cancellationToken = default) =>
+      aclRepository.DeleteRolesAsync(userId, cancellationToken);
 }
 

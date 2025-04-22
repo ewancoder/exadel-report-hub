@@ -13,6 +13,7 @@ public class GrantUserRoleCommandHandler(IACLService aclService) : ICommandHandl
 {
     public async Task<BaseResponse<bool>> Handle(GrantUserRoleCommand request, CancellationToken cancellationToken)
     {
+        var role = await aclService.GetPermissions(request.UserId, request.ClientId, cancellationToken);
         await aclService.GrantPermission(request.UserId, request.ClientId, request.Role, cancellationToken);
         return new SuccessResponse<bool>(true);
     }

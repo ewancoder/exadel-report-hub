@@ -1,4 +1,5 @@
 ﻿using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Models;
 
 namespace ExportPro.Common.Shared.Helpers;
 
@@ -6,6 +7,7 @@ public static class PermissionChecker
 {
     public static bool HasPermission(UserRole role, Resource resource, CrudAction action)
     {
+
         if (!RolePermissions.Matrix.TryGetValue(role, out var permissions))
             return false;
 

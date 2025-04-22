@@ -43,5 +43,13 @@ namespace ExportPro.Auth.ServiceHost.Controllers
         public Task<BaseResponse<List<Guid>>> UserClients()
             => mediator.Send(new GetUserClientsQuery());
 
+        [HttpGet("user-roles")]
+        public Task<BaseResponse<List<UserClientRolesDTO>>> UserRoles()
+            => mediator.Send(new GetUserClientRolesQuery());
+
+        [HttpDelete("{userId}")]
+        public Task<BaseResponse<bool>> DeletePermission([FromRoute] Guid userId) =>
+            mediator.Send(new DeleteUserClientRole(userId.ToObjectId()));
+
     }
 }

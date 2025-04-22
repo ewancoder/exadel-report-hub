@@ -34,7 +34,7 @@ public class GetClientsQueryHandler(IClientRepository clientRepository, IMapper 
             return new SuccessResponse<List<ClientResponse>>([.. allClients.Select(x => mapper.Map<ClientResponse>(x))]);
         }
         var availableClients = await aclApi.GetUserClientsAsync(cancellationToken);
-        var clientIds = availableClients
+        var clientIds = availableClients.Data
                             .Select(id => id.ToObjectId())
                             .ToList();
         var clients = await clientRepository.GetClientsByIdsAsync(clientIds, request.Top, request.Skip, cancellationToken);

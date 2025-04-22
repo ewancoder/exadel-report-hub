@@ -41,7 +41,7 @@ public sealed class GetAllInvoicesHandler(
             return new BadRequestResponse<PaginatedListDto<InvoiceDto>>("Page size must be greater than zero.");
 
         var availableClientGuids = await aCLSharedApi.GetUserClientsAsync(cancellationToken);
-        var availableClientObjectIds = availableClientGuids.Select(g => g.ToObjectId()).ToHashSet();
+        var availableClientObjectIds = availableClientGuids.Data?.Select(g => g.ToObjectId()).ToHashSet();
 
         var parameters = new PaginationParameters
         {
