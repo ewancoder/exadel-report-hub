@@ -7,7 +7,6 @@ using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
 using MediatR;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Shared logging and config
