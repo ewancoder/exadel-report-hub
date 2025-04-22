@@ -9,5 +9,5 @@ namespace ExportPro.Export.SDK.Interfaces;
 public interface IStorageServiceApi
 {
     [Get("/api/Invoice/{id}")]
-    Task<InvoicePdfExportDto> GetInvoiceByIdAsync(string id, CancellationToken cancellationToken = default);
+    Task<InvoicePdfExportDto> GetInvoiceByIdAsync(string id, CancellationToken cancellationToken);
 }
