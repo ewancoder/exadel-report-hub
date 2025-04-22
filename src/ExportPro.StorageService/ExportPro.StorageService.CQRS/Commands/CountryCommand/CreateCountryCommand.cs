@@ -5,7 +5,7 @@ namespace ExportPro.StorageService.CQRS.Commands.CountryCommand;
 
 public class CreateCountryCommand : ICommand<CountryDto>
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public string? Code { get; set; }
-    public string? currencyId { get; set; }
+    public string? CurrencyId { get; set; }
 }

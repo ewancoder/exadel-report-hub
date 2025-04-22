@@ -13,11 +13,9 @@ namespace ExportPro.StorageService.API.Controllers;
 [Route("api/[controller]")]
 public class CustomerController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator = mediator;
-
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCustomerCommand command, CancellationToken cancellationToken)
-        => Ok(await _mediator.Send(command, cancellationToken));
+        => Ok(await mediator.Send(command, cancellationToken));
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateCustomerCommand command, CancellationToken cancellationToken)
@@ -26,7 +24,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
             return BadRequest("Invalid customer ID format.");
 
         command.Id = id;
-        return Ok(await _mediator.Send(command, cancellationToken));
+        return Ok(await mediator.Send(command, cancellationToken));
     }
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
@@ -34,7 +32,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid customer ID format.");
 
-        return Ok(await _mediator.Send(new DeleteCustomerCommand { Id = objectId }, cancellationToken));
+        return Ok(await mediator.Send(new DeleteCustomerCommand { Id = objectId }, cancellationToken));
     }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
@@ -42,7 +40,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid customer ID format.");
 
-        return Ok(await _mediator.Send(new GetCustomerByIdQuery { Id = objectId }, cancellationToken));
+        return Ok(await mediator.Send(new GetCustomerByIdQuery { Id = objectId }, cancellationToken));
     }
     [HttpGet]
     public async Task<ActionResult<BaseResponse<PaginatedList<Customer>>>> GetAll(
@@ -57,7 +55,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
             PageSize = pageSize,
             IncludeDeleted = includeDeleted
         };
-        var response = await _mediator.Send(query);
+        var response = await mediator.Send(query);
         return StatusCode((int)response.ApiState, response);
     }
 }

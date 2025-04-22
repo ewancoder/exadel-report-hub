@@ -7,7 +7,7 @@ public class Country : IModel
 {
     public ObjectId Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string Code { get; set; } = string.Empty;
+    public string? Code { get; set; } = string.Empty;
     public string? CurrencyId { get; set; } 
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

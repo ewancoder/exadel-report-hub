@@ -13,43 +13,41 @@ namespace ExportPro.StorageService.API.Controllers;
 [Route("api/[controller]")]
 public class InvoiceController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator = mediator;
-
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateInvoiceCommand command, CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(command, cancellationToken);
+        var response = await mediator.Send(command, cancellationToken);
         return StatusCode((int)response.ApiState, response);
     }
    
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(string id, [FromBody] UpdateInvoiceCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateInvoiceCommand command, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(id) || !ObjectId.TryParse(id, out _))
             return BadRequest("Invalid invoice ID format.");
 
         command.Id = id;
 
-        var response = await _mediator.Send(command, cancellationToken);
+        var response = await mediator.Send(command, cancellationToken);
         return StatusCode((int)response.ApiState, response);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid invoice ID.");
 
         var command = new DeleteInvoiceCommand { Id = objectId };
-        var response = await _mediator.Send(command, cancellationToken);
+        var response = await mediator.Send(command, cancellationToken);
         return StatusCode((int)response.ApiState, response);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
     {
         var query = new GetInvoiceByIdQuery { Id = id };
-        var response = await _mediator.Send(query, cancellationToken);
+        var response = await mediator.Send(query, cancellationToken);
         return StatusCode((int)response.ApiState, response);
     }
 
@@ -67,7 +65,7 @@ public class InvoiceController(IMediator mediator) : ControllerBase
             IncludeDeleted = includeDeleted
         };
 
-        var response = await _mediator.Send(query, cancellationToken);
+        var response = await mediator.Send(query, cancellationToken);
         return StatusCode((int)response.ApiState, response);
     }
 }

@@ -25,15 +25,15 @@ public class CreateCountryCommandHandler(ICountryRepository repository, IMapper 
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Country name is required." },
+                Messages = ["Country name is required."]
             };
         }
 
         var country = new Country
         {
             Name = request.Name,
-            Code = request.Code,
-            CurrencyId = request.currencyId,
+            Code = request?.Code,
+            CurrencyId = request?.CurrencyId,
         };
 
         await _repository.AddOneAsync(country, cancellationToken);
