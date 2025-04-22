@@ -76,7 +76,7 @@ public class ClientController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> AddItemToClient(string clientId, [FromBody] ItemDtoForClient item)
     {
         var response = await mediator.Send(
-            new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.CurrencyId, clientId)
+            new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.Currency, clientId)
         );
         return StatusCode((int)response.ApiState, response);
     }

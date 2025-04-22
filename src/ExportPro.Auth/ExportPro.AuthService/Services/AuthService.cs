@@ -5,6 +5,9 @@ using ExportPro.AuthService.Repositories;
 using ExportPro.Common.Shared.Exceptions;
 using Microsoft.Extensions.Options;
 using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Common.Shared.Models;
+using Microsoft.AspNetCore.Identity;
+using ExportPro.Common.Shared.Helpers;
 namespace ExportPro.AuthService.Services;
 
 public class AuthService(
@@ -30,13 +33,17 @@ public class AuthService(
         {
             throw new EmailAlreadyExistsException();
         }
-
+        RoleMappings.RoleToGuid.TryGetValue(Common.Shared.Enums.Role.Operator, out var roleId);
+        if(roleId == null)
+        {
+            throw new InvalidOperationException("Invalid role mapping.");
+        }
         var user = new User
         {
             Username = dto.Username,
             Email = dto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = UserRole.Operator,
+            RoleId = roleId.ToString(),
         };
 
         user = await _userRepository.CreateAsync(user);
@@ -124,7 +131,7 @@ public class AuthService(
         [
             new (ClaimTypes.NameIdentifier, user.Id.ToString()),
             new (ClaimTypes.Name, user.Username),
-            new (ClaimTypes.Role,user.Role.ToString() )
+            new (ClaimTypes.Role,user.RoleId.ToString() )
         ];
 
 

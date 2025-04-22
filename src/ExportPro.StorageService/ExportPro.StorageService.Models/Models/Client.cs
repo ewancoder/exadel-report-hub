@@ -17,4 +17,5 @@ public class Client : IModel
     public List<Plans>? Plans { get; set; } = [];
     public Guid OwnerId { get; set; }
     public List<Guid> ClientAdmins { get; set; } = [];
+    public List<Guid> Operators { get; set; } = [];
 }

@@ -1,20 +1,30 @@
 ﻿using ExportPro.Auth.SDK.Models;
-using ExportPro.Common.DataAccess.MongoDB.Contexts;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+using ExportPro.Common.DataAccess.MongoDB.Repository;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace ExportPro.AuthService.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository : MongoRepositoryBase<User>, IUserRepository
 {
-    private readonly IMongoCollection<User> _users;
+    private readonly ICollectionProvider collection;
 
-    public UserRepository(ExportProMongoContext context, IMongoDbConnectionFactory mongoDbConnectionFactory)
+    public UserRepository(ICollectionProvider collectionProvider) : base(collectionProvider)
     {
-        _users = mongoDbConnectionFactory.GetDatabase().GetCollection<User>("Users");
+        collection = collectionProvider;
         EnsureEmailUniqueness();
     }
+
+    private IMongoCollection<User> Collection => collection.GetCollection<User>();
+
+    //private readonly IMongoCollection<User> _users;
+
+    //public UserRepository(ExportProMongoContext context, IMongoDbConnectionFactory mongoDbConnectionFactory)
+    //{
+    //    _users = mongoDbConnectionFactory.GetDatabase().GetCollection<User>("Users");
+    //    EnsureEmailUniqueness();
+    //}
 
     /// <summary>
     /// Ensures that the email field in the User collection is unique by creating a unique index on it.
@@ -24,7 +34,7 @@ public class UserRepository : IUserRepository
         var indexKeys = Builders<User>.IndexKeys.Ascending(u => u.Email);
         var indexOptions = new CreateIndexOptions { Unique = true };
         var indexModel = new CreateIndexModel<User>(indexKeys, indexOptions);
-        _users.Indexes.CreateOne(indexModel);
+        Collection.Indexes.CreateOne(indexModel);
     }
 
     /// <summary>
@@ -34,7 +44,7 @@ public class UserRepository : IUserRepository
     /// <returns>The user, or null if not found.</returns>
     public async Task<User?> GetByUsernameAsync(string username)
     {
-        return await _users.Find(u => u.Username == username).FirstOrDefaultAsync();
+        return await Collection.Find(u => u.Username == username).FirstOrDefaultAsync();
     }
 
     /// <summary>
@@ -44,7 +54,7 @@ public class UserRepository : IUserRepository
     /// <returns>The user, or null if not found.</returns>
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
+        return await Collection.Find(u => u.Email == email).FirstOrDefaultAsync();
     }
 
     /// <summary>
@@ -54,7 +64,7 @@ public class UserRepository : IUserRepository
     /// <returns>The user associated with the refresh token, or null if not found.</returns>
     public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
     {
-        return await _users
+        return await Collection
             .Find(u => u.RefreshTokens.Any(rt => rt.Token == refreshToken))
             .FirstOrDefaultAsync();
     }
@@ -66,7 +76,7 @@ public class UserRepository : IUserRepository
     /// <returns>The user, or null if not found.</returns>
     public async Task<User?> GetByIdAsync(ObjectId id)
     {
-        return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
+        return await Collection.Find(u => u.Id == id).FirstOrDefaultAsync();
     }
 
     /// <summary>
@@ -76,7 +86,7 @@ public class UserRepository : IUserRepository
     /// <returns>The created user.</returns>
     public async Task<User> CreateAsync(User user)
     {
-        await _users.InsertOneAsync(user);
+        await Collection.InsertOneAsync(user);
         return user;
     }
 
@@ -89,6 +99,6 @@ public class UserRepository : IUserRepository
     /// </remarks>
     public async Task UpdateAsync(User user)
     {
-        await _users.ReplaceOneAsync(u => u.Id == user.Id, user);
+        await Collection.ReplaceOneAsync(u => u.Id == user.Id, user);
     }
 }

@@ -16,10 +16,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Auth Service");
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddScoped<ExportProMongoContext>();
+builder.Services.AddScoped<ICollectionProvider>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
 builder.Services.AddMediatR(cfg =>
 {
@@ -27,7 +29,7 @@ builder.Services.AddMediatR(cfg =>
 });
 
 builder.Services.AddRefitClient<IAuth>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7067"));
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7067/swagger/index.html"));
 
 var app = builder.Build();
 

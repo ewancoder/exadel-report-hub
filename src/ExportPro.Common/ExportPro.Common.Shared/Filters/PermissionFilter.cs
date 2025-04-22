@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using ExportPro.Common.Shared.Helpers;
-using ExportPro.Common.Shared.Enums;
 using System.Security.Claims;
 
 namespace ExportPro.Common.Shared.Filters;
@@ -14,9 +13,9 @@ public class PermissionFilter : IAsyncActionFilter
     {
         var user = context.HttpContext.User;
 
-        var roleClaim = user?.FindFirst(ClaimTypes.Role)?.Value;
+        var roleIdClaim = user?.FindFirst(ClaimTypes.Role)?.Value;
 
-        if (string.IsNullOrEmpty(roleClaim) || !Enum.TryParse<Role>(roleClaim, out var userRole))
+        if (string.IsNullOrEmpty(roleIdClaim) || !Guid.TryParse(roleIdClaim, out var roleId))
         {
             context.Result = new UnauthorizedResult();
             return;
@@ -27,7 +26,7 @@ public class PermissionFilter : IAsyncActionFilter
 
         foreach (var attr in permissionAttributes)
         {
-            if (!PermissionChecker.HasPermission(userRole, attr.Resource, attr.Action))
+            if (!PermissionChecker.HasPermission(roleId, attr.Resource, attr.Action))
             {
                 context.Result = new ObjectResult(new
                 {

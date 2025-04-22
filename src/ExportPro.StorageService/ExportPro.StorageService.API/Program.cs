@@ -65,6 +65,8 @@ builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<UserRepository>();
 builder.Services.AddCQRS();
 var app = builder.Build();
 app.UseSwagger();
