@@ -2,7 +2,7 @@
 
 namespace ExportPro.Common.Shared.Attributes;
 
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
 public class HasPermissionAttribute(Resource resource, CrudAction action) : Attribute
 {
     public Resource Resource { get; } = resource;

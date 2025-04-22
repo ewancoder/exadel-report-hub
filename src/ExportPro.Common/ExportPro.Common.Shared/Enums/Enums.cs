@@ -26,6 +26,7 @@ public enum Resource
     Invoices,
     Customers,
     Plans,
-    Reports
+    Reports,
+    Export
 }
 

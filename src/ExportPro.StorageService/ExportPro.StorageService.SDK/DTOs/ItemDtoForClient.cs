@@ -5,10 +5,9 @@ namespace ExportPro.StorageService.SDK.DTOs;
 
 public class ItemDtoForClient
 {
-    [Required]
-    public string? Name { get; set; }
-    [Required]
-    public string? Description { get; set; }
+
+    public required string Name { get; set; }
+    public required string Description { get; set; }
     [Required]
     public double Price { get; set; }
     public Status Status { get; set; }
