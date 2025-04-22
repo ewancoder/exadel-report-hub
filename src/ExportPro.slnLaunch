@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "ExportPro.StorageService\\ExportPro.StorageService.API\\ExportPro.StorageService.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ExportPro.Auth\\ExportPro.Auth.ServiceHost\\ExportPro.Auth.ServiceHost.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ExportPro.Gateway\\ExportPro.Gateway.ServiceHost\\ExportPro.Gateway.ServiceHost.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

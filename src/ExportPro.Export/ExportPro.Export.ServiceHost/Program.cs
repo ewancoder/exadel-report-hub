@@ -3,6 +3,7 @@ using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Config;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
 using MediatR;
 
@@ -15,6 +16,7 @@ builder.Host.UseSharedSerilogAndConfiguration();
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddSwaggerServices("ExportPro Auth Service");
 builder.Services.AddCommonRegistrations();
 
 // Register MongoDB dependencies
@@ -32,7 +34,8 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 // Swagger only in development
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
