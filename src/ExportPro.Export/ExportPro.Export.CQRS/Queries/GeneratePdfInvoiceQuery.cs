@@ -20,47 +20,44 @@ public sealed class GenerateInvoicePdfQueryHandler(
             throw new ArgumentException("InvoiceId is required.", nameof(request.InvoiceId));
 
         // fetch plain DTO
-        var apiResp = await storageApi.GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
-
-        var src = apiResp.Data ?? throw new InvalidOperationException("Storage-service returned no data");
+        var apiResponce = await storageApi.GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
+        var invoiceDto = apiResponce.Data ?? throw new InvalidOperationException("Storage-service returned no data");
 
         string currencyCode = "—";
-
-        if (!string.IsNullOrWhiteSpace(src.CurrencyId))
+        if (!string.IsNullOrWhiteSpace(invoiceDto.CurrencyId))
         {
-            var curResp = await storageApi.GetCurrencyByIdAsync(src.CurrencyId, cancellationToken);
+            var curResp = await storageApi.GetCurrencyByIdAsync(invoiceDto.CurrencyId, cancellationToken);
             currencyCode = curResp.Data?.CurrencyCode ?? "—";
         }
 
         string clientName = "—";
-
-        if (!string.IsNullOrWhiteSpace(src.ClientId))
+        if (!string.IsNullOrWhiteSpace(invoiceDto.ClientId))
         {
-            var clientResp = await storageApi.GetClientByIdAsync(src.ClientId, cancellationToken);
+            var clientResp = await storageApi.GetClientByIdAsync(invoiceDto.ClientId, cancellationToken);
             clientName = clientResp.Data?.TModel?.Name ?? "—";
         }
 
         string customerName = "—";
-
-        if (!string.IsNullOrWhiteSpace(src.CustomerId))
+        if (!string.IsNullOrWhiteSpace(invoiceDto.CustomerId))
         {
-            var custResp = await storageApi.GetCustomerByIdAsync(src.CustomerId, cancellationToken);
+            var custResp = await storageApi.GetCustomerByIdAsync(invoiceDto.CustomerId, cancellationToken);
             customerName = custResp.Data?.Name ?? "—";
         }
 
+        // TODO: instead use AutoMapper
         PdfInvoiceExportDto invoice = new()
         {
-            Id = src.Id,
-            InvoiceNumber = src.InvoiceNumber,
-            IssueDate = src.IssueDate,
-            DueDate = src.DueDate,
-            Amount = src.Amount,
+            Id = invoiceDto.Id,
+            InvoiceNumber = invoiceDto.InvoiceNumber,
+            IssueDate = invoiceDto.IssueDate,
+            DueDate = invoiceDto.DueDate,
+            Amount = invoiceDto.Amount,
             CurrencyCode = currencyCode,
-            PaymentStatus = src.PaymentStatus?.ToString(),
-            BankAccountNumber = src.BankAccountNumber,
+            PaymentStatus = invoiceDto.PaymentStatus?.ToString(),
+            BankAccountNumber = invoiceDto.BankAccountNumber,
             ClientName = clientName,
             CustomerName = customerName,
-            Items = src.Items?.Select(i => new PdfItemExportDto
+            Items = invoiceDto.Items?.Select(i => new PdfItemExportDto
             {
                 Name = i.Name,
                 Price = (decimal)i.Price

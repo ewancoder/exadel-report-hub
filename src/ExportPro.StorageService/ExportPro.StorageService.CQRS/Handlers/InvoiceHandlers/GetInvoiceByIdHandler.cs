@@ -46,6 +46,7 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper
             IssueDate = invoice.IssueDate,
             DueDate = invoice.DueDate,
             CurrencyId = invoice.CurrencyId,
+            CustomerId = invoice.CustomerId,
             PaymentStatus = invoice.PaymentStatus,
             BankAccountNumber = invoice.BankAccountNumber,
             ClientId = invoice.ClientId,
