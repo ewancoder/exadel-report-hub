@@ -30,14 +30,14 @@ public class CreateCountryCommandHandler(
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = validate.Errors.Select(x => x.ErrorMessage).ToList(),
+                Messages = new List<string> { "Country name is required." },
             };
         }
         var country = new Country
         {
             Name = request.Name,
-            Code = request.Code,
-            CurrencyId = request.currencyId,
+            Code = request?.Code,
+            CurrencyId = request?.CurrencyId,
         };
 
         await _repository.AddOneAsync(country, cancellationToken);

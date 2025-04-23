@@ -9,7 +9,7 @@ using ZstdSharp.Unsafe;
 
 namespace ExportPro.StorageService.CQRS.Handlers.CurrencyHandlers;
 
-public class CreateCurrencyHandler(ICurrencyRepository repository,IMapper mapper) : IRequestHandler<CreateCurrencyCommand, BaseResponse<CurrencyResponse>>
+public class CreateCurrencyHandler(ICurrencyRepository repository, IMapper mapper) : IRequestHandler<CreateCurrencyCommand, BaseResponse<CurrencyResponse>>
 {
     private readonly ICurrencyRepository _repository = repository;
     private readonly IMapper _mapper = mapper;
@@ -22,7 +22,7 @@ public class CreateCurrencyHandler(ICurrencyRepository repository,IMapper mapper
         };
 
         await _repository.AddOneAsync(currency, cancellationToken);
-        var curResponse =_mapper.Map<CurrencyResponse>(currency);
+        var curResponse = _mapper.Map<CurrencyResponse>(currency);
         return new BaseResponse<CurrencyResponse> { Data = curResponse };
     }
 }

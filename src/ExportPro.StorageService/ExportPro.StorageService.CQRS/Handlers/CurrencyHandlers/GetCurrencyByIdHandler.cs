@@ -2,14 +2,13 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.Queries.CurrencyQueries;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using System.Net;
 
 namespace ExportPro.StorageService.CQRS.Handlers.CurrencyHandlers;
 
-public class GetCurrencyByIdHandler(ICurrencyRepository repository,IMapper mapper) : IRequestHandler<GetCurrencyByIdQuery, BaseResponse<CurrencyResponse>>
+public class GetCurrencyByIdHandler(ICurrencyRepository repository, IMapper mapper) : IRequestHandler<GetCurrencyByIdQuery, BaseResponse<CurrencyResponse>>
 {
     private readonly ICurrencyRepository _repository = repository;
     private readonly IMapper _mapper = mapper;
@@ -23,7 +22,7 @@ public class GetCurrencyByIdHandler(ICurrencyRepository repository,IMapper mappe
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.NotFound,
-                Messages = new() { "Currency not found." }
+                Messages = ["Currency not found."]
             }
             : new BaseResponse<CurrencyResponse> { Data = currencyResp};
     }

@@ -14,12 +14,10 @@ namespace ExportPro.StorageService.API.Controllers;
 [Route("api/[controller]")]
 public class CustomerController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator = mediator;
-
     [HttpPost]
     [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Create)]
     public async Task<IActionResult> Create([FromBody] CreateCustomerCommand command, CancellationToken cancellationToken)
-        => Ok(await _mediator.Send(command, cancellationToken));
+        => Ok(await mediator.Send(command, cancellationToken));
 
     [HttpPut("{id}")]
     [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Update)]
@@ -29,7 +27,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
             return BadRequest("Invalid customer ID format.");
 
         command.Id = id;
-        return Ok(await _mediator.Send(command, cancellationToken));
+        return Ok(await mediator.Send(command, cancellationToken));
     }
     [HttpDelete("{id}")]
     [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Delete)]
@@ -38,7 +36,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid customer ID format.");
 
-        return Ok(await _mediator.Send(new DeleteCustomerCommand { Id = objectId }, cancellationToken));
+        return Ok(await mediator.Send(new DeleteCustomerCommand { Id = objectId }, cancellationToken));
     }
     [HttpGet("{id}")]
     [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
@@ -47,7 +45,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid customer ID format.");
 
-        return Ok(await _mediator.Send(new GetCustomerByIdQuery { Id = objectId }, cancellationToken));
+        return Ok(await mediator.Send(new GetCustomerByIdQuery { Id = objectId }, cancellationToken));
     }
     /// <summary>
     /// Get all customers
@@ -66,7 +64,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
             PageSize = pageSize,
             IncludeDeleted = includeDeleted
         };
-        var response = await _mediator.Send(query);
+        var response = await mediator.Send(query);
         return StatusCode((int)response.ApiState, response);
     }
 }

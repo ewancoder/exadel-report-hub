@@ -20,7 +20,7 @@ public class UpdateCurrencyHandler(ICurrencyRepository repository) : IRequestHan
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.NotFound,
-                Messages = new() { "Currency not found." }
+                Messages = ["Currency not found."]
             };
         }
 

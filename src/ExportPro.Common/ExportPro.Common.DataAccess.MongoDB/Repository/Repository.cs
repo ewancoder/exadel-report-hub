@@ -5,13 +5,13 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 
 namespace ExportPro.Common.DataAccess.MongoDB.Repository;
-public abstract class MongoRepositoryBase<TDocument> : IRepository<TDocument> where TDocument : IModel
+public abstract class BaseRepository<TDocument> : IRepository<TDocument> where TDocument : IModel
 {
     private readonly ICollectionProvider _collectionProvider;
     private readonly Lazy<IMongoCollection<TDocument>> _collectionAccessor;
     private readonly FilterDefinitionBuilder<TDocument> _fdb;
 
-    protected MongoRepositoryBase(ICollectionProvider collectionProvider)
+    protected BaseRepository(ICollectionProvider collectionProvider)
     {
         _collectionProvider = collectionProvider ?? throw new ArgumentNullException(nameof(collectionProvider));
         _collectionAccessor = new Lazy<IMongoCollection<TDocument>>(
@@ -23,28 +23,32 @@ public abstract class MongoRepositoryBase<TDocument> : IRepository<TDocument> wh
 
     protected virtual IMongoCollection<TDocument> Collection => _collectionAccessor.Value;
 
-    public virtual async Task AddOneAsync(TDocument entity, CancellationToken cancellationToken)
+    public virtual async Task<TDocument> AddOneAsync(TDocument entity, CancellationToken cancellationToken)
     {
         await Collection.InsertOneAsync(entity, cancellationToken: cancellationToken);
+        return entity;
     }
 
-    public virtual async Task AddManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken)
+    public virtual async Task<ICollection<TDocument>> AddManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken)
     {
         await Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
+        return entities;
     }
 
-    public virtual async Task UpdateOneAsync(TDocument entity, CancellationToken cancellationToken)
+    public virtual async Task<TDocument> UpdateOneAsync(TDocument entity, CancellationToken cancellationToken)
     {
         var filter = _fdb.Eq(doc => doc.Id, entity.Id);
         await Collection.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
+        return entity;
     }
 
-    public virtual async Task UpdateManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken)
+    public virtual async Task<ICollection<TDocument>> UpdateManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken)
     {
         foreach (var entity in entities)
         {
             await UpdateOneAsync(entity, cancellationToken);
         }
+        return entities;
     }
 
     public virtual async Task<TDocument> GetByIdAsync(ObjectId id, CancellationToken cancellationToken)
@@ -58,16 +62,22 @@ public abstract class MongoRepositoryBase<TDocument> : IRepository<TDocument> wh
         return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public virtual async Task DeleteAsync(ObjectId id, CancellationToken cancellationToken)
+    public virtual async Task<TDocument> DeleteAsync(ObjectId id, CancellationToken cancellationToken)
     {
         var filter = _fdb.Eq(doc => doc.Id, id);
+        var document = await GetByIdAsync(id, cancellationToken);
+     
         await Collection.DeleteOneAsync(filter, cancellationToken);
+        return document;
     }
 
-    public virtual async Task SoftDeleteAsync(ObjectId id, CancellationToken cancellationToken)
+    public virtual async Task<TDocument> SoftDeleteAsync(ObjectId id, CancellationToken cancellationToken)
     {
         var filter = _fdb.Eq(doc => doc.Id, id);
         var update = Builders<TDocument>.Update.Set("IsDeleted", true);
+        var document = await GetByIdAsync(id, cancellationToken);
+
         await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        return document;
     }
 }
