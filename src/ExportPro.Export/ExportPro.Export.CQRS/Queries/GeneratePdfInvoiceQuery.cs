@@ -20,8 +20,29 @@ public sealed class GenerateInvoicePdfQueryHandler(
             throw new ArgumentException("InvoiceId is required.", nameof(request.InvoiceId));
 
         // fetch plain DTO
-        PdfInvoiceExportDto invoice =
-            await storageApi.GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
+        var apiResp = await storageApi.GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
+
+        var src = apiResp.Data ?? throw new InvalidOperationException("Storage-service returned no data");
+
+        // light, in-place mapper – keeps export service completely decoupled
+        PdfInvoiceExportDto invoice = new()
+        {
+            Id = src.Id,
+            InvoiceNumber = src.InvoiceNumber,
+            IssueDate = src.IssueDate,
+            DueDate = src.DueDate,
+            Amount = src.Amount,
+            CurrencyId = src.CurrencyId,
+            PaymentStatus = src.PaymentStatus?.ToString(),
+            BankAccountNumber = src.BankAccountNumber,
+            ClientId = src.ClientId,
+            CustomerId = src.CustomerId,
+            Items = src.Items?.Select(i => new PdfItemExportDto
+            {
+                Name = i.Name,
+                Price = (decimal)i.Price
+            }).ToList() ?? []
+        };
 
         // build PDF
         byte[] bytes = pdfGenerator.GeneratePdf(invoice);

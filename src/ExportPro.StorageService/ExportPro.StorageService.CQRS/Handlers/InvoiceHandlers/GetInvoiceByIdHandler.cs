@@ -4,10 +4,8 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Queries.InvoiceQueries;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
-using Microsoft.AspNetCore.Http.Features;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Handlers.InvoiceHandlers;
@@ -52,6 +50,7 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper
             BankAccountNumber = invoice.BankAccountNumber,
             ClientId = invoice.ClientId,
             Items = invoice.Items.Select(x => _mapper.Map<ItemDtoForClient>(x)).ToList(),
+            Amount = Convert.ToDecimal(invoice.Amount ?? 0),
         };
 
         return new BaseResponse<InvoiceDto>

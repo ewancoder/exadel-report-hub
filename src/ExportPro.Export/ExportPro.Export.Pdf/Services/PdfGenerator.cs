@@ -15,7 +15,7 @@ public sealed class PdfGenerator : IPdfGenerator
             container.Page(page =>
             {
                 page.Margin(25);
-                page.Size(PageSizes.A4);
+                page.Size(PageSizes.A4.Landscape());
 
                 // ---- Header ----
                 page.Header()
