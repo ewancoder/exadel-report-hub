@@ -12,12 +12,18 @@ public sealed class GenerateInvoicePdfQueryHandler(
     IPdfGenerator pdfGenerator)
         : IRequestHandler<GeneratePdfInvoiceQuery, PdfFileDto>
 {
-    public async Task<PdfFileDto> Handle(GeneratePdfInvoiceQuery request, CancellationToken cancellationToken)
+    public async Task<PdfFileDto> Handle(
+        GeneratePdfInvoiceQuery request,
+        CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.InvoiceId))
-            throw new ArgumentException("InvoiceId is required.");
+            throw new ArgumentException("InvoiceId is required.", nameof(request.InvoiceId));
 
-        PdfInvoiceExportDto invoice = await storageApi.GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
+        // fetch plain DTO
+        PdfInvoiceExportDto invoice =
+            await storageApi.GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
+
+        // build PDF
         byte[] bytes = pdfGenerator.GeneratePdf(invoice);
         string fileName = $"invoice_{invoice.InvoiceNumber}.pdf";
 

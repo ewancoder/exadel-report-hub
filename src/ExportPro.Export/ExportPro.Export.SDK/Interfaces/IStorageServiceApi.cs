@@ -1,4 +1,6 @@
-﻿using ExportPro.Export.SDK.DTOs;
+﻿using ExportPro.Common.Shared.Library;
+using ExportPro.Export.SDK.DTOs;
+using ExportPro.StorageService.SDK.PaginationParams;
 using Refit;
 
 namespace ExportPro.Export.SDK.Interfaces;
@@ -9,5 +11,5 @@ namespace ExportPro.Export.SDK.Interfaces;
 public interface IStorageServiceApi
 {
     [Get("/api/Invoice/{id}")]
-    Task<PdfInvoiceExportDto> GetInvoiceByIdAsync(string id, CancellationToken cancellationToken);
+    Task<PdfInvoiceExportDto> GetInvoiceByIdAsync(string id, CancellationToken ct);
 }

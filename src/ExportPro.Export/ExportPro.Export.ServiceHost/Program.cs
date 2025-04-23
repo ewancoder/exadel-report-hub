@@ -7,6 +7,7 @@ using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.Export.ServiceHost.Extensions;
 using MediatR;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,7 @@ builder.Host.UseSharedSerilogAndConfiguration();
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddSwaggerServices("ExportPro Auth Service");
+builder.Services.AddSwaggerServices("ExportPro Export Service");
 builder.Services.AddCommonRegistrations();
 builder.Services.AddExportModule(builder.Configuration);
 
@@ -42,5 +43,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 app.Run();

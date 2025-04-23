@@ -2,33 +2,36 @@
 using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
 using ExportPro.Export.SDK.Interfaces;
+using ExportPro.Export.ServiceHost.Infrastructure;
 using Refit;
 
 namespace ExportPro.Export.ServiceHost.Extensions;
 
 public static class ExportServiceCollectionExtensions
 {
-    public static IServiceCollection AddExportModule(this IServiceCollection services, IConfiguration cfg)
+    public static IServiceCollection AddExportModule(
+        this IServiceCollection services, IConfiguration cfg)
     {
-        //services.AddMediatR(opt => opt.RegisterServicesFromAssemblyContaining<IPdfGenerator>());
-        services.AddMediatR(opt => 
-            opt.RegisterServicesFromAssemblies(
+        // ---------- MediatR ----------
+        services.AddMediatR(options =>
+            options.RegisterServicesFromAssemblies(
                 typeof(GeneratePdfInvoiceQuery).Assembly,
                 typeof(IPdfGenerator).Assembly));
 
-    https://localhost:7195
-
+        // ---------- PDF ----------
         services.AddSingleton<IPdfGenerator, PdfGenerator>();
 
-        //services.AddRefitClient<IStorageServiceApi>()
-        //        .ConfigureHttpClient(c =>
-        //            c.BaseAddress = new Uri(cfg["StorageService:BaseUrl"]));
+        // ---------- HttpContext accessor ----------
+        services.AddHttpContextAccessor();
+        services.AddTransient<ForwardAuthHeaderHandler>();
 
-        var baseUrl = cfg["StorageService:BaseUrl"]
-              ?? throw new InvalidOperationException("StorageService:BaseUrl config missing.");
+        // ---------- Refit client ----------
+        var baseUrl = cfg.GetValue<string>("StorageService:BaseUrl")
+                     ?? "http://localhost:5011";
 
         services.AddRefitClient<IStorageServiceApi>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl));
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
 
         return services;
     }

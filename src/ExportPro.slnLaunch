@@ -4,19 +4,18 @@
     "Projects": [
       {
         "Path": "ExportPro.StorageService\\ExportPro.StorageService.API\\ExportPro.StorageService.API.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "ExportPro.StorageService.API (http)"
       },
       {
         "Path": "ExportPro.Auth\\ExportPro.Auth.ServiceHost\\ExportPro.Auth.ServiceHost.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "ExportPro.Gateway\\ExportPro.Gateway.ServiceHost\\ExportPro.Gateway.ServiceHost.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "http"
       },
       {
         "Path": "ExportPro.Export\\ExportPro.Export.ServiceHost\\ExportPro.Export.ServiceHost.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "http"
       }
     ]
   }

@@ -1,39 +1,39 @@
 {
-  "Serilog": {
-    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File"],
-    "MinimumLevel": {
-      "Default": "Information",
-      "Override": {
-        "Microsoft": "Warning",
-        "System": "Warning",
-        "Microsoft.AspNetCore.Hosting": "Information"
-      }
-    },
-    "WriteTo": [
-      //{
-      //  "Name": "Console",
-      //  "Args": {
-      //    "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-      //  }
-      //},
-      {
-        "Name": "File",
-        "Args": {
-          "path": "C:/Logs/log-.txt",
-          "rollingInterval": "Day",
-          "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-        }
-      }
-    ],
-    "Enrich": [
-      "FromLogContext",
-      "WithMachineName",
-      "WithExceptionDetails",
-      "Elapsed"
-    ],
-    "Properties": {
-      "Application": "ExportPro.WebAPI"
-    },
-    "AllowedHosts": "*"
-  }
+  //"Serilog": {
+  //  "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File"],
+  //  "MinimumLevel": {
+  //    "Default": "Information",
+  //    "Override": {
+  //      "Microsoft": "Warning",
+  //      "System": "Warning",
+  //      "Microsoft.AspNetCore.Hosting": "Information"
+  //    }
+  //  },
+  //  "WriteTo": [
+  //    //{
+  //    //  "Name": "Console",
+  //    //  "Args": {
+  //    //    "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+  //    //  }
+  //    //},
+  //    {
+  //      "Name": "File",
+  //      "Args": {
+  //        "path": "C:/Logs/log-.txt",
+  //        "rollingInterval": "Day",
+  //        "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+  //      }
+  //    }
+  //  ],
+  //  "Enrich": [
+  //    "FromLogContext",
+  //    "WithMachineName",
+  //    "WithExceptionDetails",
+  //    "Elapsed"
+  //  ],
+  //  "Properties": {
+  //    "Application": "ExportPro.WebAPI"
+  //  },
+  //  "AllowedHosts": "*"
+  //}
 }
