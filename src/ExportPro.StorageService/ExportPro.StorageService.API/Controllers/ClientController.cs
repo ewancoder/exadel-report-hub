@@ -3,7 +3,7 @@ using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.Client;
 using ExportPro.StorageService.CQRS.Commands.Items;
-using ExportPro.StorageService.CQRS.Handlers.Plans;
+using ExportPro.StorageService.CQRS.CommandHandlers.Plans;
 using ExportPro.StorageService.CQRS.QueryHandlers.Client;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -29,7 +29,6 @@ public class ClientController(IMediator mediator) : ControllerBase
         var clientResponse = await mediator.Send(clientCommand);
         return StatusCode((int)clientResponse.ApiState, clientResponse);
     }
-
     [HttpGet]
     [SwaggerOperation(Summary = "Getting  clients")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
@@ -39,7 +38,6 @@ public class ClientController(IMediator mediator) : ControllerBase
         var clientResponse = await mediator.Send(new GetClientsQuery(top, skip));
         return StatusCode((int)clientResponse.ApiState, clientResponse);
     }
-
     [HttpGet("{clientId}")]
     [SwaggerOperation(Summary = "Getting  client by client id")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
@@ -59,7 +57,6 @@ public class ClientController(IMediator mediator) : ControllerBase
         var afterUpdate = await mediator.Send(new UpdateClientCommand(clientdto, clientId));
         return StatusCode((int)afterUpdate.ApiState, afterUpdate);
     }
-
     [HttpDelete("{clientId}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]
     [ProducesResponseType(typeof(BaseResponse<ClientResponse>), 200)]

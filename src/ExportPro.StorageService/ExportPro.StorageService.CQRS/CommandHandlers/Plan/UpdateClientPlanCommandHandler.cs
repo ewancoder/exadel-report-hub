@@ -8,7 +8,7 @@ using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
 using MediatR;
 
-namespace ExportPro.StorageService.CQRS.Handlers.Plans;
+namespace ExportPro.StorageService.CQRS.CommandHandlers.Plans;
 public record UpdateClientPlanCommand(string clientId, string planId, PlansDto plansDto) : ICommand<ValidationModel<PlansResponse>>;
 public class UpdateClientPlanCommandHandler(
     IClientRepository clientRepository

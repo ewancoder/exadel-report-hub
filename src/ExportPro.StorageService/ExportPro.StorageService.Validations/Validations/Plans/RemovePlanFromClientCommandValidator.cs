@@ -1,4 +1,4 @@
-using ExportPro.StorageService.CQRS.Handlers.Plans;
+using ExportPro.StorageService.CQRS.CommandHandlers.Plans;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Validations.Validations.Client;
 using FluentValidation;
