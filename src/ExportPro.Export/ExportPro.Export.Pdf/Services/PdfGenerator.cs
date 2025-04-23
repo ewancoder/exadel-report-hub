@@ -56,14 +56,14 @@ public sealed class PdfGenerator : IPdfGenerator
 
                     string[] row =
                     [
-                        invoice.CustomerId ?? "—",
+                        invoice.CustomerName ?? "—",
                         invoice.IssueDate.ToString("yyyy‑MM‑dd"),
                         invoice.DueDate.ToString("yyyy‑MM‑dd"),
                         itemList,
                         invoice.Amount.ToString("N2"),
-                        invoice.CurrencyId ?? "—",
+                        invoice.CurrencyCode ?? "—",
                         invoice.PaymentStatus ?? "—",
-                        invoice.ClientId ?? "—",
+                        invoice.ClientName ?? "—",
                         invoice.BankAccountNumber ?? "—",
                         invoice.Amount.ToString("N2")
                     ];
@@ -77,7 +77,8 @@ public sealed class PdfGenerator : IPdfGenerator
                 // ---- Footer ----
                 page.Footer()
                     .AlignCenter()
-                    .Text($"Generated {DateTime.UtcNow:u}").Italic();
+                    .Text($"Generated {DateTime.UtcNow:u}")
+                    .Italic();
             });
         });
 
