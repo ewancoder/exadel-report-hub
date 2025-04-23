@@ -1,11 +1,11 @@
-﻿using ExportPro.StorageService.CQRS.Commands.CustomerCommand;
+﻿using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Customer;
 
-public class CreateCustomerCommandValidator:AbstractValidator<CreateCustomerCommand>
+public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCommand>
 {
     public CreateCustomerCommandValidator(ICountryRepository countryRepository)
     {

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using ExportPro.StorageService.CQRS.Commands.CustomerCommand;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
