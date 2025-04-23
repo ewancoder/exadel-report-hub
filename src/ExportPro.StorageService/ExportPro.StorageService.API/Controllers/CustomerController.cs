@@ -1,7 +1,7 @@
 ﻿using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Library;
-using ExportPro.StorageService.CQRS.Commands.CustomerCommand;
-using ExportPro.StorageService.CQRS.Queries.CustomerQueries;
+using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
+using ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using MediatR;
@@ -19,6 +19,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateCustomerCommand command, CancellationToken cancellationToken)
         => Ok(await mediator.Send(command, cancellationToken));
 
+ 
     [HttpPut("{id}")]
     [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Update)]
     public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateCustomerCommand command, CancellationToken cancellationToken)
@@ -29,6 +30,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
         command.Id = id;
         return Ok(await mediator.Send(command, cancellationToken));
     }
+  
     [HttpDelete("{id}")]
     [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Delete)]
     public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
@@ -36,8 +38,9 @@ public class CustomerController(IMediator mediator) : ControllerBase
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid customer ID format.");
 
-        return Ok(await mediator.Send(new DeleteCustomerCommand { Id = objectId }, cancellationToken));
+        return Ok(await mediator.Send(new DeleteCustomerCommand(objectId), cancellationToken));
     }
+    
     [HttpGet("{id}")]
     [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
@@ -45,11 +48,9 @@ public class CustomerController(IMediator mediator) : ControllerBase
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid customer ID format.");
 
-        return Ok(await mediator.Send(new GetCustomerByIdQuery { Id = objectId }, cancellationToken));
+        return Ok(await mediator.Send(new GetCustomerByIdQuery(objectId), cancellationToken));
     }
-    /// <summary>
-    /// Get all customers
-    /// </summary>
+
     [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
     [HttpGet]
     public async Task<ActionResult<BaseResponse<PaginatedList<Customer>>>> GetAll(

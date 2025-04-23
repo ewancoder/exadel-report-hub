@@ -1,5 +1,5 @@
-﻿using ExportPro.StorageService.CQRS.Commands.CurrencyCommand;
-using ExportPro.StorageService.CQRS.Queries.CurrencyQueries;
+﻿using ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
+using ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -34,7 +34,7 @@ public class CurrencyController(IMediator mediator) : ControllerBase
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid currency ID format.");
 
-        var response = await mediator.Send(new DeleteCurrencyCommand { Id = objectId }, cancellationToken);
+        var response = await mediator.Send(new DeleteCurrencyCommand(objectId), cancellationToken);
         return Ok(response);
     }
 
@@ -44,7 +44,7 @@ public class CurrencyController(IMediator mediator) : ControllerBase
         if (!ObjectId.TryParse(id, out var objectId))
             return BadRequest("Invalid currency ID format.");
 
-        var response = await mediator.Send(new GetCurrencyByIdQuery { Id = objectId }, cancellationToken);
+        var response = await mediator.Send(new GetCurrencyByIdQuery(objectId), cancellationToken);
         return Ok(response);
     }
 

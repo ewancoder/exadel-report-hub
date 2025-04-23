@@ -1,10 +1,10 @@
-﻿using ExportPro.StorageService.CQRS.Commands.CountryCommand;
-using ExportPro.StorageService.CQRS.Queries.CountryQueries;
+﻿using ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
+using ExportPro.StorageService.CQRS.QueryHandlers.CountryQueries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.Controllers;
+namespace ExportPro.StorageService.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -44,6 +44,7 @@ public class CountryController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(new GetCountryByIdQuery(id), cancellationToken);
         return StatusCode((int)response.ApiState, response);
     }
+    
     [HttpGet]
     public async Task<IActionResult> GetAll(
             CancellationToken cancellationToken,
