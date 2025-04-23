@@ -44,10 +44,9 @@ public sealed class GenerateInvoicePdfQueryHandler(
             customerName = custResp.Data?.Name ?? "—";
         }
 
-        // TODO: instead use AutoMapper
+        // TODO: should i use instead of it AutoMapper?
         PdfInvoiceExportDto invoice = new()
         {
-            Id = invoiceDto.Id,
             InvoiceNumber = invoiceDto.InvoiceNumber,
             IssueDate = invoiceDto.IssueDate,
             DueDate = invoiceDto.DueDate,
@@ -60,7 +59,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
             Items = invoiceDto.Items?.Select(i => new PdfItemExportDto
             {
                 Name = i.Name,
-                Price = (decimal)i.Price
+                Price = i.Price
             }).ToList() ?? []
         };
 
