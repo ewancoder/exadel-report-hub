@@ -1,6 +1,6 @@
 ﻿namespace ExportPro.Export.SDK.DTOs;
 
-public sealed class InvoicePdfExportDto
+public sealed class PdfInvoiceExportDto
 {
     public string Id { get; set; } = default!;
     public string InvoiceNumber { get; set; } = default!;
@@ -13,5 +13,5 @@ public sealed class InvoicePdfExportDto
     public string? ClientId { get; set; }
     public string? CustomerId { get; set; }
 
-    public List<ItemPdfExportDto> Items { get; set; } = [];
+    public List<PdfItemExportDto> Items { get; set; } = [];
 }

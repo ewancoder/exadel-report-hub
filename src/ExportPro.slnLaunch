@@ -13,6 +13,10 @@
       {
         "Path": "ExportPro.Gateway\\ExportPro.Gateway.ServiceHost\\ExportPro.Gateway.ServiceHost.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "ExportPro.Export\\ExportPro.Export.ServiceHost\\ExportPro.Export.ServiceHost.csproj",
+        "Action": "Start"
       }
     ]
   }

@@ -5,6 +5,7 @@ using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
+using ExportPro.Export.ServiceHost.Extensions;
 using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Auth Service");
 builder.Services.AddCommonRegistrations();
+builder.Services.AddExportModule(builder.Configuration);
 
 // Register MongoDB dependencies
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
