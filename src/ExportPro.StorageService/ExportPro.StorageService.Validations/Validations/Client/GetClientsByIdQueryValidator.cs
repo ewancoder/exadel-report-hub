@@ -5,11 +5,11 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Client;
 
-public sealed class SoftDeleteClientCommandValidator : AbstractValidator<SoftDeleteClientCommand>
+public class GetClientsByIdQueryValidator : AbstractValidator<GetClientByIdQuery>
 {
-    public SoftDeleteClientCommandValidator(IClientRepository clientRepository)
+    public GetClientsByIdQueryValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.ClientId)
+        RuleFor(x => x.Id)
             .NotEmpty()
             .WithMessage("Client Id  cannot be empty.")
             .Must(id =>
@@ -19,7 +19,7 @@ public sealed class SoftDeleteClientCommandValidator : AbstractValidator<SoftDel
             .WithMessage("The Client Id is not valid in format.")
             .DependentRules(() =>
             {
-                RuleFor(x => x.ClientId)
+                RuleFor(x => x.Id)
                     .MustAsync(
                         async (id, _) =>
                         {
