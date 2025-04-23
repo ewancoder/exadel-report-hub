@@ -1,4 +1,4 @@
-using ExportPro.StorageService.CQRS.Handlers.Client;
+using ExportPro.StorageService.CQRS.QueryHandlers.Client;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 using MongoDB.Bson;

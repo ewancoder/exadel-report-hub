@@ -1,4 +1,4 @@
-﻿using ExportPro.StorageService.CQRS.Handlers.Client;
+﻿using ExportPro.StorageService.CQRS.QueryHandlers.Client;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
@@ -8,9 +8,7 @@ public class GetClientsQueryValidator : AbstractValidator<GetClientsQuery>
 {
     public GetClientsQueryValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.top)
-            .GreaterThan(0)
-            .WithMessage("Top must be higher than 0");
+        RuleFor(x => x.top).GreaterThan(0).WithMessage("Top must be higher than 0");
 
         RuleFor(x => x.skip)
             .GreaterThanOrEqualTo(0)

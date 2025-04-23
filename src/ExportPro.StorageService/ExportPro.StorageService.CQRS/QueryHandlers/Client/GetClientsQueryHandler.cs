@@ -8,7 +8,7 @@ using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace ExportPro.StorageService.CQRS.Handlers.Client;
+namespace ExportPro.StorageService.CQRS.QueryHandlers.Client;
 
 public record GetClientsQuery(int top, int skip) : IQuery<ValidationModel<List<ClientResponse>>>;
 

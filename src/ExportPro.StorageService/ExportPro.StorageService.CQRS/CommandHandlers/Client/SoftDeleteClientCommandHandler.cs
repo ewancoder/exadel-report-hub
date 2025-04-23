@@ -8,7 +8,7 @@ using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.CQRS.Handlers.Client;
+namespace ExportPro.StorageService.CQRS.CommandHandlers.Client;
 
 public record SoftDeleteClientCommand(string ClientId) : ICommand<ValidationModel<ClientResponse>>;
 
