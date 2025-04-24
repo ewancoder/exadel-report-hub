@@ -43,7 +43,7 @@ public sealed class PdfGenerator : IPdfGenerator
                     [
                         "Customer", "Issue Date", "Due Date",
                         "Item List", "Amount", "Currency",
-                        "Payment Status", "Client", "Bank Acc. #", "Total Price"
+                        "Payment Status", "Client", "Bank Acc. #", "Total Price"
                     ];
 
                     foreach (var h in headers)
