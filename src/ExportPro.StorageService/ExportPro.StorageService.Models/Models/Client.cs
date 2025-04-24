@@ -15,6 +15,6 @@ public class Client : IModel
     public bool IsDeleted { get; set; } = false;
     public List<Item>? Items { get; set; } = [];
     public List<Plans>? Plans { get; set; } = [];
-    public Guid OwnerId { get; set; }
-    public List<Guid> ClientAdmins { get; set; } = [];
+    public Guid? OwnerId { get; set; }
+    public List<Guid>? ClientAdmins { get; set; } = [];
 }

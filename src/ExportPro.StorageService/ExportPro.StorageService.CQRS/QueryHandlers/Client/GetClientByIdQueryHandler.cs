@@ -7,7 +7,7 @@ using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
 
-namespace ExportPro.StorageService.CQRS.Handlers.Client;
+namespace ExportPro.StorageService.CQRS.QueryHandlers.Client;
 
 public record GetClientByIdQuery(string Id) : IQuery<ValidationModel<ClientResponse>>;
 

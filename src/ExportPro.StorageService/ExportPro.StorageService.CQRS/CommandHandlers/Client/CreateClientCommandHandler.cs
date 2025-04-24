@@ -8,13 +8,15 @@ using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
 
-
-namespace ExportPro.StorageService.CQRS.Handlers.Client;
+namespace ExportPro.StorageService.CQRS.CommandHandlers.Client;
 
 public record CreateClientCommand(ClientDto Clientdto) : ICommand<ValidationModel<ClientResponse>>;
 
-public class CreateClientCommandHandler(IClientRepository clientRepository, IValidator<CreateClientCommand> validator, IMapper _mapper)
-    : ICommandHandler<CreateClientCommand, ValidationModel<ClientResponse>>
+public class CreateClientCommandHandler(
+    IClientRepository clientRepository,
+    IValidator<CreateClientCommand> validator,
+    IMapper _mapper
+) : ICommandHandler<CreateClientCommand, ValidationModel<ClientResponse>>
 {
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IValidator<CreateClientCommand> _validator = validator;

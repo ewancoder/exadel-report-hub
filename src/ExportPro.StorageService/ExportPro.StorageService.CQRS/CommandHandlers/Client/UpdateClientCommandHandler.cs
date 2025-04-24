@@ -7,7 +7,7 @@ using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
 
-namespace ExportPro.StorageService.CQRS.Handlers.Client;
+namespace ExportPro.StorageService.CQRS.CommandHandlers.Client;
 
 public record UpdateClientCommand(ClientUpdateDto clientUpdateDto, string ClientId)
     : ICommand<ValidationModel<ClientResponse>>;

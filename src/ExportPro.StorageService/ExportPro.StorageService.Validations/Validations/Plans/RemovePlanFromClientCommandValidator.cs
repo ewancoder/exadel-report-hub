@@ -2,6 +2,7 @@ using ExportPro.StorageService.CQRS.Handlers.Plans;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Validations.Validations.Client;
 using FluentValidation;
+using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Plans;
 
@@ -10,7 +11,25 @@ public sealed class RemovePlanFromClientCommandValidator : AbstractValidator<Rem
     public RemovePlanFromClientCommandValidator(IClientRepository clientRepository)
     {
         RuleFor(x => x.clientId)
-            .SetValidator(new ClientIdValidator(clientRepository))
+            .NotEmpty()
+            .WithMessage("Client Id  cannot be empty.")
+            .Must(id =>
+            {
+                return ObjectId.TryParse(id, out _);
+            })
+            .WithMessage("The Client Id is not valid in format.")
+            .DependentRules(() =>
+            {
+                RuleFor(x => x.clientId)
+                    .MustAsync(
+                        async (id, _) =>
+                        {
+                            var client = await clientRepository.GetClientById(id);
+                            return client != null;
+                        }
+                    )
+                    .WithMessage("The Client Id does not exist");
+            })
             .DependentRules(
                 () =>
                     RuleFor(x => x)
