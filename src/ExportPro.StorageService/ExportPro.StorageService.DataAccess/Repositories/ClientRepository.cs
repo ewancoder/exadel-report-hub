@@ -28,19 +28,6 @@ public class ClientRepository(ICollectionProvider collectionProvider, IMapper ma
         return paginated;
     }
 
-    public async Task<ClientResponse> UpdateClient(
-        ClientDto client,
-        string clientid,
-        CancellationToken cancellationToken
-    )
-    {
-        var clientGet = await GetByIdAsync(ObjectId.Parse(clientid), cancellationToken);
-        clientGet.Name = client.Name;
-        clientGet.Description = client.Description;
-        await UpdateOneAsync(clientGet, CancellationToken.None);
-        return mapper.Map<ClientResponse>(clientGet);
-    }
-
     public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)
     {
         var max_size = Collection.Find(_ => !_.IsDeleted).CountDocuments();
@@ -208,30 +195,4 @@ public class ClientRepository(ICollectionProvider collectionProvider, IMapper ma
     {
         throw new NotImplementedException();
     }
-
-    //public async Task<PlansResponse> UpdateClientPlan(string clientId, string planId, PlansDto plansDto)
-    //{
-    //    var client = await GetClientById(clientId);
-    //    Plans plans = new();
-    //    foreach (var i in client.Plans)
-    //    {
-    //        if (i.Id.ToString() == planId)
-    //        {
-    //            plans = i;
-    //        }
-    //    }
-    //    plans.StartDate = plansDto.StartDate;
-    //    plans.EndDate = plansDto.EndDate;
-    //    for (int i = 0; i < plansDto.Items.Count; ++i)
-    //    {
-    //        plans.items[i].Name = plansDto.Items[i].Name;
-    //        plans.items[i].Description = plansDto.Items[i].Description;
-    //        plans.items[i].Price = plansDto.Items[i].Price;
-    //        plans.items[i].Currency = plansDto.Items[i].Currency;
-    //        plans.items[i].Status = plansDto.Items[i].Status;
-    //    }
-    //    await UpdateOneAsync(client, CancellationToken.None);
-    //    var planResp = mapper.Map<PlansResponse>(plans);
-    //    return planResp;
-    //}
 }

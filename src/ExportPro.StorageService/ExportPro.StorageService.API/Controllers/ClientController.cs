@@ -55,10 +55,9 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Clients, Common.Shared.Enums.CrudAction.Update)]
-    public async Task<IActionResult> UpdateClient([Required] string clientId, [FromBody] UpdateClientCommand command)
+    public async Task<IActionResult> UpdateClient([FromRoute] string clientId, [FromBody] ClientDto client)
     {
-        command = command with { clientId = clientId };
-        var afterUpdate = await mediator.Send(command);
+        var afterUpdate = await mediator.Send(new UpdateClientCommand(client, clientId));
         return StatusCode((int)afterUpdate.ApiState, afterUpdate);
     }
 

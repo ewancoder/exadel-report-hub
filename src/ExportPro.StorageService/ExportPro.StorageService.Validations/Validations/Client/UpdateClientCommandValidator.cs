@@ -9,7 +9,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
 {
     public UpdateClientCommandValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.clientId)
+        RuleFor(x => x.ClientId)
             .NotEmpty()
             .WithMessage("Client Id  cannot be empty.")
             .Must(id =>
@@ -19,7 +19,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
             .WithMessage("The Client Id is not valid in format.")
             .DependentRules(() =>
             {
-                RuleFor(x => x.clientId)
+                RuleFor(x => x.ClientId)
                     .MustAsync(
                         async (id, cancellationToken) =>
                         {
@@ -34,7 +34,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
             })
             .DependentRules(() =>
             {
-                RuleFor(x => x.Name)
+                RuleFor(x => x.client.Name)
                     .NotEmpty()
                     .WithMessage("Name must not be empty")
                     .MinimumLength(3)
@@ -43,7 +43,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
                     .WithMessage("Name must not exceed 50 characters")
                     .DependentRules(() =>
                     {
-                        RuleFor(x => x.Name)
+                        RuleFor(x => x.client.Name)
                             .MustAsync(
                                 async (Name, cancellationToken) =>
                                 {

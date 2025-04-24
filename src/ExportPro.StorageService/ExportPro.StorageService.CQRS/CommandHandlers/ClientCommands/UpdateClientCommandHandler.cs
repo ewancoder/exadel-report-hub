@@ -9,11 +9,12 @@ using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 
-public record UpdateClientCommand(string Name, string? Description, string clientId) : ICommand<ClientResponse>;
+public record UpdateClientCommand(ClientDto client, string ClientId) : ICommand<ClientResponse>;
 
 public class UpdateClientCommandHandler(
     IHttpContextAccessor httpContext,
@@ -27,15 +28,16 @@ public class UpdateClientCommandHandler(
     )
     {
         var client = await clientRepository.GetOneAsync(
-            x => x.Id == ObjectId.Parse(request.clientId),
+            x => x.Id == ObjectId.Parse(request.ClientId),
             cancellationToken
         );
-        if (request.Name != null)
-            client.Name = request.Name;
-        if (request.Description != null)
-            client.Description = request.Description;
+        if (request.client.Name != null)
+            client.Name = request.client.Name;
+        if (request.client.Description != null)
+            client.Description = request.client.Description;
         client.UpdatedBy = httpContext.HttpContext?.User?.FindFirst(ClaimTypes.Name).Value;
         client.UpdatedAt = DateTime.UtcNow;
+        await clientRepository.UpdateOneAsync(client, cancellationToken);
         var clientResponse = mapper.Map<ClientResponse>(client);
         return new SuccessResponse<ClientResponse>(clientResponse, "Client Updated Successfully");
     }
