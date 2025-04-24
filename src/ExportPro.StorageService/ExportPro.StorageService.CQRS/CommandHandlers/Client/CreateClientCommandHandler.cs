@@ -10,36 +10,24 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.Client;
 
-public record CreateClientCommand(ClientDto Clientdto) : ICommand<ValidationModel<ClientResponse>>;
+public record CreateClientCommand(ClientDto Client) : ICommand<ClientResponse>;
 
 public class CreateClientCommandHandler(
     IClientRepository clientRepository,
     IValidator<CreateClientCommand> validator,
     IMapper _mapper
-) : ICommandHandler<CreateClientCommand, ValidationModel<ClientResponse>>
+) : ICommandHandler<CreateClientCommand, ClientResponse>
 {
     private readonly IClientRepository _clientRepository = clientRepository;
-    private readonly IValidator<CreateClientCommand> _validator = validator;
-
-    public async Task<BaseResponse<ValidationModel<ClientResponse>>> Handle(
+    public async Task<BaseResponse<ClientResponse>> Handle(
         CreateClientCommand request,
         CancellationToken cancellationToken
     )
     {
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
+        var creatingClient = await _clientRepository.AddClientFromClientDto(request.Client);
+        return new BaseResponse<ClientResponse>
         {
-            return new BaseResponse<ValidationModel<ClientResponse>>
-            {
-                Data = new(validationResult),
-                ApiState = HttpStatusCode.BadRequest,
-                IsSuccess = false,
-            };
-        }
-        var creatingClient = await _clientRepository.AddClientFromClientDto(request.Clientdto);
-        return new BaseResponse<ValidationModel<ClientResponse>>
-        {
-            Data = new(creatingClient),
+            Data = creatingClient,
             Messages = ["Client Created Successfully"],
             ApiState = HttpStatusCode.Created,
             IsSuccess = true,

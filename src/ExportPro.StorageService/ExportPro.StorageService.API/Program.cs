@@ -63,6 +63,7 @@ builder.Services
     {
         c.BaseAddress = new Uri(builder.Configuration["Refit:appurl"]);
     });
+builder.Services.AddLogging();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Storage Service");
 builder.Services.AddValidatorsFromAssembly(typeof(CreateClientCommandValidator).Assembly);

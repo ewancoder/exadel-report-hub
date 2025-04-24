@@ -9,7 +9,7 @@ public class GetClientsByIdQueryValidator : AbstractValidator<GetClientByIdQuery
 {
     public GetClientsByIdQueryValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.clientId)
             .NotEmpty()
             .WithMessage("Client Id  cannot be empty.")
             .Must(id =>
@@ -19,7 +19,7 @@ public class GetClientsByIdQueryValidator : AbstractValidator<GetClientByIdQuery
             .WithMessage("The Client Id is not valid in format.")
             .DependentRules(() =>
             {
-                RuleFor(x => x.Id)
+                RuleFor(x => x.clientId)
                     .MustAsync(
                         async (id, _) =>
                         {

@@ -9,7 +9,7 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.Client;
 
-public record GetClientByIdQuery(string Id) : IQuery<ValidationModel<ClientResponse>>;
+public record GetClientByIdQuery(string clientId) : IQuery<ValidationModel<ClientResponse>>;
 
 public class GetClientByIdQueryHandler(
     IClientRepository clientRepository,
@@ -26,17 +26,7 @@ public class GetClientByIdQueryHandler(
         CancellationToken cancellationToken
     )
     {
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            return new BaseResponse<ValidationModel<ClientResponse>>
-            {
-                Data = new ValidationModel<ClientResponse>(validationResult),
-                ApiState = HttpStatusCode.BadRequest,
-                IsSuccess = false,
-            };
-        }
-        var client = await _clientRepository.GetClientById(request.Id);
+        var client = await _clientRepository.GetClientById(request.clientId);
         var plans = new List<Models.Models.Plans>();
         foreach (var i in client.Plans)
         {

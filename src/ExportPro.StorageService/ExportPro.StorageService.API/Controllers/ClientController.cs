@@ -42,9 +42,9 @@ public class ClientController(IMediator mediator) : ControllerBase
     [SwaggerOperation(Summary = "Getting  client by client id")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Clients, Common.Shared.Enums.CrudAction.Read)]
-    public async Task<IActionResult> GetClientById([Required] GetClientsQuery clientId)
+    public async Task<IActionResult> GetClientById([Required][FromRoute] string clientId)
     {
-        var clientResponse = await mediator.Send(clientId);
+        var clientResponse = await mediator.Send(new GetClientByIdQuery(clientId));
         return StatusCode((int)clientResponse.ApiState, clientResponse);
     }
 

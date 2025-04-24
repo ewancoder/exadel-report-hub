@@ -27,16 +27,7 @@ public class GetClientsQueryHandler(
         CancellationToken cancellationToken
     )
     {
-        var validationResult = await _validator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return new BaseResponse<ValidationModel<List<ClientResponse>>>
-            {
-                Data = new(validationResult),
-                ApiState = HttpStatusCode.BadRequest,
-                IsSuccess = false,
-            };
-        }
+      
         var clientresponse = _clientRepository.GetClients(request.top, request.skip);
         var message = clientresponse.Messages;
         if (message[0] == "There is no such document")

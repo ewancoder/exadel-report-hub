@@ -14,7 +14,7 @@ public sealed class CreateClientCommandValidator : AbstractValidator<CreateClien
 {
     public CreateClientCommandValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.Clientdto.Name)
+        RuleFor(x => x.Client.Name)
             .NotEmpty()
             .WithMessage("Name must not be empty")
             .MinimumLength(3)
@@ -23,7 +23,7 @@ public sealed class CreateClientCommandValidator : AbstractValidator<CreateClien
             .WithMessage("Name must not exceed 50 characters")
             .DependentRules(() =>
             {
-                RuleFor(x => x.Clientdto.Name)
+                RuleFor(x => x.Client.Name)
                     .MustAsync(
                         async (Name, _) =>
                         {
