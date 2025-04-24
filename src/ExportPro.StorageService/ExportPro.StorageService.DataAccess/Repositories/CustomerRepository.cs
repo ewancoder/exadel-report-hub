@@ -7,7 +7,7 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class CustomerRepository(ICollectionProvider collectionProvider) : MongoRepositoryBase<Customer>(collectionProvider), ICustomerRepository
+public class CustomerRepository(ICollectionProvider collectionProvider) : BaseRepository<Customer>(collectionProvider), ICustomerRepository
 {
     public async Task<PaginatedList<Customer>> GetAllPaginatedAsync(
         PaginationParameters parameters,

@@ -1,4 +1,4 @@
-using ExportPro.StorageService.CQRS.CommandHandlers.Client;
+using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 using MongoDB.Bson;
@@ -21,9 +21,12 @@ public sealed class SoftDeleteClientCommandValidator : AbstractValidator<SoftDel
             {
                 RuleFor(x => x.ClientId)
                     .MustAsync(
-                        async (id, _) =>
+                        async (id, cancellationtoken) =>
                         {
-                            var client = await clientRepository.GetClientById(id);
+                            var client = await clientRepository.GetOneAsync(
+                                x => x.Id == ObjectId.Parse(id) && !x.IsDeleted,
+                                cancellationtoken
+                            );
                             return client != null;
                         }
                     )

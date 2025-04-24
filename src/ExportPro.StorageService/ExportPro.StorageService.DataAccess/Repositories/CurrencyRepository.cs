@@ -7,7 +7,7 @@ using MongoDB.Driver;
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
 public class CurrencyRepository(ICollectionProvider collectionProvider)
-    : MongoRepositoryBase<Currency>(collectionProvider),
+    : BaseRepository<Currency>(collectionProvider),
         ICurrencyRepository
 {
     public async Task<Currency> GetByCodeAsync(CancellationToken cancellationToken)

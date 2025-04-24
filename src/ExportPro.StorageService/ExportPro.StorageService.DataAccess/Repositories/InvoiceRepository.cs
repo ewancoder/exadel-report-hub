@@ -9,7 +9,7 @@ using ExportPro.StorageService.SDK.PaginationParams;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class InvoiceRepository(ICollectionProvider collectionProvider) : MongoRepositoryBase<Invoice>(collectionProvider), IInvoiceRepository
+public class InvoiceRepository(ICollectionProvider collectionProvider) : BaseRepository<Invoice>(collectionProvider), IInvoiceRepository
 {
     public async Task<List<Invoice>> GetAllByClientIdAsync(string clientId, CancellationToken cancellationToken)
     {

@@ -22,9 +22,9 @@ public sealed class AddPlanToClientCommandValidator : AbstractValidator<AddPlanT
             {
                 RuleFor(x => x.clientId)
                     .MustAsync(
-                        async (id, _) =>
+                        async (id, cancellationToken) =>
                         {
-                            var client = await clientRepository.GetClientById(id);
+                            var client = await clientRepository.GetByIdAsync(ObjectId.Parse(id), cancellationToken);
                             return client != null;
                         }
                     )

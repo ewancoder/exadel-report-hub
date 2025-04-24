@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Library;
-using ExportPro.StorageService.CQRS.CommandHandlers.Client;
-using ExportPro.StorageService.CQRS.Commands.Items;
+using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 using ExportPro.StorageService.CQRS.CommandHandlers.Plans;
-using ExportPro.StorageService.CQRS.QueryHandlers.Client;
+using ExportPro.StorageService.CQRS.Commands.Items;
+using ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
@@ -18,7 +19,7 @@ namespace ExportPro.StorageService.API.Controllers;
 [Route("api/client/")]
 [Authorize]
 [ApiController]
-public class ClientController(IMediator mediator) : ControllerBase
+public class ClientController(IMediator mediator, IHttpContextAccessor contextAccessor) : ControllerBase
 {
     [HttpPost]
     [SwaggerOperation(Summary = "Creating a client")]
@@ -29,6 +30,7 @@ public class ClientController(IMediator mediator) : ControllerBase
         var clientResponse = await mediator.Send(clientCommand);
         return StatusCode((int)clientResponse.ApiState, clientResponse);
     }
+
     [HttpGet]
     [SwaggerOperation(Summary = "Getting  clients")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
@@ -38,11 +40,12 @@ public class ClientController(IMediator mediator) : ControllerBase
         var clientResponse = await mediator.Send(new GetClientsQuery(top, skip));
         return StatusCode((int)clientResponse.ApiState, clientResponse);
     }
+
     [HttpGet("{clientId}")]
     [SwaggerOperation(Summary = "Getting  client by client id")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Clients, Common.Shared.Enums.CrudAction.Read)]
-    public async Task<IActionResult> GetClientById([Required][FromRoute] string clientId)
+    public async Task<IActionResult> GetClientById([Required] [FromRoute] string clientId)
     {
         var clientResponse = await mediator.Send(new GetClientByIdQuery(clientId));
         return StatusCode((int)clientResponse.ApiState, clientResponse);
@@ -52,18 +55,20 @@ public class ClientController(IMediator mediator) : ControllerBase
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Clients, Common.Shared.Enums.CrudAction.Update)]
-    public async Task<IActionResult> UpdateClient([Required] string clientId, [FromBody] ClientUpdateDto clientdto)
+    public async Task<IActionResult> UpdateClient([Required] string clientId, [FromBody] UpdateClientCommand command)
     {
-        var afterUpdate = await mediator.Send(new UpdateClientCommand(clientdto, clientId));
+        command = command with { clientId = clientId };
+        var afterUpdate = await mediator.Send(command);
         return StatusCode((int)afterUpdate.ApiState, afterUpdate);
     }
+
     [HttpDelete("{clientId}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]
     [ProducesResponseType(typeof(BaseResponse<ClientResponse>), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Clients, Common.Shared.Enums.CrudAction.Delete)]
-    public async Task<IActionResult> SoftDeleteClient([FromRoute] SoftDeleteClientCommand clientId)
+    public async Task<IActionResult> SoftDeleteClient([FromRoute] string clientId)
     {
-        var clientDeleting = await mediator.Send(clientId);
+        var clientDeleting = await mediator.Send(new SoftDeleteClientCommand(clientId));
         return StatusCode((int)clientDeleting.ApiState, clientDeleting);
     }
 

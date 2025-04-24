@@ -1,4 +1,4 @@
-﻿using ExportPro.StorageService.CQRS.CommandHandlers.Client;
+﻿using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 using MongoDB.Bson;
@@ -9,7 +9,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
 {
     public UpdateClientCommandValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.ClientId)
+        RuleFor(x => x.clientId)
             .NotEmpty()
             .WithMessage("Client Id  cannot be empty.")
             .Must(id =>
@@ -19,11 +19,14 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
             .WithMessage("The Client Id is not valid in format.")
             .DependentRules(() =>
             {
-                RuleFor(x => x.ClientId)
+                RuleFor(x => x.clientId)
                     .MustAsync(
-                        async (id, _) =>
+                        async (id, cancellationToken) =>
                         {
-                            var client = await clientRepository.GetClientById(id);
+                            var client = await clientRepository.GetOneAsync(
+                                x => x.Id == ObjectId.Parse(id) && !x.IsDeleted,
+                                cancellationToken
+                            );
                             return client != null;
                         }
                     )
@@ -31,7 +34,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
             })
             .DependentRules(() =>
             {
-                RuleFor(x => x.clientUpdateDto.Name)
+                RuleFor(x => x.Name)
                     .NotEmpty()
                     .WithMessage("Name must not be empty")
                     .MinimumLength(3)
@@ -40,12 +43,15 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
                     .WithMessage("Name must not exceed 50 characters")
                     .DependentRules(() =>
                     {
-                        RuleFor(x => x.clientUpdateDto.Name)
+                        RuleFor(x => x.Name)
                             .MustAsync(
-                                async (Name, _) =>
+                                async (Name, cancellationToken) =>
                                 {
-                                    var client = await clientRepository.ClientExists(Name);
-                                    return !client;
+                                    var client = await clientRepository.GetOneAsync(
+                                        x => x.Name == Name && !x.IsDeleted,
+                                        cancellationToken
+                                    );
+                                    return client == null;
                                 }
                             )
                             .WithMessage("Client with this name already exists");

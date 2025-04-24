@@ -22,9 +22,9 @@ public class UpdateClientPlanCommandValidator : AbstractValidator<UpdateClientPl
             {
                 RuleFor(x => x.clientId)
                     .MustAsync(
-                        async (id, _) =>
+                        async (id, cancellationToken) =>
                         {
-                            var client = await clientRepository.GetClientById(id);
+                            var client = await clientRepository.GetByIdAsync(ObjectId.Parse(id), cancellationToken);
                             return client != null;
                         }
                     )
@@ -34,9 +34,12 @@ public class UpdateClientPlanCommandValidator : AbstractValidator<UpdateClientPl
             {
                 RuleFor(x => x)
                     .MustAsync(
-                        async (plan, _) =>
+                        async (plan, cancellationToken) =>
                         {
-                            var client = await clientRepository.GetClientById(plan.clientId);
+                            var client = await clientRepository.GetByIdAsync(
+                                ObjectId.Parse(plan.clientId),
+                                cancellationToken
+                            );
                             if (client.Plans.Any(x => x.Id.ToString() == plan.planId && !x.IsDeleted))
                                 return true;
                             return false;
