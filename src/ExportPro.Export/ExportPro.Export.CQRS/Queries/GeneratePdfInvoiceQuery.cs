@@ -7,19 +7,14 @@ namespace ExportPro.Export.CQRS.Queries;
 
 public record GeneratePdfInvoiceQuery(string InvoiceId) : IRequest<PdfFileDto>;
 
-public sealed class GenerateInvoicePdfQueryHandler(
-    IStorageServiceApi storageApi,
-    IPdfGenerator pdfGenerator)
+public sealed class GenerateInvoicePdfQueryHandler(IStorageServiceApi storageApi, IPdfGenerator pdfGenerator)
         : IRequestHandler<GeneratePdfInvoiceQuery, PdfFileDto>
 {
-    public async Task<PdfFileDto> Handle(
-        GeneratePdfInvoiceQuery request,
-        CancellationToken cancellationToken)
+    public async Task<PdfFileDto> Handle(GeneratePdfInvoiceQuery request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.InvoiceId))
             throw new ArgumentException("InvoiceId is required.", nameof(request.InvoiceId));
 
-        // fetch plain DTO
         var apiResponce = await storageApi.GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
         var invoiceDto = apiResponce.Data ?? throw new InvalidOperationException("Storage-service returned no data");
 

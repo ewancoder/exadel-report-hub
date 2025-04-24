@@ -41,9 +41,9 @@ public sealed class PdfGenerator : IPdfGenerator
 
                     string[] headers =
                     [
-                        "Customer", "Issue Date", "Due Date",
-                        "Item List", "Amount", "Currency",
-                        "Payment Status", "Client", "Bank Acc. #", "Total Price"
+                        "Customer", "Issue Date", "Due Date",
+                        "Item List", "Amount", "Currency",
+                        "Payment Status", "Client", "Bank Acc. #", "Total Price"
                     ];
 
                     foreach (var h in headers)
@@ -56,7 +56,7 @@ public sealed class PdfGenerator : IPdfGenerator
 
                     string[] row =
                     [
-                        invoice.CustomerName ?? "—",
+                        invoice.CustomerName ?? "-",
                         invoice.IssueDate.ToString("yyyy‑MM‑dd"),
                         invoice.DueDate.ToString("yyyy‑MM‑dd"),
                         itemList,

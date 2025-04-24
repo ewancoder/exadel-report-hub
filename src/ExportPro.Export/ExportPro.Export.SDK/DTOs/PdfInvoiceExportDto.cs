@@ -11,6 +11,5 @@ public sealed class PdfInvoiceExportDto
     public string? BankAccountNumber { get; set; }
     public string? ClientName { get; set; }
     public string? CustomerName { get; set; }
-
     public List<PdfItemExportDto> Items { get; set; } = [];
 }

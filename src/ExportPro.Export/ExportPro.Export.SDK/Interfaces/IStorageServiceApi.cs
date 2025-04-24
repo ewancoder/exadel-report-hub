@@ -13,14 +13,14 @@ namespace ExportPro.Export.SDK.Interfaces;
 public interface IStorageServiceApi
 {
     [Get("/api/Invoice/{id}")]
-    Task<BaseResponse<InvoiceDto>> GetInvoiceByIdAsync(string id, CancellationToken ct);
+    Task<BaseResponse<InvoiceDto>> GetInvoiceByIdAsync(string id, CancellationToken cancellationToken);
 
     [Get("/api/Currency/{id}")]
-    Task<BaseResponse<CurrencyResponse>> GetCurrencyByIdAsync(string id, CancellationToken ct);
+    Task<BaseResponse<CurrencyResponse>> GetCurrencyByIdAsync(string id, CancellationToken cancellationToken);
 
     [Get("/api/client/{id}")]
-    Task<BaseResponse<ValidationModel<ClientResponse>>> GetClientByIdAsync(string id, CancellationToken ct);
+    Task<BaseResponse<ValidationModel<ClientResponse>>> GetClientByIdAsync(string id, CancellationToken cancellationToken);
 
     [Get("/api/Customer/{id}")]
-    Task<BaseResponse<CustomerDto>> GetCustomerByIdAsync(string id, CancellationToken ct);
+    Task<BaseResponse<CustomerDto>> GetCustomerByIdAsync(string id, CancellationToken cancellationToken);
 }

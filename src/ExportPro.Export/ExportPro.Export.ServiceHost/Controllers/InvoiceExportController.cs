@@ -11,9 +11,9 @@ public sealed class InvoiceExportController(IMediator mediator) : ControllerBase
     private readonly IMediator _mediator = mediator;
 
     [HttpGet("{id}/pdf")]
-    public async Task<IActionResult> GetPdf(string id, CancellationToken ct)
+    public async Task<IActionResult> GetPdf(string id, CancellationToken cancellationToken)
     {
-        var dto = await _mediator.Send(new GeneratePdfInvoiceQuery(id), ct);
+        var dto = await _mediator.Send(new GeneratePdfInvoiceQuery(id), cancellationToken);
         return File(dto.Content, "application/pdf", dto.FileName);
     }
 }
