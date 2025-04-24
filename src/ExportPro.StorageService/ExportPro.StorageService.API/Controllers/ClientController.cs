@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
-using ExportPro.StorageService.CQRS.CommandHandlers.Plans;
+using ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 using ExportPro.StorageService.CQRS.Commands.Items;
 using ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
+using ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
@@ -118,6 +118,28 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
         return StatusCode((int)response.ApiState, response);
     }
 
+    [HttpGet("plan/{planId}")]
+    [SwaggerOperation(Summary = "Get Plan by id ")]
+    [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Read)]
+    public async Task<IActionResult> GetPlan(string planId)
+    {
+        var response = await mediator.Send(new GetPlanQuery(planId));
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpGet("{clientId}/plans")]
+    [SwaggerOperation(Summary = "Get Client Plans")]
+    [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Read)]
+    public async Task<IActionResult> GetClientPlans(
+        [FromRoute] string clientId,
+        [FromQuery] int top = 5,
+        [FromQuery] int skip = 0
+    )
+    {
+        var response = await mediator.Send(new GetClientPlansQuery(clientId, top, skip));
+        return StatusCode((int)response.ApiState, response);
+    }
+
     [HttpPatch("{clientId}/plan")]
     [SwaggerOperation(Summary = "add single plan to client")]
     [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Create)]
@@ -127,25 +149,21 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
         return StatusCode((int)response.ApiState, response);
     }
 
-    [HttpDelete("{clientId}/plan/{planId}")]
+    [HttpDelete("plan/{planId}")]
     [SwaggerOperation(Summary = "remove plan from client")]
     [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Delete)]
-    public async Task<IActionResult> RemovePlanFromClient([FromRoute] string clientId, [FromRoute] string planId)
+    public async Task<IActionResult> RemovePlanFromClient([FromRoute] string planId)
     {
-        var response = await mediator.Send(new RemovePlanFromClientCommand(clientId, planId));
+        var response = await mediator.Send(new RemovePlanFromClientCommand(planId));
         return StatusCode((int)response.ApiState, response);
     }
 
-    [HttpPatch("{clientId}/plan/{planId}")]
+    [HttpPatch("plan/{planId}")]
     [SwaggerOperation(Summary = "Update Client's Plan")]
     [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Update)]
-    public async Task<IActionResult> UpdateClientPlan(
-        [FromRoute] string clientId,
-        [FromRoute] string planId,
-        [FromBody] PlansDto plansDto
-    )
+    public async Task<IActionResult> UpdateClientPlan([FromRoute] string planId, [FromBody] PlansDto plansDto)
     {
-        var response = await mediator.Send(new UpdateClientPlanCommand(clientId, planId, plansDto));
+        var response = await mediator.Send(new UpdateClientPlanCommand(planId, plansDto));
         return StatusCode((int)response.ApiState, response);
     }
 }

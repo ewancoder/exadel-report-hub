@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using AutoMapper;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
@@ -9,6 +10,7 @@ using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -16,9 +18,11 @@ using ZstdSharp.Unsafe;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class ClientRepository(ICollectionProvider collectionProvider, IMapper mapper)
-    : BaseRepository<Client>(collectionProvider),
-        IClientRepository
+public class ClientRepository(
+    IHttpContextAccessor httpContextAccessor,
+    ICollectionProvider collectionProvider,
+    IMapper mapper
+) : BaseRepository<Client>(collectionProvider), IClientRepository
 {
     public Task<List<Client>> GetClients(int top, int skip, CancellationToken cancellationToken = default)
     {
@@ -135,6 +139,7 @@ public class ClientRepository(ICollectionProvider collectionProvider, IMapper ma
             if (result.ModifiedCount > 0)
                 successCount++;
         }
+
         return successCount;
     }
 
@@ -144,7 +149,7 @@ public class ClientRepository(ICollectionProvider collectionProvider, IMapper ma
         CancellationToken cancellationToken = default
     )
     {
-        var client = await GetByIdAsync(ObjectId.Parse(clientId), cancellationToken);
+        var client = await GetOneAsync(x => x.Id == ObjectId.Parse(clientId) && !x.IsDeleted, cancellationToken);
         var plans = mapper.Map<Plans>(plan);
         plans.Id = ObjectId.GenerateNewId();
         int ind = 0;
@@ -155,44 +160,78 @@ public class ClientRepository(ICollectionProvider collectionProvider, IMapper ma
         }
         client.Plans.Add(plans);
         plans.Amount = ind;
-        UpdateOneAsync(client, cancellationToken);
+        client.UpdatedAt = DateTime.UtcNow;
+        client.UpdatedBy = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name).Value;
+        await UpdateOneAsync(client, cancellationToken);
         return plans;
     }
 
-    public async Task<PlansResponse> RemovePlanFromClient(
-        string clientId,
-        string planId,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<PlansResponse> RemovePlanFromClient(string planId, CancellationToken cancellationToken = default)
     {
-        var client = await GetByIdAsync(ObjectId.Parse(clientId), cancellationToken);
-        var plan = new Plans();
-        foreach (var i in client.Plans)
-        {
-            if (i.Id.ToString() == planId)
-            {
-                plan = i;
-                i.IsDeleted = true;
-                break;
-            }
-        }
+        var client = await Collection
+            .Find(x => x.Plans.Any(x => x.Id == ObjectId.Parse(planId)) && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        var plan = client.Plans.FirstOrDefault(x => x.Id == ObjectId.Parse(planId));
+        client.Plans.Remove(plan);
         await UpdateOneAsync(client, cancellationToken);
         var planResp = mapper.Map<PlansResponse>(plan);
         return planResp;
     }
 
-    public Task<PlansResponse> UpdateClientPlan(
-        string clientId,
+    public async Task<PlansResponse> UpdateClientPlan(
         string planId,
         PlansDto plansDto,
         CancellationToken cancellationToken = default
     )
     {
-        throw new NotImplementedException();
+        var client = await Collection
+            .Find(x => x.Plans.Any(p => p.Id == ObjectId.Parse(planId)) && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        var plan = client.Plans.FirstOrDefault(p => p.Id == ObjectId.Parse(planId));
+        if (plansDto.StartDate != null)
+            plan.StartDate = plansDto.StartDate;
+        if (plansDto.EndDate != null)
+            plan.EndDate = plansDto.EndDate;
+        if (plansDto.Items != null)
+        {
+            var items = plansDto.Items.Select(x => mapper.Map<Item>(x)).ToList();
+            foreach (var item in items)
+            {
+                item.Id = ObjectId.GenerateNewId();
+            }
+            plan.items = items;
+        }
+        plan.UpdatedBy = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
+        plan.UpdatedAt = DateTime.UtcNow;
+        var update = Builders<Client>.Update.Set(c => c.Plans[-1], plan);
+        var filter = Builders<Client>.Filter.And(
+            Builders<Client>.Filter.Eq(c => c.Id, client.Id),
+            Builders<Client>.Filter.ElemMatch(c => c.Plans, p => p.Id == ObjectId.Parse(planId))
+        );
+        await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        var planResponse = mapper.Map<PlansResponse>(plan);
+        return planResponse;
     }
 
-    public Task<PlansResponse> UpdateClientPlan(string clientId, string planId, PlansDto plansDto)
+    public async Task<PlansResponse> GetPlan(string planId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var client = await Collection
+            .Find(x => x.Plans.Any(x => x.Id == ObjectId.Parse(planId)) && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        var plan = client.Plans?.FirstOrDefault(x => x.Id == ObjectId.Parse(planId) && !x.IsDeleted);
+        var planResponse = mapper.Map<PlansResponse>(plan);
+        return planResponse;
+    }
+
+    public async Task<List<PlansResponse>> GetClientPlans(
+        string clientId,
+        int top,
+        int skip,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var client = await GetOneAsync(x => x.Id == ObjectId.Parse(clientId) && !x.IsDeleted, cancellationToken);
+        var plans = client.Plans.Skip(skip).Take(top).Select(x => mapper.Map<PlansResponse>(x)).ToList();
+        return plans;
     }
 }

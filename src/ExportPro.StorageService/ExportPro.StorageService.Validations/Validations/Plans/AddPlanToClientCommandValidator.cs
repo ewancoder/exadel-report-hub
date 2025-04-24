@@ -1,4 +1,4 @@
-using ExportPro.StorageService.CQRS.CommandHandlers.Plans;
+using ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Validations.Validations.Client;
 using FluentValidation;
@@ -10,7 +10,7 @@ public sealed class AddPlanToClientCommandValidator : AbstractValidator<AddPlanT
 {
     public AddPlanToClientCommandValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.clientId)
+        RuleFor(x => x.ClientId)
             .NotEmpty()
             .WithMessage("Client Id  cannot be empty.")
             .Must(id =>
@@ -20,7 +20,7 @@ public sealed class AddPlanToClientCommandValidator : AbstractValidator<AddPlanT
             .WithMessage("The Client Id is not valid in format.")
             .DependentRules(() =>
             {
-                RuleFor(x => x.clientId)
+                RuleFor(x => x.ClientId)
                     .MustAsync(
                         async (id, cancellationToken) =>
                         {
@@ -32,17 +32,17 @@ public sealed class AddPlanToClientCommandValidator : AbstractValidator<AddPlanT
             })
             .DependentRules(() =>
             {
-                RuleFor(x => x.plan.StartDate)
+                RuleFor(x => x.Plan.StartDate)
                     .NotEmpty()
                     .WithMessage("Start date cannot be empty")
                     .GreaterThanOrEqualTo(DateTime.UtcNow)
                     .WithMessage("The start date must be greater than or equal to Today");
-                RuleFor(x => x.plan.EndDate)
+                RuleFor(x => x.Plan.EndDate)
                     .NotEmpty()
                     .WithMessage("End date cannot be empty")
                     .GreaterThanOrEqualTo(DateTime.UtcNow)
                     .WithMessage("The end date must be greater than or equal to Today");
-                RuleFor(x => x.plan)
+                RuleFor(x => x.Plan)
                     .Must(x =>
                     {
                         var res = x.StartDate.CompareTo(x.EndDate);
@@ -51,7 +51,6 @@ public sealed class AddPlanToClientCommandValidator : AbstractValidator<AddPlanT
                         return true;
                     })
                     .WithMessage("The end date must be greater than start date");
-                ;
             });
     }
 }
