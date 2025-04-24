@@ -1,4 +1,4 @@
-﻿namespace ExportPro.StorageService.SDK.DTOs.CustomerDTO;
+namespace ExportPro.StorageService.SDK.Responses;
 
 public class CustomerDto
 {

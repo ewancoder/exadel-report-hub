@@ -2,6 +2,7 @@
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Profiles.CountryMaps;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
@@ -51,7 +52,7 @@ public class CreateCountryCommandHandler(
         {
             IsSuccess = true,
             ApiState = HttpStatusCode.Created,
-            Data = mapper.Map<CountryDto>(country),
+            Data = CountryMapper.ToDto(country),
         };
     }
 }

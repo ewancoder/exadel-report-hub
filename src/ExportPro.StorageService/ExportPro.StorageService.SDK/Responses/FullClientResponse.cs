@@ -12,5 +12,5 @@ public class FullClientResponse
     public bool IsDeleted { get; set; }
     public List<InvoiceResponse> invoices { get; set; }
     public List<Item> items { get; set; }
-    public List<CustomerResponse> customers { get; set; }
+    public List<CustomerDto> customers { get; set; }
 }

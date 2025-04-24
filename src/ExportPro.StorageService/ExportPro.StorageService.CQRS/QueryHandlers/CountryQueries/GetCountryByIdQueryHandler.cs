@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Profiles.CountryMaps;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 using MongoDB.Bson;
@@ -38,7 +39,7 @@ public class GetCountryByIdQueryHandler(ICountryRepository repository, IMapper m
         {
             IsSuccess = true,
             ApiState = HttpStatusCode.OK,
-            Data = mapper.Map<CountryDto>(country)
+            Data = CountryMapper.ToDto(country)
         };
     }
 }

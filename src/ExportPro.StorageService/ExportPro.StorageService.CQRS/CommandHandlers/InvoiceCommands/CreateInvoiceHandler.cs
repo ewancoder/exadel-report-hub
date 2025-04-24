@@ -1,7 +1,8 @@
 ﻿using System.Net;
-using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Profiles.InvoiceMaps;
+using ExportPro.StorageService.CQRS.Profiles.ItemMaps;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
@@ -26,7 +27,6 @@ public class CreateInvoiceCommand : ICommand<InvoiceResponse>
 }
 public class CreateInvoiceHandler(
     IInvoiceRepository repository,
-    IMapper mapper,
     ICurrencyExchangeService currencyExchangeService,
     ICurrencyRepository currencyRepository,
     ICustomerRepository customerRepository,
@@ -36,7 +36,6 @@ public class CreateInvoiceHandler(
 ) : ICommandHandler<CreateInvoiceCommand, InvoiceResponse>
 {
     private readonly IInvoiceRepository _repository = repository;
-    private readonly IMapper _mapper = mapper;
     private readonly ICurrencyExchangeService _currencyExchangeService = currencyExchangeService;
     private readonly ICurrencyRepository _currencyRepository = currencyRepository;
     private readonly ICustomerRepository _customerRepository = customerRepository;
@@ -71,7 +70,7 @@ public class CreateInvoiceHandler(
             BankAccountNumber = request.BankAccountNumber,
             ClientId = request.ClientId,
             CustomerId = request.CustomerId,
-            Items = request.Items.Select(_ => _mapper.Map<Item>(_)).ToList(),
+            Items = request.Items?.Select(ItemMapper.ToEntity).ToList(),
         };
 
         foreach (var i in invoice.Items)
@@ -154,7 +153,7 @@ public class CreateInvoiceHandler(
 
         return new BaseResponse<InvoiceResponse>
         {
-            Data = _mapper.Map<InvoiceResponse>(invoice),
+            Data = InvoiceMapper.ToDto(invoice),
             ApiState = HttpStatusCode.Created,
             IsSuccess = true,
             Messages = ["Invoice created successfully."],

@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Profiles.CustomerMaps;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
+using ExportPro.StorageService.SDK.Responses;
 using MongoDB.Bson;
 using System.Net;
 
@@ -10,11 +10,10 @@ namespace ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 
 public record GetCustomerByIdQuery(ObjectId Id) : IQuery<CustomerDto>;
 
-public class GetCustomerByIdQueryHandler(ICustomerRepository repository, IMapper mapper)
+public class GetCustomerByIdQueryHandler(ICustomerRepository repository)
     : IQueryHandler<GetCustomerByIdQuery, CustomerDto>
 {
     private readonly ICustomerRepository _repository = repository;
-    private readonly IMapper _mapper = mapper;
 
     public async Task<BaseResponse<CustomerDto>> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
     {
@@ -29,7 +28,7 @@ public class GetCustomerByIdQueryHandler(ICustomerRepository repository, IMapper
             };
         }
 
-        var dto = _mapper.Map<CustomerDto>(customer);
+        var dto = CustomerMapper.ToDto(customer);
         return new BaseResponse<CustomerDto> { Data = dto };
     }
 }

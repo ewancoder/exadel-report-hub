@@ -1,7 +1,7 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
+using ExportPro.StorageService.SDK.DTOs.CustomerDTOs;
 using ExportPro.StorageService.SDK.PaginationParams;
 using System.Net;
 

@@ -1,9 +1,8 @@
 ﻿using System.Net;
-using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Profiles.ItemMaps;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 
@@ -15,11 +14,10 @@ public class GetAllInvoicesQuery : IQuery<PaginatedListDto<InvoiceDto>>
     public int PageSize { get; set; } = 10;
     public bool IncludeDeleted { get; set; } = false;
 }
-public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper)
+public class GetAllInvoicesHandler(IInvoiceRepository repository)
     : IQueryHandler<GetAllInvoicesQuery, PaginatedListDto<InvoiceDto>>
 {
     private readonly IInvoiceRepository _repository = repository;
-    private readonly IMapper _mapper = mapper;
 
     public async Task<BaseResponse<PaginatedListDto<InvoiceDto>>> Handle(
         GetAllInvoicesQuery request,
@@ -32,7 +30,7 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Page number must be greater than zero." },
+                Messages = ["Page number must be greater than zero."],
             };
         }
 
@@ -42,7 +40,7 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Page size must be greater than zero." },
+                Messages = ["Page size must be greater than zero."],
             };
         }
 
@@ -65,7 +63,7 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper
                 PaymentStatus = invoice.PaymentStatus,
                 BankAccountNumber = invoice.BankAccountNumber,
                 ClientId = invoice.ClientId,
-                Items = invoice.Items.Select(_ => _mapper.Map<ItemDtoForClient>(_)).ToList(),
+                Items = invoice.Items?.Select(ItemMapper.ToEntityForClient).ToList(),
             })
             .ToList();
 

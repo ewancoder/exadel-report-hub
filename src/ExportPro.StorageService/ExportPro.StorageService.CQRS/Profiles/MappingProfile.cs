@@ -2,9 +2,7 @@
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
-using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.Responses;
-using Microsoft.AspNetCore.Routing.Constraints;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.Profiles;
@@ -30,9 +28,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Id, src => src.MapFrom(y => ObjectId.Parse(y.Id)));
 
         // Customer -> CustomerDto
-        CreateMap<Customer, CustomerDto>()
+        CreateMap<Customer, SDK.DTOs.CustomerDTOs.CustomerDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
-            .ForMember(dest => dest.CountryId, opt => opt.MapFrom(src => src.CountryId.ToString()));
+            .ForMember<string>(dest => dest.CountryId, opt => opt.MapFrom(src => src.CountryId.ToString()));
 
         CreateMap<Country, CountryDto>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()));
 
@@ -44,11 +42,11 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Id, src => src.MapFrom(x => ObjectId.Parse(x.Id)));
         CreateMap<Plans, PlansDto>().ReverseMap();
         CreateMap<PlansResponse, PlansDto>().ReverseMap();
-        CreateMap<Currency, CurrencyResponse>()
+        CreateMap<Currency, CurrencyDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
             .ReverseMap()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.Parse(src.Id)));
-        CreateMap<Customer, CustomerResponse>()
+        CreateMap<Customer, SDK.Responses.CustomerDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
             .ReverseMap()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.Parse(src.Id)));

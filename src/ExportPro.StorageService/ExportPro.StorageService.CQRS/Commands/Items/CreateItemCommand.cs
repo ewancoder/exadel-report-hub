@@ -1,7 +1,6 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
@@ -11,7 +10,7 @@ namespace ExportPro.StorageService.CQRS.Commands.Items;
 public record CreateItemCommand(string Name,
     string Description, 
     double Price, 
-    Status Status,
+    Status? Status,
     string CurrencyId,
     string ClientId): ICommand<string>;
 

@@ -4,7 +4,7 @@ namespace ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 public class InvoiceDto
 {
-    public string Id { get; set; }
+    public required string Id { get; set; }
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
