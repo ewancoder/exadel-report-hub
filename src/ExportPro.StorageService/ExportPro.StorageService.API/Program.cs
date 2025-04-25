@@ -4,7 +4,6 @@ using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.StorageService.CQRS;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Services;
 using ExportPro.StorageService.Validations.Validations.Client;
@@ -15,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Refit;
 using ExportPro.StorageService.API.Configurations;
+using ExportPro.AuthService.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 //builder.Host.UseSharedSerilogAndConfiguration();

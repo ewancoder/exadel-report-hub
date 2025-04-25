@@ -9,16 +9,18 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="ExportPro.Common.Shared" Version="1.0.9" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="FluentValidation" Version="12.0.0-preview1" />
     <PackageReference Include="MediatR" Version="12.5.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
     <ProjectReference Include="..\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj" />
     <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="CommandHandlers\" />
     <Folder Include="Queries\Items\" />
   </ItemGroup>
 
