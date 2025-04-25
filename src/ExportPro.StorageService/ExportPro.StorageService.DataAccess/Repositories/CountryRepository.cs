@@ -7,7 +7,7 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class CountryRepository(ICollectionProvider collectionProvider) : MongoRepositoryBase<Country>(collectionProvider), ICountryRepository
+public class CountryRepository(ICollectionProvider collectionProvider) : BaseRepository<Country>(collectionProvider), ICountryRepository
 {
     public async Task<PaginatedList<Country>> GetAllPaginatedAsync(PaginationParameters parameters, bool includeDeleted, CancellationToken cancellationToken)
     {

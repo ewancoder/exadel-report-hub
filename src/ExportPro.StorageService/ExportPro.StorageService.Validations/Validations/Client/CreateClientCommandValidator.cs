@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ExportPro.StorageService.CQRS.CommandHandlers.Client;
+using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Validations.Validations.Plans;
 using FluentValidation;
@@ -14,7 +14,7 @@ public sealed class CreateClientCommandValidator : AbstractValidator<CreateClien
 {
     public CreateClientCommandValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.Clientdto.Name)
+        RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Name must not be empty")
             .MinimumLength(3)
@@ -23,12 +23,15 @@ public sealed class CreateClientCommandValidator : AbstractValidator<CreateClien
             .WithMessage("Name must not exceed 50 characters")
             .DependentRules(() =>
             {
-                RuleFor(x => x.Clientdto.Name)
+                RuleFor(x => x.Name)
                     .MustAsync(
-                        async (Name, _) =>
+                        async (Name, cancellationtoken) =>
                         {
-                            var client = await clientRepository.ClientExists(Name);
-                            return !client;
+                            var client = await clientRepository.GetOneAsync(
+                                x => x.Name == Name && !x.IsDeleted,
+                                cancellationtoken
+                            );
+                            return client == null;
                         }
                     )
                     .WithMessage("Client with this name already exists");

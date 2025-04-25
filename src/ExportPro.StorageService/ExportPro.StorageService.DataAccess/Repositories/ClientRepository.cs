@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using AutoMapper;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
@@ -9,6 +10,7 @@ using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -16,97 +18,23 @@ using ZstdSharp.Unsafe;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
+public class ClientRepository(
+    IHttpContextAccessor httpContextAccessor,
+    ICollectionProvider collectionProvider,
+    IMapper mapper
+) : BaseRepository<Client>(collectionProvider), IClientRepository
 {
-    private readonly IMongoCollection<Client> _clients;
-    private readonly IMapper _mapper;
-
-    public ClientRepository(IMapper mapper, ICollectionProvider collectionProvider)
-        : base(collectionProvider)
+    public Task<List<Client>> GetClients(int top, int skip, CancellationToken cancellationToken = default)
     {
-        _mapper = mapper;
-        _clients = collectionProvider.GetCollection<Client>("Client");
-    }
-
-    public BaseResponse<Task<List<Client>>> GetClients(int top, int skip)
-    {
-        var clients = _clients.Find(_ => !_.IsDeleted);
+        var clients = Collection.Find(_ => !_.IsDeleted);
         string message = "Clients Retrieved";
-        var max_size = clients.CountDocuments();
-        if (max_size == 0)
-        {
-            message = $"There is no such document";
-            return new BaseResponse<Task<List<Client>>> { Messages = [message], Data = null };
-        }
-        var paginated = clients.Skip(skip).Limit(top).ToListAsync();
-        return new BaseResponse<Task<List<Client>>>
-        {
-            Messages = [message],
-            Data = paginated,
-            ApiState = HttpStatusCode.Accepted,
-            IsSuccess = true,
-        };
+        var paginated = clients.Skip(skip).Limit(top).ToListAsync(cancellationToken);
+        return paginated;
     }
 
-    public Task<Client> GetClientById(string Clientid)
+    public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)
     {
-        var client = GetOneAsync(x => x.Id == ObjectId.Parse(Clientid) && !x.IsDeleted, CancellationToken.None);
-        return client;
-    }
-
-    public async Task<ClientResponse> AddClientFromClientDto(ClientDto clientDto)
-    {
-        var client = _mapper.Map<Client>(clientDto);
-
-        foreach (var item in client.Items)
-        {
-            item.Id = ObjectId.GenerateNewId();
-        }
-
-        foreach (var i in client.Plans)
-        {
-            int ind = 0;
-            i.Id = ObjectId.GenerateNewId();
-            foreach (var j in i.items)
-            {
-                j.Id = ObjectId.GenerateNewId();
-                ind++;
-            }
-            i.Amount = ind;
-        }
-        client.CreatedAt = DateTime.UtcNow;
-        client.UpdatedAt = null;
-        await AddOneAsync(client, CancellationToken.None);
-        var clientresp = _mapper.Map<ClientResponse>(client);
-        clientresp.Items = _mapper.Map<List<ItemResponse>>(client.Items);
-        return clientresp;
-    }
-
-    public async Task<ClientResponse> UpdateClient(ClientUpdateDto client, string clientid)
-    {
-        var clientGet = await GetClientById(clientid);
-        clientGet.Name = client.Name;
-        clientGet.Description = client.Description;
-        await UpdateOneAsync(clientGet, CancellationToken.None);
-        return _mapper.Map<ClientResponse>(clientGet);
-    }
-
-    public Task SoftDeleteClient(string clientId)
-    {
-        return SoftDeleteAsync(ObjectId.Parse(clientId), CancellationToken.None);
-    }
-
-    public async Task<bool> ClientExists(string Name)
-    {
-        var client = await GetOneAsync(x => x.Name == Name && !x.IsDeleted, CancellationToken.None);
-        if (client == null)
-            return false;
-        return true;
-    }
-
-    public Task<bool> HigherThanMaxSize(int skip)
-    {
-        var max_size = _clients.Find(_ => !_.IsDeleted).CountDocuments();
+        var max_size = Collection.Find(_ => !_.IsDeleted).CountDocuments(cancellationToken);
         if (skip > max_size)
             return Task.FromResult(true);
         return Task.FromResult(false);
@@ -114,7 +42,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
     public async Task AddItem(ObjectId id, Client updatedClient, CancellationToken cancellationToken = default)
     {
-        var result = await _clients.ReplaceOneAsync(
+        var result = await Collection.ReplaceOneAsync(
             client => client.Id == id,
             updatedClient,
             cancellationToken: cancellationToken
@@ -136,7 +64,11 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
 
         var update = Builders<Client>.Update.PushEach(x => x.Items, items);
 
-        var result = await _clients.UpdateOneAsync(x => x.Id == clientId, update, cancellationToken: cancellationToken);
+        var result = await Collection.UpdateOneAsync(
+            x => x.Id == clientId,
+            update,
+            cancellationToken: cancellationToken
+        );
 
         return result.ModifiedCount > 0;
     }
@@ -149,7 +81,11 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
     {
         var update = Builders<Client>.Update.PullFilter(c => c.Items, i => i.Id == itemId);
 
-        var result = await _clients.UpdateOneAsync(c => c.Id == clientId, update, cancellationToken: cancellationToken);
+        var result = await Collection.UpdateOneAsync(
+            c => c.Id == clientId,
+            update,
+            cancellationToken: cancellationToken
+        );
 
         return result.ModifiedCount > 0;
     }
@@ -173,7 +109,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
             .Set(c => c.Items[-1].Status, updatedItem.Status)
             .Set(c => c.Items[-1].UpdatedAt, DateTime.UtcNow);
 
-        var result = await _clients.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        var result = await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount > 0;
     }
 
@@ -199,7 +135,7 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
                 .Set(c => c.Items[-1].Status, item.Status)
                 .Set(c => c.Items[-1].UpdatedAt, DateTime.UtcNow);
 
-            var result = await _clients.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+            var result = await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
             if (result.ModifiedCount > 0)
                 successCount++;
         }
@@ -213,8 +149,8 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         CancellationToken cancellationToken = default
     )
     {
-        var client = await GetClientById(clientId);
-        var plans = _mapper.Map<Plans>(plan);
+        var client = await GetOneAsync(x => x.Id == ObjectId.Parse(clientId) && !x.IsDeleted, cancellationToken);
+        var plans = mapper.Map<Plans>(plan);
         plans.Id = ObjectId.GenerateNewId();
         int ind = 0;
         foreach (var i in plans.items)
@@ -224,60 +160,83 @@ public class ClientRepository : MongoRepositoryBase<Client>, IClientRepository
         }
         client.Plans.Add(plans);
         plans.Amount = ind;
-        UpdateOneAsync(client, cancellationToken);
+        client.UpdatedAt = DateTime.UtcNow;
+        client.UpdatedBy = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name).Value;
+        await UpdateOneAsync(client, cancellationToken);
         return plans;
     }
 
-    public async Task<PlansResponse> RemovePlanFromClient(
-        string clientId,
-        string planId,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<PlansResponse> RemovePlanFromClient(string planId, CancellationToken cancellationToken = default)
     {
-        var client = await GetClientById(clientId);
-        var plan = new Plans();
-        foreach (var i in client.Plans)
-        {
-            if (i.Id.ToString() == planId)
-            {
-                plan = i;
-                i.IsDeleted = true;
-                break;
-            }
-        }
+        var client = await Collection
+            .Find(x => x.Plans.Any(x => x.Id == ObjectId.Parse(planId)) && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        var plan = client.Plans.FirstOrDefault(x => x.Id == ObjectId.Parse(planId));
+        client.Plans.Remove(plan);
         await UpdateOneAsync(client, cancellationToken);
-        var planResp = _mapper.Map<PlansResponse>(plan);
+        var planResp = mapper.Map<PlansResponse>(plan);
         return planResp;
     }
 
-    public Task<PlansResponse> UpdateClientPlan(string clientId, string planId, PlansDto plansDto)
+    public async Task<PlansResponse> UpdateClientPlan(
+        string planId,
+        PlansDto plansDto,
+        CancellationToken cancellationToken = default
+    )
     {
-        throw new NotImplementedException();
+        var objectId = ObjectId.Parse(planId);
+        var client = await Collection
+            .Find(x => x.Plans.Any(p => p.Id == objectId) && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken);
+        var plan = client.Plans.FirstOrDefault(p => p.Id == objectId);
+        if (plan == null)
+            return null;
+        if (plansDto.StartDate != null)
+            plan.StartDate = plansDto.StartDate;
+        if (plansDto.EndDate != null)
+            plan.EndDate = plansDto.EndDate;
+        if (plansDto.Items != null)
+        {
+            var items = plansDto.Items.Select(x => mapper.Map<Item>(x)).ToList();
+            foreach (var item in items)
+            {
+                item.Id = ObjectId.GenerateNewId();
+            }
+            plan.items = items;
+        }
+        plan.UpdatedBy = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
+        plan.UpdatedAt = DateTime.UtcNow;
+        var filter = Builders<Client>.Filter.And(
+            Builders<Client>.Filter.Eq(c => c.Id, client.Id),
+            Builders<Client>.Filter.ElemMatch(c => c.Plans, p => p.Id == objectId)
+        );
+        var update = Builders<Client>.Update.Set("Plans.$", plan);
+        await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        var planResponse = mapper.Map<PlansResponse>(plan);
+        return planResponse;
     }
 
-    //public async Task<PlansResponse> UpdateClientPlan(string clientId, string planId, PlansDto plansDto)
-    //{
-    //    var client = await GetClientById(clientId);
-    //    Plans plans = new();
-    //    foreach (var i in client.Plans)
-    //    {
-    //        if (i.Id.ToString() == planId)
-    //        {
-    //            plans = i;
-    //        }
-    //    }
-    //    plans.StartDate = plansDto.StartDate;
-    //    plans.EndDate = plansDto.EndDate;
-    //    for (int i = 0; i < plansDto.Items.Count; ++i)
-    //    {
-    //        plans.items[i].Name = plansDto.Items[i].Name;
-    //        plans.items[i].Description = plansDto.Items[i].Description;
-    //        plans.items[i].Price = plansDto.Items[i].Price;
-    //        plans.items[i].Currency = plansDto.Items[i].Currency;
-    //        plans.items[i].Status = plansDto.Items[i].Status;
-    //    }
-    //    await UpdateOneAsync(client, CancellationToken.None);
-    //    var planResp = _mapper.Map<PlansResponse>(plans);
-    //    return planResp;
-    //}
+    public async Task<PlansResponse> GetPlan(string planId, CancellationToken cancellationToken = default)
+    {
+        var client = await Collection
+            .Find(x => x.Plans.Any(x => x.Id == ObjectId.Parse(planId)) && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        if(client == null) 
+            return null;
+        var plan = client.Plans?.FirstOrDefault(x => x.Id == ObjectId.Parse(planId) && !x.IsDeleted);
+        var planResponse = mapper.Map<PlansResponse>(plan);
+        return planResponse;
+    }
+
+    public async Task<List<PlansResponse>> GetClientPlans(
+        string clientId,
+        int top,
+        int skip,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var client = await GetOneAsync(x => x.Id == ObjectId.Parse(clientId) && !x.IsDeleted, cancellationToken);
+        var plans = client.Plans.Skip(skip).Take(top).Select(x => mapper.Map<PlansResponse>(x)).ToList();
+        return plans;
+    }
 }

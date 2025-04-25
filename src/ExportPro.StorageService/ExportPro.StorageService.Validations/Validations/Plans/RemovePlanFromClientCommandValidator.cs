@@ -1,4 +1,5 @@
-using ExportPro.StorageService.CQRS.Handlers.Plans;
+using ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
+using ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Validations.Validations.Client;
 using FluentValidation;
@@ -10,39 +11,24 @@ public sealed class RemovePlanFromClientCommandValidator : AbstractValidator<Rem
 {
     public RemovePlanFromClientCommandValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.clientId)
+        RuleFor(x => x.PlanId)
             .NotEmpty()
-            .WithMessage("Client Id  cannot be empty.")
+            .WithMessage("Plan  Id  cannot be empty.")
             .Must(id =>
             {
                 return ObjectId.TryParse(id, out _);
             })
-            .WithMessage("The Client Id is not valid in format.")
+            .WithMessage("The Plan Id is not valid in format.")
             .DependentRules(() =>
             {
-                RuleFor(x => x.clientId)
-                    .MustAsync(
-                        async (id, _) =>
-                        {
-                            var client = await clientRepository.GetClientById(id);
-                            return client != null;
-                        }
-                    )
-                    .WithMessage("The Client Id does not exist");
-            })
-            .DependentRules(
-                () =>
-                    RuleFor(x => x)
-                        .MustAsync(
-                            async (plan, _) =>
-                            {
-                                var client = await clientRepository.GetClientById(plan.clientId);
-                                if (client.Plans.Any(x => x.Id.ToString() == plan.planId && !x.IsDeleted))
-                                    return true;
-                                return false;
-                            }
-                        )
-                        .WithMessage("The Plan id does not exist in the client")
-            );
+                RuleFor(x => x.PlanId).MustAsync(
+                async (plan, cancellationToken) =>
+                {
+                    var plansResponse = await clientRepository.GetPlan(plan, cancellationToken);
+                    return plansResponse != null;
+                }
+            )
+            .WithMessage("The Plan id does not exist in the client");
+            });
     }
 }

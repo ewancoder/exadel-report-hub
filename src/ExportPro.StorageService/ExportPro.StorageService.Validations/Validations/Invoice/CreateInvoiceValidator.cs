@@ -38,9 +38,12 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
                 () =>
                     RuleFor(x => x.CustomerId)
                         .MustAsync(
-                            async (customer, _) =>
+                            async (customer, cancellationToken) =>
                             {
-                                var client = await customerRepository.GetByIdAsync(ObjectId.Parse(customer), _);
+                                var client = await customerRepository.GetByIdAsync(
+                                    ObjectId.Parse(customer),
+                                    cancellationToken
+                                );
                                 return client != null;
                             }
                         )
@@ -58,9 +61,9 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
             {
                 RuleFor(x => x.ClientId)
                     .MustAsync(
-                        async (id, _) =>
+                        async (id, cancellationToken) =>
                         {
-                            var client = await clientRepository.GetClientById(id);
+                            var client = await clientRepository.GetByIdAsync(ObjectId.Parse(id), cancellationToken);
                             return client != null;
                         }
                     )
@@ -78,9 +81,12 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
                 () =>
                     RuleFor(x => x.CurrencyId)
                         .MustAsync(
-                            async (currency, _) =>
+                            async (currency, cancellationToken) =>
                             {
-                                var client = await currencyRepository.GetByIdAsync(ObjectId.Parse(currency), _);
+                                var client = await currencyRepository.GetByIdAsync(
+                                    ObjectId.Parse(currency),
+                                    cancellationToken
+                                );
                                 return client != null;
                             }
                         )

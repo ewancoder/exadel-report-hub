@@ -4,7 +4,6 @@ namespace ExportPro.StorageService.SDK.Services;
 
 public interface ICurrencyExchangeService
 {
-    Task<double> ExchangeRate(CurrenyExchangeModel currenyExchangeModel);
-    Task<double> ConvertCurrency(CurrenyExchangeModel currenyExchangeModel);
-    Task<bool> DataExists(string from,string date);
+    Task<double> ExchangeRate(CurrencyExchangeModel currenyExchangeModel,CancellationToken cancellationToken=default);
+    Task<bool> DateExists(string from,string date);
 }

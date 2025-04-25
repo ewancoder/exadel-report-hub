@@ -1,30 +1,18 @@
-﻿using System.Xml;
+﻿using System.Security.Cryptography;
+using System.Xml;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
+using FluentValidation;
 
 namespace ExportPro.StorageService.SDK.Services;
 
 public class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeService
 {
-    private readonly IECBApi _ecbApi = ecbApi;
-
-    public async Task<double> ConvertCurrency(CurrenyExchangeModel currenyExchangeModel)
+    public async Task<double> ExchangeRate(CurrencyExchangeModel currenyExchangeModel, CancellationToken cancellationToken = default)
     {
-        if (currenyExchangeModel.AmountFrom == 0)
-        {
-            return 0;
-        }
-        var exchangeRate = await ExchangeRate(currenyExchangeModel);
-        if (exchangeRate <= 0)
-        {
-            return 0;
-        }
-        var amountTo = currenyExchangeModel.AmountFrom * exchangeRate;
-        return amountTo ?? 0;
-    }
-
-    public async Task<double> ExchangeRate(CurrenyExchangeModel currenyExchangeModel)
-    {
+        //getting the day of the date 
+        //because if it is saturday or sunday then we need to
+        //go back to the last working day because the api is resting on that day
         var day = currenyExchangeModel.Date.ToString("dddd");
         if (day == "Saturday")
         {
@@ -35,14 +23,17 @@ public class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeService
             currenyExchangeModel.Date = currenyExchangeModel.Date.AddDays(-2);
         }
         var dateCorrectFormat = currenyExchangeModel.Date.ToString("yyyy-MM-dd");
-        var data_exists = await DataExists("USD",dateCorrectFormat);
+        //need to confirm that the date is not a holiday
+        var data_exists = await DateExists("USD",dateCorrectFormat);
         int sub = -1;
         int ind = 7;
+        // if it a holiday then we need to go back to the last working day
         while (!data_exists && ind > 0)
         {
             currenyExchangeModel.Date = currenyExchangeModel.Date.AddDays(sub);
             dateCorrectFormat = currenyExchangeModel.Date.ToString("yyyy-MM-dd");
-            data_exists = await DataExists("USD", dateCorrectFormat);
+            //checking if the date is a holiday or not
+            data_exists = await DateExists("USD", dateCorrectFormat);
             if (data_exists)
             {
                 break;
@@ -50,20 +41,23 @@ public class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeService
             ind--;
             sub--;
         }
-        var xmlDocument = await _ecbApi.GetXmlDocument(
+        //getting the xml document 
+        var xmlDocument = await ecbApi.GetXmlDocument(
             currenyExchangeModel.From,
             dateCorrectFormat
         );
         var namespaceManager = new XmlNamespaceManager(xmlDocument.NameTable);
         namespaceManager.AddNamespace("generic", "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic");
+        //getting the exchange rate 
         var value = xmlDocument.SelectSingleNode("//generic:ObsValue", namespaceManager);
         var currencyValue = value.Attributes?["value"]?.Value;
         return currencyValue != null ? Convert.ToDouble(currencyValue) : 0;
     }
-
-    public async Task<bool> DataExists(string from, string date)
+    
+    //checks if the date is holiday
+    public async Task<bool> DateExists(string from, string date)
     {
-        var response = await _ecbApi.DataExists(from, date);
+        var response = await ecbApi.DataExists(from, date);
         string content = await response.Content.ReadAsStringAsync();
 
         if (string.IsNullOrWhiteSpace(content))
@@ -72,4 +66,5 @@ public class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeService
         }
         return true;
     }
+
 }
