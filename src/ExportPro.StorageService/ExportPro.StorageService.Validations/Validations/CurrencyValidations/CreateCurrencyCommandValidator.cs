@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.Validations.Validations.CurrencyValidations;
 
-public class CreateCurrencyValidator : AbstractValidator<Currency>
+public class CreateCurrencyCommandValidator : AbstractValidator<Currency>
 {
-    public CreateCurrencyValidator()
+    public CreateCurrencyCommandValidator()
     {
         RuleFor(x => x.CurrencyCode)
             .NotEmpty().WithMessage("Currency code is required.")

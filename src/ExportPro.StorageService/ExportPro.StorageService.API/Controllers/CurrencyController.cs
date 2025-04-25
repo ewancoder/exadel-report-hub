@@ -20,10 +20,7 @@ public class CurrencyController(IMediator mediator) : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateCurrencyCommand command, CancellationToken cancellationToken)
     {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return BadRequest("Invalid currency ID format.");
-
-        command.Id = objectId;
+        command.Id = ObjectId.Parse(id); // No need for try/catch as FluentValidation will handle it
         var response = await mediator.Send(command, cancellationToken);
         return Ok(response);
     }
@@ -31,20 +28,16 @@ public class CurrencyController(IMediator mediator) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
     {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return BadRequest("Invalid currency ID format.");
-
-        var response = await mediator.Send(new DeleteCurrencyCommand(objectId), cancellationToken);
+        var command = new DeleteCurrencyCommand(ObjectId.Parse(id));
+        var response = await mediator.Send(command, cancellationToken);
         return Ok(response);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
     {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return BadRequest("Invalid currency ID format.");
-
-        var response = await mediator.Send(new GetCurrencyByIdQuery(objectId), cancellationToken);
+        var query = new GetCurrencyByIdQuery(ObjectId.Parse(id));
+        var response = await mediator.Send(query, cancellationToken);
         return Ok(response);
     }
 

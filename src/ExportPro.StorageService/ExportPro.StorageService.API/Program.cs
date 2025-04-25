@@ -1,7 +1,6 @@
 using System.Text;
 using ExportPro.Common.DataAccess.MongoDB.Configurations;
 using ExportPro.Common.Shared.Behaviors;
-using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
@@ -65,7 +64,7 @@ builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<
 builder.Services.AddAutoMapper(typeof(ExportPro.StorageService.CQRS.Profiles.MappingProfile));
 builder.Services.AddCommonRegistrations();
 builder.Services.AddRepositoryConfig();
-builder.Services.AddScoped<ICurrencyExchangeService,CurrencyExchangeService>();
+builder.Services.AddScoped<ICurrencyExchangeService, CurrencyExchangeService>();
 builder.Services.AddCQRS();
 var app = builder.Build();
 app.UseSwagger();
