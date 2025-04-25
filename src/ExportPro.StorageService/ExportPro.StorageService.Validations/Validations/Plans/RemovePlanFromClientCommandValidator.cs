@@ -19,7 +19,9 @@ public sealed class RemovePlanFromClientCommandValidator : AbstractValidator<Rem
                 return ObjectId.TryParse(id, out _);
             })
             .WithMessage("The Plan Id is not valid in format.")
-            .MustAsync(
+            .DependentRules(() =>
+            {
+                RuleFor(x => x.PlanId).MustAsync(
                 async (plan, cancellationToken) =>
                 {
                     var plansResponse = await clientRepository.GetPlan(plan, cancellationToken);
@@ -27,5 +29,6 @@ public sealed class RemovePlanFromClientCommandValidator : AbstractValidator<Rem
                 }
             )
             .WithMessage("The Plan id does not exist in the client");
+            });
     }
 }

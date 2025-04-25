@@ -17,9 +17,9 @@ public class GetClientsQueryValidator : AbstractValidator<GetClientsQuery>
             {
                 RuleFor(x => x.Skip)
                     .MustAsync(
-                        async (skip, _) =>
+                        async (skip, cancellationToken) =>
                         {
-                            var res = await clientRepository.HigherThanMaxSize(skip);
+                            var res = await clientRepository.HigherThanMaxSize(skip, cancellationToken);
                             return !res;
                         }
                     )

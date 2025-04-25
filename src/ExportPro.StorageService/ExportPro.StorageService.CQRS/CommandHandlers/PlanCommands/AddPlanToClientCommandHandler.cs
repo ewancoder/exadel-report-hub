@@ -14,7 +14,6 @@ namespace ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 public record AddPlanToClientCommand(string ClientId, PlansDto Plan) : ICommand<PlansResponse>;
 
 public class AddPlanToClientCommandHandler(
-    IHttpContextAccessor httpContextAccessor,
     IClientRepository clientRepository,
     IMapper mapper
 ) : ICommandHandler<AddPlanToClientCommand, PlansResponse>

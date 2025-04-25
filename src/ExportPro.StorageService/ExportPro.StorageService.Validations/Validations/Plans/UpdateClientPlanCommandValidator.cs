@@ -10,17 +10,25 @@ public class UpdateClientPlanCommandValidator : AbstractValidator<UpdateClientPl
 {
     public UpdateClientPlanCommandValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x)
-            .MustAsync(
-                async (plan, cancellationToken) =>
-                {
-                    var client = await clientRepository.GetByIdAsync(ObjectId.Parse(plan.PlanId), cancellationToken);
-                    if (client.Plans.Any(x => x.Id.ToString() == plan.PlanId && !x.IsDeleted))
-                        return true;
-                    return false;
-                }
-            )
-            .WithMessage("The Plan id does not exist in the client")
+        RuleFor(x => x.PlanId)
+           .NotEmpty()
+           .WithMessage("Plan  Id  cannot be empty.")
+           .Must(id =>
+           {
+               return ObjectId.TryParse(id, out _);
+           })
+           .WithMessage("The Plan Id is not valid in format.")
+           .DependentRules(() =>
+           {
+               RuleFor(x => x.PlanId).MustAsync(
+               async (plan, cancellationToken) =>
+               {
+                   var plansResponse = await clientRepository.GetPlan(plan, cancellationToken);
+                   return plansResponse != null;
+               }
+           )
+           .WithMessage("The Plan id does not exist in the client");
+           })   
             .DependentRules(() =>
             {
                 RuleFor(x => x.PlansDto.StartDate)

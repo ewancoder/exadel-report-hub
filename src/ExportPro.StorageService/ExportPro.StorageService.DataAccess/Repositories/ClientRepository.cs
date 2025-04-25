@@ -34,7 +34,7 @@ public class ClientRepository(
 
     public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)
     {
-        var max_size = Collection.Find(_ => !_.IsDeleted).CountDocuments();
+        var max_size = Collection.Find(_ => !_.IsDeleted).CountDocuments(cancellationToken);
         if (skip > max_size)
             return Task.FromResult(true);
         return Task.FromResult(false);
@@ -184,10 +184,13 @@ public class ClientRepository(
         CancellationToken cancellationToken = default
     )
     {
+        var objectId = ObjectId.Parse(planId);
         var client = await Collection
-            .Find(x => x.Plans.Any(p => p.Id == ObjectId.Parse(planId)) && !x.IsDeleted)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        var plan = client.Plans.FirstOrDefault(p => p.Id == ObjectId.Parse(planId));
+            .Find(x => x.Plans.Any(p => p.Id == objectId) && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken);
+        var plan = client.Plans.FirstOrDefault(p => p.Id == objectId);
+        if (plan == null)
+            return null;
         if (plansDto.StartDate != null)
             plan.StartDate = plansDto.StartDate;
         if (plansDto.EndDate != null)
@@ -203,11 +206,11 @@ public class ClientRepository(
         }
         plan.UpdatedBy = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
         plan.UpdatedAt = DateTime.UtcNow;
-        var update = Builders<Client>.Update.Set(c => c.Plans[-1], plan);
         var filter = Builders<Client>.Filter.And(
             Builders<Client>.Filter.Eq(c => c.Id, client.Id),
-            Builders<Client>.Filter.ElemMatch(c => c.Plans, p => p.Id == ObjectId.Parse(planId))
+            Builders<Client>.Filter.ElemMatch(c => c.Plans, p => p.Id == objectId)
         );
+        var update = Builders<Client>.Update.Set("Plans.$", plan);
         await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         var planResponse = mapper.Map<PlansResponse>(plan);
         return planResponse;
@@ -218,6 +221,8 @@ public class ClientRepository(
         var client = await Collection
             .Find(x => x.Plans.Any(x => x.Id == ObjectId.Parse(planId)) && !x.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        if(client == null) 
+            return null;
         var plan = client.Plans?.FirstOrDefault(x => x.Id == ObjectId.Parse(planId) && !x.IsDeleted);
         var planResponse = mapper.Map<PlansResponse>(plan);
         return planResponse;

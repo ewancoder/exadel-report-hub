@@ -24,7 +24,7 @@ public sealed class AddPlanToClientCommandValidator : AbstractValidator<AddPlanT
                     .MustAsync(
                         async (id, cancellationToken) =>
                         {
-                            var client = await clientRepository.GetByIdAsync(ObjectId.Parse(id), cancellationToken);
+                            var client = await clientRepository.GetOneAsync(x=>x.Id  == ObjectId.Parse(id) && !x.IsDeleted, cancellationToken);
                             return client != null;
                         }
                     )
