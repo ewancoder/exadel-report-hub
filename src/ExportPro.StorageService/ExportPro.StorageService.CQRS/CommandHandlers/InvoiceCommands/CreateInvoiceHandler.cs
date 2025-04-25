@@ -1,5 +1,4 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -31,35 +30,15 @@ public class CreateInvoiceHandler(
     ICurrencyRepository currencyRepository,
     ICustomerRepository customerRepository,
     ICountryRepository countryRepository,
-    IValidator<CurrenyExchangeModel> validator,
-    IValidator<CreateInvoiceCommand> validatorInvoice
+    //i need to use this manually because it is not validating automatically
+    IValidator<CurrencyExchangeModel> validator
 ) : ICommandHandler<CreateInvoiceCommand, InvoiceResponse>
 {
-    private readonly IInvoiceRepository _repository = repository;
-    private readonly IMapper _mapper = mapper;
-    private readonly ICurrencyExchangeService _currencyExchangeService = currencyExchangeService;
-    private readonly ICurrencyRepository _currencyRepository = currencyRepository;
-    private readonly ICustomerRepository _customerRepository = customerRepository;
-    private readonly ICountryRepository _countryRepository = countryRepository;
-    private readonly IValidator<CurrenyExchangeModel> _validator = validator;
-    private readonly IValidator<CreateInvoiceCommand> _validatorInvoice = validatorInvoice;
     public async Task<BaseResponse<InvoiceResponse>> Handle(
         CreateInvoiceCommand request,
         CancellationToken cancellationToken
     )
     {
-        var validateInvoice = await _validatorInvoice.ValidateAsync(request);
-
-        if (!validateInvoice.IsValid)
-        {
-            return new BaseResponse<InvoiceResponse>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.BadRequest,
-                Messages = validateInvoice.Errors.Select(x => x.ErrorMessage).ToList(),
-            };
-        }
-
         var invoice = new Invoice
         {
             Id = ObjectId.GenerateNewId(),
@@ -71,93 +50,68 @@ public class CreateInvoiceHandler(
             BankAccountNumber = request.BankAccountNumber,
             ClientId = request.ClientId,
             CustomerId = request.CustomerId,
-            Items = request.Items.Select(_ => _mapper.Map<Item>(_)).ToList(),
+            Items = request.Items.Select(_ => mapper.Map<Item>(_)).ToList(),
         };
-
         foreach (var i in invoice.Items)
         {
             i.Id = ObjectId.GenerateNewId();
         }
-        var customer = await _customerRepository.GetOneAsync(
-            x => x.Id.ToString() == invoice.CustomerId,
-            CancellationToken.None
+        //getting the customer 
+        var customer = await customerRepository.GetOneAsync(
+            x => x.Id.ToString() == invoice.CustomerId && !x.IsDeleted,
+            cancellationToken
         );
-        var country = await _countryRepository.GetOneAsync(
-            x => x.Id.ToString() == customer.CountryId,
-            CancellationToken.None
+        //getting the country so that i can get costomer's currency
+        var country = await countryRepository.GetOneAsync(
+            x => x.Id.ToString() == customer.CountryId && !x.IsDeleted,
+            cancellationToken
         );
-
-        var customer_currency = await _currencyRepository.GetCurrencyCodeById(country.CurrencyId);
-        CurrenyExchangeModel cur = new()
+        //getting the currency of the customer
+        var customer_currency = await currencyRepository.GetCurrencyCodeById(country.CurrencyId);
+        CurrencyExchangeModel currencyExchangeModel = new()
         {
-            From = customer_currency.CurrencyCode,
-            Date = new DateTime(2024, 4, 17)
+            Date = invoice.IssueDate,
+            From = customer_currency.CurrencyCode
         };
-
-        var to_euro_echange_rate = 1.0;
-        var validat = _validator.ValidateAsync(cur);
-        if (!validat.Result.IsValid)
-        {
-            return new BaseResponse<InvoiceResponse>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.BadRequest,
-                Messages = validat.Result.Errors.Select(x => x.ErrorMessage).ToList(),
-            };
-        }
+        //converting the customer's currency to euro becuase the api converts the currency to EUR only
+        //if it is already EUR than there is no need to convert it 
+        var customerCurrencyExchangeRateToEuro = 1.0;
         if (customer_currency.CurrencyCode != "EUR")
         {
-            var exchangeRate = await _currencyExchangeService.ExchangeRate(cur);
-            to_euro_echange_rate = exchangeRate;
+            //manually validating because it is not validating automatically and catching it in the middlewere.
+            await validator.ValidateAndThrowAsync(currencyExchangeModel, cancellationToken);
+            customerCurrencyExchangeRateToEuro = await currencyExchangeService.ExchangeRate(currencyExchangeModel);
         }
         invoice.Amount = 0;
+        //going to convert items currency to customer's currency 
+        //first converting to euro
         foreach (var i in invoice.Items)
         {
-            var currency = await _currencyRepository.GetCurrencyCodeById(i.CurrencyId);
+            var currency = await currencyRepository.GetCurrencyCodeById(i.CurrencyId);
             if (currency == null)
             {
-                return new BaseResponse<InvoiceResponse>
+                return new BadRequestResponse<InvoiceResponse>
                 {
-                    ApiState = HttpStatusCode.BadRequest,
-                    IsSuccess = false,
                     Messages = ["Currency not found."]
                 };
             }
+            //item's currencycode
             string currencyCode = currency.CurrencyCode;
-            CurrenyExchangeModel currencyExchangeModel = new()
-            {
-                From = currencyCode,
-                Date = invoice.IssueDate,
-            };
-            var validateCurrency = await _validator.ValidateAsync(currencyExchangeModel);
-            if (!validateCurrency.IsValid)
-            {
-                return new BaseResponse<InvoiceResponse>
-                {
-                    IsSuccess = false,
-                    ApiState = HttpStatusCode.BadRequest,
-                    Messages = validateCurrency.Errors.Select(x => x.ErrorMessage).ToList(),
-                };
-            }
-            var exchangeRate = 1.0;
+            //converting item currency to EUR 
+            var itemExchangeRateToEuro = 1.0;
             if (currencyCode != "EUR")
             {
-
-                exchangeRate = await _currencyExchangeService.ExchangeRate(currencyExchangeModel);
+                currencyExchangeModel.From = currencyCode;
+                await validator.ValidateAndThrowAsync(currencyExchangeModel, cancellationToken);
+                //getting the exchange rate of item's currency code and EUR
+                itemExchangeRateToEuro = await currencyExchangeService.ExchangeRate(currencyExchangeModel, cancellationToken);
             }
-
-            var exc = to_euro_echange_rate / exchangeRate;
-            i.Price = i.Price * exc;
-            invoice.Amount += i.Price;
+            //converting and getting the amount 
+            var amount = (i.Price * customerCurrencyExchangeRateToEuro) / itemExchangeRateToEuro;
+            invoice.Amount += amount;
         }
-        await _repository.AddOneAsync(invoice, cancellationToken);
-
-        return new BaseResponse<InvoiceResponse>
-        {
-            Data = _mapper.Map<InvoiceResponse>(invoice),
-            ApiState = HttpStatusCode.Created,
-            IsSuccess = true,
-            Messages = ["Invoice created successfully."],
-        };
+        await repository.AddOneAsync(invoice, cancellationToken);
+        var invoiceResponse = mapper.Map<InvoiceResponse>(invoice);
+        return new SuccessResponse<InvoiceResponse>(invoiceResponse, "Invoice created successfully.");
     }
 }

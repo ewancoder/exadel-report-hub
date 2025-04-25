@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.Validations.Validations.CurrencyConversion;
 
-public sealed class CurrencyExchangeServiceValidator : AbstractValidator<CurrenyExchangeModel>
+public sealed class CurrencyExchangeServiceValidator : AbstractValidator<CurrencyExchangeModel>
 {
     public CurrencyExchangeServiceValidator(ICurrencyExchangeService currencyExchangeService)
     {
@@ -12,7 +12,7 @@ public sealed class CurrencyExchangeServiceValidator : AbstractValidator<Curreny
             .MustAsync(async (from, _) =>
             {
 
-                var currenyExchangeModel = new CurrenyExchangeModel
+                var currenyExchangeModel = new CurrencyExchangeModel
                 {
                     From = from,
                     Date = new DateTime(2024, 04, 17)
@@ -21,7 +21,7 @@ public sealed class CurrencyExchangeServiceValidator : AbstractValidator<Curreny
                 {
                     var res = await currencyExchangeService.ExchangeRate(currenyExchangeModel);
                 }
-                catch (Exception ex)
+                catch 
                 {
                     return false;
                 }
@@ -29,4 +29,4 @@ public sealed class CurrencyExchangeServiceValidator : AbstractValidator<Curreny
             }).WithMessage(x => $"Currency [{x.From}] is not supported by the  European Central Bank for conversion.");
 
     }
-}
+}   
