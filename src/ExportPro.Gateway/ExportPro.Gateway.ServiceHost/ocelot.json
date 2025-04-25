@@ -6,12 +6,12 @@
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
-                    "Host": "invoiceexportservice",
+                    "Host": "exportservice",
                     "Port": 8080
                 }
             ],
-            "DownstreamPathTemplate": "/api/currency",
-            "SwaggerKey": "invoiceexportservice"
+            "DownstreamPathTemplate": "/api/InvoiceExport/{id}/pdf",
+            "SwaggerKey": "exportservice"
         },
         {
             "UpstreamPathTemplate": "/api/currency",
@@ -330,12 +330,12 @@
             ]
         },
         {
-            "Key": "InvoiceExportService",
+            "Key": "exportservice",
             "Config": [
                 {
                     "Name": "Invoice Export Service",
                     "Version": "v1",
-                    "Url": "http://invoiceexportservice:8080/swagger/v1/swagger.json"
+                    "Url": "http://exportservice:8080/swagger/v1/swagger.json"
                 }
             ]
         }

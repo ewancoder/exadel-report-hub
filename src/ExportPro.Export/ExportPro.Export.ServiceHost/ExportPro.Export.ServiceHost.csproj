@@ -7,13 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
 	</ItemGroup>
-
 	<ItemGroup>
-		<ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.DataAccess.MongoDB\ExportPro.Common.DataAccess.MongoDB.csproj" />
 		<ProjectReference Include="..\ExportPro.Export.CQRS\ExportPro.Export.CQRS.csproj" />
 	</ItemGroup>
 

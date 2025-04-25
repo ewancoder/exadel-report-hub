@@ -4,7 +4,7 @@ using ExportPro.Export.ServiceHost.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSharedSerilogAndConfiguration();
+//builder.Host.UseSharedSerilogAndConfiguration();
 builder.Services.AddControllers();
 builder.Services.AddExportModule(builder.Configuration);
 

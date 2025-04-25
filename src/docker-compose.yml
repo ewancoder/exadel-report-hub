@@ -46,3 +46,19 @@ services:
       - "1500:8080"
     depends_on:
       - authservice
+  exportservice:
+    container_name: exportservice
+    # image: giorgaaa/exportpro.export
+    build:
+      context: .
+      dockerfile: ExportPro.Export/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=mongodb://ExportProDb:27017
+      - StorageUrl=http://storageservice:8080
+    ports:
+      - "2000:8080"
+    depends_on:
+      - authservice
+      - storageservice
+      - mongodb

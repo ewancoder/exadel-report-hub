@@ -44,7 +44,7 @@ public static class ExportServiceCollectionExtensions
         services.AddTransient<ForwardAuthHeaderHandler>();
 
         // ---------- Refit client to Storage-service ---
-        var baseUrl = cfg.GetValue<string>("StorageService:BaseUrl")
+        var baseUrl = Environment.GetEnvironmentVariable("StorageUrl")
                    ?? "http://localhost:5011";
 
         services.AddRefitClient<IStorageServiceApi>()
