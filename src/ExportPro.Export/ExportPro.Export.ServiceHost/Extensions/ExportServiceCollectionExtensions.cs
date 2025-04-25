@@ -1,4 +1,5 @@
-﻿using ExportPro.Common.DataAccess.MongoDB.Configurations;
+﻿using System.Text;
+using ExportPro.Common.DataAccess.MongoDB.Configurations;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
@@ -9,6 +10,9 @@ using ExportPro.Export.Pdf.Services;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.ServiceHost.Infrastructure;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using QuestPDF.Infrastructure;
 using Refit;
 
@@ -22,8 +26,29 @@ public static class ExportServiceCollectionExtensions
         services.AddCommonRegistrations();
         services.AddOpenApi();
         services.AddSwaggerServices("ExportPro Export Service");
+        var jwtSettings = cfg.GetSection("JwtSettings").Get<JwtSettings>();
+        services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+.AddJwtBearer(options =>
+{
+    options.Authority = "https://localhost:7067/"; // if using identity server or Auth0
+    options.RequireHttpsMetadata = false; // optional for local dev
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings?.Issuer,
+        ValidAudience = jwtSettings?.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Secret))
+    };
+});
 
         // ---------- Mongo  ----------
+
         services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
         services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 

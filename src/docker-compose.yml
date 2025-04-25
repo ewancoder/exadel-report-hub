@@ -62,3 +62,12 @@ services:
       - authservice
       - storageservice
       - mongodb
+      - exportproseq
+  exportproseq:
+    image: datalust/seq:latest
+    container_name: exportproseq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 8081:80

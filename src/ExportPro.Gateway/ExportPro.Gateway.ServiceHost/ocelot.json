@@ -14,6 +14,19 @@
             "SwaggerKey": "exportservice"
         },
         {
+            "UpstreamPathTemplate": "/api/Log/today-log",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "exportservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Log/today-log",
+            "SwaggerKey": "exportservice"
+        },
+        {
             "UpstreamPathTemplate": "/api/currency",
             "UpstreamHttpMethod": [ "Get", "Post" ],
             "DownstreamScheme": "http",
