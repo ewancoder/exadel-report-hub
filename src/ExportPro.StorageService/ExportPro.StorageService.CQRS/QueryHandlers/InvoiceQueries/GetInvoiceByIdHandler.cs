@@ -52,6 +52,7 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper
             BankAccountNumber = invoice.BankAccountNumber,
             ClientId = invoice.ClientId,
             Items = invoice.Items.Select(x => _mapper.Map<ItemDtoForClient>(x)).ToList(),
+            Amount = Convert.ToDecimal(invoice.Amount ?? 0),
         };
 
         return new BaseResponse<InvoiceDto>

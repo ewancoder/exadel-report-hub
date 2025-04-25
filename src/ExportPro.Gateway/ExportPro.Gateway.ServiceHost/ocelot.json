@@ -1,6 +1,19 @@
 {
     "Routes": [
         {
+            "UpstreamPathTemplate": "/api/InvoiceExport/{id}/pdf",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "invoiceexportservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/currency",
+            "SwaggerKey": "invoiceexportservice"
+        },
+        {
             "UpstreamPathTemplate": "/api/currency",
             "UpstreamHttpMethod": [ "Get", "Post" ],
             "DownstreamScheme": "http",
@@ -252,45 +265,45 @@
             "SwaggerKey": "AuthService"
         },
 
-            {
-                "UpstreamPathTemplate": "/api/Auth/login",
-                "UpstreamHttpMethod": [ "Post" ],
-                "DownstreamScheme": "http",
-                "DownstreamHostAndPorts": [
-                    {
-                        "Host": "authservice",
-                        "Port": 8080
-                    }
-                ],
-                "DownstreamPathTemplate": "/api/Auth/login",
-                "SwaggerKey": "AuthService"
-            },
-            {
-                "UpstreamPathTemplate": "/api/Auth/refresh-token",
-                "UpstreamHttpMethod": [ "Post" ],
-                "DownstreamScheme": "http",
-                "DownstreamHostAndPorts": [
-                    {
-                        "Host": "authservice",
-                        "Port": 8080
-                    }
-                ],
-                "DownstreamPathTemplate": "/api/Auth/refresh-token",
-                "SwaggerKey": "AuthService"
-            },
-            {
-                "UpstreamPathTemplate": "/api/Auth/logout",
-                "UpstreamHttpMethod": [ "Post" ],
-                "DownstreamScheme": "http",
-                "DownstreamHostAndPorts": [
-                    {
-                        "Host": "authservice",
-                        "Port": 8080
-                    }
-                ],
-                "DownstreamPathTemplate": "/api/Auth/logout",
-                "SwaggerKey": "AuthService"
-            }
+        {
+            "UpstreamPathTemplate": "/api/Auth/login",
+            "UpstreamHttpMethod": [ "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "authservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Auth/login",
+            "SwaggerKey": "AuthService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/Auth/refresh-token",
+            "UpstreamHttpMethod": [ "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "authservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Auth/refresh-token",
+            "SwaggerKey": "AuthService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/Auth/logout",
+            "UpstreamHttpMethod": [ "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "authservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Auth/logout",
+            "SwaggerKey": "AuthService"
+        }
     ],
     "GlobalConfiguration": {
         "BaseUrl": "http://localhost:1200"
@@ -313,6 +326,16 @@
                     "Name": "Auth Service",
                     "Version": "v1",
                     "Url": "http://authservice:8080/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "InvoiceExportService",
+            "Config": [
+                {
+                    "Name": "Invoice Export Service",
+                    "Version": "v1",
+                    "Url": "http://invoiceexportservice:8080/swagger/v1/swagger.json"
                 }
             ]
         }
