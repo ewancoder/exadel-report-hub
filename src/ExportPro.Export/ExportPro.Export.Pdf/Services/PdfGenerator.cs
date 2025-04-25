@@ -29,7 +29,7 @@ public sealed class PdfGenerator : IPdfGenerator
                 {
                     table.ColumnsDefinition(c =>
                     {
-                        for (int i = 0; i < 10; i++) c.RelativeColumn();
+                        for (int i = 0; i < 9; i++) c.RelativeColumn();
                     });
 
                     static IContainer Cell(IContainer c) =>
@@ -42,8 +42,8 @@ public sealed class PdfGenerator : IPdfGenerator
                     string[] headers =
                     [
                         "Customer", "Issue Date", "Due Date",
-                        "Item List", "Amount", "Currency",
-                        "Payment Status", "Client", "Bank Acc. #", "Total Price"
+                        "Item List", "Currency",
+                        "Payment Status", "Client", "Bank Acc. #", "Amount"
                     ];
 
                     foreach (var h in headers)
@@ -60,7 +60,6 @@ public sealed class PdfGenerator : IPdfGenerator
                         invoice.IssueDate.ToString("yyyy‑MM‑dd"),
                         invoice.DueDate.ToString("yyyy‑MM‑dd"),
                         itemList,
-                        invoice.Amount.ToString("N2"),
                         invoice.CurrencyCode ?? "—",
                         invoice.PaymentStatus ?? "—",
                         invoice.ClientName ?? "—",
