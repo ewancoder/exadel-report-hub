@@ -32,7 +32,7 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Page number must be greater than zero." },
+                Messages = ["Page number must be greater than zero."],
             };
         }
 
@@ -42,7 +42,7 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Page size must be greater than zero." },
+                Messages = ["Page size must be greater than zero."],
             };
         }
 
