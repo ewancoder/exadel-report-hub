@@ -1,3 +1,6 @@
+# terraform init 
+# terraform plan -var="admin_password=<paswd>"
+# terraform apply -var="admin_password=<paswd>"
 terraform {
   required_providers {
     azurerm = {
