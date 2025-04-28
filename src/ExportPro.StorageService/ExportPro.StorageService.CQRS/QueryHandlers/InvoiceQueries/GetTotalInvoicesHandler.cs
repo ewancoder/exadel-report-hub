@@ -7,14 +7,15 @@ using System.Net;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public class GetTotalInvoicesQuery : IQuery<long>
+public sealed class GetTotalInvoicesQuery : IQuery<long>
 {
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public string? ClientId { get; set; }
     public string? CustomerId { get; set; }
 }
-public class GetTotalInvoicesHandler(
+
+public sealed class GetTotalInvoicesHandler(
     IInvoiceRepository invoiceRepository
 ) : IQueryHandler<GetTotalInvoicesQuery, long>
 {

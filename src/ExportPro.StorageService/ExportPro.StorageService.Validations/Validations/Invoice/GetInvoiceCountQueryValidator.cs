@@ -1,7 +1,7 @@
-﻿namespace ExportPro.StorageService.Validations.Validations.Invoice;
-
-using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
+﻿using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 using FluentValidation;
+
+namespace ExportPro.StorageService.Validations.Validations.Invoice;
 
 public class GetInvoiceCountQueryValidator : AbstractValidator<GetTotalInvoicesQuery>
 {
@@ -35,4 +35,3 @@ public class GetInvoiceCountQueryValidator : AbstractValidator<GetTotalInvoicesQ
         return MongoDB.Bson.ObjectId.TryParse(id, out _);
     }
 }
-
