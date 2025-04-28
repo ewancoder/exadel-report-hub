@@ -9,16 +9,16 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
-public class CreateCountryCommand : ICommand<CountryDto>
+public sealed class CreateCountryCommand : ICommand<CountryDto>
 {
     public required string Name { get; set; }
     public string? Code { get; set; }
     public string? CurrencyId { get; set; }
 }
-public class CreateCountryCommandHandler(
-    ICountryRepository repository
-    , IMapper mapper
-    , IValidator<CreateCountryCommand> validator)
+public sealed class CreateCountryCommandHandler(
+    ICountryRepository repository, 
+    IMapper mapper, 
+    IValidator<CreateCountryCommand> validator)
     : ICommandHandler<CreateCountryCommand, CountryDto>
 {
     private readonly ICountryRepository _repository = repository;
@@ -29,6 +29,7 @@ public class CreateCountryCommandHandler(
     )
     {
         var validate = await _validator.ValidateAsync(request, cancellationToken);
+        
         if (!validate.IsValid)
         {
             return new BaseResponse<CountryDto>

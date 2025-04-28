@@ -6,8 +6,8 @@ using MediatR;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 
-public class GetAllCurrenciesQuery : IRequest<BaseResponse<List<CurrencyResponse>>> { }
-public class GetAllCurrenciesHandler(ICurrencyRepository repository, IMapper mapper) : IRequestHandler<GetAllCurrenciesQuery, BaseResponse<List<CurrencyResponse>>>
+public sealed class GetAllCurrenciesQuery : IRequest<BaseResponse<List<CurrencyResponse>>> { }
+public sealed class GetAllCurrenciesHandler(ICurrencyRepository repository, IMapper mapper) : IRequestHandler<GetAllCurrenciesQuery, BaseResponse<List<CurrencyResponse>>>
 {
     private readonly ICurrencyRepository _repository = repository;
     private readonly IMapper _mapper = mapper;

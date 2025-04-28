@@ -7,7 +7,7 @@ using System.Net;
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
 public record UpdateCountryCommand(string Id, string Name, string? Code) : ICommand<bool>;
-public class UpdateCountryCommandHandler(ICountryRepository repository) : ICommandHandler<UpdateCountryCommand, bool>
+public sealed class UpdateCountryCommandHandler(ICountryRepository repository) : ICommandHandler<UpdateCountryCommand, bool>
 {
     private readonly ICountryRepository _repository = repository;
 

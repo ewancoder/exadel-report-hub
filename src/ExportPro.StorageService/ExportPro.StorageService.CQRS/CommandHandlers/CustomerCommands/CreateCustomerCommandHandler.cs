@@ -11,14 +11,13 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
-public class CreateCustomerCommand : ICommand<CustomerResponse>
+public sealed class CreateCustomerCommand : ICommand<CustomerResponse>
 {
     public required string Name { get; set; }
     public required string Email { get; set; }
     public required string CountryId { get; set; }
 }
-public class CreateCustomerCommandHandler(ICustomerRepository repository
-
+public sealed class CreateCustomerCommandHandler(ICustomerRepository repository
     , IMapper mapper, IValidator<CreateCustomerCommand> validator)
     : ICommandHandler<CreateCustomerCommand, CustomerResponse>
 {
@@ -31,6 +30,7 @@ public class CreateCustomerCommandHandler(ICustomerRepository repository
     )
     {
         var validate = await _validator.ValidateAsync(request, cancellationToken);
+        
         if (!validate.IsValid)
         {
             return new BaseResponse<CustomerResponse>

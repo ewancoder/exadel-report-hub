@@ -7,7 +7,7 @@ using System.Net;
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
 public record DeleteCountryCommand(string Id) : ICommand<bool>;
-public class DeleteCountryCommandHandler(ICountryRepository repository)
+public sealed class DeleteCountryCommandHandler(ICountryRepository repository)
     : ICommandHandler<DeleteCountryCommand, bool>
 {
     private readonly ICountryRepository _repository = repository;
@@ -25,6 +25,7 @@ public class DeleteCountryCommandHandler(ICountryRepository repository)
         }
 
         var existing = await _repository.GetByIdAsync(objectId, cancellationToken);
+        
         if (existing == null)
         {
             return new BaseResponse<bool>

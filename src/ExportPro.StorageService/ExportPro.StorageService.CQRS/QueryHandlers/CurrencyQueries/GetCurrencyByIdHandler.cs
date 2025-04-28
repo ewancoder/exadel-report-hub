@@ -10,7 +10,7 @@ namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 
 public record GetCurrencyByIdQuery(ObjectId Id) : IRequest<BaseResponse<CurrencyResponse>>;
 
-public class GetCurrencyByIdHandler(ICurrencyRepository repository, IMapper mapper) : IRequestHandler<GetCurrencyByIdQuery, BaseResponse<CurrencyResponse>>
+public sealed class GetCurrencyByIdHandler(ICurrencyRepository repository, IMapper mapper) : IRequestHandler<GetCurrencyByIdQuery, BaseResponse<CurrencyResponse>>
 {
     private readonly ICurrencyRepository _repository = repository;
     private readonly IMapper _mapper = mapper;

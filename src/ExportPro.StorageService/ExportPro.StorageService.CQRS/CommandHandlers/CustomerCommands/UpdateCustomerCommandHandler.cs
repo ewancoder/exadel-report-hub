@@ -7,14 +7,14 @@ using System.Net;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
-public class UpdateCustomerCommand : ICommand<Customer>
+public sealed class UpdateCustomerCommand : ICommand<Customer>
 {
     public required string Id { get; set; }
     public string? Name { get; set; }
     public string? Email { get; set; }
     public string? CountryId { get; set; }
 }
-public class UpdateCustomerCommandHandler(ICustomerRepository repository)
+public sealed class UpdateCustomerCommandHandler(ICustomerRepository repository)
     : ICommandHandler<UpdateCustomerCommand, Customer>
 {
     private readonly ICustomerRepository _repository = repository;
@@ -42,6 +42,7 @@ public class UpdateCustomerCommandHandler(ICustomerRepository repository)
         }
 
         var existingCustomer = await _repository.GetByIdAsync(objectId, cancellationToken);
+        
         if (existingCustomer is null || existingCustomer.IsDeleted)
         {
             return new BaseResponse<Customer>

@@ -10,7 +10,7 @@ namespace ExportPro.StorageService.CQRS.QueryHandlers.CountryQueries;
 
 public record GetPaginatedCountriesQuery(int PageNumber = 1, int PageSize = 10, bool IncludeDeleted = false)
     : IQuery<PaginatedListDto<CountryDto>>;
-public class GetPaginatedCountriesQueryHandler(ICountryRepository repository, IMapper mapper) : IQueryHandler<GetPaginatedCountriesQuery, PaginatedListDto<CountryDto>>
+public sealed class GetPaginatedCountriesQueryHandler(ICountryRepository repository, IMapper mapper) : IQueryHandler<GetPaginatedCountriesQuery, PaginatedListDto<CountryDto>>
 {
     public async Task<BaseResponse<PaginatedListDto<CountryDto>>> Handle(GetPaginatedCountriesQuery request, CancellationToken cancellationToken)
     {

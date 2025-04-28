@@ -7,13 +7,13 @@ using System.Net;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 
-public class GetPaginatedCustomersQuery : IQuery<PaginatedListDto<CustomerDto>>
+public sealed class GetPaginatedCustomersQuery : IQuery<PaginatedListDto<CustomerDto>>
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public bool IncludeDeleted { get; set; } = false;
 }
-public class GetPaginatedCustomersQueryHandler(ICustomerRepository repository) : IQueryHandler<GetPaginatedCustomersQuery, PaginatedListDto<CustomerDto>>
+public sealed class GetPaginatedCustomersQueryHandler(ICustomerRepository repository) : IQueryHandler<GetPaginatedCustomersQuery, PaginatedListDto<CustomerDto>>
 {
     private readonly ICustomerRepository _repository = repository;
 

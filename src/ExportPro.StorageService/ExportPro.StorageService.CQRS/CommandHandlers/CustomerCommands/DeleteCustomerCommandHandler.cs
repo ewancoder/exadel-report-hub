@@ -7,13 +7,14 @@ using System.Net;
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
 public record DeleteCustomerCommand(ObjectId Id) : ICommand<bool>;
-public class DeleteCustomerCommandHandler(ICustomerRepository repository) : ICommandHandler<DeleteCustomerCommand, bool>
+public sealed class DeleteCustomerCommandHandler(ICustomerRepository repository) : ICommandHandler<DeleteCustomerCommand, bool>
 {
     private readonly ICustomerRepository _repository = repository;
 
     public async Task<BaseResponse<bool>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
     {
         var customer = await _repository.GetByIdAsync(request.Id, cancellationToken);
+       
         if (customer == null || customer.IsDeleted)
         {
             return new BaseResponse<bool>

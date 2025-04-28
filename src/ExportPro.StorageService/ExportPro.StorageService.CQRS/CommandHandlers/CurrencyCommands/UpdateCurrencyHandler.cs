@@ -7,13 +7,13 @@ using System.Net;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 
-public class UpdateCurrencyCommand : IRequest<BaseResponse<Currency>>
+public sealed class UpdateCurrencyCommand : IRequest<BaseResponse<Currency>>
 {
     public ObjectId Id { get; set; }
     public string? Name { get; set; }
     public string? Code { get; set; }
 }
-public class UpdateCurrencyHandler(ICurrencyRepository repository) : IRequestHandler<UpdateCurrencyCommand, BaseResponse<Currency>>
+public sealed class UpdateCurrencyHandler(ICurrencyRepository repository) : IRequestHandler<UpdateCurrencyCommand, BaseResponse<Currency>>
 {
     private readonly ICurrencyRepository _repository = repository;
 

@@ -11,7 +11,7 @@ using FluentValidation;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
-public class CreateInvoiceCommand : ICommand<InvoiceResponse>
+public sealed class CreateInvoiceCommand : ICommand<InvoiceResponse>
 {
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; } = DateTime.UtcNow;
@@ -23,7 +23,7 @@ public class CreateInvoiceCommand : ICommand<InvoiceResponse>
     public string? ClientId { get; set; }
     public List<ItemDtoForClient>? Items { get; set; }
 }
-public class CreateInvoiceHandler(
+public sealed class CreateInvoiceHandler(
     IInvoiceRepository repository,
     IMapper mapper,
     ICurrencyExchangeService currencyExchangeService,

@@ -9,6 +9,6 @@ public class CreateCurrencyCommandValidator : AbstractValidator<CreateCurrencyCo
     {
         RuleFor(x => x.Code)
             .NotEmpty().WithMessage("Currency code is required.")
-            .Length(3, 5).WithMessage("Currency code must be between 3 and 5 characters.");
+            .Length(3, 3).WithMessage("Currency code must be between 3 and 3 characters.");
     }
 }

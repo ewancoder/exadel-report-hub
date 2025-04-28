@@ -7,7 +7,7 @@ using MongoDB.Bson;
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
 public record DeleteInvoiceCommand(ObjectId Id) : ICommand<bool>;
-public class DeleteInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<DeleteInvoiceCommand, bool>
+public sealed class DeleteInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<DeleteInvoiceCommand, bool>
 {
     private readonly IInvoiceRepository _repository = repository;
 
@@ -25,6 +25,7 @@ public class DeleteInvoiceHandler(IInvoiceRepository repository) : ICommandHandl
         }
 
         var invoice = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        
         if (invoice == null)
         {
             return new BaseResponse<bool>

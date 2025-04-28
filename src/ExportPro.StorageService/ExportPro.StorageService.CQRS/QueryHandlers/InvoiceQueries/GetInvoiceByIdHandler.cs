@@ -11,7 +11,7 @@ namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
 public record GetInvoiceByIdQuery(string Id) : IQuery<InvoiceDto>;
 
-public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper)
+public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper)
     : IQueryHandler<GetInvoiceByIdQuery, InvoiceDto>
 {
     private readonly IInvoiceRepository _repository = repository;
@@ -30,6 +30,7 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper
         }
 
         var invoice = await _repository.GetByIdAsync(objectId, cancellationToken);
+        
         if (invoice == null)
         {
             return new BaseResponse<InvoiceDto>

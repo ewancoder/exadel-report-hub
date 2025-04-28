@@ -6,7 +6,7 @@ using MongoDB.Bson;
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 
 public record DeleteCurrencyCommand(ObjectId Id) : IRequest<BaseResponse<bool>>;
-public class DeleteCurrencyHandler(ICurrencyRepository repository) : IRequestHandler<DeleteCurrencyCommand, BaseResponse<bool>>
+public sealed class DeleteCurrencyHandler(ICurrencyRepository repository) : IRequestHandler<DeleteCurrencyCommand, BaseResponse<bool>>
 {
     private readonly ICurrencyRepository _repository = repository;
 

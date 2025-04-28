@@ -9,7 +9,7 @@ using System.Net;
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CountryQueries;
 
 public record GetCountryByIdQuery(string Id) : IQuery<CountryDto>;
-public class GetCountryByIdQueryHandler(ICountryRepository repository, IMapper mapper) : IQueryHandler<GetCountryByIdQuery, CountryDto>
+public sealed class GetCountryByIdQueryHandler(ICountryRepository repository, IMapper mapper) : IQueryHandler<GetCountryByIdQuery, CountryDto>
 {
     public async Task<BaseResponse<CountryDto>> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
     {
@@ -24,6 +24,7 @@ public class GetCountryByIdQueryHandler(ICountryRepository repository, IMapper m
         }
 
         var country = await repository.GetByIdAsync(objectId, cancellationToken);
+        
         if (country == null)
         {
             return new BaseResponse<CountryDto>

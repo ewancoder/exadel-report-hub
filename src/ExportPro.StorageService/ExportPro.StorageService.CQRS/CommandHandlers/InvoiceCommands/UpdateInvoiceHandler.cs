@@ -8,9 +8,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public class UpdateInvoiceCommand : ICommand<Invoice>
+public sealed class UpdateInvoiceCommand : ICommand<Invoice>
 {
-    public string Id { get; set; }
+    public required string Id { get; set; }
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
@@ -21,7 +21,7 @@ public class UpdateInvoiceCommand : ICommand<Invoice>
     public string? ClientId { get; set; }
     public List<string>? ItemIds { get; set; }
 }
-public class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<UpdateInvoiceCommand, Invoice>
+public sealed class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<UpdateInvoiceCommand, Invoice>
 {
     private readonly IInvoiceRepository _repository = repository;
 
@@ -39,6 +39,7 @@ public class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandl
         }
 
         var existing = await _repository.GetByIdAsync(objectId, cancellationToken);
+        
         if (existing == null)
         {
             return new BaseResponse<Invoice>
