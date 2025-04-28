@@ -1,16 +1,14 @@
-﻿namespace ExportPro.StorageService.Validations.Validations.Invoice;
-
-using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
+﻿using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 using FluentValidation;
+
+namespace ExportPro.StorageService.Validations.Validations.Invoice;
 
 public class GetTotalRevenueQueryValidator : AbstractValidator<GetTotalRevenueQuery>
 {
     public GetTotalRevenueQueryValidator()
     {
-        RuleFor(x => x.StartDate).NotEmpty();
-        RuleFor(x => x.EndDate)
-            .NotEmpty()
-            .GreaterThan(x => x.StartDate)
-            .WithMessage("EndDate must be greater than StartDate.");
+        RuleFor(x => x.StartDate)
+            .LessThanOrEqualTo(x => x.EndDate)
+            .WithMessage("StartDate must be before EndDate.");
     }
 }

@@ -2,45 +2,32 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using FluentValidation;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public class GetTotalRevenueQuery : IQuery<double>
+public sealed class GetTotalRevenueQuery : IQuery<double>
 {
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
 }
 
-public class GetTotalRevenueHandler(
-    IInvoiceRepository invoiceRepository,
-    IValidator<GetTotalRevenueQuery> validator
+public sealed class GetTotalRevenueHandler(
+    IInvoiceRepository repository
 ) : IQueryHandler<GetTotalRevenueQuery, double>
 {
-    private readonly IInvoiceRepository _invoiceRepository = invoiceRepository;
-    private readonly IValidator<GetTotalRevenueQuery> _validator = validator;
+    private readonly IInvoiceRepository _repository = repository;
 
     public async Task<BaseResponse<double>> Handle(GetTotalRevenueQuery request, CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            return new BaseResponse<double>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.BadRequest,
-                Messages = validationResult.Errors.Select(x => x.ErrorMessage).ToList()
-            };
-        }
-
-        var invoices = await _invoiceRepository.GetInvoicesInDateRangeAsync(request.StartDate, request.EndDate);
+        var invoices = await _repository.GetInvoicesInDateRangeAsync(request.StartDate, request.EndDate);
 
         if (invoices == null || !invoices.Any())
         {
             return new BaseResponse<double>
             {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.NotFound,
+                Data = 0,
+                IsSuccess = true,
+                ApiState = HttpStatusCode.OK,
                 Messages = ["No invoices issued in selected period."]
             };
         }
