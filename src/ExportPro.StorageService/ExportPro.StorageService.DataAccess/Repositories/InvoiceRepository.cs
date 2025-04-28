@@ -60,4 +60,8 @@ public class InvoiceRepository(ICollectionProvider collectionProvider) : BaseRep
     {
         throw new NotImplementedException();
     }
+    public async Task<long> CountAsync(FilterDefinition<Invoice> filter, CancellationToken cancellationToken)
+    {
+        return await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+    }
 }
