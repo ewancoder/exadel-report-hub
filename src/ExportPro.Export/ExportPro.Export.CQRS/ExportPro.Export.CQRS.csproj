@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ExportPro.Export.Pdf\ExportPro.Export.Pdf.csproj" />
-    <ProjectReference Include="..\ExportPro.Export.SDK\ExportPro.Export.SDK.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ExportPro.Export.Pdf\ExportPro.Export.Pdf.csproj" />
+		<ProjectReference Include="..\ExportPro.Export.SDK\ExportPro.Export.SDK.csproj" />
+		<PackageReference Include="AutoMapper" Version="14.0.0" />
+	</ItemGroup>
 
 </Project>

@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSharedSerilogAndConfiguration();
 builder.Services.AddControllers();
 builder.Services.AddExportModule(builder.Configuration);
+//builder.Services.AddAutoMapper(typeof(ExportPro.Export.CQRS.Profile.MappingProfile));
 
 var app = builder.Build();
 

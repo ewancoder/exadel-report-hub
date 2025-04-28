@@ -20,6 +20,7 @@ public interface IStorageServiceApi
 
     [Get("/api/client/{id}")]
     Task<BaseResponse<ValidationModel<ClientResponse>>> GetClientByIdAsync(string id, CancellationToken cancellationToken);
+    // Task<BaseResponse<ClientResponse<ClientResponse>>> GetClientByIdAsync(string id, CancellationToken cancellationToken);
 
     [Get("/api/Customer/{id}")]
     Task<BaseResponse<CustomerDto>> GetCustomerByIdAsync(string id, CancellationToken cancellationToken);

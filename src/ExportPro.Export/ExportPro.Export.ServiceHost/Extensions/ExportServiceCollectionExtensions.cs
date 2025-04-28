@@ -3,6 +3,7 @@ using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Export.CQRS.Profile;
 using ExportPro.Export.CQRS.Queries;
 using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
@@ -30,10 +31,13 @@ public static class ExportServiceCollectionExtensions
         // ---------- MediatR --------------------------
         services.AddMediatR(options =>
             options.RegisterServicesFromAssemblies(
-                typeof(GeneratePdfInvoiceQuery).Assembly,
+                typeof(GenerateInvoicePdfQuery).Assembly,
                 typeof(IPdfGenerator).Assembly));
 
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
+        // ---------- AddAutoMapper --------------------------
+        services.AddAutoMapper(typeof(MappingProfile));
 
         // ---------- PDF ------------------------------
         services.AddSingleton<IPdfGenerator, PdfGenerator>();
