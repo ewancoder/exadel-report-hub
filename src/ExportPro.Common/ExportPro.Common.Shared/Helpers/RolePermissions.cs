@@ -6,14 +6,14 @@ namespace ExportPro.Common.Shared.Helpers;
 
 public static class RolePermissions
 {
-    public static readonly Dictionary<Role, List<Permission>> Matrix = new()
+    public static readonly Dictionary<UserRole, List<Permission>> Matrix = new()
     {
-        [Role.SuperAdmin] = new()
+        [UserRole.SuperAdmin] = new()
         {
             new Permission { Resource = Resource.Clients, AllowedActions = new() { CrudAction.Create, CrudAction.Read, CrudAction.Update, CrudAction.Delete } },
             new Permission { Resource = Resource.Users, AllowedActions = new() { CrudAction.Create, CrudAction.Read, CrudAction.Update, CrudAction.Delete } }
         },
-        [Role.Owner] = new()
+        [UserRole.Owner] = new()
         {
             new Permission { Resource = Resource.Clients, AllowedActions = new() { CrudAction.Read, CrudAction.Update } },
             new Permission { Resource = Resource.Users, AllowedActions = new() { CrudAction.Create, CrudAction.Read, CrudAction.Update, CrudAction.Delete } },
@@ -23,7 +23,7 @@ public static class RolePermissions
             new Permission { Resource = Resource.Plans, AllowedActions = new() { CrudAction.Create, CrudAction.Read, CrudAction.Update, CrudAction.Delete } },
             new Permission { Resource = Resource.Reports, AllowedActions = new() { CrudAction.Create, CrudAction.Read, CrudAction.Update, CrudAction.Delete } }
         },
-        [Role.ClientAdmin] = new()
+        [UserRole.ClientAdmin] = new()
         {
             new Permission { Resource = Resource.Clients, AllowedActions = new() { CrudAction.Read } },
             new Permission { Resource = Resource.Users, AllowedActions = new() { CrudAction.Create, CrudAction.Read, CrudAction.Update, CrudAction.Delete } },
@@ -33,7 +33,7 @@ public static class RolePermissions
             new Permission { Resource = Resource.Plans, AllowedActions = new() { CrudAction.Create, CrudAction.Read, CrudAction.Update } },
             new Permission { Resource = Resource.Reports, AllowedActions = new() { CrudAction.Create, CrudAction.Read } }
         },
-        [Role.Operator] = new()
+        [UserRole.Operator] = new()
         {
             new Permission { Resource = Resource.Clients, AllowedActions = new() { CrudAction.Read } },
             new Permission { Resource = Resource.Users, AllowedActions = new() {  CrudAction.Read } },

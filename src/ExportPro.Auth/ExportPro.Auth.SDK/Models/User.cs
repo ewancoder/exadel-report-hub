@@ -11,7 +11,7 @@ public class User : IModel
     public string Username { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
-    public UserRole Role { get; set; }
+    public Role Role { get; set; } = Role.None;
     public List<RefreshToken> RefreshTokens { get; set; } = [];
 }
 

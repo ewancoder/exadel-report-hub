@@ -20,6 +20,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddScoped<ExportProMongoContext>();
+builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
+builder.Services.AddScoped<IACLRepository, ACLRepository>();
+builder.Services.AddScoped<IACLService, ACLService>();
 
 builder.Services.AddMediatR(cfg =>
 {

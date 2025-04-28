@@ -38,7 +38,7 @@ public static class AuthenticationExtensions
             {
                 OnTokenValidated = async context =>
                 {
-                    var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                    var userRepository = context.HttpContext.RequestServices.GetRequiredService<UserRepository>();
 
                     var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier);
                     var tokenVersionClaim = context.Principal?.FindFirst("tokenVersion");
