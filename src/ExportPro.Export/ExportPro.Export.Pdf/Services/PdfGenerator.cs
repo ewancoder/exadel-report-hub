@@ -25,7 +25,9 @@ public sealed class PdfGenerator : IPdfGenerator
                     .Bold();
 
                 // ---- Table ----
-                page.Content().PaddingVertical(10).Table(table =>
+                page.Content()
+                .PaddingVertical(10)
+                .Table(table =>
                 {
                     table.ColumnsDefinition(c =>
                     {
@@ -52,7 +54,7 @@ public sealed class PdfGenerator : IPdfGenerator
                     }
 
                     string itemList = string.Join("\n",
-                        invoice.Items.Select(i => $"{i.Name} — {i.Price:N2}"));
+                        invoice.Items.Select(i => $"{i.Name} — {i.Price:N2} {invoice.CurrencyCode}"));
 
                     string[] row =
                     [
@@ -64,12 +66,12 @@ public sealed class PdfGenerator : IPdfGenerator
                         invoice.PaymentStatus ?? "—",
                         invoice.ClientName ?? "—",
                         invoice.BankAccountNumber ?? "—",
-                        invoice.Amount.ToString("N2")
+                        $"{invoice.Amount:N2} {invoice.CurrencyCode}"
                     ];
 
                     foreach (var cell in row)
                     {
-                        table.Cell().Element(Cell).Text(cell);
+                        table.Cell().Element(Cell).Text(cell).FontSize(8);
                     }
                 });
 
