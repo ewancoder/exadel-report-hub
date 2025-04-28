@@ -2,6 +2,7 @@
 using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Interfaces;
+using ExportPro.Export.SDK.Utilities;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -78,7 +79,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
     private PdfFileDto GeneratePdfFile(PdfInvoiceExportDto invoice)
     {
         byte[] bytes = pdfGenerator.GeneratePdf(invoice);
-        string fileName = $"invoice_{invoice.InvoiceNumber}.pdf";
+        string fileName = FileNameTemplates.InvoicePdfFileName(invoice.InvoiceNumber);
         return new PdfFileDto(fileName, bytes);
     }
 }
