@@ -15,4 +15,5 @@ public interface IInvoiceRepository : IRepository<Invoice>
         bool includeDeleted = false,
         CancellationToken cancellationToken = default);
     Task<bool> ExistsAsync(ObjectId id, CancellationToken cancellationToken);
+    Task<List<Invoice>> GetInvoicesInDateRangeAsync(DateTime startDate, DateTime endDate);
 }

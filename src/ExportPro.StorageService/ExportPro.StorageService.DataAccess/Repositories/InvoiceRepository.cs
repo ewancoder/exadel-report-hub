@@ -60,4 +60,8 @@ public class InvoiceRepository(ICollectionProvider collectionProvider) : BaseRep
     {
         throw new NotImplementedException();
     }
+    public async Task<List<Invoice>> GetInvoicesInDateRangeAsync(DateTime startDate, DateTime endDate)
+    {
+        return await Collection.Find(x => x.IssueDate >= startDate && x.IssueDate <= endDate).ToListAsync();
+    }
 }

@@ -71,4 +71,11 @@ public class InvoiceController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(query, cancellationToken);
         return StatusCode((int)response.ApiState, response);
     }
+
+    [HttpGet("revenue")]
+    public async Task<IActionResult> GetTotalRevenue([FromQuery] GetTotalRevenueQuery query)
+    {
+        var result = await mediator.Send(query);
+        return StatusCode((int)result.ApiState, result);
+    }
 }
