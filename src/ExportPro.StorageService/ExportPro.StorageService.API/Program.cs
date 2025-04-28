@@ -61,13 +61,14 @@ builder.Services
     })
     .ConfigureHttpClient(c =>
     {
-        c.BaseAddress = new Uri(builder.Configuration["Refit:appurl"]);
+        c.BaseAddress = new Uri(builder.Configuration["Refit:currencyUrl"]);
     });
 builder.Services.AddLogging();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Storage Service");
 builder.Services.AddValidatorsFromAssembly(typeof(CreateClientCommandValidator).Assembly);
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
 builder.Services.AddAutoMapper(typeof(ExportPro.StorageService.CQRS.Profiles.MappingProfile));
 builder.Services.AddCommonRegistrations();
 builder.Services.AddRepositoryConfig();

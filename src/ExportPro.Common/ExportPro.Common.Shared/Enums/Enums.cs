@@ -2,7 +2,7 @@
 
 namespace ExportPro.Common.Shared.Enums;
 
-public enum Role
+public enum UserRole
 {
     SuperAdmin,
     Owner,
@@ -27,5 +27,11 @@ public enum Resource
     Customers,
     Plans,
     Reports
+}
+
+public enum Role
+{
+    None,
+    SuperAdmin
 }
 
