@@ -21,7 +21,7 @@ public sealed class GetTotalRevenueHandler(
     {
         var invoices = await _repository.GetInvoicesInDateRangeAsync(request.StartDate, request.EndDate);
 
-        if (invoices == null || !invoices.Any())
+        if (invoices == null || invoices.Count == 0)
         {
             return new BaseResponse<double>
             {
