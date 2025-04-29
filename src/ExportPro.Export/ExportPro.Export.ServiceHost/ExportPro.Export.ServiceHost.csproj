@@ -20,6 +20,8 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\ExportPro.Export.CQRS\ExportPro.Export.CQRS.csproj" />
+		<ProjectReference Include="..\ExportPro.Export.Csv\ExportPro.Export.Csv.csproj" />
+		<ProjectReference Include="..\ExportPro.Export.Excel\ExportPro.Export.Excel.csproj" />
 	</ItemGroup>
 
 </Project>
