@@ -5,12 +5,12 @@ using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.Export.Excel.Services;
 
-public sealed class ExcelReportGenerator : ICsvExcelReportGenerator
+public sealed class ExcelReportGenerator : IReportGenerator
 {
     public string ContentType => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public string Extension => "xlsx";
 
-    public byte[] Generate(StatisticsReportDto data)
+    public byte[] Generate(ReportContentDto data)
     {
         using var wb = new XLWorkbook();
         GenerateInvoicesSheet(data, wb);
@@ -27,28 +27,28 @@ public sealed class ExcelReportGenerator : ICsvExcelReportGenerator
         return ms.ToArray();
     }
 
-    private static void GenerateReportInfoSheet(StatisticsReportDto data, XLWorkbook wb)
+    private static void GenerateReportInfoSheet(ReportContentDto data, XLWorkbook wb)
     {
         var info = wb.Worksheets.Add("ReportInfo");
         info.Cell("A1").Value = "GeneratedAt"; info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
         info.Cell("A2").Value = "ClientId"; info.Cell("B2").Value = data.Filters.ClientId ?? "—";
     }
 
-    private static void GeneratePlansSheet(StatisticsReportDto data, XLWorkbook wb)
+    private static void GeneratePlansSheet(ReportContentDto data, XLWorkbook wb)
     {
         wb.Worksheets.Add("Plans")
           .Cell(1, 1)
           .InsertTable(data.Plans, "Plans", true);
     }
 
-    private static void GenerateItemsSheet(StatisticsReportDto data, XLWorkbook wb)
+    private static void GenerateItemsSheet(ReportContentDto data, XLWorkbook wb)
     {
         wb.Worksheets.Add("Items")
           .Cell(1, 1)
           .InsertTable(data.Items, "Items", true);
     }
 
-    private static void GenerateInvoicesSheet(StatisticsReportDto data, XLWorkbook wb)
+    private static void GenerateInvoicesSheet(ReportContentDto data, XLWorkbook wb)
     {
         wb.Worksheets.Add("Invoices")
           .Cell(1, 1)

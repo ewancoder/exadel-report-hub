@@ -2,9 +2,9 @@
 
 namespace ExportPro.Export.SDK.Interfaces;
 
-public interface ICsvExcelReportGenerator
+public interface IReportGenerator
 {
-    byte[] Generate(StatisticsReportDto data);
+    byte[] Generate(ReportContentDto data);
     string ContentType { get; }
     string Extension { get; }
 }

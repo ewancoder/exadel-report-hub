@@ -1,6 +1,6 @@
 ﻿namespace ExportPro.Export.SDK.DTOs;
 
-public class StatisticsFilterDto
+public class ReportFilterDto
 {
     public string? ClientId { get; set; }
 }

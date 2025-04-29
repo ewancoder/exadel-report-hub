@@ -3,10 +3,10 @@ using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.Export.SDK.DTOs;
 
-public class StatisticsReportDto
+public class ReportContentDto
 {
     public List<InvoiceDto> Invoices { get; init; } = [];
     public List<ItemResponse> Items { get; init; } = [];
     public List<PlansResponse> Plans { get; init; } = [];
-    public StatisticsFilterDto Filters { get; init; } = new();
+    public ReportFilterDto Filters { get; init; } = new();
 }

@@ -9,25 +9,25 @@ using Microsoft.Extensions.Logging;
 
 namespace ExportPro.Export.CQRS.Queries;
 
-public sealed record GenerateCsvExcelReportQuery(
+public sealed record GenerateReportQuery(
         ReportFormat Format,
-        StatisticsFilterDto Filters)
+        ReportFilterDto Filters)
     : IRequest<ReportFileDto>;
 
-public sealed class GenerateCsvExcelReportQueryHandler(
+public sealed class GenerateReportQueryHandler(
         IStorageServiceApi storageApi,
-        IEnumerable<ICsvExcelReportGenerator> generators,
-        ILogger<GenerateCsvExcelReportQueryHandler> log)
-    : IRequestHandler<GenerateCsvExcelReportQuery, ReportFileDto>
+        IEnumerable<IReportGenerator> generators,
+        ILogger<GenerateReportQueryHandler> log)
+    : IRequestHandler<GenerateReportQuery, ReportFileDto>
 {
     public async Task<ReportFileDto> Handle(
-        GenerateCsvExcelReportQuery request,
+        GenerateReportQuery request,
         CancellationToken cancellationToken)
     {
         log.LogInformation("Statistics export start (format={Format})", request.Format);
         var invoices = await FetchInvoicesAsync(cancellationToken);
         var (items, plans) = await FetchItemsAndPlansAsync(request.Filters.ClientId, cancellationToken);
-        var dto = new StatisticsReportDto { Invoices = invoices, Items = items, Plans = plans, Filters = request.Filters };
+        var dto = new ReportContentDto { Invoices = invoices, Items = items, Plans = plans, Filters = request.Filters };
         var file = CreateReportFile(dto, request.Format, generators);
         log.LogInformation("Statistics export done (bytes={Len})", file.Content.Length);
         return file;
@@ -52,9 +52,9 @@ public sealed class GenerateCsvExcelReportQueryHandler(
     }
 
     private static ReportFileDto CreateReportFile(
-        StatisticsReportDto dto, 
+        ReportContentDto dto, 
         ReportFormat fmt, 
-        IEnumerable<ICsvExcelReportGenerator> generators)
+        IEnumerable<IReportGenerator> generators)
     {
         var key = fmt == ReportFormat.Csv ? "csv" : "xlsx";
         var generator = generators.First(g => g.Extension.ToLowerInvariant() == key);
