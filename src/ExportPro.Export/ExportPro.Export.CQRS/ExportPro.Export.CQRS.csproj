@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ExportPro.Export.Pdf\ExportPro.Export.Pdf.csproj" />
     <ProjectReference Include="..\ExportPro.Export.SDK\ExportPro.Export.SDK.csproj" />
+	<PackageReference Include="AutoMapper" Version="14.0.0" />
   </ItemGroup>
 
 </Project>

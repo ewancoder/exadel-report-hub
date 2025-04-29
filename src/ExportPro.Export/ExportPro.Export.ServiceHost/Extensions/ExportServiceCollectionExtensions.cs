@@ -4,6 +4,7 @@ using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Export.CQRS.Profile;
 using ExportPro.Export.CQRS.Queries;
 using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
@@ -11,7 +12,6 @@ using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.ServiceHost.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using QuestPDF.Infrastructure;
 using Refit;
@@ -31,34 +31,36 @@ public static class ExportServiceCollectionExtensions
         {
             options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-.AddJwtBearer(options =>
-{
-    options.Authority = "https://localhost:7067/"; // if using identity server or Auth0
-    options.RequireHttpsMetadata = false; // optional for local dev
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings?.Issuer,
-        ValidAudience = jwtSettings?.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Secret))
-    };
-});
+        .AddJwtBearer(options =>
+        {
+            options.Authority = "https://localhost:7067/"; // if using identity server or Auth0
+            options.RequireHttpsMetadata = false; // optional for local dev
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings?.Issuer,
+                ValidAudience = jwtSettings?.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Secret))
+            };
+        });
 
         // ---------- Mongo  ----------
-
         services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
         services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 
         // ---------- MediatR --------------------------
         services.AddMediatR(options =>
             options.RegisterServicesFromAssemblies(
-                typeof(GeneratePdfInvoiceQuery).Assembly,
+                typeof(GenerateInvoicePdfQuery).Assembly,
                 typeof(IPdfGenerator).Assembly));
 
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
+        // ---------- AddAutoMapper --------------------------
+        services.AddAutoMapper(typeof(MappingProfile));
 
         // ---------- PDF ------------------------------
         services.AddSingleton<IPdfGenerator, PdfGenerator>();

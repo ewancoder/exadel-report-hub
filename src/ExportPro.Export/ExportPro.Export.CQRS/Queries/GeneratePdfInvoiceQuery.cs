@@ -1,98 +1,113 @@
 ﻿using System.Security.Claims;
-using DnsClient.Internal;
+using AutoMapper;
 using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Interfaces;
+using ExportPro.Export.SDK.Utilities;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace ExportPro.Export.CQRS.Queries;
 
-public record GeneratePdfInvoiceQuery(string InvoiceId) : IRequest<PdfFileDto>;
+public record GenerateInvoicePdfQuery([FromRoute] string InvoiceId) : IRequest<PdfFileDto>;
 
 public sealed class GenerateInvoicePdfQueryHandler(
     IStorageServiceApi storageApi,
     IPdfGenerator pdfGenerator,
+    IMapper mapper,
     IHttpContextAccessor httpContextAccessor,
-    ILogger<GeneratePdfInvoiceQuery> logger
-) : IRequestHandler<GeneratePdfInvoiceQuery, PdfFileDto>
+    ILogger<GenerateInvoicePdfQueryHandler> logger)
+    : IRequestHandler<GenerateInvoicePdfQuery, PdfFileDto>
 {
-    public async Task<PdfFileDto> Handle(GeneratePdfInvoiceQuery request, CancellationToken cancellationToken)
+    public async Task<PdfFileDto> Handle(GenerateInvoicePdfQuery request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.InvoiceId))
-            throw new ArgumentException("InvoiceId is required.", nameof(request.InvoiceId));
+        ValidateInvoiceId(request.InvoiceId);
 
-        var apiResponce = await storageApi.GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
-        var invoiceDto = apiResponce.Data ?? throw new InvalidOperationException("Storage-service returned no data");
-        var userId = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
-        logger.LogInformation(
-            "Start GeneratePdfInvoiceQuery: User {@UserId}, " + "InvoiceId {@InvoiceId}," + " Timestamp {@Timestamp}",
-            userId,
-            request.InvoiceId,
-            DateTime.UtcNow
-        );
-        string currencyCode = "—";
+        var userId = httpContextAccessor.HttpContext?.User?
+                         .FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
+
+        logger.LogInformation("GenerateInvoicePdf START: user {UserId}, invoice {InvoiceId}, ts {Ts}",
+                              userId, request.InvoiceId, DateTime.UtcNow);
+
         try
         {
-            if (!string.IsNullOrWhiteSpace(invoiceDto.CurrencyId))
-            {
-                var curResp = await storageApi.GetCurrencyByIdAsync(invoiceDto.CurrencyId, cancellationToken);
-                currencyCode = curResp.Data?.CurrencyCode ?? "—";
-            }
+            var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
+            string currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
+            string client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
+            string customer = await GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
+            var invoice = MapToPdfInvoiceExportDto(invoiceDto, currency, client, customer);
+            var result = GeneratePdfFile(invoice);
 
-            string clientName = "—";
-            if (!string.IsNullOrWhiteSpace(invoiceDto.ClientId))
-            {
-                var clientResp = await storageApi.GetClientByIdAsync(invoiceDto.ClientId, cancellationToken);
-                clientName = clientResp.Data?.Name ?? "—";
-            }
+            logger.LogInformation("GenerateInvoicePdf DONE: user {UserId}, invoice {InvoiceId}, ts {Ts}",
+                                  userId, request.InvoiceId, DateTime.UtcNow);
 
-            string customerName = "—";
-            if (!string.IsNullOrWhiteSpace(invoiceDto.CustomerId))
-            {
-                var custResp = await storageApi.GetCustomerByIdAsync(invoiceDto.CustomerId, cancellationToken);
-                customerName = custResp.Data?.Name ?? "—";
-            }
-            // TODO: should i use instead of it AutoMapper?
-            PdfInvoiceExportDto invoice = new()
-            {
-                InvoiceNumber = invoiceDto.InvoiceNumber,
-                IssueDate = invoiceDto.IssueDate,
-                DueDate = invoiceDto.DueDate,
-                Amount = invoiceDto.Amount,
-                CurrencyCode = currencyCode,
-                PaymentStatus = invoiceDto.PaymentStatus?.ToString(),
-                BankAccountNumber = invoiceDto.BankAccountNumber,
-                ClientName = clientName,
-                CustomerName = customerName,
-                Items =
-                    invoiceDto.Items?.Select(i => new PdfItemExportDto { Name = i.Name, Price = i.Price }).ToList()
-                    ?? [],
-            };
-
-            // build PDF
-            byte[] bytes = pdfGenerator.GeneratePdf(invoice);
-            string fileName = $"invoice_{invoice.InvoiceNumber}.pdf";
-            logger.LogInformation(
-                "Finished GeneratePdfInvoiceQuery: User {@UserId}, InvoiceId {@InvoiceId}, "
-                    + "Timestamp {@Timestamp} Status : Success",
-                userId,
-                request.InvoiceId,
-                DateTime.UtcNow
-            );
-            return new PdfFileDto(fileName, bytes);
+            return result;
         }
         catch (Exception ex)
         {
-            logger.LogError(
-                ex,
-                "Error in GeneratePdfInvoiceQuery: User {UserId}, InvoiceId {InvoiceId}, Timestamp {Timestamp}, Status : Failed",
-                userId,
-                request.InvoiceId,
-                DateTime.UtcNow
-            );
+            logger.LogError(ex,
+                "GenerateInvoicePdf FAILED: user {UserId}, invoice {InvoiceId}, ts {Ts}",
+                userId, request.InvoiceId, DateTime.UtcNow);
             throw;
         }
+    }
+
+    private static void ValidateInvoiceId(string invoiceId)
+    {
+        if (string.IsNullOrWhiteSpace(invoiceId))
+            throw new ArgumentException("InvoiceId is required.", nameof(invoiceId));
+    }
+
+    private async Task<InvoiceDto> GetInvoiceByIdAsync(string id, CancellationToken ct)
+    {
+        var resp = await storageApi.GetInvoiceByIdAsync(id, ct);
+        return resp.Data ?? throw new InvalidOperationException("Storage-service returned no data");
+    }
+
+    private async Task<string> GetCurrencyCodeAsync(string? id, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return "—";
+
+        var resp = await storageApi.GetCurrencyByIdAsync(id, ct);
+        return resp.Data?.CurrencyCode ?? "—";
+    }
+
+    private async Task<string> GetClientNameAsync(string? id, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return "—";
+
+        var resp = await storageApi.GetClientByIdAsync(id, ct);
+        return resp.Data?.Name ?? "—"; // fixed for BaseResponse<ClientResponse>
+    }
+
+    private async Task<string> GetCustomerNameAsync(string? id, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return "—";
+
+        var resp = await storageApi.GetCustomerByIdAsync(id, ct);
+        return resp.Data?.Name ?? "—";
+    }
+
+    private PdfInvoiceExportDto MapToPdfInvoiceExportDto(
+        InvoiceDto src, string currency, string client, string customer)
+    {
+        var dest = mapper.Map<PdfInvoiceExportDto>(src);
+        dest.CurrencyCode = currency;
+        dest.ClientName = client;
+        dest.CustomerName = customer;
+        return dest;
+    }
+
+    private PdfFileDto GeneratePdfFile(PdfInvoiceExportDto invoice)
+    {
+        byte[] bytes = pdfGenerator.GeneratePdf(invoice);
+        string name = FileNameTemplates.InvoicePdfFileName(invoice.InvoiceNumber);
+        return new PdfFileDto(name, bytes);
     }
 }
