@@ -13,26 +13,46 @@ public sealed class ExcelReportGenerator : IReportGenerator
     public byte[] Generate(StatisticsReportDto data)
     {
         using var wb = new XLWorkbook();
+        GenerateInvoicesSheet(data, wb);
+        GenerateItemsSheet(data, wb);
+        GeneratePlansSheet(data, wb);
+        GenerateReportInfoSheet(data, wb);
+        return FinalizeExcelData(wb);
+    }
 
-        wb.Worksheets.Add("Invoices")
-          .Cell(1, 1)
-          .InsertTable(ProjectInvoices(data.Invoices), "Invoices", true);
-
-        wb.Worksheets.Add("Items")
-          .Cell(1, 1)
-          .InsertTable(data.Items, "Items", true);
-
-        wb.Worksheets.Add("Plans")
-          .Cell(1, 1)
-          .InsertTable(data.Plans, "Plans", true);
-
-        var info = wb.Worksheets.Add("ReportInfo");
-        info.Cell("A1").Value = "GeneratedAt"; info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
-        info.Cell("A2").Value = "ClientId"; info.Cell("B2").Value = data.Filters.ClientId ?? "—";
-
+    private static byte[] FinalizeExcelData(XLWorkbook wb)
+    {
         using var ms = new MemoryStream();
         wb.SaveAs(ms);
         return ms.ToArray();
+    }
+
+    private static void GenerateReportInfoSheet(StatisticsReportDto data, XLWorkbook wb)
+    {
+        var info = wb.Worksheets.Add("ReportInfo");
+        info.Cell("A1").Value = "GeneratedAt"; info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
+        info.Cell("A2").Value = "ClientId"; info.Cell("B2").Value = data.Filters.ClientId ?? "—";
+    }
+
+    private static void GeneratePlansSheet(StatisticsReportDto data, XLWorkbook wb)
+    {
+        wb.Worksheets.Add("Plans")
+          .Cell(1, 1)
+          .InsertTable(data.Plans, "Plans", true);
+    }
+
+    private static void GenerateItemsSheet(StatisticsReportDto data, XLWorkbook wb)
+    {
+        wb.Worksheets.Add("Items")
+          .Cell(1, 1)
+          .InsertTable(data.Items, "Items", true);
+    }
+
+    private static void GenerateInvoicesSheet(StatisticsReportDto data, XLWorkbook wb)
+    {
+        wb.Worksheets.Add("Invoices")
+          .Cell(1, 1)
+          .InsertTable(ProjectInvoices(data.Invoices), "Invoices", true);
     }
 
     private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src) =>
