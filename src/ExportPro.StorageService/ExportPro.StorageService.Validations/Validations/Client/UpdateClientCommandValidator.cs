@@ -1,4 +1,5 @@
 ﻿using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 using MongoDB.Bson;
@@ -12,11 +13,6 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
         RuleFor(x => x.ClientId)
             .NotEmpty()
             .WithMessage("Client Id  cannot be empty.")
-            .Must(id =>
-            {
-                return ObjectId.TryParse(id, out _);
-            })
-            .WithMessage("The Client Id is not valid in format.")
             .DependentRules(() =>
             {
                 RuleFor(x => x.ClientId)
@@ -24,7 +20,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
                         async (id, cancellationToken) =>
                         {
                             var client = await clientRepository.GetOneAsync(
-                                x => x.Id == ObjectId.Parse(id) && !x.IsDeleted,
+                                x => x.Id == id.ToObjectId() && !x.IsDeleted,
                                 cancellationToken
                             );
                             return client != null;

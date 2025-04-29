@@ -2,8 +2,10 @@
 using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
+using ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 using ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
-using ExportPro.StorageService.CQRS.Commands.Items;
+using ExportPro.StorageService.CQRS.Extensions;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
 using ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 using ExportPro.StorageService.Models.Models;
@@ -12,6 +14,7 @@ using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace ExportPro.StorageService.API.Controllers;
@@ -45,7 +48,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [SwaggerOperation(Summary = "Getting  client by client id")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Clients, Common.Shared.Enums.CrudAction.Read)]
-    public async Task<IActionResult> GetClientById([Required] [FromRoute] string clientId)
+    public async Task<IActionResult> GetClientById([Required] [FromRoute] Guid clientId)
     {
         var clientResponse = await mediator.Send(new GetClientByIdQuery(clientId));
         return StatusCode((int)clientResponse.ApiState, clientResponse);
@@ -55,7 +58,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Clients, Common.Shared.Enums.CrudAction.Update)]
-    public async Task<IActionResult> UpdateClient([FromRoute] string clientId, [FromBody] ClientDto client)
+    public async Task<IActionResult> UpdateClient([FromRoute] Guid clientId, [FromBody] ClientDto client)
     {
         var afterUpdate = await mediator.Send(new UpdateClientCommand(client, clientId));
         return StatusCode((int)afterUpdate.ApiState, afterUpdate);
@@ -65,16 +68,16 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [SwaggerOperation(Summary = "deleting the client by clientid")]
     [ProducesResponseType(typeof(BaseResponse<ClientResponse>), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Clients, Common.Shared.Enums.CrudAction.Delete)]
-    public async Task<IActionResult> SoftDeleteClient([FromRoute] string clientId)
+    public async Task<IActionResult> SoftDeleteClient([FromRoute] Guid clientId)
     {
-        var clientDeleting = await mediator.Send(new SoftDeleteClientCommand(clientId));
+        var clientDeleting = await mediator.Send(new SoftDeleteClientCommand(clientId.ToObjectId()));
         return StatusCode((int)clientDeleting.ApiState, clientDeleting);
     }
 
     [HttpPatch("{clientId}/item")]
     [SwaggerOperation(Summary = "add single item to client")]
     [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Create)]
-    public async Task<IActionResult> AddItemToClient(string clientId, [FromBody] ItemDtoForClient item)
+    public async Task<IActionResult> AddItemToClient(Guid clientId, [FromBody] ItemDtoForClient item)
     {
         var response = await mediator.Send(
             new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.CurrencyId, clientId)
@@ -85,7 +88,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [HttpPatch("{clientId}/items")]
     [SwaggerOperation(Summary = "add many items to client")]
     [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Create)]
-    public async Task<IActionResult> AddItemsToClient(string clientId, [FromBody] List<ItemDtoForClient> items)
+    public async Task<IActionResult> AddItemsToClient(Guid clientId, [FromBody] List<ItemDtoForClient> items)
     {
         var response = await mediator.Send(new CreateItemsCommand(clientId, items));
         return StatusCode((int)response.ApiState, response);
@@ -94,7 +97,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [HttpDelete("{clientId}/item/{itemId}")]
     [SwaggerOperation(Summary = "remove item from client")]
     [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Delete)]
-    public async Task<IActionResult> RemoveItemFromClient(string clientId, string itemId)
+    public async Task<IActionResult> RemoveItemFromClient(Guid clientId, Guid itemId)
     {
         var response = await mediator.Send(new DeleteItemCommand(itemId, clientId));
         return StatusCode((int)response.ApiState, response);
@@ -103,7 +106,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [HttpPut("{clientId}/item")]
     [SwaggerOperation(Summary = "update item in client")]
     [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Update)]
-    public async Task<IActionResult> UpdateItemInClient(string clientId, [FromBody] Item item)
+    public async Task<IActionResult> UpdateItemInClient(Guid clientId, [FromBody] Item item)
     {
         var response = await mediator.Send(new UpdateItemCommand(clientId, item));
         return StatusCode((int)response.ApiState, response);
@@ -112,7 +115,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [HttpPut("{clientId}/items")]
     [SwaggerOperation(Summary = "update many items in client")]
     [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Update)]
-    public async Task<IActionResult> UpdateItemsInClient(string clientId, [FromBody] List<Item> items)
+    public async Task<IActionResult> UpdateItemsInClient(Guid clientId, [FromBody] List<Item> items)
     {
         var response = await mediator.Send(new UpdateItemsCommand(clientId, items));
         return StatusCode((int)response.ApiState, response);
@@ -121,7 +124,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [HttpGet("plan/{planId}")]
     [SwaggerOperation(Summary = "Get Plan by id ")]
     [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Read)]
-    public async Task<IActionResult> GetPlan(string planId)
+    public async Task<IActionResult> GetPlan(Guid planId)
     {
         var response = await mediator.Send(new GetPlanQuery(planId));
         return StatusCode((int)response.ApiState, response);
@@ -131,7 +134,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [SwaggerOperation(Summary = "Get Client Plans")]
     [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetClientPlans(
-        [FromRoute] string clientId,
+        [FromRoute] Guid clientId,
         [FromQuery] int top = 5,
         [FromQuery] int skip = 0
     )
@@ -143,7 +146,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [HttpPatch("{clientId}/plan")]
     [SwaggerOperation(Summary = "add single plan to client")]
     [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Create)]
-    public async Task<IActionResult> AddPlanToClient([FromRoute] string clientId, [FromBody] PlansDto plan)
+    public async Task<IActionResult> AddPlanToClient([FromRoute] Guid clientId, [FromBody] PlansDto plan)
     {
         var response = await mediator.Send(new AddPlanToClientCommand(clientId, plan));
         return StatusCode((int)response.ApiState, response);
@@ -152,16 +155,16 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [HttpDelete("plan/{planId}")]
     [SwaggerOperation(Summary = "remove plan from client")]
     [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Delete)]
-    public async Task<IActionResult> RemovePlanFromClient([FromRoute] string planId)
+    public async Task<IActionResult> RemovePlanFromClient([FromRoute] Guid planId)
     {
-        var response = await mediator.Send(new RemovePlanFromClientCommand(planId));
+        var response = await mediator.Send(new RemovePlanFromClientCommand(planId.ToObjectId()));
         return StatusCode((int)response.ApiState, response);
     }
 
     [HttpPatch("plan/{planId}")]
     [SwaggerOperation(Summary = "Update Client's Plan")]
     [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Update)]
-    public async Task<IActionResult> UpdateClientPlan([FromRoute] string planId, [FromBody] PlansDto plansDto)
+    public async Task<IActionResult> UpdateClientPlan([FromRoute] Guid planId, [FromBody] PlansDto plansDto)
     {
         var response = await mediator.Send(new UpdateClientPlanCommand(planId, plansDto));
         return StatusCode((int)response.ApiState, response);

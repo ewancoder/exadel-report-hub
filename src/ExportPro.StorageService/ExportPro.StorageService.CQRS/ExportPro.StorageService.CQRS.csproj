@@ -17,8 +17,4 @@
     <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Queries\Items\" />
-  </ItemGroup>
-
 </Project>

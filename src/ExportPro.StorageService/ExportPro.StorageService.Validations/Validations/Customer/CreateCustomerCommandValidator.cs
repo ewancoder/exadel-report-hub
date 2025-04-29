@@ -1,4 +1,5 @@
 ﻿using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 using MongoDB.Bson;
@@ -19,24 +20,27 @@ public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCo
             .WithMessage("Email is required.")
             .EmailAddress()
             .WithMessage("Invalid email format.");
-        RuleFor(x => x.CountryId).NotEmpty().WithMessage("The country id is required")
-            
-            .Must(id => { return ObjectId.TryParse(id, out _); }).WithMessage("The Country Id is not valid in format.")
-            .DependentRules(
-            () =>
+        RuleFor(x => x.CountryId)
+            .NotEmpty()
+            .WithMessage("The country id is required")
+            .DependentRules(() =>
             {
                 RuleFor(x => x.CountryId)
-                   .MustAsync(async (countryId, cancellation) =>
-                   {
-
-                       var country = await countryRepository.GetOneAsync(x => x.Id.ToString() == countryId, cancellation);
-                       if (country == null)
-                       {
-                           return false;
-                       }
-                       return true;
-                   })
-                   .WithMessage("CountryId does not exist.");
+                    .MustAsync(
+                        async (countryId, cancellation) =>
+                        {
+                            var country = await countryRepository.GetOneAsync(
+                                x => x.Id == countryId.ToObjectId(),
+                                cancellation
+                            );
+                            if (country == null)
+                            {
+                                return false;
+                            }
+                            return true;
+                        }
+                    )
+                    .WithMessage("CountryId does not exist.");
             });
     }
 }
