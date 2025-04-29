@@ -24,7 +24,7 @@ public sealed class ReportExportController(IMediator mediator) : ControllerBase
             return BadRequest("format must be 'csv' or 'xlsx'");
 
         var filters = new StatisticsFilterDto { ClientId = clientId };
-        var file = await mediator.Send(new GenerateStatisticsReportQuery(fmt, filters), ct);
+        var file = await mediator.Send(new GenerateCsvExcelReportQuery(fmt, filters), ct);
         return File(file.Content, file.ContentType, file.FileName);
     }
 }

@@ -5,7 +5,7 @@ using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.Export.Excel.Services;
 
-public sealed class ExcelReportGenerator : IReportGenerator
+public sealed class ExcelReportGenerator : ICsvExcelReportGenerator
 {
     public string ContentType => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public string Extension => "xlsx";

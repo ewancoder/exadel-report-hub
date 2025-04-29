@@ -9,19 +9,19 @@ using Microsoft.Extensions.Logging;
 
 namespace ExportPro.Export.CQRS.Queries;
 
-public sealed record GenerateStatisticsReportQuery(
+public sealed record GenerateCsvExcelReportQuery(
         ReportFormat Format,
         StatisticsFilterDto Filters)
     : IRequest<ReportFileDto>;
 
-public sealed class GenerateStatisticsReportQueryHandler(
+public sealed class GenerateCsvExcelReportQueryHandler(
         IStorageServiceApi storageApi,
-        IEnumerable<IReportGenerator> generators,
-        ILogger<GenerateStatisticsReportQueryHandler> log)
-    : IRequestHandler<GenerateStatisticsReportQuery, ReportFileDto>
+        IEnumerable<ICsvExcelReportGenerator> generators,
+        ILogger<GenerateCsvExcelReportQueryHandler> log)
+    : IRequestHandler<GenerateCsvExcelReportQuery, ReportFileDto>
 {
     public async Task<ReportFileDto> Handle(
-        GenerateStatisticsReportQuery request,
+        GenerateCsvExcelReportQuery request,
         CancellationToken cancellationToken)
     {
         log.LogInformation("Statistics export start (format={Format})", request.Format);
@@ -51,12 +51,15 @@ public sealed class GenerateStatisticsReportQueryHandler(
                 plansTask.Result.Data ?? []);
     }
 
-    private static ReportFileDto CreateReportFile(StatisticsReportDto dto, ReportFormat fmt, IEnumerable<IReportGenerator> generators)
+    private static ReportFileDto CreateReportFile(
+        StatisticsReportDto dto, 
+        ReportFormat fmt, 
+        IEnumerable<ICsvExcelReportGenerator> generators)
     {
         var key = fmt == ReportFormat.Csv ? "csv" : "xlsx";
         var generator = generators.First(g => g.Extension.ToLowerInvariant() == key);
         var bytes = generator.Generate(dto);
-        var name = ReportFileNameTemplates.Statistics(generator.Extension);
+        var name = FileNameTemplates.CsvExcelFileName(generator.Extension);
         return new ReportFileDto(name, bytes, generator.ContentType);
     }
 }

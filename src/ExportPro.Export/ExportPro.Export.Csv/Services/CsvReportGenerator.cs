@@ -8,7 +8,7 @@ using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.Export.Csv.Services;
 
-public sealed class CsvReportGenerator : IReportGenerator
+public sealed class CsvReportGenerator : ICsvExcelReportGenerator
 {
     public string ContentType => "text/csv";
     public string Extension => "csv";

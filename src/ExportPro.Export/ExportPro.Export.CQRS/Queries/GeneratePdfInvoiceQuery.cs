@@ -31,27 +31,17 @@ public sealed class GenerateInvoicePdfQueryHandler(
         logger.LogInformation("GenerateInvoicePdf START: user {UserId}, invoice {InvoiceId}, ts {Ts}",
                               userId, request.InvoiceId, DateTime.UtcNow);
 
-        try
-        {
-            var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
-            string currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
-            string client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
-            string customer = await GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
-            var invoice = MapToPdfInvoiceExportDto(invoiceDto, currency, client, customer);
-            var result = GeneratePdfFile(invoice);
+        var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
+        string currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
+        string client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
+        string customer = await GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
+        var invoice = MapToPdfInvoiceExportDto(invoiceDto, currency, client, customer);
+        var result = GeneratePdfFile(invoice);
 
-            logger.LogInformation("GenerateInvoicePdf DONE: user {UserId}, invoice {InvoiceId}, ts {Ts}",
-                                  userId, request.InvoiceId, DateTime.UtcNow);
+        logger.LogInformation("GenerateInvoicePdf DONE: user {UserId}, invoice {InvoiceId}, ts {Ts}",
+                              userId, request.InvoiceId, DateTime.UtcNow);
 
-            return result;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex,
-                "GenerateInvoicePdf FAILED: user {UserId}, invoice {InvoiceId}, ts {Ts}",
-                userId, request.InvoiceId, DateTime.UtcNow);
-            throw;
-        }
+        return result;
     }
 
     private static void ValidateInvoiceId(string invoiceId)
