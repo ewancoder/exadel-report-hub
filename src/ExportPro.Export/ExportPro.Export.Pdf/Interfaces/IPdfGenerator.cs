@@ -4,5 +4,5 @@ namespace ExportPro.Export.Pdf.Interfaces;
 
 public interface IPdfGenerator
 {
-    byte[] GeneratePdf(PdfInvoiceExportDto invoice);
+    byte[] GeneratePdfDocument(PdfInvoiceExportDto invoice);
 }

@@ -8,57 +8,68 @@ namespace ExportPro.Export.Pdf.Services;
 
 public sealed class PdfGenerator : IPdfGenerator
 {
-    public byte[] GeneratePdf(PdfInvoiceExportDto invoice)
+    public byte[] GeneratePdfDocument(PdfInvoiceExportDto invoice)
     {
         var doc = Document.Create(container =>
         {
             container.Page(page =>
             {
-                page.Margin(25);
-                page.Size(PageSizes.A4.Landscape());
+                ConfigureLayout(page);
+                GenerateHeader(invoice, page);
+                GenerateTableContent(invoice, page);
+                GenerateFooter(page);
+            });
+        });
 
-                // ---- Header ----
-                page.Header()
-                    .AlignCenter()
-                    .Text($"Invoice {invoice.InvoiceNumber}")
-                    .FontSize(20)
-                    .Bold();
+        return doc.GeneratePdf();
+    }
 
-                // ---- Table ----
-                page.Content()
-                .PaddingVertical(10)
-                .Table(table =>
-                {
-                    table.ColumnsDefinition(c =>
-                    {
-                        for (int i = 0; i < 9; i++) c.RelativeColumn();
-                    });
+    private static void GenerateFooter(PageDescriptor page)
+    {
+        // ---- Footer ----
+        page.Footer()
+            .AlignCenter()
+            .Text($"Generated {DateTime.UtcNow:u}")
+            .Italic();
+    }
 
-                    static IContainer Cell(IContainer c) =>
-                        c.Border(1)
-                         .BorderColor("#DDD")
-                         .Padding(4)
-                         .AlignMiddle()
-                         .AlignLeft();
+    private static void GenerateTableContent(PdfInvoiceExportDto invoice, PageDescriptor page)
+    {
+        // ---- Table ----
+        page.Content()
+        .PaddingVertical(10)
+        .Table(table =>
+        {
+            table.ColumnsDefinition(c =>
+            {
+                for (int i = 0; i < 9; i++) c.RelativeColumn();
+            });
 
-                    string[] headers =
-                    [
-                        "Customer", "Issue Date", "Due Date",
+            static IContainer Cell(IContainer c) =>
+                c.Border(1)
+                 .BorderColor("#DDD")
+                 .Padding(4)
+                 .AlignMiddle()
+                 .AlignLeft();
+
+            string[] headers =
+            [
+                "Customer", "Issue Date", "Due Date",
                         "Item List", "Currency",
                         "Payment Status", "Client", "Bank Acc. #", "Amount"
-                    ];
+            ];
 
-                    foreach (var h in headers)
-                    {
-                        table.Cell().Element(Cell).Text(h).Bold();
-                    }
+            foreach (var h in headers)
+            {
+                table.Cell().Element(Cell).Text(h).Bold();
+            }
 
-                    string itemList = string.Join("\n",
-                        invoice.Items.Select(i => $"{i.Name} — {i.Price:N2} {invoice.CurrencyCode}"));
+            string itemList = string.Join("\n",
+                invoice.Items.Select(i => $"{i.Name} — {i.Price:N2} {invoice.CurrencyCode}"));
 
-                    string[] row =
-                    [
-                        invoice.CustomerName ?? "-",
+            string[] row =
+            [
+                invoice.CustomerName ?? "-",
                         invoice.IssueDate.ToString("yyyy‑MM‑dd"),
                         invoice.DueDate.ToString("yyyy‑MM‑dd"),
                         itemList,
@@ -67,22 +78,28 @@ public sealed class PdfGenerator : IPdfGenerator
                         invoice.ClientName ?? "—",
                         invoice.BankAccountNumber ?? "—",
                         $"{invoice.Amount:N2} {invoice.CurrencyCode}"
-                    ];
+            ];
 
-                    foreach (var cell in row)
-                    {
-                        table.Cell().Element(Cell).Text(cell).FontSize(8);
-                    }
-                });
-
-                // ---- Footer ----
-                page.Footer()
-                    .AlignCenter()
-                    .Text($"Generated {DateTime.UtcNow:u}")
-                    .Italic();
-            });
+            foreach (var cell in row)
+            {
+                table.Cell().Element(Cell).Text(cell).FontSize(8);
+            }
         });
+    }
 
-        return doc.GeneratePdf();
+    private static void GenerateHeader(PdfInvoiceExportDto invoice, PageDescriptor page)
+    {
+        // ---- Header ----
+        page.Header()
+            .AlignCenter()
+            .Text($"Invoice {invoice.InvoiceNumber}")
+            .FontSize(20)
+            .Bold();
+    }
+
+    private static void ConfigureLayout(PageDescriptor page)
+    {
+        page.Margin(25);
+        page.Size(PageSizes.A4.Landscape());
     }
 }

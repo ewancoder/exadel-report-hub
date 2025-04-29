@@ -105,7 +105,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
 
     private PdfFileDto GeneratePdfFile(PdfInvoiceExportDto invoice)
     {
-        byte[] bytes = pdfGenerator.GeneratePdf(invoice);
+        byte[] bytes = pdfGenerator.GeneratePdfDocument(invoice);
         string name = FileNameTemplates.InvoicePdfFileName(invoice.InvoiceNumber);
         return new PdfFileDto(name, bytes);
     }
