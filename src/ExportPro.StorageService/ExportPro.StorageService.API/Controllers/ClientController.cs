@@ -5,6 +5,7 @@ using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 using ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 using ExportPro.StorageService.CQRS.Commands.Items;
 using ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
+using ExportPro.StorageService.CQRS.QueryHandlers.ItemQueries;
 using ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -45,7 +46,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [SwaggerOperation(Summary = "Getting  client by client id")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Clients, Common.Shared.Enums.CrudAction.Read)]
-    public async Task<IActionResult> GetClientById([Required] [FromRoute] string clientId)
+    public async Task<IActionResult> GetClientById([Required][FromRoute] string clientId)
     {
         var clientResponse = await mediator.Send(new GetClientByIdQuery(clientId));
         return StatusCode((int)clientResponse.ApiState, clientResponse);
@@ -69,6 +70,31 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     {
         var clientDeleting = await mediator.Send(new SoftDeleteClientCommand(clientId));
         return StatusCode((int)clientDeleting.ApiState, clientDeleting);
+    }
+
+    [HttpGet("{clientId}/items")]
+    [SwaggerOperation(Summary = "Get all items for a client")]
+    [ProducesResponseType(typeof(List<ItemResponse>), 200)]
+    [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Read)]
+    public async Task<IActionResult> GetItems(
+    [FromRoute] string clientId,
+    CancellationToken cancellationToken)
+    {
+        var response = await mediator.Send(new GetItemsQuery(clientId), cancellationToken);
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpGet("{clientId}/items/{itemId}")]
+    [SwaggerOperation(Summary = "Get a single item by ID for a client")]
+    [ProducesResponseType(typeof(ItemResponse), 200)]
+    [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Read)]
+    public async Task<IActionResult> GetItemById(
+        [FromRoute] string clientId,
+        [FromRoute] string itemId,
+        CancellationToken cancellationToken)
+    {
+        var response = await mediator.Send(new GetItemByIdQuery(clientId, itemId), cancellationToken);
+        return StatusCode((int)response.ApiState, response);
     }
 
     [HttpPatch("{clientId}/item")]

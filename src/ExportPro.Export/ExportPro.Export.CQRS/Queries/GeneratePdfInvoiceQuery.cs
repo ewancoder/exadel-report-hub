@@ -7,12 +7,11 @@ using ExportPro.Export.SDK.Utilities;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace ExportPro.Export.CQRS.Queries;
 
-public record GenerateInvoicePdfQuery([FromRoute] string InvoiceId) : IRequest<PdfFileDto>;
+public record GenerateInvoicePdfQuery(string InvoiceId) : IRequest<PdfFileDto>;
 
 public sealed class GenerateInvoicePdfQueryHandler(
     IStorageServiceApi storageApi,
