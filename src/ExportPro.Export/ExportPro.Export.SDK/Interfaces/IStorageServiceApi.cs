@@ -1,7 +1,7 @@
 ﻿using ExportPro.Common.Shared.Library;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 using Refit;
 
@@ -23,4 +23,21 @@ public interface IStorageServiceApi
 
     [Get("/api/Customer/{id}")]
     Task<BaseResponse<CustomerDto>> GetCustomerByIdAsync(string id, CancellationToken cancellationToken);
+
+    [Get("/api/Invoice")]
+    Task<BaseResponse<PaginatedListDto<InvoiceDto>>> GetInvoicesAsync(
+        [Query] int pageNumber = 1,
+        [Query] int pageSize = 1000,
+        [Query] bool includeDeleted = false,
+        CancellationToken cancellationToken = default);
+
+    [Get("/api/client/{clientId}/items")]
+    Task<BaseResponse<List<ItemResponse>>> GetItemsByClientAsync(
+        string clientId,
+        CancellationToken cancellationToken = default);
+
+    [Get("/api/client/{clientId}/plans")]
+    Task<BaseResponse<List<PlansResponse>>> GetPlansByClientAsync(
+        string clientId,
+        CancellationToken cancellationToken = default);
 }
