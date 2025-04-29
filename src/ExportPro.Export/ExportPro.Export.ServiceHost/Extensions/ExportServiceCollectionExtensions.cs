@@ -6,6 +6,8 @@ using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Export.CQRS.Profile;
 using ExportPro.Export.CQRS.Queries;
+using ExportPro.Export.Csv.Services;
+using ExportPro.Export.Excel.Services;
 using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
 using ExportPro.Export.SDK.Interfaces;
@@ -13,6 +15,7 @@ using ExportPro.Export.ServiceHost.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using QuestPDF.Infrastructure;
 using Refit;
 
@@ -22,61 +25,73 @@ public static class ExportServiceCollectionExtensions
 {
     public static IServiceCollection AddExportModule(this IServiceCollection services, IConfiguration cfg)
     {
-        // ---------- common infrastructure ----------
+        // —— common / swagger ——
         services.AddCommonRegistrations();
         services.AddOpenApi();
         services.AddSwaggerServices("ExportPro Export Service");
-        var jwtSettings = cfg.GetSection("JwtSettings").Get<JwtSettings>();
-        services.AddAuthentication(options =>
-        {
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.Authority = "https://localhost:7067/"; // if using identity server or Auth0
-            options.RequireHttpsMetadata = false; // optional for local dev
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings?.Issuer,
-                ValidAudience = jwtSettings?.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Secret))
-            };
-        });
 
-        // ---------- Mongo  ----------
+        // —— auth ——
+        var jwt = cfg.GetSection("JwtSettings").Get<JwtSettings>();
+        services.AddAuthentication(o => o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(o =>
+                {
+                    o.Authority = "https://localhost:7067/";
+                    o.RequireHttpsMetadata = false;
+                    o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwt?.Issuer,
+                        ValidAudience = jwt?.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt?.Secret))
+                    };
+                });
+
+        // —— Mongo —— 
         services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
         services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 
-        // ---------- MediatR --------------------------
-        services.AddMediatR(options =>
-            options.RegisterServicesFromAssemblies(
-                typeof(GenerateInvoicePdfQuery).Assembly,
-                typeof(IPdfGenerator).Assembly));
+        // —— MediatR —— 
+        services.AddMediatR(o => o.RegisterServicesFromAssemblies(
+            typeof(GenerateInvoicePdfQuery).Assembly,
+            typeof(IPdfGenerator).Assembly));
 
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
-        // ---------- AddAutoMapper --------------------------
+        // —— AutoMapper —— 
         services.AddAutoMapper(typeof(MappingProfile));
 
-        // ---------- PDF ------------------------------
+        // —— PDF —— 
         services.AddSingleton<IPdfGenerator, PdfGenerator>();
         QuestPDF.Settings.License = LicenseType.Community;
 
-        // ---------- HttpContext / auth forward -------
+        // —— CSV / XLSX generators —— 
+        services.AddSingleton<CsvReportGenerator>();
+        services.AddSingleton<ExcelReportGenerator>();
+        services.AddSingleton<IReportGenerator>(sp => sp.GetRequiredService<CsvReportGenerator>());
+        services.AddSingleton<IReportGenerator>(sp => sp.GetRequiredService<ExcelReportGenerator>());
+        services.AddSingleton<IReportGeneratorResolver, ReportGeneratorResolver>();
+
+        // —— HttpContext / auth forwarding —— 
         services.AddHttpContextAccessor();
         services.AddTransient<ForwardAuthHeaderHandler>();
 
-        // ---------- Refit client to Storage-service ---
-        var baseUrl = Environment.GetEnvironmentVariable("StorageUrl")
-                   ?? "http://localhost:5011";
-
-        services.AddRefitClient<IStorageServiceApi>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
-                .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
+        // —— Refit client to Storage-service —— 
+        var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
+        services.AddRefitClient<IStorageServiceApi>(new RefitSettings
+        {
+            ContentSerializer = new NewtonsoftJsonContentSerializer(
+                new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DateTimeZoneHandling = DateTimeZoneHandling.Utc
+                }
+            )
+        })
+        .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+        .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
 
         return services;
     }

@@ -4,6 +4,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Interfaces;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.Export.Csv.Services;
 
@@ -26,18 +27,35 @@ public sealed class CsvReportGenerator : IReportGenerator
         writer.WriteLine($"Filters,Start:{data.Filters.StartDate:yyyy-MM-dd},End:{data.Filters.EndDate:yyyy-MM-dd},ClientId:{data.Filters.ClientId}");
         writer.WriteLine();
 
-        writer.WriteLine("Invoices");
-        csv.WriteRecords(data.Invoices);
-        writer.WriteLine();
+        WriteSection("Invoices", ProjectInvoices(data.Invoices));
 
-        writer.WriteLine("Items");
-        csv.WriteRecords(data.Items);
-        writer.WriteLine();
+        WriteSection("Items", data.Items);
 
-        writer.WriteLine("Plans");
-        csv.WriteRecords(data.Plans);
+        WriteSection("Plans", data.Plans);
 
         writer.Flush();
         return ms.ToArray();
+
+        void WriteSection<T>(string title, IEnumerable<T> records)
+        {
+            writer.WriteLine(title);
+            csv.WriteRecords(records);
+            writer.WriteLine();
+        }
     }
+
+    private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src) =>
+        src.Select(i => new
+        {
+            i.Id,
+            i.InvoiceNumber,
+            IssueDate = i.IssueDate.ToString("yyyy-MM-dd"),
+            DueDate = i.DueDate.ToString("yyyy-MM-dd"),
+            i.Amount,
+            i.CurrencyId,
+            i.PaymentStatus,
+            i.BankAccountNumber,
+            i.ClientId,
+            i.CustomerId
+        });
 }

@@ -26,9 +26,9 @@ public interface IStorageServiceApi
 
     [Get("/api/Invoice")]
     Task<BaseResponse<PaginatedListDto<InvoiceDto>>> GetInvoicesAsync(
-        [Query] int pageNumber = 1,
-        [Query] int pageSize = 1000,
-        [Query] bool includeDeleted = false,
+        int pageNumber = 1,
+        int pageSize = 1000,
+        bool includeDeleted = false,
         CancellationToken cancellationToken = default);
 
     [Get("/api/client/{clientId}/items")]
