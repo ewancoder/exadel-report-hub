@@ -172,7 +172,33 @@
             "SwaggerKey": "StorageService"
         },
         {
-            "UpstreamPathTemplate": "/api/{clientId}/plan",
+            "UpstreamPathTemplate": "/api/client/plan/{planId}",
+            "UpstreamHttpMethod": [ "Get", "Delete", "Patch" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "storageservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/client/plan/{planId}",
+            "SwaggerKey": "StorageService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/client/{clientId}/plans",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "storageservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/client/{clientId}/plans",
+            "SwaggerKey": "StorageService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/client/{clientId}/plan",
             "UpstreamHttpMethod": [ "Patch" ],
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
@@ -181,23 +207,9 @@
                     "Port": 8080
                 }
             ],
-            "DownstreamPathTemplate": "/api/{clientId}/plan",
+            "DownstreamPathTemplate": "/api/client/{clientId}/plan",
             "SwaggerKey": "StorageService"
         },
-        {
-            "UpstreamPathTemplate": "/api/{clientId}/plan/{planId}",
-            "UpstreamHttpMethod": [ "Delete", "Patch" ],
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "storageservice",
-                    "Port": 8080
-                }
-            ],
-            "DownstreamPathTemplate": "/api/{clientId}/plan/{planId}",
-            "SwaggerKey": "StorageService"
-        },
-
         {
             "UpstreamPathTemplate": "/api/customer",
             "UpstreamHttpMethod": [ "Post" ],
@@ -235,33 +247,6 @@
                 }
             ],
             "DownstreamPathTemplate": "/api/customer/",
-            "SwaggerKey": "StorageService"
-        },
-        {
-            "UpstreamPathTemplate": "/api/client/{clientId}/plan",
-            "UpstreamHttpMethod": [ "Patch" ],
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "storageservice",
-                    "Port": 8080
-                }
-            ],
-            "DownstreamPathTemplate": "/api/client/{clientId}/plan",
-            "SwaggerKey": "StorageService"
-        },
-
-        {
-            "UpstreamPathTemplate": "/api/client/{clientId}/plan/{planId}",
-            "UpstreamHttpMethod": [ "Delete", "Patch" ],
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "storageservice",
-                    "Port": 8080
-                }
-            ],
-            "DownstreamPathTemplate": "/api/client/{clientId}/plan/{planId}",
             "SwaggerKey": "StorageService"
         },
         {
