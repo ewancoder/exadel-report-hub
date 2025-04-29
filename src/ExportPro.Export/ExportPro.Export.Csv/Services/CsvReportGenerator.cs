@@ -15,37 +15,42 @@ public sealed class CsvReportGenerator : IReportGenerator
 
     public byte[] Generate(StatisticsReportDto data)
     {
-        using var ms = new MemoryStream();
-        using var writer = new StreamWriter(ms, Encoding.UTF8, leaveOpen: true);
-        using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
-        {
-            HasHeaderRecord = true,
-            NewLine = Environment.NewLine
-        });
-
-        writer.WriteLine($"Generated at,{DateTime.UtcNow:u}");
-        writer.WriteLine($"Filters,Start:{data.Filters.StartDate:yyyy-MM-dd},End:{data.Filters.EndDate:yyyy-MM-dd},ClientId:{data.Filters.ClientId}");
-        writer.WriteLine();
-
-        WriteSection("Invoices", ProjectInvoices(data.Invoices));
-
-        WriteSection("Items", data.Items);
-
-        WriteSection("Plans", data.Plans);
-
-        writer.Flush();
-        return ms.ToArray();
-
-        void WriteSection<T>(string title, IEnumerable<T> records)
-        {
-            writer.WriteLine(title);
-            csv.WriteRecords(records);
-            writer.WriteLine();
-        }
+        SetupCsvStream(out MemoryStream ms, out StreamWriter writer, out CsvWriter csv);
+        GenerateReportMetaData(data, writer);
+        GenerateInvoiceSection(data, writer, csv);
+        GenerateItemSection(data, writer, csv);
+        GeneratePlanSection(data, writer, csv);
+        return FinalizeCsvData(ms, writer);
     }
 
-    private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src) =>
-        src.Select(i => new
+    private static byte[] FinalizeCsvData(MemoryStream ms, StreamWriter writer)
+    {
+        writer.Flush();
+        return ms.ToArray();
+    }
+
+    private static void GeneratePlanSection(StatisticsReportDto data, StreamWriter writer, CsvWriter csv)
+    {
+        writer.WriteLine("Plans");
+        csv.WriteRecords(data.Plans);
+        writer.WriteLine();
+    }
+
+    private static void GenerateItemSection(StatisticsReportDto data, StreamWriter writer, CsvWriter csv)
+    {
+        writer.WriteLine("Items");
+        csv.WriteRecords(data.Items);
+        writer.WriteLine();
+    }
+
+    private static void GenerateInvoiceSection(
+        StatisticsReportDto data,
+        StreamWriter writer,
+        CsvWriter csv)
+    {
+        writer.WriteLine("Invoices");
+
+        var rows = data.Invoices.Select(i => new
         {
             i.Id,
             i.InvoiceNumber,
@@ -58,4 +63,26 @@ public sealed class CsvReportGenerator : IReportGenerator
             i.ClientId,
             i.CustomerId
         });
+
+        csv.WriteRecords(rows);
+        writer.WriteLine();
+    }
+
+    private static void GenerateReportMetaData(StatisticsReportDto data, StreamWriter writer)
+    {
+        writer.WriteLine($"Generated at,{DateTime.UtcNow:u}");
+        writer.WriteLine($"Filters,ClientId:{data.Filters.ClientId}");
+        writer.WriteLine();
+    }
+
+    private static void SetupCsvStream(out MemoryStream ms, out StreamWriter writer, out CsvWriter csv)
+    {
+        ms = new MemoryStream();
+        writer = new StreamWriter(ms, Encoding.UTF8, leaveOpen: true);
+        csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true,
+            NewLine = Environment.NewLine
+        });
+    }
 }

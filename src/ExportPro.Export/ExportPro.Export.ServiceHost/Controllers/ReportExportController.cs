@@ -13,26 +13,17 @@ public sealed class ReportExportController(IMediator mediator) : ControllerBase
 {
     /// <summary>
     /// Export statistics of invoices, items and plans.
-    /// Example: <c>/api/reports/statistics?format=csv</c>
     /// </summary>
     [HttpGet("statistics")]
     public async Task<IActionResult> Statistics(
         [FromQuery] string format = "csv",
-        [FromQuery] DateTime? startDate = null,
-        [FromQuery] DateTime? endDate = null,
         [FromQuery] string? clientId = null,
         CancellationToken ct = default)
     {
         if (!Enum.TryParse<ReportFormat>(format, true, out var fmt))
             return BadRequest("format must be 'csv' or 'xlsx'");
 
-        StatisticsFilterDto filters = new()
-        {
-            StartDate = startDate,
-            EndDate = endDate,
-            ClientId = clientId
-        };
-
+        var filters = new StatisticsFilterDto { ClientId = clientId };
         var file = await mediator.Send(new GenerateStatisticsReportQuery(fmt, filters), ct);
         return File(file.Content, file.ContentType, file.FileName);
     }

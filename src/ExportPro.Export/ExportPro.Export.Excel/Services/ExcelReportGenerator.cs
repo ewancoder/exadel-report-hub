@@ -28,9 +28,7 @@ public sealed class ExcelReportGenerator : IReportGenerator
 
         var info = wb.Worksheets.Add("ReportInfo");
         info.Cell("A1").Value = "GeneratedAt"; info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
-        info.Cell("A2").Value = "StartDate"; info.Cell("B2").Value = data.Filters.StartDate?.ToString("yyyy-MM-dd") ?? "—";
-        info.Cell("A3").Value = "EndDate"; info.Cell("B3").Value = data.Filters.EndDate?.ToString("yyyy-MM-dd") ?? "—";
-        info.Cell("A4").Value = "ClientId"; info.Cell("B4").Value = data.Filters.ClientId ?? "—";
+        info.Cell("A2").Value = "ClientId"; info.Cell("B2").Value = data.Filters.ClientId ?? "—";
 
         using var ms = new MemoryStream();
         wb.SaveAs(ms);

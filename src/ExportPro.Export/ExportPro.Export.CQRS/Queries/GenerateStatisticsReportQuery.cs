@@ -1,4 +1,4 @@
-﻿using ExportPro.Export.SDK.DTOs;
+﻿/*using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Enums;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.SDK.Utilities;
@@ -72,6 +72,80 @@ public sealed class GenerateStatisticsReportQueryHandler(
         var generator = resolver.Resolve(format);
         var bytes = generator.Generate(dto);
         var name = ReportFileNameTemplates.Statistics(generator.Extension);
+        return new ReportFileDto(name, bytes, generator.ContentType);
+    }
+}*/
+
+using ExportPro.Export.SDK.DTOs;
+using ExportPro.Export.SDK.Enums;
+using ExportPro.Export.SDK.Interfaces;
+using ExportPro.Export.SDK.Utilities;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.StorageService.SDK.Responses;
+using MediatR;
+using Microsoft.Extensions.Logging;
+
+namespace ExportPro.Export.CQRS.Queries;
+
+public sealed record GenerateStatisticsReportQuery(
+        ReportFormat Format,
+        StatisticsFilterDto Filters)
+    : IRequest<ReportFileDto>;
+
+public sealed class GenerateStatisticsReportQueryHandler(
+        IStorageServiceApi storageApi,
+        IEnumerable<IReportGenerator> generators,   // <-- all formats injected
+        ILogger<GenerateStatisticsReportQueryHandler> log)
+    : IRequestHandler<GenerateStatisticsReportQuery, ReportFileDto>
+{
+    // build a lookup: "csv" → CsvReportGenerator, "xlsx" → ExcelReportGenerator
+    private readonly Dictionary<string, IReportGenerator> _byExt =
+        generators.ToDictionary(g => g.Extension.ToLowerInvariant(), g => g);
+
+    public async Task<ReportFileDto> Handle(
+        GenerateStatisticsReportQuery request,
+        CancellationToken ct)
+    {
+        log.LogInformation("Statistics export start (format={Format})", request.Format);
+
+        var invoices = await FetchInvoicesAsync(ct);
+        var (items, plans) = await FetchItemsAndPlansAsync(request.Filters.ClientId, ct);
+
+        var dto = new StatisticsReportDto { Invoices = invoices, Items = items, Plans = plans, Filters = request.Filters };
+        var file = CreateReportFile(dto, request.Format);
+
+        log.LogInformation("Statistics export done (bytes={Len})", file.Content.Length);
+        return file;
+    }
+
+    // ---------- internal helpers ----------
+
+    private async Task<List<InvoiceDto>> FetchInvoicesAsync(CancellationToken ct)
+        => (await storageApi.GetInvoicesAsync(1, int.MaxValue, false, ct))
+               .Data?.Items ?? [];
+
+    private async Task<(List<ItemResponse>, List<PlansResponse>)>
+        FetchItemsAndPlansAsync(string? clientId, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(clientId))
+            return ([], []);
+
+        var itemsTask = storageApi.GetItemsByClientAsync(clientId, ct);
+        var plansTask = storageApi.GetPlansByClientAsync(clientId, ct);
+        await Task.WhenAll(itemsTask, plansTask);
+
+        return (itemsTask.Result.Data ?? [],
+                plansTask.Result.Data ?? []);
+    }
+
+    private ReportFileDto CreateReportFile(StatisticsReportDto dto, ReportFormat fmt)
+    {
+        var key = fmt == ReportFormat.Csv ? "csv" : "xlsx";
+        var generator = _byExt[key];
+
+        var bytes = generator.Generate(dto);
+        var name = ReportFileNameTemplates.Statistics(generator.Extension);
+
         return new ReportFileDto(name, bytes, generator.ContentType);
     }
 }

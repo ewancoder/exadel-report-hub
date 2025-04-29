@@ -67,12 +67,9 @@ public static class ExportServiceCollectionExtensions
         services.AddSingleton<IPdfGenerator, PdfGenerator>();
         QuestPDF.Settings.License = LicenseType.Community;
 
-        // —— CSV / XLSX generators —— 
-        services.AddSingleton<CsvReportGenerator>();
-        services.AddSingleton<ExcelReportGenerator>();
-        services.AddSingleton<IReportGenerator>(sp => sp.GetRequiredService<CsvReportGenerator>());
-        services.AddSingleton<IReportGenerator>(sp => sp.GetRequiredService<ExcelReportGenerator>());
-        services.AddSingleton<IReportGeneratorResolver, ReportGeneratorResolver>();
+        // —— CSV / XLSX generators ——
+        services.AddSingleton<IReportGenerator, CsvReportGenerator>();
+        services.AddSingleton<IReportGenerator, ExcelReportGenerator>();
 
         // —— HttpContext / auth forwarding —— 
         services.AddHttpContextAccessor();
