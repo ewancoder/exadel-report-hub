@@ -11,7 +11,7 @@ public class Customer : IModel
     public string? Email { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? CountryId { get; set; }
+    public ObjectId CountryId { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }

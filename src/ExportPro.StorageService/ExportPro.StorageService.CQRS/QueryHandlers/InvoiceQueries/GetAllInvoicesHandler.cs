@@ -2,6 +2,7 @@
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
@@ -15,12 +16,10 @@ public class GetAllInvoicesQuery : IQuery<PaginatedListDto<InvoiceDto>>
     public int PageSize { get; set; } = 10;
     public bool IncludeDeleted { get; set; } = false;
 }
+
 public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper)
     : IQueryHandler<GetAllInvoicesQuery, PaginatedListDto<InvoiceDto>>
 {
-    private readonly IInvoiceRepository _repository = repository;
-    private readonly IMapper _mapper = mapper;
-
     public async Task<BaseResponse<PaginatedListDto<InvoiceDto>>> Handle(
         GetAllInvoicesQuery request,
         CancellationToken cancellationToken
@@ -48,7 +47,7 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper
 
         var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
 
-        var paginatedInvoices = await _repository.GetAllPaginatedAsync(
+        var paginatedInvoices = await repository.GetAllPaginatedAsync(
             parameters,
             request.IncludeDeleted,
             cancellationToken
@@ -57,15 +56,16 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper
         var invoiceDtos = paginatedInvoices
             .Items.Select(invoice => new InvoiceDto
             {
-                Id = invoice.Id.ToString(),
+                Id = invoice.Id.ToGuid(),
                 InvoiceNumber = invoice.InvoiceNumber,
                 IssueDate = invoice.IssueDate,
                 DueDate = invoice.DueDate,
-                CurrencyId = invoice.CurrencyId,
+                CurrencyId = invoice.CurrencyId?.ToGuid(),
                 PaymentStatus = invoice.PaymentStatus,
                 BankAccountNumber = invoice.BankAccountNumber,
-                ClientId = invoice.ClientId,
-                Items = invoice.Items.Select(_ => _mapper.Map<ItemDtoForClient>(_)).ToList(),
+                ClientId = invoice.ClientId?.ToGuid(),
+                Amount = invoice.Amount,
+                Items = invoice.Items.Select(_ => mapper.Map<ItemDtoForClient>(_)).ToList(),
             })
             .ToList();
 

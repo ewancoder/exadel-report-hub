@@ -2,6 +2,7 @@
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
@@ -15,44 +16,32 @@ public class CreateCustomerCommand : ICommand<CustomerResponse>
 {
     public required string Name { get; set; }
     public required string Email { get; set; }
-    public required string CountryId { get; set; }
+    public required Guid CountryId { get; set; }
 }
-public class CreateCustomerCommandHandler(ICustomerRepository repository
 
-    , IMapper mapper, IValidator<CreateCustomerCommand> validator)
-    : ICommandHandler<CreateCustomerCommand, CustomerResponse>
+public class CreateCustomerCommandHandler(
+    ICustomerRepository repository,
+    IMapper mapper,
+    IValidator<CreateCustomerCommand> validator
+) : ICommandHandler<CreateCustomerCommand, CustomerResponse>
 {
-    private readonly IMapper _mapper = mapper;
-    private readonly ICustomerRepository _repository = repository;
-    private readonly IValidator<CreateCustomerCommand> _validator = validator;
     public async Task<BaseResponse<CustomerResponse>> Handle(
         CreateCustomerCommand request,
         CancellationToken cancellationToken
     )
     {
-        var validate = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validate.IsValid)
-        {
-            return new BaseResponse<CustomerResponse>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.BadRequest,
-                Messages = validate.Errors.Select(x => x.ErrorMessage).ToList(),
-            };
-        }
         var countryIdString = request.CountryId.ToString();
-
         var customer = new Customer
         {
             Id = ObjectId.GenerateNewId(),
             Name = request.Name,
             Email = request.Email,
-            CountryId = countryIdString,
+            CountryId = request.CountryId.ToObjectId(),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = null,
             IsDeleted = false,
         };
-        await _repository.AddOneAsync(customer, cancellationToken);
-        return new BaseResponse<CustomerResponse> { Data = _mapper.Map<CustomerResponse>(customer) };
+        await repository.AddOneAsync(customer, cancellationToken);
+        return new BaseResponse<CustomerResponse> { Data = mapper.Map<CustomerResponse>(customer) };
     }
 }
