@@ -1,41 +1,34 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using System.Net;
+using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
-using System.Net;
 
-namespace ExportPro.StorageService.CQRS.Commands.Items;
+namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
-public record UpdateItemCommand(string ClientId, Item Item) : ICommand<bool>;
+public record UpdateItemCommand(Guid ClientId, Item Item) : ICommand<bool>;
 
 public class UpdateItemCommandHandler(IClientRepository repository) : ICommandHandler<UpdateItemCommand, bool>
 {
-    private readonly IClientRepository _repository = repository;
-
     public async Task<BaseResponse<bool>> Handle(UpdateItemCommand request, CancellationToken cancellationToken)
     {
-        if (!ObjectId.TryParse(request.ClientId, out var clientObjectId))
-        {
-            return new BaseResponse<bool>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.BadRequest,
-                Messages = ["Invalid ClientId format."]
-            };
-        }
-
         if (request.Item is null || request.Item.Id == ObjectId.Empty)
         {
             return new BaseResponse<bool>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
-                Messages = ["Item is null or missing valid Id."]
+                Messages = ["Item is null or missing valid Id."],
             };
         }
 
-        var updated = await _repository.UpdateItemInClient(clientObjectId, request.Item, cancellationToken);
+        var updated = await repository.UpdateItemInClient(
+            request.ClientId.ToObjectId(),
+            request.Item,
+            cancellationToken
+        );
 
         if (!updated)
         {

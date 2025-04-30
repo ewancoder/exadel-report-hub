@@ -11,33 +11,37 @@ namespace ExportPro.StorageService.API.Controllers;
 public class CurrencyController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateCurrencyCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(
+        [FromBody] CreateCurrencyCommand command,
+        CancellationToken cancellationToken
+    )
     {
         var response = await mediator.Send(command, cancellationToken);
         return Ok(response);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateCurrencyCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(
+        [FromRoute] Guid id,
+        [FromBody] string CurrencyCode,
+        CancellationToken cancellationToken
+    )
     {
-        command.Id = ObjectId.Parse(id); // No need for try/catch as FluentValidation will handle it
-        var response = await mediator.Send(command, cancellationToken);
+        var response = await mediator.Send(new UpdateCurrencyCommand(id, CurrencyCode));
         return Ok(response);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var command = new DeleteCurrencyCommand(ObjectId.Parse(id));
-        var response = await mediator.Send(command, cancellationToken);
+        var response = await mediator.Send(new DeleteCurrencyCommand(id), cancellationToken);
         return Ok(response);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var query = new GetCurrencyByIdQuery(ObjectId.Parse(id));
-        var response = await mediator.Send(query, cancellationToken);
+        var response = await mediator.Send(new GetCurrencyByIdQuery(id), cancellationToken);
         return Ok(response);
     }
 

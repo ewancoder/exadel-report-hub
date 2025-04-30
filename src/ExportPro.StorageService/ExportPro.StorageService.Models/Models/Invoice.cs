@@ -14,14 +14,15 @@ public class Invoice : IModel
     public double? Amount { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? CurrencyId { get; set; }
+    public ObjectId? CurrencyId { get; set; }
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? ClientId { get; set; }
+    public ObjectId? ClientId { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? CustomerId { get; set; }
+    public ObjectId? CustomerId { get; set; }
     public List<Item>? Items { get; set; }
+    public bool IsDeleted { get; set; } = false;
 }

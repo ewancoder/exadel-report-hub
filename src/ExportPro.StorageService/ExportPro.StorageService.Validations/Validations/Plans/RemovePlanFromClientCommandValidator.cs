@@ -14,21 +14,17 @@ public sealed class RemovePlanFromClientCommandValidator : AbstractValidator<Rem
         RuleFor(x => x.PlanId)
             .NotEmpty()
             .WithMessage("Plan  Id  cannot be empty.")
-            .Must(id =>
-            {
-                return ObjectId.TryParse(id, out _);
-            })
-            .WithMessage("The Plan Id is not valid in format.")
             .DependentRules(() =>
             {
-                RuleFor(x => x.PlanId).MustAsync(
-                async (plan, cancellationToken) =>
-                {
-                    var plansResponse = await clientRepository.GetPlan(plan, cancellationToken);
-                    return plansResponse != null;
-                }
-            )
-            .WithMessage("The Plan id does not exist in the client");
+                RuleFor(x => x.PlanId)
+                    .MustAsync(
+                        async (plan, cancellationToken) =>
+                        {
+                            var plansResponse = await clientRepository.GetPlan(plan, cancellationToken);
+                            return plansResponse != null;
+                        }
+                    )
+                    .WithMessage("The Plan id does not exist in the client");
             });
     }
 }
