@@ -10,14 +10,13 @@ using ExportPro.StorageService.SDK.PaginationParams;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public class GetAllInvoicesQuery : IQuery<PaginatedListDto<InvoiceDto>>
+public sealed class GetAllInvoicesQuery : IQuery<PaginatedListDto<InvoiceDto>>
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public bool IncludeDeleted { get; set; } = false;
 }
-
-public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper)
+public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper)
     : IQueryHandler<GetAllInvoicesQuery, PaginatedListDto<InvoiceDto>>
 {
     public async Task<BaseResponse<PaginatedListDto<InvoiceDto>>> Handle(

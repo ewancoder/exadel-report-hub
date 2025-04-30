@@ -9,14 +9,16 @@ using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
-public class CreateCountryCommand : ICommand<CountryDto>
+public sealed class CreateCountryCommand : ICommand<CountryDto>
 {
     public required string Name { get; set; }
     public string? Code { get; set; }
     public Guid CurrencyId { get; set; }
 }
-
-public class CreateCountryCommandHandler(ICountryRepository repository, IMapper mapper)
+public sealed class CreateCountryCommandHandler(
+    ICountryRepository repository, 
+    IMapper mapper, 
+    IValidator<CreateCountryCommand> validator)
     : ICommandHandler<CreateCountryCommand, CountryDto>
 {
     public async Task<BaseResponse<CountryDto>> Handle(
@@ -24,6 +26,17 @@ public class CreateCountryCommandHandler(ICountryRepository repository, IMapper 
         CancellationToken cancellationToken
     )
     {
+        var validate = await _validator.ValidateAsync(request, cancellationToken);
+        
+        if (!validate.IsValid)
+        {
+            return new BaseResponse<CountryDto>
+            {
+                IsSuccess = false,
+                ApiState = HttpStatusCode.BadRequest,
+                Messages = ["Country name is required."],
+            };
+        }
         var country = new Country
         {
             Name = request.Name,

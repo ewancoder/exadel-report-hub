@@ -9,7 +9,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public class UpdateInvoiceCommand : ICommand<Invoice>
+public sealed class UpdateInvoiceCommand : ICommand<Invoice>
 {
     public Guid Id { get; set; }
     public string? InvoiceNumber { get; set; }
@@ -22,8 +22,7 @@ public class UpdateInvoiceCommand : ICommand<Invoice>
     public Guid? ClientId { get; set; }
     public List<Guid>? ItemIds { get; set; }
 }
-
-public class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<UpdateInvoiceCommand, Invoice>
+public sealed class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<UpdateInvoiceCommand, Invoice>
 {
     private readonly IInvoiceRepository _repository = repository;
 

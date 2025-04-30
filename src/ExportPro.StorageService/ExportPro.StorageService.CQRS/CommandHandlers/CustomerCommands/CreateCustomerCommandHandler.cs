@@ -12,7 +12,7 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
-public class CreateCustomerCommand : ICommand<CustomerResponse>
+public sealed class CreateCustomerCommand : ICommand<CustomerResponse>
 {
     public required string Name { get; set; }
     public required string Email { get; set; }

@@ -10,7 +10,7 @@ namespace ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 
 public record GetCustomerByIdQuery(ObjectId Id) : IQuery<CustomerDto>;
 
-public class GetCustomerByIdQueryHandler(ICustomerRepository repository, IMapper mapper)
+public sealed class GetCustomerByIdQueryHandler(ICustomerRepository repository, IMapper mapper)
     : IQueryHandler<GetCustomerByIdQuery, CustomerDto>
 {
     private readonly ICustomerRepository _repository = repository;

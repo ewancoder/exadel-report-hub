@@ -8,6 +8,10 @@ using MediatR;
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 
 public record CreateCurrencyCommand(string Code) : IRequest<BaseResponse<CurrencyResponse>>;
+public sealed class CreateCurrencyHandler(ICurrencyRepository repository, IMapper mapper) : IRequestHandler<CreateCurrencyCommand, BaseResponse<CurrencyResponse>>
+{
+    private readonly ICurrencyRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
 public class CreateCurrencyHandler(ICurrencyRepository repository, IMapper mapper)
     : IRequestHandler<CreateCurrencyCommand, BaseResponse<CurrencyResponse>>

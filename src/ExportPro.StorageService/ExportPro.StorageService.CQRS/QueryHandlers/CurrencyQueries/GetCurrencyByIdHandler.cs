@@ -11,8 +11,7 @@ namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 
 public record GetCurrencyByIdQuery(Guid Id) : IRequest<BaseResponse<CurrencyResponse>>;
 
-public class GetCurrencyByIdHandler(ICurrencyRepository repository, IMapper mapper)
-    : IRequestHandler<GetCurrencyByIdQuery, BaseResponse<CurrencyResponse>>
+public sealed class GetCurrencyByIdHandler(ICurrencyRepository repository, IMapper mapper) : IRequestHandler<GetCurrencyByIdQuery, BaseResponse<CurrencyResponse>>
 {
     public async Task<BaseResponse<CurrencyResponse>> Handle(
         GetCurrencyByIdQuery request,
