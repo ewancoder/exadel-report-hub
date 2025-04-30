@@ -10,7 +10,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ExportPro.StorageService.SDK.Responses;
 
-public class ItemResponse
+public sealed class ItemResponse
 {
     public required Guid Id { get; set; }
     public string? Name { get; set; }

@@ -9,7 +9,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public class UpdateInvoiceCommand : ICommand<Invoice>
+public sealed class UpdateInvoiceCommand : ICommand<Invoice>
 {
     public Guid Id { get; set; }
     public string? InvoiceNumber { get; set; }
@@ -23,23 +23,15 @@ public class UpdateInvoiceCommand : ICommand<Invoice>
     public List<Guid>? ItemIds { get; set; }
 }
 
-public class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<UpdateInvoiceCommand, Invoice>
+public sealed class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<UpdateInvoiceCommand, Invoice>
 {
-    private readonly IInvoiceRepository _repository = repository;
-
     public async Task<BaseResponse<Invoice>> Handle(UpdateInvoiceCommand request, CancellationToken cancellationToken)
     {
-        var existing = await _repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
+        var existing = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
         if (existing == null)
         {
-            return new BaseResponse<Invoice>
-            {
-                ApiState = HttpStatusCode.NotFound,
-                IsSuccess = false,
-                Messages = ["Invoice not found."],
-            };
+            return new NotFoundResponse<Invoice>("Invoice not found.");
         }
-
         existing.InvoiceNumber = request.InvoiceNumber;
         existing.IssueDate = request.IssueDate;
         existing.DueDate = request.DueDate;
@@ -49,15 +41,7 @@ public class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandl
         existing.BankAccountNumber = request.BankAccountNumber;
         existing.ClientId = request.ClientId?.ToObjectId();
         //existing.ItemIds = request.ItemIds ?? new List<string>();
-
-        await _repository.UpdateOneAsync(existing, cancellationToken);
-
-        return new BaseResponse<Invoice>
-        {
-            Data = existing,
-            ApiState = HttpStatusCode.OK,
-            IsSuccess = true,
-            Messages = ["Invoice updated successfully."],
-        };
+        await repository.UpdateOneAsync(existing, cancellationToken);
+        return new SuccessResponse<Invoice>(existing, "Invoice updated successfully.");
     }
 }

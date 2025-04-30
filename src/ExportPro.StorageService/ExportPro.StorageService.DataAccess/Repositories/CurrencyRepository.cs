@@ -7,7 +7,7 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class CurrencyRepository(ICollectionProvider collectionProvider)
+public sealed class CurrencyRepository(ICollectionProvider collectionProvider)
     : BaseRepository<Currency>(collectionProvider),
         ICurrencyRepository
 {

@@ -8,9 +8,10 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
-public record UpdateCountryCommand(Guid Id, UpdateCountry Country) : ICommand<bool>;
+public sealed record UpdateCountryCommand(Guid Id, UpdateCountry Country) : ICommand<bool>;
 
-public class UpdateCountryCommandHandler(ICountryRepository repository) : ICommandHandler<UpdateCountryCommand, bool>
+public sealed class UpdateCountryCommandHandler(ICountryRepository repository)
+    : ICommandHandler<UpdateCountryCommand, bool>
 {
     public async Task<BaseResponse<bool>> Handle(UpdateCountryCommand request, CancellationToken cancellationToken)
     {

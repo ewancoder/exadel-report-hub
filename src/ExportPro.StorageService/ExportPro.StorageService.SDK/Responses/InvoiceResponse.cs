@@ -2,7 +2,7 @@ using ExportPro.StorageService.Models.Enums;
 
 namespace ExportPro.StorageService.SDK.Responses;
 
-public class InvoiceResponse
+public sealed class InvoiceResponse
 {
     public required Guid Id { get; set; }
     public string InvoiceNumber { get; set; }

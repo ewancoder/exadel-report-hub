@@ -9,7 +9,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
-public record CreateItemCommand(
+public sealed record CreateItemCommand(
     string Name,
     string Description,
     double Price,
@@ -18,7 +18,8 @@ public record CreateItemCommand(
     Guid ClientId
 ) : ICommand<string>;
 
-public class CreateItemCommandHandler(IClientRepository clientRepository) : ICommandHandler<CreateItemCommand, string>
+public sealed class CreateItemCommandHandler(IClientRepository clientRepository)
+    : ICommandHandler<CreateItemCommand, string>
 {
     public async Task<BaseResponse<string>> Handle(CreateItemCommand request, CancellationToken cancellationToken)
     {

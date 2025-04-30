@@ -11,9 +11,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 
-public record SoftDeleteClientCommand(ObjectId ClientId) : ICommand<ClientResponse>;
+public sealed record SoftDeleteClientCommand(ObjectId ClientId) : ICommand<ClientResponse>;
 
-public class SoftDeleteClientCommandHandler(IClientRepository clientRepository, IMapper mapper)
+public sealed class SoftDeleteClientCommandHandler(IClientRepository clientRepository, IMapper mapper)
     : ICommandHandler<SoftDeleteClientCommand, ClientResponse>
 {
     public async Task<BaseResponse<ClientResponse>> Handle(

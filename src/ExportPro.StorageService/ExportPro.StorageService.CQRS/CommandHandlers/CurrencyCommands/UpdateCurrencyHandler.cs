@@ -11,9 +11,10 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 
-public record UpdateCurrencyCommand(Guid CurrencyId, string CurrencyCode) : IRequest<BaseResponse<CurrencyResponse>>;
+public sealed record UpdateCurrencyCommand(Guid CurrencyId, string CurrencyCode)
+    : IRequest<BaseResponse<CurrencyResponse>>;
 
-public class UpdateCurrencyHandler(ICurrencyRepository repository, IMapper mapper)
+public sealed class UpdateCurrencyHandler(ICurrencyRepository repository, IMapper mapper)
     : IRequestHandler<UpdateCurrencyCommand, BaseResponse<CurrencyResponse>>
 {
     public async Task<BaseResponse<CurrencyResponse>> Handle(
@@ -24,12 +25,7 @@ public class UpdateCurrencyHandler(ICurrencyRepository repository, IMapper mappe
         var currency = await repository.GetByIdAsync(request.CurrencyId.ToObjectId(), cancellationToken);
         if (currency == null)
         {
-            return new BaseResponse<CurrencyResponse>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.NotFound,
-                Messages = ["Currency not found."],
-            };
+            return new NotFoundResponse<CurrencyResponse>("Currency not Found");
         }
         currency.CurrencyCode = request.CurrencyCode;
         currency.UpdatedAt = DateTime.UtcNow;

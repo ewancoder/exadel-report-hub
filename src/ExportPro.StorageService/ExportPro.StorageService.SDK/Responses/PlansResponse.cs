@@ -1,6 +1,6 @@
 namespace ExportPro.StorageService.SDK.Responses;
 
-public class PlansResponse
+public sealed class PlansResponse
 {
     public required Guid Id { get; set; }
     public int Amount { get; set; }

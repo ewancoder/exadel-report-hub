@@ -3,7 +3,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Models.Models;
 
-public class Country : IModel
+public sealed class Country : IModel
 {
     public ObjectId Id { get; set; }
     public string Name { get; set; }

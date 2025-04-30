@@ -2,7 +2,7 @@
 
 namespace ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
-public class InvoiceDto
+public sealed class InvoiceDto
 {
     public Guid Id { get; set; }
     public string? InvoiceNumber { get; set; }

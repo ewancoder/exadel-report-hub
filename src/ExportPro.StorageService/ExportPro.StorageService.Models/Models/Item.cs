@@ -5,7 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ExportPro.StorageService.Models.Models;
 
-public class Item : IModel
+public sealed class Item : IModel
 {
     public ObjectId Id { get; set; }
     public string? Name { get; set; }

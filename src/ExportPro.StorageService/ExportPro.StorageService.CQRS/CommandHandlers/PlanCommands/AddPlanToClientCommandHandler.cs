@@ -13,9 +13,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 
-public record AddPlanToClientCommand(Guid ClientId, PlansDto Plan) : ICommand<PlansResponse>;
+public sealed record AddPlanToClientCommand(Guid ClientId, PlansDto Plan) : ICommand<PlansResponse>;
 
-public class AddPlanToClientCommandHandler(IClientRepository clientRepository, IMapper mapper)
+public sealed class AddPlanToClientCommandHandler(IClientRepository clientRepository, IMapper mapper)
     : ICommandHandler<AddPlanToClientCommand, PlansResponse>
 {
     public async Task<BaseResponse<PlansResponse>> Handle(

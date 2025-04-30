@@ -10,9 +10,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
-public record CreateItemsCommand(Guid ClientId, List<ItemDtoForClient> Items) : ICommand<bool>;
+public sealed record CreateItemsCommand(Guid ClientId, List<ItemDtoForClient> Items) : ICommand<bool>;
 
-public class CreateItemsCommandHandler(IClientRepository repository, IMapper mapper)
+public sealed class CreateItemsCommandHandler(IClientRepository repository, IMapper mapper)
     : ICommandHandler<CreateItemsCommand, bool>
 {
     public async Task<BaseResponse<bool>> Handle(CreateItemsCommand request, CancellationToken cancellationToken)

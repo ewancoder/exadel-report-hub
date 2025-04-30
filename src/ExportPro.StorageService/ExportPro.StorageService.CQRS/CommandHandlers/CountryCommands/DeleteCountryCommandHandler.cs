@@ -7,9 +7,10 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
-public record DeleteCountryCommand(Guid Id) : ICommand<bool>;
+public sealed record DeleteCountryCommand(Guid Id) : ICommand<bool>;
 
-public class DeleteCountryCommandHandler(ICountryRepository repository) : ICommandHandler<DeleteCountryCommand, bool>
+public sealed class DeleteCountryCommandHandler(ICountryRepository repository)
+    : ICommandHandler<DeleteCountryCommand, bool>
 {
     public async Task<BaseResponse<bool>> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
     {

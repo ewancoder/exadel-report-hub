@@ -8,9 +8,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
-public record UpdateItemCommand(Guid ClientId, Item Item) : ICommand<bool>;
+public sealed record UpdateItemCommand(Guid ClientId, Item Item) : ICommand<bool>;
 
-public class UpdateItemCommandHandler(IClientRepository repository) : ICommandHandler<UpdateItemCommand, bool>
+public sealed class UpdateItemCommandHandler(IClientRepository repository) : ICommandHandler<UpdateItemCommand, bool>
 {
     public async Task<BaseResponse<bool>> Handle(UpdateItemCommand request, CancellationToken cancellationToken)
     {

@@ -10,9 +10,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 
-public record UpdateClientPlanCommand(Guid PlanId, PlansDto PlansDto) : ICommand<PlansResponse>;
+public sealed record UpdateClientPlanCommand(Guid PlanId, PlansDto PlansDto) : ICommand<PlansResponse>;
 
-public class UpdateClientPlanCommandHandler(IClientRepository clientRepository)
+public sealed class UpdateClientPlanCommandHandler(IClientRepository clientRepository)
     : ICommandHandler<UpdateClientPlanCommand, PlansResponse>
 {
     public async Task<BaseResponse<PlansResponse>> Handle(
@@ -25,6 +25,6 @@ public class UpdateClientPlanCommandHandler(IClientRepository clientRepository)
             request.PlansDto,
             cancellationToken
         );
-        return new SuccessResponse<PlansResponse>(plan);
+        return new SuccessResponse<PlansResponse>(plan, "Plan updated successfully");
     }
 }

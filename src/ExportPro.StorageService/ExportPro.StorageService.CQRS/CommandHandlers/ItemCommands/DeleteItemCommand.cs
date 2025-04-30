@@ -10,9 +10,9 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
-public record DeleteItemCommand(Guid ItemId, Guid ClientId) : ICommand<bool>;
+public sealed record DeleteItemCommand(Guid ItemId, Guid ClientId) : ICommand<bool>;
 
-public class DeleteItemCommandHandler(IClientRepository repository) : ICommandHandler<DeleteItemCommand, bool>
+public sealed class DeleteItemCommandHandler(IClientRepository repository) : ICommandHandler<DeleteItemCommand, bool>
 {
     public async Task<BaseResponse<bool>> Handle(DeleteItemCommand request, CancellationToken cancellationToken)
     {

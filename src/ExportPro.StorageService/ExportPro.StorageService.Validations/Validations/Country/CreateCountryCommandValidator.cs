@@ -6,7 +6,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Country;
 
-public class CreateCountryCommandValidator : AbstractValidator<CreateCountryCommand>
+public sealed class CreateCountryCommandValidator : AbstractValidator<CreateCountryCommand>
 {
     public CreateCountryCommandValidator(ICurrencyRepository currencyRepository)
     {

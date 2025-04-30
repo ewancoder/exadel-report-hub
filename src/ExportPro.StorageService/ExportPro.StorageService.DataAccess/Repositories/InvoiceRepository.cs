@@ -9,7 +9,7 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class InvoiceRepository(ICollectionProvider collectionProvider)
+public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
     : BaseRepository<Invoice>(collectionProvider),
         IInvoiceRepository
 {

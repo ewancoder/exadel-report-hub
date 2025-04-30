@@ -1,6 +1,6 @@
 namespace ExportPro.StorageService.SDK.DTOs;
 
-public class PlansDto
+public sealed class PlansDto
 {
     public DateTime StartDate { get; set; } = DateTime.UtcNow;
     public DateTime EndDate { get; set; }

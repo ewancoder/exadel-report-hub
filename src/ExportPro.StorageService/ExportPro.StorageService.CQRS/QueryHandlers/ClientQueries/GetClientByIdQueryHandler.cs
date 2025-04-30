@@ -11,9 +11,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
 
-public record GetClientByIdQuery(Guid ClientId) : IQuery<ClientResponse>;
+public sealed record GetClientByIdQuery(Guid ClientId) : IQuery<ClientResponse>;
 
-public class GetClientByIdQueryHandler(IClientRepository clientRepository, IMapper mapper)
+public sealed class GetClientByIdQueryHandler(IClientRepository clientRepository, IMapper mapper)
     : IQueryHandler<GetClientByIdQuery, ClientResponse>
 {
     public async Task<BaseResponse<ClientResponse>> Handle(

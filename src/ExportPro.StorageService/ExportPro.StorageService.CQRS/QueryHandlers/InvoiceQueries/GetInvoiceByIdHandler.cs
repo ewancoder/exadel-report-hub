@@ -10,9 +10,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public record GetInvoiceByIdQuery(Guid Id) : IQuery<InvoiceDto>;
+public sealed record GetInvoiceByIdQuery(Guid Id) : IQuery<InvoiceDto>;
 
-public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper)
+public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper)
     : IQueryHandler<GetInvoiceByIdQuery, InvoiceDto>
 {
     public async Task<BaseResponse<InvoiceDto>> Handle(GetInvoiceByIdQuery request, CancellationToken cancellationToken)
@@ -23,12 +23,7 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper
         );
         if (invoice == null)
         {
-            return new BaseResponse<InvoiceDto>
-            {
-                ApiState = HttpStatusCode.NotFound,
-                IsSuccess = false,
-                Messages = ["Invoice not found."],
-            };
+            return new NotFoundResponse<InvoiceDto>("Invoice not found.");
         }
 
         var dto = new InvoiceDto
@@ -45,6 +40,6 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper
             Amount = invoice.Amount,
             Items = invoice.Items.Select(x => mapper.Map<ItemDtoForClient>(x)).ToList(),
         };
-        return new SuccessResponse<InvoiceDto>(dto);
+        return new SuccessResponse<InvoiceDto>(dto, "Invoice found successfully.");
     }
 }

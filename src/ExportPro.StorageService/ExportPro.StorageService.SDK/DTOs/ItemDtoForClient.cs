@@ -4,7 +4,7 @@ using ExportPro.StorageService.Models.Models;
 
 namespace ExportPro.StorageService.SDK.DTOs;
 
-public class ItemDtoForClient
+public sealed class ItemDtoForClient
 {
     [Required]
     public string? Name { get; set; }

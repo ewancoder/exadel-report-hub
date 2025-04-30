@@ -10,14 +10,14 @@ using ExportPro.StorageService.SDK.PaginationParams;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public class GetAllInvoicesQuery : IQuery<PaginatedListDto<InvoiceDto>>
+public sealed class GetAllInvoicesQuery : IQuery<PaginatedListDto<InvoiceDto>>
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public bool IncludeDeleted { get; set; } = false;
 }
 
-public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper)
+public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper)
     : IQueryHandler<GetAllInvoicesQuery, PaginatedListDto<InvoiceDto>>
 {
     public async Task<BaseResponse<PaginatedListDto<InvoiceDto>>> Handle(
@@ -37,14 +37,8 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper
 
         if (request.PageSize < 1)
         {
-            return new BaseResponse<PaginatedListDto<InvoiceDto>>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.BadRequest,
-                Messages = new List<string> { "Page size must be greater than zero." },
-            };
+            return new BadRequestResponse<PaginatedListDto<InvoiceDto>>("Page size must be greater than zero.");
         }
-
         var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
 
         var paginatedInvoices = await repository.GetAllPaginatedAsync(
@@ -76,11 +70,9 @@ public class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper
             paginatedInvoices.TotalPages
         );
 
-        return new BaseResponse<PaginatedListDto<InvoiceDto>>
-        {
-            Data = paginatedDto,
-            IsSuccess = true,
-            ApiState = HttpStatusCode.OK,
-        };
+        return new SuccessResponse<PaginatedListDto<InvoiceDto>>(
+            paginatedDto,
+            "The invoices were retrieved successfully."
+        );
     }
 }

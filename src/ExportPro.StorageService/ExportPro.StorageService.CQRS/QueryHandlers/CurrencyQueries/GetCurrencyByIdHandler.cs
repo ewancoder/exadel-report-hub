@@ -9,9 +9,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 
-public record GetCurrencyByIdQuery(Guid Id) : IRequest<BaseResponse<CurrencyResponse>>;
+public sealed record GetCurrencyByIdQuery(Guid Id) : IRequest<BaseResponse<CurrencyResponse>>;
 
-public class GetCurrencyByIdHandler(ICurrencyRepository repository, IMapper mapper)
+public sealed class GetCurrencyByIdHandler(ICurrencyRepository repository, IMapper mapper)
     : IRequestHandler<GetCurrencyByIdQuery, BaseResponse<CurrencyResponse>>
 {
     public async Task<BaseResponse<CurrencyResponse>> Handle(
@@ -25,12 +25,7 @@ public class GetCurrencyByIdHandler(ICurrencyRepository repository, IMapper mapp
         );
         var currencyResp = mapper.Map<CurrencyResponse>(currency);
         return currency == null
-            ? new BaseResponse<CurrencyResponse>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.NotFound,
-                Messages = ["Currency not found."],
-            }
-            : new BaseResponse<CurrencyResponse> { Data = currencyResp };
+            ? new NotFoundResponse<CurrencyResponse>("Currency not found.")
+            : new SuccessResponse<CurrencyResponse>(currencyResp, "Currecy found successfully.");
     }
 }

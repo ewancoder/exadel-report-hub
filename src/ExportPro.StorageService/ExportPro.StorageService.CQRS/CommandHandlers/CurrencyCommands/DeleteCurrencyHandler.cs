@@ -6,9 +6,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 
-public record DeleteCurrencyCommand(Guid Id) : IRequest<BaseResponse<bool>>;
+public sealed record DeleteCurrencyCommand(Guid Id) : IRequest<BaseResponse<bool>>;
 
-public class DeleteCurrencyHandler(ICurrencyRepository repository)
+public sealed class DeleteCurrencyHandler(ICurrencyRepository repository)
     : IRequestHandler<DeleteCurrencyCommand, BaseResponse<bool>>
 {
     public async Task<BaseResponse<bool>> Handle(DeleteCurrencyCommand request, CancellationToken cancellationToken)

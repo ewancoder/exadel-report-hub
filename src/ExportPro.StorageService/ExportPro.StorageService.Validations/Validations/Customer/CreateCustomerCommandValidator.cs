@@ -6,7 +6,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Customer;
 
-public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCommand>
+public sealed class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCommand>
 {
     public CreateCustomerCommandValidator(ICountryRepository countryRepository)
     {

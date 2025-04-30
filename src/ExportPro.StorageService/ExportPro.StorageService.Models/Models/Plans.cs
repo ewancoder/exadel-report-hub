@@ -3,7 +3,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Models.Models;
 
-public class Plans : IModel
+public sealed class Plans : IModel
 {
     public ObjectId Id { get; set; }
     public DateTime StartDate { get; set; }

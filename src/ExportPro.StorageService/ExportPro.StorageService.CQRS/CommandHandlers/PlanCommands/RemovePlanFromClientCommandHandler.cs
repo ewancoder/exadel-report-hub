@@ -9,9 +9,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 
-public record RemovePlanFromClientCommand(ObjectId PlanId) : ICommand<PlansResponse>;
+public sealed record RemovePlanFromClientCommand(ObjectId PlanId) : ICommand<PlansResponse>;
 
-public class RemovePlanFromClientCommandHandler(IClientRepository clientRepository)
+public sealed class RemovePlanFromClientCommandHandler(IClientRepository clientRepository)
     : ICommandHandler<RemovePlanFromClientCommand, PlansResponse>
 {
     public async Task<BaseResponse<PlansResponse>> Handle(

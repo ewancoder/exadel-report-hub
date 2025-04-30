@@ -6,7 +6,7 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.Validations.Validations.Customer;
 
-public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>
+public sealed class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>
 {
     public UpdateCustomerCommandValidator(
         ICountryRepository countryRepository,

@@ -6,7 +6,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Client;
 
-public class GetClientsByIdQueryValidator : AbstractValidator<GetClientByIdQuery>
+public sealed class GetClientsByIdQueryValidator : AbstractValidator<GetClientByIdQuery>
 {
     public GetClientsByIdQueryValidator(IClientRepository clientRepository)
     {

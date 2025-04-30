@@ -18,7 +18,7 @@ using ZstdSharp.Unsafe;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class ClientRepository(
+public sealed class ClientRepository(
     IHttpContextAccessor httpContextAccessor,
     ICollectionProvider collectionProvider,
     IMapper mapper

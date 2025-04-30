@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ExportPro.StorageService.SDK.Responses;
 
-public class ClientResponse
+public sealed class ClientResponse
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]

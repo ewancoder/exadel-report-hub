@@ -17,7 +17,7 @@ namespace ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 
 public record UpdateClientCommand(ClientDto client, Guid ClientId) : ICommand<ClientResponse>;
 
-public class UpdateClientCommandHandler(
+public sealed class UpdateClientCommandHandler(
     IHttpContextAccessor httpContext,
     IClientRepository clientRepository,
     IMapper mapper

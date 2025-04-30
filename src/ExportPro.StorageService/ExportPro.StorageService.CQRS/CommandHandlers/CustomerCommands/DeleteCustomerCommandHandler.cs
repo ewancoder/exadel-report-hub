@@ -7,26 +7,19 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
-public record DeleteCustomerCommand(Guid Id) : ICommand<bool>;
+public sealed record DeleteCustomerCommand(Guid Id) : ICommand<bool>;
 
-public class DeleteCustomerCommandHandler(ICustomerRepository repository) : ICommandHandler<DeleteCustomerCommand, bool>
+public sealed class DeleteCustomerCommandHandler(ICustomerRepository repository)
+    : ICommandHandler<DeleteCustomerCommand, bool>
 {
-    private readonly ICustomerRepository _repository = repository;
-
     public async Task<BaseResponse<bool>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
     {
-        var customer = await _repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
+        var customer = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
         if (customer == null || customer.IsDeleted)
         {
-            return new BaseResponse<bool>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.NotFound,
-                Messages = ["Customer not found."],
-            };
+            return new NotFoundResponse<bool>("Customer not found.");
         }
-
-        await _repository.SoftDeleteAsync(request.Id.ToObjectId(), cancellationToken);
+        await repository.SoftDeleteAsync(request.Id.ToObjectId(), cancellationToken);
         return new SuccessResponse<bool>(true, "Successfully deleted customer.");
     }
 }

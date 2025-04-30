@@ -12,14 +12,14 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
-public class CreateCustomerCommand : ICommand<CustomerResponse>
+public sealed class CreateCustomerCommand : ICommand<CustomerResponse>
 {
     public required string Name { get; set; }
     public required string Email { get; set; }
     public required Guid CountryId { get; set; }
 }
 
-public class CreateCustomerCommandHandler(
+public sealed class CreateCustomerCommandHandler(
     ICustomerRepository repository,
     IMapper mapper,
     IValidator<CreateCustomerCommand> validator
@@ -42,6 +42,6 @@ public class CreateCustomerCommandHandler(
             IsDeleted = false,
         };
         await repository.AddOneAsync(customer, cancellationToken);
-        return new BaseResponse<CustomerResponse> { Data = mapper.Map<CustomerResponse>(customer) };
+        return new SuccessResponse<CustomerResponse>(mapper.Map<CustomerResponse>(customer));
     }
 }

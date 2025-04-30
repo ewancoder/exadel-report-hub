@@ -11,9 +11,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
-public record UpdateCustomerCommand(Guid Id, CreateUpdateCustomerDto Customer) : ICommand<CustomerResponse>;
+public sealed record UpdateCustomerCommand(Guid Id, CreateUpdateCustomerDto Customer) : ICommand<CustomerResponse>;
 
-public class UpdateCustomerCommandHandler(ICustomerRepository repository, IMapper mapper)
+public sealed class UpdateCustomerCommandHandler(ICustomerRepository repository, IMapper mapper)
     : ICommandHandler<UpdateCustomerCommand, CustomerResponse>
 {
     public async Task<BaseResponse<CustomerResponse>> Handle(
@@ -29,7 +29,6 @@ public class UpdateCustomerCommandHandler(ICustomerRepository repository, IMappe
         {
             return new NotFoundResponse<CustomerResponse>() { Messages = ["Customer not found."] };
         }
-
         if (!string.IsNullOrEmpty(request.Customer.Name))
             existingCustomer.Name = request.Customer.Name.Trim();
 
