@@ -4,6 +4,8 @@ using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Library;
+using ExportPro.Export.CQRS.Behaviors;
 using ExportPro.Export.CQRS.Queries;
 using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
@@ -27,25 +29,26 @@ public static class ExportServiceCollectionExtensions
         services.AddOpenApi();
         services.AddSwaggerServices("ExportPro Export Service");
         var jwtSettings = cfg.GetSection("JwtSettings").Get<JwtSettings>();
-        services.AddAuthentication(options =>
-        {
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-.AddJwtBearer(options =>
-{
-    options.Authority = "https://localhost:7067/"; // if using identity server or Auth0
-    options.RequireHttpsMetadata = false; // optional for local dev
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings?.Issuer,
-        ValidAudience = jwtSettings?.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Secret))
-    };
-});
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Authority = "https://localhost:7067/"; // if using identity server or Auth0
+                options.RequireHttpsMetadata = false; // optional for local dev
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings?.Issuer,
+                    ValidAudience = jwtSettings?.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Secret)),
+                };
+            });
 
         // ---------- Mongo  ----------
 
@@ -54,11 +57,13 @@ public static class ExportServiceCollectionExtensions
 
         // ---------- MediatR --------------------------
         services.AddMediatR(options =>
+        {
             options.RegisterServicesFromAssemblies(
                 typeof(GeneratePdfInvoiceQuery).Assembly,
-                typeof(IPdfGenerator).Assembly));
-
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+                typeof(IPdfGenerator).Assembly
+            );
+            options.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
+        });
 
         // ---------- PDF ------------------------------
         services.AddSingleton<IPdfGenerator, PdfGenerator>();
@@ -69,12 +74,12 @@ public static class ExportServiceCollectionExtensions
         services.AddTransient<ForwardAuthHeaderHandler>();
 
         // ---------- Refit client to Storage-service ---
-        var baseUrl = Environment.GetEnvironmentVariable("StorageUrl")
-                   ?? "http://localhost:5011";
+        var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
 
-        services.AddRefitClient<IStorageServiceApi>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
-                .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
+        services
+            .AddRefitClient<IStorageServiceApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+            .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
 
         return services;
     }
