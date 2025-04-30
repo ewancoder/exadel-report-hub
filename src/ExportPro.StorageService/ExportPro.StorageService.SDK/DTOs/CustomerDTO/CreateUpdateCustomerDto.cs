@@ -2,7 +2,7 @@
 
 public class CreateUpdateCustomerDto
 {
-    public required string Name { get; set; } 
+    public required string Name { get; set; }
     public required string Email { get; set; }
-    public string? CountryId { get; set; } 
+    public Guid CountryId { get; set; }
 }

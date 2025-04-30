@@ -4,7 +4,7 @@ namespace ExportPro.StorageService.SDK.Responses;
 
 public class FullClientResponse
 {
-    public string Id { get; set; }
+    public required Guid Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }

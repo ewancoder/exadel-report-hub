@@ -21,16 +21,16 @@ public interface IClientRepository : IRepository<Client>
         List<Item> updatedItems,
         CancellationToken cancellationToken = default
     );
-    Task<Plans> AddPlanToClient(string clientId, PlansDto plan, CancellationToken cancellationToken = default);
-    Task<PlansResponse> RemovePlanFromClient(string planId, CancellationToken cancellationToken = default);
+    Task<Plans> AddPlanToClient(ObjectId clientId, PlansDto plan, CancellationToken cancellationToken = default);
+    Task<PlansResponse> RemovePlanFromClient(ObjectId planId, CancellationToken cancellationToken = default);
     Task<PlansResponse> UpdateClientPlan(
-        string planId,
+        ObjectId planId,
         PlansDto plansDto,
         CancellationToken cancellationToken = default
     );
-    Task<PlansResponse> GetPlan(string planId, CancellationToken cancellationToken = default);
+    Task<PlansResponse> GetPlan(ObjectId planId, CancellationToken cancellationToken = default);
     Task<List<PlansResponse>> GetClientPlans(
-        string clientId,
+        ObjectId clientId,
         int top,
         int skip,
         CancellationToken cancellationToken = default
