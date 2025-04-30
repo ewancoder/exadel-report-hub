@@ -75,13 +75,14 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
         return StatusCode((int)clientDeleting.ApiState, clientDeleting);
     }
 
+    //[AllowAnonymous]
     [HttpGet("{clientId}/items")]
     [SwaggerOperation(Summary = "Get all items for a client")]
     [ProducesResponseType(typeof(List<ItemResponse>), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetItems(
-    [FromRoute] string clientId,
-    CancellationToken cancellationToken)
+            [FromRoute] Guid clientId,
+            CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new GetItemsQuery(clientId), cancellationToken);
         return StatusCode((int)response.ApiState, response);
@@ -92,9 +93,9 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
     [ProducesResponseType(typeof(ItemResponse), 200)]
     [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetItemById(
-        [FromRoute] string clientId,
-        [FromRoute] string itemId,
-        CancellationToken cancellationToken)
+            [FromRoute] Guid clientId,
+            [FromRoute] Guid itemId,
+            CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new GetItemByIdQuery(clientId, itemId), cancellationToken);
         return StatusCode((int)response.ApiState, response);
@@ -156,6 +157,7 @@ public class ClientController(IMediator mediator, IHttpContextAccessor contextAc
         return StatusCode((int)response.ApiState, response);
     }
 
+    //[AllowAnonymous]
     [HttpGet("{clientId}/plans")]
     [SwaggerOperation(Summary = "Get Client Plans")]
     [HasPermission(Common.Shared.Enums.Resource.Plans, Common.Shared.Enums.CrudAction.Read)]
