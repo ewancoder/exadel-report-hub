@@ -12,7 +12,8 @@ public record GetItemsQuery(Guid ClientId) : IQuery<List<ItemResponse>>;
 public record GetItemByIdQuery(Guid ClientId, Guid ItemId) : IQuery<ItemResponse>;
 
 public class GetItemsQueryHandler(
-    IClientRepository repository,
+    IClientRepository clientRepository,
+    IInvoiceRepository invoiceRepository,
     IMapper mapper
 ) : IQueryHandler<GetItemsQuery, List<ItemResponse>>
 {
@@ -20,7 +21,8 @@ public class GetItemsQueryHandler(
         GetItemsQuery request,
         CancellationToken cancellationToken)
     {
-        var client = await repository.GetOneAsync(
+        // First check if client exists
+        var client = await clientRepository.GetOneAsync(
             c => c.Id == request.ClientId.ToObjectId() && !c.IsDeleted,
             cancellationToken);
 
@@ -32,7 +34,37 @@ public class GetItemsQueryHandler(
                 Messages = ["Client not found."]
             };
 
-        var dtos = (client.Items ?? Enumerable.Empty<Models.Models.Item>())
+        // Get all invoices for this client
+        var parameters = new ExportPro.StorageService.SDK.PaginationParams.PaginationParameters
+        {
+            PageNumber = 1,
+            PageSize = 1000  // Large enough to get all invoices
+        };
+
+        var paginatedInvoices = await invoiceRepository.GetAllPaginatedAsync(
+            parameters,
+            false,
+            cancellationToken);
+
+        var invoices = paginatedInvoices.Items.Where(i =>
+            i.ClientId == request.ClientId.ToObjectId() && !i.IsDeleted).ToList();
+
+        // Collect items from invoices
+        var allItems = new List<Models.Models.Item>();
+
+        // Add items from invoices
+        foreach (var invoice in invoices)
+        {
+            if (invoice.Items != null && invoice.Items.Any())
+                allItems.AddRange(invoice.Items);
+        }
+
+        // Add items from client
+        if (client.Items != null && client.Items.Any())
+            allItems.AddRange(client.Items);
+
+        // Map to DTOs
+        var dtos = allItems
             .Select(i => mapper.Map<ItemResponse>(i))
             .ToList();
 
