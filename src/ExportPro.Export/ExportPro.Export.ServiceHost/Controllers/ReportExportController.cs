@@ -15,9 +15,9 @@ public sealed class ReportExportController(IMediator mediator) : ControllerBase
     /// </summary>
     [HttpGet]
     public async Task<IActionResult> Statistics(
-        [FromQuery] string format = "csv",
-        [FromQuery] string? clientId = null,
-        CancellationToken cancellationToken = default)
+    [FromQuery] string format = "csv",
+    [FromQuery] Guid? clientId = null,
+     CancellationToken cancellationToken = default)
     {
         if (!Enum.TryParse<ReportFormat>(format, true, out var fmt))
             return BadRequest("format must be 'csv' or 'xlsx'");
@@ -25,7 +25,7 @@ public sealed class ReportExportController(IMediator mediator) : ControllerBase
         var filters = new ReportFilterDto { ClientId = clientId };
 
         var file = await mediator.Send(
-            new GenerateReportQuery(fmt, filters), 
+            new GenerateReportQuery(fmt, filters),
             cancellationToken);
 
         return File(file.Content, file.ContentType, file.FileName);

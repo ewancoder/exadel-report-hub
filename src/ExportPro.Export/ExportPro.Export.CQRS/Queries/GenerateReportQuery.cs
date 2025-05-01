@@ -38,13 +38,13 @@ public sealed class GenerateReportQueryHandler(
                .Data?.Items ?? [];
 
     private async Task<(List<ItemResponse>, List<PlansResponse>)>
-        FetchItemsAndPlansAsync(string? clientId, CancellationToken cancellationToken)
+        FetchItemsAndPlansAsync(Guid? clientId, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(clientId))
+        if (clientId == null || clientId == Guid.Empty)
             return ([], []);
 
-        var itemsTask = storageApi.GetItemsByClientAsync(clientId, cancellationToken);
-        var plansTask = storageApi.GetPlansByClientAsync(clientId, cancellationToken);
+        var itemsTask = storageApi.GetItemsByClientAsync(clientId.Value, cancellationToken);
+        var plansTask = storageApi.GetPlansByClientAsync(clientId.Value, cancellationToken);
         await Task.WhenAll(itemsTask, plansTask);
 
         return (itemsTask.Result.Data ?? [],
@@ -52,8 +52,8 @@ public sealed class GenerateReportQueryHandler(
     }
 
     private static ReportFileDto CreateReportFile(
-        ReportContentDto dto, 
-        ReportFormat fmt, 
+        ReportContentDto dto,
+        ReportFormat fmt,
         IEnumerable<IReportGenerator> generators)
     {
         var key = fmt == ReportFormat.Csv ? "csv" : "xlsx";

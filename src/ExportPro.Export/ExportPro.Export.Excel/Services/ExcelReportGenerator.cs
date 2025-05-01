@@ -31,7 +31,7 @@ public sealed class ExcelReportGenerator : IReportGenerator
     {
         var info = wb.Worksheets.Add("ReportInfo");
         info.Cell("A1").Value = "GeneratedAt"; info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
-        info.Cell("A2").Value = "ClientId"; info.Cell("B2").Value = data.Filters.ClientId ?? "—";
+        info.Cell("A2").Value = "ClientId"; info.Cell("B2").Value = data.Filters.ClientId?.ToString() ?? "—";
     }
 
     private static void GeneratePlansSheet(ReportContentDto data, XLWorkbook wb)
