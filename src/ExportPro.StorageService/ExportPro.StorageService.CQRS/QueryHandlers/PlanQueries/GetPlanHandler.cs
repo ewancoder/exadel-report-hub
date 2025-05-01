@@ -13,6 +13,6 @@ public sealed class GetPlanQueryHandler(IClientRepository clientRepository) : IQ
     public async Task<BaseResponse<PlansResponse>> Handle(GetPlanQuery request, CancellationToken cancellationToken)
     {
         var plan = await clientRepository.GetPlan(request.PlanId.ToObjectId(), cancellationToken);
-        return new SuccessResponse<PlansResponse>(plan, "Plan retrieved successfully");
+        return new SuccessResponse<PlansResponse>(plan!, "Plan retrieved successfully");
     }
 }

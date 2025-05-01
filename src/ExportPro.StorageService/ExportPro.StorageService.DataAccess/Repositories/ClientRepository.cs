@@ -27,8 +27,8 @@ public sealed class ClientRepository(
 
     public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)
     {
-        var max_size = Collection.Find(c => !c.IsDeleted).CountDocuments(cancellationToken);
-        if (skip > max_size)
+        var maxSize = Collection.Find(c => !c.IsDeleted).CountDocuments(cancellationToken);
+        if (skip > maxSize)
             return Task.FromResult(true);
         return Task.FromResult(false);
     }
