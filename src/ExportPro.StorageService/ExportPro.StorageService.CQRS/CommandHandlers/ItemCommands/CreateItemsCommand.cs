@@ -3,10 +3,8 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
@@ -17,7 +15,10 @@ public sealed class CreateItemsCommandHandler(IClientRepository repository, IMap
 {
     public async Task<BaseResponse<bool>> Handle(CreateItemsCommand request, CancellationToken cancellationToken)
     {
-        var client = await repository.GetByIdAsync(request.ClientId.ToObjectId(), cancellationToken);
+        var client = await repository.GetOneAsync(
+            x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (client == null || client.IsDeleted)
             return new NotFoundResponse<bool>("Client not found");
         var result = await repository.AddItems(

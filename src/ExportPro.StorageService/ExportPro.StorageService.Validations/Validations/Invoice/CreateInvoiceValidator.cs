@@ -1,9 +1,7 @@
 ﻿using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Validations.Validations.Client;
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Invoice;
 
@@ -15,15 +13,14 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
         ICurrencyRepository currencyRepository
     )
     {
+        RuleFor(x => x.Items).NotEmpty().WithMessage("Items cannot be empty.");
         RuleFor(x => x.InvoiceNumber).NotEmpty().WithMessage("Invoice number is required.");
         RuleFor(x => x.IssueDate).NotEmpty().WithMessage("The issue date is required");
         RuleFor(x => x)
             .Must(x =>
             {
                 if (x.DueDate >= x.IssueDate)
-                {
                     return true;
-                }
                 return false;
             })
             .WithMessage("Issue date cannot be earlier than due date.");

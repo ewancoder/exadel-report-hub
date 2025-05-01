@@ -6,7 +6,7 @@ public sealed class PlansResponse
     public int Amount { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public List<ItemResponse> Items { get; set; }
+    public required List<ItemResponse> Items { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }

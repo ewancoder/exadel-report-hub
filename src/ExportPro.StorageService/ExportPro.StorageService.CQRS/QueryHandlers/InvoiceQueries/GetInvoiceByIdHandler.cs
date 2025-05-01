@@ -1,12 +1,10 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
@@ -22,9 +20,7 @@ public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper
             cancellationToken
         );
         if (invoice == null)
-        {
             return new NotFoundResponse<InvoiceDto>("Invoice not found.");
-        }
 
         var dto = new InvoiceDto
         {
@@ -32,13 +28,13 @@ public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper
             InvoiceNumber = invoice.InvoiceNumber,
             IssueDate = invoice.IssueDate,
             DueDate = invoice.DueDate,
-            CurrencyId = invoice.CurrencyId?.ToGuid(),
-            CustomerId = invoice.CustomerId?.ToGuid(),
+            CurrencyId = invoice.CurrencyId.ToGuid(),
+            CustomerId = invoice.CustomerId.ToGuid(),
             PaymentStatus = invoice.PaymentStatus,
             BankAccountNumber = invoice.BankAccountNumber,
-            ClientId = invoice.ClientId?.ToGuid(),
+            ClientId = invoice.ClientId.ToGuid(),
             Amount = invoice.Amount,
-            Items = invoice.Items.Select(x => mapper.Map<ItemDtoForClient>(x)).ToList(),
+            Items = invoice.Items?.Select(x => mapper.Map<ItemDtoForClient>(x)).ToList(),
         };
         return new SuccessResponse<InvoiceDto>(dto, "Invoice found successfully.");
     }

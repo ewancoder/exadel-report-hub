@@ -1,7 +1,6 @@
 using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Client;
 

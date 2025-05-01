@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
+﻿using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Validations.Validations.Plans;
 using FluentValidation;
 
 namespace ExportPro.StorageService.Validations.Validations.Client;

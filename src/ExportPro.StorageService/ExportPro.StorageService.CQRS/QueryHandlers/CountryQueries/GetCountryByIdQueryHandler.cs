@@ -1,11 +1,9 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CountryQueries;
 
@@ -21,9 +19,7 @@ public sealed class GetCountryByIdQueryHandler(ICountryRepository repository, IM
             cancellationToken
         );
         if (country == null)
-        {
             return new NotFoundResponse<CountryDto>("Country not found.");
-        }
         var countryResp = mapper.Map<CountryDto>(country);
         return new SuccessResponse<CountryDto>(countryResp, "Country  found successfully.");
     }

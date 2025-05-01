@@ -2,7 +2,6 @@
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
@@ -10,8 +9,8 @@ using MongoDB.Bson;
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
 public sealed record CreateItemCommand(
-    string Name,
-    string Description,
+    string? Name,
+    string? Description,
     double Price,
     Status Status,
     Guid CurrencyId,
@@ -23,10 +22,13 @@ public sealed class CreateItemCommandHandler(IClientRepository clientRepository)
 {
     public async Task<BaseResponse<string>> Handle(CreateItemCommand request, CancellationToken cancellationToken)
     {
-        var client = await clientRepository.GetByIdAsync(request.ClientId.ToObjectId(), cancellationToken);
+        var client = await clientRepository.GetOneAsync(
+            x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (client == null || client.IsDeleted)
             return new NotFoundResponse<string>("Client not found");
-        var item = new Models.Models.Item
+        var item = new Item
         {
             Id = ObjectId.GenerateNewId(),
             Name = request.Name,

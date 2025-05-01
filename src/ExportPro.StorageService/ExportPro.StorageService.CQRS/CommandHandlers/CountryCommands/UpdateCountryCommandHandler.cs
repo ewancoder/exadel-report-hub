@@ -1,10 +1,8 @@
-﻿using System.Net;
-using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
@@ -20,14 +18,7 @@ public sealed class UpdateCountryCommandHandler(ICountryRepository repository)
             cancellationToken
         );
         if (existing == null)
-        {
-            return new BaseResponse<bool>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.NotFound,
-                Messages = ["Country not found."],
-            };
-        }
+            return new NotFoundResponse<bool>("Country not found.");
 
         existing.Name = request.Country.Name;
         existing.Code = request.Country.Code;
@@ -35,12 +26,6 @@ public sealed class UpdateCountryCommandHandler(ICountryRepository repository)
 
         await repository.UpdateOneAsync(existing, cancellationToken);
 
-        return new BaseResponse<bool>
-        {
-            IsSuccess = true,
-            ApiState = HttpStatusCode.OK,
-            Data = true,
-            Messages = ["Country updated successfully."],
-        };
+        return new SuccessResponse<bool>(true, "Country updated successfully.");
     }
 }

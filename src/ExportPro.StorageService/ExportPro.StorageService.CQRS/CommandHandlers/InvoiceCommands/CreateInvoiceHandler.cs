@@ -18,7 +18,7 @@ public sealed class CreateInvoiceCommand : ICommand<InvoiceResponse>
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; } = DateTime.UtcNow;
     public DateTime DueDate { get; set; }
-    public Guid CurrencyId { get; set; }
+    public required Guid CurrencyId { get; set; }
     public Status? PaymentStatus { get; set; }
     public Guid CustomerId { get; set; }
     public string? BankAccountNumber { get; set; }
@@ -31,8 +31,6 @@ public sealed class CreateInvoiceHandler(
     IMapper mapper,
     ICurrencyExchangeService currencyExchangeService,
     ICurrencyRepository currencyRepository,
-    ICustomerRepository customerRepository,
-    ICountryRepository countryRepository,
     //i need to use this manually because it is not validating automatically
     IValidator<CurrencyExchangeModel> validator
 ) : ICommandHandler<CreateInvoiceCommand, InvoiceResponse>
@@ -53,18 +51,16 @@ public sealed class CreateInvoiceHandler(
             BankAccountNumber = request.BankAccountNumber,
             ClientId = request.ClientId.ToObjectId(),
             CustomerId = request.CustomerId.ToObjectId(),
-            Items = request.Items.Select(_ => mapper.Map<Item>(_)).ToList(),
+            Items = request.Items!.Select(c => mapper.Map<Item>(c)).ToList(),
         };
         foreach (var i in invoice.Items)
-        {
             i.Id = ObjectId.GenerateNewId();
-        }
         //getting the invoice currency
         var invoiceCurrency = await currencyRepository.GetCurrencyCodeById(request.CurrencyId.ToObjectId());
         CurrencyExchangeModel currencyExchangeModel = new()
         {
             Date = invoice.IssueDate,
-            From = invoiceCurrency.CurrencyCode,
+            From = invoiceCurrency!.CurrencyCode,
         };
         //converting the invoice's currency to euro becuase the api converts the currency to EUR only
         //if it is already EUR than there is no need to convert it
@@ -75,6 +71,7 @@ public sealed class CreateInvoiceHandler(
             await validator.ValidateAndThrowAsync(currencyExchangeModel, cancellationToken);
             invoiceCurrencyExchangeRateToEuro = await currencyExchangeService.ExchangeRate(currencyExchangeModel);
         }
+
         invoice.Amount = 0;
         //going to convert items currency to invoice's currency
         //first converting to euro
@@ -82,14 +79,12 @@ public sealed class CreateInvoiceHandler(
         {
             var currency = await currencyRepository.GetCurrencyCodeById(i.CurrencyId);
             if (currency == null)
-            {
                 return new BadRequestResponse<InvoiceResponse> { Messages = ["Currency not found."] };
-            }
             //item's currencycode
-            string currencyCode = currency.CurrencyCode;
+            var currencyCode = currency.CurrencyCode;
             //converting item currency to EUR
             var itemExchangeRateToEuro = 1.0;
-            if (currencyCode != "EUR" && currencyCode !=customer_currency.CurrencyCode)
+            if (currencyCode != "EUR" && invoiceCurrency.CurrencyCode != currencyCode)
             {
                 currencyExchangeModel.From = currencyCode;
                 await validator.ValidateAndThrowAsync(currencyExchangeModel, cancellationToken);
@@ -99,10 +94,12 @@ public sealed class CreateInvoiceHandler(
                     cancellationToken
                 );
             }
+
             //converting and getting the amount
-            var amount = (i.Price * invoiceCurrencyExchangeRateToEuro) / itemExchangeRateToEuro;
+            var amount = i.Price * invoiceCurrencyExchangeRateToEuro / itemExchangeRateToEuro;
             invoice.Amount += amount;
         }
+
         await repository.AddOneAsync(invoice, cancellationToken);
         var invoiceResponse = mapper.Map<InvoiceResponse>(invoice);
         return new SuccessResponse<InvoiceResponse>(invoiceResponse, "Invoice created successfully.");

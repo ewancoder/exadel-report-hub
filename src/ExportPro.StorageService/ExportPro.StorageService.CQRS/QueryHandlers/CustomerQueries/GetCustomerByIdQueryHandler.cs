@@ -1,5 +1,4 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -18,11 +17,9 @@ public sealed class GetCustomerByIdQueryHandler(ICustomerRepository repository, 
         CancellationToken cancellationToken
     )
     {
-        var customer = await repository.GetByIdAsync(request.Id, cancellationToken);
+        var customer = await repository.GetOneAsync(x => x.Id == request.Id && !x.IsDeleted, cancellationToken);
         if (customer == null || customer.IsDeleted)
-        {
             return new NotFoundResponse<CustomerDto>("Customer not found.");
-        }
 
         var dto = mapper.Map<CustomerDto>(customer);
         return new SuccessResponse<CustomerDto>(dto, "Successfully retrieved customer.");

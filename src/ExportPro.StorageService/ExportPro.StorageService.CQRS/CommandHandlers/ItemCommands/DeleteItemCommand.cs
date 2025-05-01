@@ -1,12 +1,7 @@
-﻿using System.Net;
-using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.DataAccess.Repositories;
-using ExportPro.StorageService.Models.Models;
-using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
@@ -23,9 +18,7 @@ public sealed class DeleteItemCommandHandler(IClientRepository repository) : ICo
         );
 
         if (!success)
-        {
             return new NotFoundResponse<bool>($"Item with ID {request.ItemId} not found or already deleted.");
-        }
 
         return new SuccessResponse<bool>(true);
     }
