@@ -13,7 +13,7 @@ public sealed class UpdateItemsCommandHandler(IClientRepository repository) : IC
 {
     public async Task<BaseResponse<bool>> Handle(UpdateItemsCommand request, CancellationToken cancellationToken)
     {
-        if (request.Items == null || request.Items.Count == 0)
+        if (request.Items.Count == 0)
             return new BaseResponse<bool>
             {
                 IsSuccess = false,

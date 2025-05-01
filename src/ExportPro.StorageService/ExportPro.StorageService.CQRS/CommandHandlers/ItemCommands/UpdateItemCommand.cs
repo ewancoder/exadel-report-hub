@@ -14,7 +14,7 @@ public sealed class UpdateItemCommandHandler(IClientRepository repository) : ICo
 {
     public async Task<BaseResponse<bool>> Handle(UpdateItemCommand request, CancellationToken cancellationToken)
     {
-        if (request.Item is null || request.Item.Id == ObjectId.Empty)
+        if (request.Item.Id == ObjectId.Empty)
             return new BaseResponse<bool>
             {
                 IsSuccess = false,

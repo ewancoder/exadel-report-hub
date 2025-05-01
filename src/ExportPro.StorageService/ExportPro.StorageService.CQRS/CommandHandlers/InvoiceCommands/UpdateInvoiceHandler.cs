@@ -25,7 +25,10 @@ public sealed class UpdateInvoiceHandler(IInvoiceRepository repository) : IComma
 {
     public async Task<BaseResponse<Invoice>> Handle(UpdateInvoiceCommand request, CancellationToken cancellationToken)
     {
-        var existing = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
+        var existing = await repository.GetOneAsync(
+            x => x.Id == request.Id.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (existing == null)
             return new NotFoundResponse<Invoice>("Invoice not found.");
         existing.InvoiceNumber = request.InvoiceNumber;

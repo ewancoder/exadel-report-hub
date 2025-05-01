@@ -22,7 +22,10 @@ public sealed class CreateItemCommandHandler(IClientRepository clientRepository)
 {
     public async Task<BaseResponse<string>> Handle(CreateItemCommand request, CancellationToken cancellationToken)
     {
-        var client = await clientRepository.GetByIdAsync(request.ClientId.ToObjectId(), cancellationToken);
+        var client = await clientRepository.GetOneAsync(
+            x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (client == null || client.IsDeleted)
             return new NotFoundResponse<string>("Client not found");
         var item = new Item

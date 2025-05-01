@@ -19,7 +19,7 @@ public sealed class CurrencyExchangeServiceValidator : AbstractValidator<Currenc
                     };
                     try
                     {
-                        var res = await currencyExchangeService.ExchangeRate(currenyExchangeModel, CancellationToken);
+                        await currencyExchangeService.ExchangeRate(currenyExchangeModel, CancellationToken);
                     }
                     catch
                     {

@@ -19,8 +19,8 @@ public sealed class CreateCountryCommandValidator : AbstractValidator<CreateCoun
                         .MustAsync(
                             async (currency, CancellationToken_) =>
                             {
-                                var client = await currencyRepository.GetByIdAsync(
-                                    currency.ToObjectId(),
+                                var client = await currencyRepository.GetOneAsync(
+                                    x => x.Id == currency.ToObjectId() && !x.IsDeleted,
                                     CancellationToken_
                                 );
                                 return client != null;

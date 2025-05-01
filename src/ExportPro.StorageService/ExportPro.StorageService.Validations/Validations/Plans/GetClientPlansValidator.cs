@@ -45,7 +45,7 @@ public class GetClientPlansValidator : AbstractValidator<GetClientPlansQuery>
                                         y => y.Id == x.ClientId.ToObjectId() && !y.IsDeleted,
                                         cancellationToken
                                     );
-                                    var cnt = res.Plans?.Count;
+                                    var cnt = res?.Plans?.Count;
                                     return x.Skip <= cnt;
                                 }
                             )

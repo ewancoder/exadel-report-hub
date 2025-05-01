@@ -16,7 +16,7 @@ public sealed class CurrencyRepository(ICollectionProvider collectionProvider)
         return await Collection.Find(x => !x.IsDeleted).ToListAsync(cancellationToken);
     }
 
-    public Task<Currency> GetCurrencyCodeById(ObjectId id)
+    public Task<Currency?> GetCurrencyCodeById(ObjectId id)
     {
         return GetOneAsync(x => x.Id == id && !x.IsDeleted, CancellationToken.None);
     }

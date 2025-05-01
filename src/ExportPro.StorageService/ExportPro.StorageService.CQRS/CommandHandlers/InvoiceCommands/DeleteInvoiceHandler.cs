@@ -13,7 +13,10 @@ public sealed class DeleteInvoiceHandler(IInvoiceRepository repository) : IComma
     {
         if (request.Id == Guid.Empty)
             return new BadRequestResponse<bool>("Invalid invoice ID.");
-        var invoice = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
+        var invoice = await repository.GetOneAsync(
+            x => x.Id == request.Id.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (invoice == null)
             return new NotFoundResponse<bool>("Invoice not found.");
         await repository.SoftDeleteAsync(request.Id.ToObjectId(), cancellationToken);

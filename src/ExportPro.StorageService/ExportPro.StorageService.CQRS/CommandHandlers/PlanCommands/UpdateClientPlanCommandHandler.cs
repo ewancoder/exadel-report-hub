@@ -12,7 +12,7 @@ public sealed record UpdateClientPlanCommand(Guid PlanId, PlansDto PlansDto) : I
 public sealed class UpdateClientPlanCommandHandler(IClientRepository clientRepository)
     : ICommandHandler<UpdateClientPlanCommand, PlansResponse>
 {
-    public async Task<BaseResponse<PlansResponse?>> Handle(
+    public async Task<BaseResponse<PlansResponse>> Handle(
         UpdateClientPlanCommand request,
         CancellationToken cancellationToken
     )
@@ -22,6 +22,6 @@ public sealed class UpdateClientPlanCommandHandler(IClientRepository clientRepos
             request.PlansDto,
             cancellationToken
         );
-        return new SuccessResponse<PlansResponse?>(plan, "Plan updated successfully");
+        return new SuccessResponse<PlansResponse>(plan!, "Plan updated successfully");
     }
 }

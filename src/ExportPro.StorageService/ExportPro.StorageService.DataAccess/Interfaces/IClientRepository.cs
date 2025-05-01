@@ -30,7 +30,7 @@ public interface IClientRepository : IRepository<Client>
         CancellationToken cancellationToken = default
     );
 
-    Task<PlansResponse> GetPlan(ObjectId planId, CancellationToken cancellationToken = default);
+    Task<PlansResponse?> GetPlan(ObjectId planId, CancellationToken cancellationToken = default);
 
     Task<List<PlansResponse>> GetClientPlans(
         ObjectId clientId,

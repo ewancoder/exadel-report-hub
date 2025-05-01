@@ -17,7 +17,7 @@ public sealed class GetCustomerByIdQueryHandler(ICustomerRepository repository, 
         CancellationToken cancellationToken
     )
     {
-        var customer = await repository.GetByIdAsync(request.Id, cancellationToken);
+        var customer = await repository.GetOneAsync(x => x.Id == request.Id && !x.IsDeleted, cancellationToken);
         if (customer == null || customer.IsDeleted)
             return new NotFoundResponse<CustomerDto>("Customer not found.");
 

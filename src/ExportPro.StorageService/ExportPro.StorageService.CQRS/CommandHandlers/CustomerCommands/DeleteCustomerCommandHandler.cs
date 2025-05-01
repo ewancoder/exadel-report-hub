@@ -12,7 +12,10 @@ public sealed class DeleteCustomerCommandHandler(ICustomerRepository repository)
 {
     public async Task<BaseResponse<bool>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
     {
-        var customer = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
+        var customer = await repository.GetOneAsync(
+            x => x.Id == request.Id.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (customer == null || customer.IsDeleted)
             return new NotFoundResponse<bool>("Customer not found.");
         await repository.SoftDeleteAsync(request.Id.ToObjectId(), cancellationToken);

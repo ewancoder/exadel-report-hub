@@ -60,7 +60,7 @@ public sealed class CreateInvoiceHandler(
         CurrencyExchangeModel currencyExchangeModel = new()
         {
             Date = invoice.IssueDate,
-            From = invoiceCurrency.CurrencyCode,
+            From = invoiceCurrency!.CurrencyCode,
         };
         //converting the invoice's currency to euro becuase the api converts the currency to EUR only
         //if it is already EUR than there is no need to convert it

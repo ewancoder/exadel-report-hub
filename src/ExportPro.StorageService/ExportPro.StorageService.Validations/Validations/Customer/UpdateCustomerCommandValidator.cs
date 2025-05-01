@@ -13,11 +13,11 @@ public sealed class UpdateCustomerCommandValidator : AbstractValidator<UpdateCus
             .NotEmpty()
             .WithMessage("The id is required")
             .MustAsync(
-                async (id, CancellationToken) =>
+                async (id, cancellationToken) =>
                 {
                     var client = await repository.GetOneAsync(
                         x => x.Id == id.ToObjectId() && !x.IsDeleted,
-                        CancellationToken
+                        cancellationToken
                     );
                     return client != null;
                 }
@@ -27,7 +27,10 @@ public sealed class UpdateCustomerCommandValidator : AbstractValidator<UpdateCus
             .MustAsync(
                 async (id, token) =>
                 {
-                    var country = countryRepository.GetOneAsync(x => x.Id == id.ToObjectId() && !x.IsDeleted, token);
+                    var country = await countryRepository.GetOneAsync(
+                        x => x.Id == id.ToObjectId() && !x.IsDeleted,
+                        token
+                    );
                     return country != null;
                 }
             )

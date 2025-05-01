@@ -150,7 +150,7 @@ public sealed class ClientRepository(
             i.Id = ObjectId.GenerateNewId();
         }
 
-        client.Plans?.Add(plans);
+        client!.Plans?.Add(plans);
         plans.Amount = ind;
         client.UpdatedAt = DateTime.UtcNow;
         client.UpdatedBy = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
@@ -164,7 +164,7 @@ public sealed class ClientRepository(
     )
     {
         var client = await Collection
-            .Find(x => x.Plans!.Any(x => x.Id == planId) && !x.IsDeleted)
+            .Find(x => x.Plans!.Any(y => y.Id == planId) && !x.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
         var plan = client.Plans!.FirstOrDefault(x => x.Id == planId);
         client.Plans?.Remove(plan!);
@@ -208,7 +208,7 @@ public sealed class ClientRepository(
         return planResponse;
     }
 
-    public async Task<PlansResponse> GetPlan(ObjectId planId, CancellationToken cancellationToken = default)
+    public async Task<PlansResponse?> GetPlan(ObjectId planId, CancellationToken cancellationToken = default)
     {
         var client = await Collection
             .Find(x => x.Plans!.Any(y => y.Id == planId) && !x.IsDeleted)
@@ -228,7 +228,7 @@ public sealed class ClientRepository(
     )
     {
         var client = await GetOneAsync(x => x.Id == clientId && !x.IsDeleted, cancellationToken);
-        var plans = client.Plans!.Skip(skip).Take(top).Select(x => mapper.Map<PlansResponse>(x)).ToList();
+        var plans = client!.Plans!.Skip(skip).Take(top).Select(x => mapper.Map<PlansResponse>(x)).ToList();
         return plans;
     }
 }
