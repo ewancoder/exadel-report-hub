@@ -1,39 +1,36 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using System.Net;
+using AutoMapper;
+using ExportPro.Common.Shared.Library;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using MongoDB.Bson;
-using System.Net;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 
-public class UpdateCurrencyCommand : IRequest<BaseResponse<Currency>>
-{
-    public ObjectId Id { get; set; }
-    public string? Name { get; set; }
-    public string? Code { get; set; }
-}
-public class UpdateCurrencyHandler(ICurrencyRepository repository) : IRequestHandler<UpdateCurrencyCommand, BaseResponse<Currency>>
-{
-    private readonly ICurrencyRepository _repository = repository;
+public sealed record UpdateCurrencyCommand(Guid CurrencyId, string CurrencyCode)
+    : IRequest<BaseResponse<CurrencyResponse>>;
 
-    public async Task<BaseResponse<Currency>> Handle(UpdateCurrencyCommand request, CancellationToken cancellationToken)
+public sealed class UpdateCurrencyHandler(ICurrencyRepository repository, IMapper mapper)
+    : IRequestHandler<UpdateCurrencyCommand, BaseResponse<CurrencyResponse>>
+{
+    public async Task<BaseResponse<CurrencyResponse>> Handle(
+        UpdateCurrencyCommand request,
+        CancellationToken cancellationToken
+    )
     {
-        var currency = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var currency = await repository.GetByIdAsync(request.CurrencyId.ToObjectId(), cancellationToken);
         if (currency == null)
         {
-            return new BaseResponse<Currency>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.NotFound,
-                Messages = ["Currency not found."]
-            };
+            return new NotFoundResponse<CurrencyResponse>("Currency not Found");
         }
-
-        currency.CurrencyCode = request?.Code;
+        currency.CurrencyCode = request.CurrencyCode;
         currency.UpdatedAt = DateTime.UtcNow;
-
-        await _repository.UpdateOneAsync(currency, cancellationToken);
-        return new BaseResponse<Currency> { Data = currency };
+        await repository.UpdateOneAsync(currency, cancellationToken);
+        var currencyResponse = mapper.Map<CurrencyResponse>(currency);
+        return new SuccessResponse<CurrencyResponse>(currencyResponse);
     }
 }

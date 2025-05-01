@@ -1,5 +1,6 @@
 ﻿namespace ExportPro.StorageService.Models.Models;
-public class JwtSettings
+
+public sealed class JwtSettings
 {
     public string Secret { get; set; } = null!;
     public int ExpirationInMinutes { get; set; }

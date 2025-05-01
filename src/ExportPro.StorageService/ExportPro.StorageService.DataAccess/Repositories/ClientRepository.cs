@@ -18,7 +18,7 @@ using ZstdSharp.Unsafe;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public class ClientRepository(
+public sealed class ClientRepository(
     IHttpContextAccessor httpContextAccessor,
     ICollectionProvider collectionProvider,
     IMapper mapper
@@ -144,12 +144,12 @@ public class ClientRepository(
     }
 
     public async Task<Plans> AddPlanToClient(
-        string clientId,
+        ObjectId clientId,
         PlansDto plan,
         CancellationToken cancellationToken = default
     )
     {
-        var client = await GetOneAsync(x => x.Id == ObjectId.Parse(clientId) && !x.IsDeleted, cancellationToken);
+        var client = await GetOneAsync(x => x.Id == clientId && !x.IsDeleted, cancellationToken);
         var plans = mapper.Map<Plans>(plan);
         plans.Id = ObjectId.GenerateNewId();
         int ind = 0;
@@ -166,12 +166,15 @@ public class ClientRepository(
         return plans;
     }
 
-    public async Task<PlansResponse> RemovePlanFromClient(string planId, CancellationToken cancellationToken = default)
+    public async Task<PlansResponse> RemovePlanFromClient(
+        ObjectId planId,
+        CancellationToken cancellationToken = default
+    )
     {
         var client = await Collection
-            .Find(x => x.Plans.Any(x => x.Id == ObjectId.Parse(planId)) && !x.IsDeleted)
+            .Find(x => x.Plans.Any(x => x.Id == planId) && !x.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        var plan = client.Plans.FirstOrDefault(x => x.Id == ObjectId.Parse(planId));
+        var plan = client.Plans.FirstOrDefault(x => x.Id == planId);
         client.Plans.Remove(plan);
         await UpdateOneAsync(client, cancellationToken);
         var planResp = mapper.Map<PlansResponse>(plan);
@@ -179,12 +182,12 @@ public class ClientRepository(
     }
 
     public async Task<PlansResponse> UpdateClientPlan(
-        string planId,
+        ObjectId planId,
         PlansDto plansDto,
         CancellationToken cancellationToken = default
     )
     {
-        var objectId = ObjectId.Parse(planId);
+        var objectId = planId;
         var client = await Collection
             .Find(x => x.Plans.Any(p => p.Id == objectId) && !x.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
@@ -216,26 +219,26 @@ public class ClientRepository(
         return planResponse;
     }
 
-    public async Task<PlansResponse> GetPlan(string planId, CancellationToken cancellationToken = default)
+    public async Task<PlansResponse> GetPlan(ObjectId planId, CancellationToken cancellationToken = default)
     {
         var client = await Collection
-            .Find(x => x.Plans.Any(x => x.Id == ObjectId.Parse(planId)) && !x.IsDeleted)
+            .Find(x => x.Plans.Any(x => x.Id == planId) && !x.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        if(client == null) 
+        if (client == null)
             return null;
-        var plan = client.Plans?.FirstOrDefault(x => x.Id == ObjectId.Parse(planId) && !x.IsDeleted);
+        var plan = client.Plans?.FirstOrDefault(x => x.Id == planId && !x.IsDeleted);
         var planResponse = mapper.Map<PlansResponse>(plan);
         return planResponse;
     }
 
     public async Task<List<PlansResponse>> GetClientPlans(
-        string clientId,
+        ObjectId clientId,
         int top,
         int skip,
         CancellationToken cancellationToken = default
     )
     {
-        var client = await GetOneAsync(x => x.Id == ObjectId.Parse(clientId) && !x.IsDeleted, cancellationToken);
+        var client = await GetOneAsync(x => x.Id == clientId && !x.IsDeleted, cancellationToken);
         var plans = client.Plans.Skip(skip).Take(top).Select(x => mapper.Map<PlansResponse>(x)).ToList();
         return plans;
     }

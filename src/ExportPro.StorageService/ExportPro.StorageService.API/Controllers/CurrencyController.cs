@@ -11,40 +11,37 @@ namespace ExportPro.StorageService.API.Controllers;
 public class CurrencyController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateCurrencyCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(
+        [FromBody] CreateCurrencyCommand command,
+        CancellationToken cancellationToken
+    )
     {
         var response = await mediator.Send(command, cancellationToken);
         return Ok(response);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateCurrencyCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(
+        [FromRoute] Guid id,
+        [FromBody] string CurrencyCode,
+        CancellationToken cancellationToken
+    )
     {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return BadRequest("Invalid currency ID format.");
-
-        command.Id = objectId;
-        var response = await mediator.Send(command, cancellationToken);
+        var response = await mediator.Send(new UpdateCurrencyCommand(id, CurrencyCode));
         return Ok(response);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return BadRequest("Invalid currency ID format.");
-
-        var response = await mediator.Send(new DeleteCurrencyCommand(objectId), cancellationToken);
+        var response = await mediator.Send(new DeleteCurrencyCommand(id), cancellationToken);
         return Ok(response);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return BadRequest("Invalid currency ID format.");
-
-        var response = await mediator.Send(new GetCurrencyByIdQuery(objectId), cancellationToken);
+        var response = await mediator.Send(new GetCurrencyByIdQuery(id), cancellationToken);
         return Ok(response);
     }
 

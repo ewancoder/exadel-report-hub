@@ -2,13 +2,13 @@ using ExportPro.StorageService.Models.Enums;
 
 namespace ExportPro.StorageService.SDK.Responses;
 
-public class InvoiceResponse
+public sealed class InvoiceResponse
 {
-    public string Id { get; set; }
+    public required Guid Id { get; set; }
     public string InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
-    public decimal Amount { get; set; }
+    public double Amount { get; set; }
     public string CurrencyId { get; set; }
     public Status? PaymentStatus { get; set; }
     public string CustomerId { get; set; }

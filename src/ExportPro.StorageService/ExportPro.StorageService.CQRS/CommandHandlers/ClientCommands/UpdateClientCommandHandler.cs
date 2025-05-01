@@ -3,6 +3,7 @@ using System.Security.Claims;
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -14,9 +15,9 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 
-public record UpdateClientCommand(ClientDto client, string ClientId) : ICommand<ClientResponse>;
+public record UpdateClientCommand(ClientDto client, Guid ClientId) : ICommand<ClientResponse>;
 
-public class UpdateClientCommandHandler(
+public sealed class UpdateClientCommandHandler(
     IHttpContextAccessor httpContext,
     IClientRepository clientRepository,
     IMapper mapper
@@ -28,7 +29,7 @@ public class UpdateClientCommandHandler(
     )
     {
         var client = await clientRepository.GetOneAsync(
-            x => x.Id == ObjectId.Parse(request.ClientId),
+            x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
             cancellationToken
         );
         if (request.client.Name != null)

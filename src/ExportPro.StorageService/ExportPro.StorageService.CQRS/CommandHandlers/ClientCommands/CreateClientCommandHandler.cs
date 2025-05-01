@@ -12,9 +12,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 
-public record CreateClientCommand(string Name, string? Description) : ICommand<ClientResponse>;
+public sealed record CreateClientCommand(string Name, string? Description) : ICommand<ClientResponse>;
 
-public class CreateClientCommandHandler(
+public sealed class CreateClientCommandHandler(
     IClientRepository clientRepository,
     IMapper mapper,
     IHttpContextAccessor httpContext

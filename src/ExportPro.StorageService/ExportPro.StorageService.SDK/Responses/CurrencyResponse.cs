@@ -7,8 +7,8 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.SDK.Responses;
 
-public class CurrencyResponse
+public sealed class CurrencyResponse
 {
-    public string? Id { get; set; }
-    public required string CurrencyCode { get; set; }   // e.g. "USD"
+    public required Guid Id { get; set; }
+    public required string CurrencyCode { get; set; } // e.g. "USD"
 }
