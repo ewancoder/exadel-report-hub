@@ -2,7 +2,6 @@
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Customer;
 
@@ -34,9 +33,7 @@ public sealed class CreateCustomerCommandValidator : AbstractValidator<CreateCus
                                 cancellation
                             );
                             if (country == null)
-                            {
                                 return false;
-                            }
                             return true;
                         }
                     )

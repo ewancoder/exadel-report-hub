@@ -1,11 +1,9 @@
-﻿using System.Net;
-using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
@@ -29,9 +27,7 @@ public sealed class UpdateInvoiceHandler(IInvoiceRepository repository) : IComma
     {
         var existing = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
         if (existing == null)
-        {
             return new NotFoundResponse<Invoice>("Invoice not found.");
-        }
         existing.InvoiceNumber = request.InvoiceNumber;
         existing.IssueDate = request.IssueDate;
         existing.DueDate = request.DueDate;

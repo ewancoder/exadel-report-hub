@@ -7,7 +7,6 @@ namespace ExportPro.StorageService.Models.Models;
 
 public sealed class Invoice : IModel
 {
-    public ObjectId Id { get; set; }
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; } = DateTime.Now;
     public DateTime DueDate { get; set; } = DateTime.Now;
@@ -15,6 +14,7 @@ public sealed class Invoice : IModel
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId CurrencyId { get; set; }
+
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
 
@@ -23,6 +23,8 @@ public sealed class Invoice : IModel
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId CustomerId { get; set; }
+
     public List<Item>? Items { get; set; }
     public bool IsDeleted { get; set; } = false;
+    public ObjectId Id { get; set; }
 }

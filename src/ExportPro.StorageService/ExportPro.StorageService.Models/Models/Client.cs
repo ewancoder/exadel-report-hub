@@ -5,7 +5,6 @@ namespace ExportPro.StorageService.Models.Models;
 
 public sealed class Client : IModel
 {
-    public ObjectId Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -17,4 +16,5 @@ public sealed class Client : IModel
     public List<Plans>? Plans { get; set; } = [];
     public Guid? OwnerId { get; set; }
     public List<Guid>? ClientAdmins { get; set; } = [];
+    public ObjectId Id { get; set; }
 }

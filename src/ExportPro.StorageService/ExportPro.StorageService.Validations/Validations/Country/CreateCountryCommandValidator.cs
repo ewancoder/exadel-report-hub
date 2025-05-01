@@ -2,7 +2,6 @@
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Country;
 
@@ -18,9 +17,12 @@ public sealed class CreateCountryCommandValidator : AbstractValidator<CreateCoun
                 () =>
                     RuleFor(x => x.CurrencyId)
                         .MustAsync(
-                            async (currency, _) =>
+                            async (currency, CancellationToken_) =>
                             {
-                                var client = await currencyRepository.GetByIdAsync(currency.ToObjectId(), _);
+                                var client = await currencyRepository.GetByIdAsync(
+                                    currency.ToObjectId(),
+                                    CancellationToken_
+                                );
                                 return client != null;
                             }
                         )

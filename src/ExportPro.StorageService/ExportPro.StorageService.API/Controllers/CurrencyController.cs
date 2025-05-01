@@ -2,7 +2,6 @@
 using ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.API.Controllers;
 

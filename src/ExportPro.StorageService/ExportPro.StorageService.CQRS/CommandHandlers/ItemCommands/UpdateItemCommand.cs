@@ -15,14 +15,12 @@ public sealed class UpdateItemCommandHandler(IClientRepository repository) : ICo
     public async Task<BaseResponse<bool>> Handle(UpdateItemCommand request, CancellationToken cancellationToken)
     {
         if (request.Item is null || request.Item.Id == ObjectId.Empty)
-        {
             return new BaseResponse<bool>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
                 Messages = ["Item is null or missing valid Id."],
             };
-        }
 
         var updated = await repository.UpdateItemInClient(
             request.ClientId.ToObjectId(),
@@ -31,9 +29,7 @@ public sealed class UpdateItemCommandHandler(IClientRepository repository) : ICo
         );
 
         if (!updated)
-        {
             return new NotFoundResponse<bool>($"Item with ID {request.Item.Id} not found in client.");
-        }
 
         return new SuccessResponse<bool>(true);
     }

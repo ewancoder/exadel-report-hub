@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
-    <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.7" />
-    <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="14.0.0"/>
+        <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.7"/>
+        <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.1"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj" />
-    <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj"/>
+        <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj"/>
+    </ItemGroup>
 
 </Project>

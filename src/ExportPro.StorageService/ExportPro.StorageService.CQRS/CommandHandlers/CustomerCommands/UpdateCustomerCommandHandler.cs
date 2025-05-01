@@ -1,13 +1,10 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.Responses;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
@@ -26,9 +23,7 @@ public sealed class UpdateCustomerCommandHandler(ICustomerRepository repository,
             cancellationToken
         );
         if (existingCustomer is null || existingCustomer.IsDeleted)
-        {
-            return new NotFoundResponse<CustomerResponse>() { Messages = ["Customer not found."] };
-        }
+            return new NotFoundResponse<CustomerResponse>("Customer not found.");
         if (!string.IsNullOrEmpty(request.Customer.Name))
             existingCustomer.Name = request.Customer.Name.Trim();
 

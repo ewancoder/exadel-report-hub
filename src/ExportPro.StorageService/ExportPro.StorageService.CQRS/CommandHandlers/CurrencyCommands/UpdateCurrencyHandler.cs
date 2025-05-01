@@ -1,13 +1,9 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.DataAccess.Repositories;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 
@@ -24,9 +20,7 @@ public sealed class UpdateCurrencyHandler(ICurrencyRepository repository, IMappe
     {
         var currency = await repository.GetByIdAsync(request.CurrencyId.ToObjectId(), cancellationToken);
         if (currency == null)
-        {
             return new NotFoundResponse<CurrencyResponse>("Currency not Found");
-        }
         currency.CurrencyCode = request.CurrencyCode;
         currency.UpdatedAt = DateTime.UtcNow;
         await repository.UpdateOneAsync(currency, cancellationToken);

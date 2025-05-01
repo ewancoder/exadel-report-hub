@@ -1,11 +1,9 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 

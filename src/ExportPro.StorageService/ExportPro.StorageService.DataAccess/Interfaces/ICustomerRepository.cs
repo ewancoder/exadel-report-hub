@@ -9,5 +9,6 @@ public interface ICustomerRepository : IRepository<Customer>
     Task<PaginatedList<Customer>> GetAllPaginatedAsync(
         PaginationParameters parameters,
         bool includeDeleted = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

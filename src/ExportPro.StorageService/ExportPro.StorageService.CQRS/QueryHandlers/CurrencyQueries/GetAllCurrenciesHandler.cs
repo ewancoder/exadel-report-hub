@@ -17,7 +17,7 @@ public sealed class GetAllCurrenciesHandler(ICurrencyRepository repository, IMap
     )
     {
         var currencies = await repository.GetAllAsync(cancellationToken);
-        List<CurrencyResponse> currency = currencies.Select(x => mapper.Map<CurrencyResponse>(x)).ToList();
+        var currency = currencies.Select(x => mapper.Map<CurrencyResponse>(x)).ToList();
         return new BaseResponse<List<CurrencyResponse>> { Data = currency };
     }
 }

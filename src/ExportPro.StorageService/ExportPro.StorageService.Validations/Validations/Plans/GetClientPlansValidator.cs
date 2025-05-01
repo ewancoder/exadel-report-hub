@@ -1,10 +1,7 @@
-﻿using System.Runtime.CompilerServices;
-using ExportPro.StorageService.CQRS.Extensions;
+﻿using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.DataAccess.Repositories;
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Plans;
 
@@ -48,7 +45,7 @@ public class GetClientPlansValidator : AbstractValidator<GetClientPlansQuery>
                                         y => y.Id == x.ClientId.ToObjectId() && !y.IsDeleted,
                                         cancellationToken
                                     );
-                                    var cnt = res.Plans.Count;
+                                    var cnt = res.Plans?.Count;
                                     return x.Skip <= cnt;
                                 }
                             )

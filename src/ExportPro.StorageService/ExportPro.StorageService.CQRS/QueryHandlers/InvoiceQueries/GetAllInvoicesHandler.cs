@@ -26,19 +26,15 @@ public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper
     )
     {
         if (request.PageNumber < 1)
-        {
             return new BaseResponse<PaginatedListDto<InvoiceDto>>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
                 Messages = new List<string> { "Page number must be greater than zero." },
             };
-        }
 
         if (request.PageSize < 1)
-        {
             return new BadRequestResponse<PaginatedListDto<InvoiceDto>>("Page size must be greater than zero.");
-        }
         var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
 
         var paginatedInvoices = await repository.GetAllPaginatedAsync(
@@ -59,7 +55,7 @@ public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper
                 BankAccountNumber = invoice.BankAccountNumber,
                 ClientId = invoice.ClientId.ToGuid(),
                 Amount = invoice.Amount,
-                Items = invoice.Items.Select(_ => mapper.Map<ItemDtoForClient>(_)).ToList(),
+                Items = invoice.Items?.Select(i => mapper.Map<ItemDtoForClient>(i)).ToList(),
             })
             .ToList();
 

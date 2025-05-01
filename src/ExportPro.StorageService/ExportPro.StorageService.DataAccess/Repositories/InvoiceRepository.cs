@@ -34,9 +34,7 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
         var filter = Builders<Invoice>.Filter.Empty;
 
         if (!includeDeleted && typeof(Invoice).GetProperty("IsDeleted") != null)
-        {
             filter = Builders<Invoice>.Filter.Eq("IsDeleted", false);
-        }
 
         var totalCount = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
 

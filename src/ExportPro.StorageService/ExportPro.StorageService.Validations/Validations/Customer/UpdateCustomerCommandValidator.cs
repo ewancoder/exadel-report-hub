@@ -1,4 +1,3 @@
-using AutoMapper;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -8,11 +7,7 @@ namespace ExportPro.StorageService.Validations.Validations.Customer;
 
 public sealed class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>
 {
-    public UpdateCustomerCommandValidator(
-        ICountryRepository countryRepository,
-        ICustomerRepository repository,
-        IMapper mapper
-    )
+    public UpdateCustomerCommandValidator(ICountryRepository countryRepository, ICustomerRepository repository)
     {
         RuleFor(x => x.Id)
             .NotEmpty()

@@ -5,7 +5,6 @@ namespace ExportPro.StorageService.Models.Models;
 
 public sealed class Plans : IModel
 {
-    public ObjectId Id { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public bool IsDeleted { get; set; } = false;
@@ -15,4 +14,5 @@ public sealed class Plans : IModel
     public string? UpdatedBy { get; set; }
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
+    public ObjectId Id { get; set; }
 }

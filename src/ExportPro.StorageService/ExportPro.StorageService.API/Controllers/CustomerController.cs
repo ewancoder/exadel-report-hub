@@ -1,4 +1,5 @@
 ﻿using ExportPro.Common.Shared.Attributes;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.CQRS.Extensions;
@@ -8,7 +9,6 @@ using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.API.Controllers;
 
@@ -17,14 +17,17 @@ namespace ExportPro.StorageService.API.Controllers;
 public class CustomerController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Create)]
+    [HasPermission(Resource.Customers, CrudAction.Create)]
     public async Task<IActionResult> Create(
         [FromBody] CreateCustomerCommand command,
         CancellationToken cancellationToken
-    ) => Ok(await mediator.Send(command, cancellationToken));
+    )
+    {
+        return Ok(await mediator.Send(command, cancellationToken));
+    }
 
     [HttpPut("{id}")]
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Update)]
+    [HasPermission(Resource.Customers, CrudAction.Update)]
     public async Task<IActionResult> Update(
         [FromRoute] Guid id,
         [FromBody] CreateUpdateCustomerDto customerDto,
@@ -35,20 +38,20 @@ public class CustomerController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Delete)]
+    [HasPermission(Resource.Customers, CrudAction.Delete)]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(new DeleteCustomerCommand(id), cancellationToken));
     }
 
     [HttpGet("{id}")]
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
+    [HasPermission(Resource.Customers, CrudAction.Read)]
     public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(new GetCustomerByIdQuery(id.ToObjectId()), cancellationToken));
     }
 
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
+    [HasPermission(Resource.Customers, CrudAction.Read)]
     [HttpGet]
     public async Task<ActionResult<BaseResponse<PaginatedList<Customer>>>> GetAll(
         CancellationToken cancellationToken,

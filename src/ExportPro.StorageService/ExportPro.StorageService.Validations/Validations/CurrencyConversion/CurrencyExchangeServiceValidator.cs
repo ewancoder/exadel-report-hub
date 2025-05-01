@@ -9,24 +9,26 @@ public sealed class CurrencyExchangeServiceValidator : AbstractValidator<Currenc
     public CurrencyExchangeServiceValidator(ICurrencyExchangeService currencyExchangeService)
     {
         RuleFor(x => x.From)
-            .MustAsync(async (from, _) =>
-            {
+            .MustAsync(
+                async (from, CancellationToken) =>
+                {
+                    var currenyExchangeModel = new CurrencyExchangeModel
+                    {
+                        From = from,
+                        Date = new DateTime(2024, 04, 17),
+                    };
+                    try
+                    {
+                        var res = await currencyExchangeService.ExchangeRate(currenyExchangeModel, CancellationToken);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
 
-                var currenyExchangeModel = new CurrencyExchangeModel
-                {
-                    From = from,
-                    Date = new DateTime(2024, 04, 17)
-                };
-                try
-                {
-                    var res = await currencyExchangeService.ExchangeRate(currenyExchangeModel);
+                    return true;
                 }
-                catch 
-                {
-                    return false;
-                }
-                return true;
-            }).WithMessage(x => $"Currency [{x.From}] is not supported by the  European Central Bank for conversion.");
-
+            )
+            .WithMessage(x => $"Currency [{x.From}] is not supported by the  European Central Bank for conversion.");
     }
-}   
+}

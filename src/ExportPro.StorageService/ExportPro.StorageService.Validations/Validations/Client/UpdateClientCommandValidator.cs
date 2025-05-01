@@ -2,7 +2,6 @@
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Client;
 
@@ -30,7 +29,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
             })
             .DependentRules(() =>
             {
-                RuleFor(x => x.client.Name)
+                RuleFor(x => x.Client.Name)
                     .NotEmpty()
                     .WithMessage("Name must not be empty")
                     .MinimumLength(3)
@@ -39,7 +38,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
                     .WithMessage("Name must not exceed 50 characters")
                     .DependentRules(() =>
                     {
-                        RuleFor(x => x.client.Name)
+                        RuleFor(x => x.Client.Name)
                             .MustAsync(
                                 async (Name, cancellationToken) =>
                                 {
