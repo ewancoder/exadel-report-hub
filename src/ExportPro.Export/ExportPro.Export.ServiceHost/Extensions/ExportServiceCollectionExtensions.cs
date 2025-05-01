@@ -11,6 +11,8 @@ using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.ServiceHost.Infrastructure;
+using ExportPro.Export.Validations.Validations;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
@@ -56,12 +58,14 @@ public static class ExportServiceCollectionExtensions
         services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 
         // ---------- MediatR --------------------------
+        services.AddValidatorsFromAssembly(typeof(DownloadLogByDateRangeQueryValidator).Assembly);
         services.AddMediatR(options =>
         {
             options.RegisterServicesFromAssemblies(
                 typeof(GeneratePdfInvoiceQuery).Assembly,
                 typeof(IPdfGenerator).Assembly
             );
+            options.AddOpenBehavior(typeof(ValidationBehavior<,>));
             options.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
         });
 

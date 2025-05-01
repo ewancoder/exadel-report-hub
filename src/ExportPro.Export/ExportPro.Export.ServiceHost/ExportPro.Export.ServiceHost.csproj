@@ -21,6 +21,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\ExportPro.Export.CQRS\ExportPro.Export.CQRS.csproj" />
+		<ProjectReference Include="..\ExportPro.Export.Validations\ExportPro.Export.Validations.csproj" />
 	</ItemGroup>
 
 </Project>

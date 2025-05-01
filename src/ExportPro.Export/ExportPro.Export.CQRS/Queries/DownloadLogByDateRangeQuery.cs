@@ -9,7 +9,7 @@ public class DowloadLogByDateRangeQueryHandler : IRequestHandler<DownloadLogByDa
     public async Task<byte[]?> Handle(DownloadLogByDateRangeQuery request, CancellationToken cancellationToken)
     {
         var combinedLogs = new List<string>();
-        for (var i = request.startDate; i <= request.endDate; i.AddDays(1))
+        for (var i = request.startDate; i <= request.endDate; i = i.AddDays(1))
         {
             var format = i.ToString("yyyyMMdd");
             var fileName = $"log-{format}.txt";
@@ -17,11 +17,13 @@ public class DowloadLogByDateRangeQueryHandler : IRequestHandler<DownloadLogByDa
             if (File.Exists(logPath))
             {
                 var content = await File.ReadAllTextAsync(logPath, cancellationToken);
-                combinedLogs.Add(format);
+                combinedLogs.Add(i.ToString());
                 combinedLogs.Add(content);
             }
         }
         var combinedText = string.Join(Environment.NewLine + "-----" + Environment.NewLine, combinedLogs);
+        if (combinedText.Length == 0)
+            return null;
         return System.Text.Encoding.UTF8.GetBytes(combinedText);
     }
 }
