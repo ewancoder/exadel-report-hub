@@ -14,5 +14,5 @@ public sealed class InvoiceResponse
     public Guid CustomerId { get; set; }
     public string BankAccountNumber { get; set; } = string.Empty;
     public Guid ClientId { get; set; }
-    public List<ItemResponse> Items { get; set; }
+    public required List<ItemResponse> Items { get; set; }
 }
