@@ -50,7 +50,7 @@ public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeS
         namespaceManager.AddNamespace("generic", "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic");
         //getting the exchange rate
         var value = xmlDocument.SelectSingleNode("//generic:ObsValue", namespaceManager);
-        var currencyValue = value.Attributes?["value"]?.Value;
+        var currencyValue = value?.Attributes?["value"]?.Value;
         return currencyValue != null ? Convert.ToDouble(currencyValue) : 0;
     }
 

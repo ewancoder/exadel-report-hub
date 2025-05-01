@@ -16,10 +16,10 @@ public sealed class UpdateInvoiceCommand : ICommand<Invoice>
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
     public double Amount { get; set; }
-    public Guid? CurrencyId { get; set; }
+    public Guid CurrencyId { get; set; }
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
-    public Guid? ClientId { get; set; }
+    public Guid ClientId { get; set; }
     public List<Guid>? ItemIds { get; set; }
 }
 
@@ -36,10 +36,10 @@ public sealed class UpdateInvoiceHandler(IInvoiceRepository repository) : IComma
         existing.IssueDate = request.IssueDate;
         existing.DueDate = request.DueDate;
         existing.Amount = request.Amount;
-        existing.CurrencyId = request.CurrencyId?.ToObjectId();
+        existing.CurrencyId = request.CurrencyId.ToObjectId();
         existing.PaymentStatus = request.PaymentStatus;
         existing.BankAccountNumber = request.BankAccountNumber;
-        existing.ClientId = request.ClientId?.ToObjectId();
+        existing.ClientId = request.ClientId.ToObjectId();
         //existing.ItemIds = request.ItemIds ?? new List<string>();
         await repository.UpdateOneAsync(existing, cancellationToken);
         return new SuccessResponse<Invoice>(existing, "Invoice updated successfully.");

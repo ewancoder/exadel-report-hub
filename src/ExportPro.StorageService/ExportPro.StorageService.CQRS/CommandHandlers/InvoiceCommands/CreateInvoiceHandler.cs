@@ -89,7 +89,7 @@ public sealed class CreateInvoiceHandler(
             string currencyCode = currency.CurrencyCode;
             //converting item currency to EUR
             var itemExchangeRateToEuro = 1.0;
-            if (currencyCode != "EUR")
+            if (currencyCode != "EUR" && invoiceCurrency.CurrencyCode != currencyCode)
             {
                 currencyExchangeModel.From = currencyCode;
                 await validator.ValidateAndThrowAsync(currencyExchangeModel, cancellationToken);

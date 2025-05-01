@@ -9,7 +9,7 @@ public sealed class Plans : IModel
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public bool IsDeleted { get; set; } = false;
-    public List<Item> items { get; set; } = new();
+    public List<Item> items { get; set; } = [];
     public int Amount { get; set; }
     public string? CreatedBy { get; set; }
     public string? UpdatedBy { get; set; }

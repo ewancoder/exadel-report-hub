@@ -54,10 +54,10 @@ public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper
                 InvoiceNumber = invoice.InvoiceNumber,
                 IssueDate = invoice.IssueDate,
                 DueDate = invoice.DueDate,
-                CurrencyId = invoice.CurrencyId?.ToGuid(),
+                CurrencyId = invoice.CurrencyId.ToGuid(),
                 PaymentStatus = invoice.PaymentStatus,
                 BankAccountNumber = invoice.BankAccountNumber,
-                ClientId = invoice.ClientId?.ToGuid(),
+                ClientId = invoice.ClientId.ToGuid(),
                 Amount = invoice.Amount,
                 Items = invoice.Items.Select(_ => mapper.Map<ItemDtoForClient>(_)).ToList(),
             })

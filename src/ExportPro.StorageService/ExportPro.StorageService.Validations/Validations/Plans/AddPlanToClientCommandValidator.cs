@@ -51,5 +51,6 @@ public sealed class AddPlanToClientCommandValidator : AbstractValidator<AddPlanT
                     })
                     .WithMessage("The end date must be greater than start date");
             });
+        RuleFor(x => x.Plan.Items).NotEmpty().WithMessage("The items cannot be empty");
     }
 }
