@@ -6,9 +6,9 @@ using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 
-public record GetClientPlansQuery(Guid ClientId, int Top, int Skip) : IQuery<List<PlansResponse>>;
+public sealed record GetClientPlansQuery(Guid ClientId, int Top, int Skip) : IQuery<List<PlansResponse>>;
 
-public class GetClientsPlansQueryHandler(IClientRepository clientRepository)
+public sealed class GetClientsPlansQueryHandler(IClientRepository clientRepository)
     : IQueryHandler<GetClientPlansQuery, List<PlansResponse>>
 {
     public async Task<BaseResponse<List<PlansResponse>>> Handle(

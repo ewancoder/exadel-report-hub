@@ -1,5 +1,4 @@
-﻿using System.Net;
-using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -8,18 +7,16 @@ using ExportPro.StorageService.SDK.PaginationParams;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 
-public class GetPaginatedCustomersQuery : IQuery<PaginatedListDto<CustomerDto>>
+public sealed class GetPaginatedCustomersQuery : IQuery<PaginatedListDto<CustomerDto>>
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public bool IncludeDeleted { get; set; } = false;
 }
 
-public class GetPaginatedCustomersQueryHandler(ICustomerRepository repository)
+public sealed class GetPaginatedCustomersQueryHandler(ICustomerRepository repository)
     : IQueryHandler<GetPaginatedCustomersQuery, PaginatedListDto<CustomerDto>>
 {
-    private readonly ICustomerRepository _repository = repository;
-
     public async Task<BaseResponse<PaginatedListDto<CustomerDto>>> Handle(
         GetPaginatedCustomersQuery request,
         CancellationToken cancellationToken
@@ -27,7 +24,7 @@ public class GetPaginatedCustomersQueryHandler(ICustomerRepository repository)
     {
         var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
 
-        var paginatedCustomers = await _repository.GetAllPaginatedAsync(
+        var paginatedCustomers = await repository.GetAllPaginatedAsync(
             parameters,
             request.IncludeDeleted,
             cancellationToken
@@ -53,11 +50,6 @@ public class GetPaginatedCustomersQueryHandler(ICustomerRepository repository)
             paginatedCustomers.TotalPages
         );
 
-        return new BaseResponse<PaginatedListDto<CustomerDto>>
-        {
-            Data = dto,
-            IsSuccess = true,
-            ApiState = HttpStatusCode.OK,
-        };
+        return new SuccessResponse<PaginatedListDto<CustomerDto>>(dto, "Successfully retrieved customers.");
     }
 }

@@ -1,19 +1,16 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.Responses;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
-public record UpdateCustomerCommand(Guid Id, CreateUpdateCustomerDto Customer) : ICommand<CustomerResponse>;
+public sealed record UpdateCustomerCommand(Guid Id, CreateUpdateCustomerDto Customer) : ICommand<CustomerResponse>;
 
-public class UpdateCustomerCommandHandler(ICustomerRepository repository, IMapper mapper)
+public sealed class UpdateCustomerCommandHandler(ICustomerRepository repository, IMapper mapper)
     : ICommandHandler<UpdateCustomerCommand, CustomerResponse>
 {
     public async Task<BaseResponse<CustomerResponse>> Handle(
@@ -26,17 +23,14 @@ public class UpdateCustomerCommandHandler(ICustomerRepository repository, IMappe
             cancellationToken
         );
         if (existingCustomer is null || existingCustomer.IsDeleted)
-        {
-            return new NotFoundResponse<CustomerResponse>() { Messages = ["Customer not found."] };
-        }
-
+            return new NotFoundResponse<CustomerResponse>("Customer not found.");
         if (!string.IsNullOrEmpty(request.Customer.Name))
             existingCustomer.Name = request.Customer.Name.Trim();
 
         if (!string.IsNullOrEmpty(request.Customer.Email))
             existingCustomer.Email = request.Customer.Email.Trim();
 
-        if (request.Customer.CountryId != null)
+        if (request.Customer.CountryId != Guid.Empty)
             existingCustomer.CountryId = request.Customer.CountryId.ToObjectId();
 
         existingCustomer.UpdatedAt = DateTime.UtcNow;

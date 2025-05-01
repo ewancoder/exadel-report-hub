@@ -1,19 +1,15 @@
-using System.Net;
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
-using FluentValidation;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 
-public record SoftDeleteClientCommand(ObjectId ClientId) : ICommand<ClientResponse>;
+public sealed record SoftDeleteClientCommand(ObjectId ClientId) : ICommand<ClientResponse>;
 
-public class SoftDeleteClientCommandHandler(IClientRepository clientRepository, IMapper mapper)
+public sealed class SoftDeleteClientCommandHandler(IClientRepository clientRepository, IMapper mapper)
     : ICommandHandler<SoftDeleteClientCommand, ClientResponse>
 {
     public async Task<BaseResponse<ClientResponse>> Handle(
