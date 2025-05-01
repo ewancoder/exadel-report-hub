@@ -30,7 +30,7 @@ public sealed class UpdateCustomerCommandHandler(ICustomerRepository repository,
         if (!string.IsNullOrEmpty(request.Customer.Email))
             existingCustomer.Email = request.Customer.Email.Trim();
 
-        if (request.Customer.CountryId != null)
+        if (request.Customer.CountryId != Guid.Empty)
             existingCustomer.CountryId = request.Customer.CountryId.ToObjectId();
 
         existingCustomer.UpdatedAt = DateTime.UtcNow;

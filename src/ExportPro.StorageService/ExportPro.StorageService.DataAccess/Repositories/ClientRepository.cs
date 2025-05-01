@@ -173,7 +173,7 @@ public sealed class ClientRepository(
         return planResp;
     }
 
-    public async Task<PlansResponse> UpdateClientPlan(
+    public async Task<PlansResponse?> UpdateClientPlan(
         ObjectId planId,
         PlansDto plansDto,
         CancellationToken cancellationToken = default
@@ -186,17 +186,15 @@ public sealed class ClientRepository(
         var plan = client.Plans!.FirstOrDefault(p => p.Id == objectId);
         if (plan == null)
             return null;
-        if (plansDto.StartDate != null)
+        if (plansDto.StartDate != DateTime.MinValue)
             plan.StartDate = plansDto.StartDate;
-        if (plansDto.EndDate != null)
+        if (plansDto.EndDate != DateTime.MinValue)
             plan.EndDate = plansDto.EndDate;
-        if (plansDto.Items != null)
-        {
-            var items = plansDto.Items.Select(x => mapper.Map<Item>(x)).ToList();
-            foreach (var item in items)
-                item.Id = ObjectId.GenerateNewId();
-            plan.items = items;
-        }
+
+        var items = plansDto.Items.Select(x => mapper.Map<Item>(x)).ToList();
+        foreach (var item in items)
+            item.Id = ObjectId.GenerateNewId();
+        plan.items = items;
 
         plan.UpdatedBy = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
         plan.UpdatedAt = DateTime.UtcNow;
@@ -213,10 +211,10 @@ public sealed class ClientRepository(
     public async Task<PlansResponse> GetPlan(ObjectId planId, CancellationToken cancellationToken = default)
     {
         var client = await Collection
-            .Find(x => x.Plans!.Any(x => x.Id == planId) && !x.IsDeleted)
+            .Find(x => x.Plans!.Any(y => y.Id == planId) && !x.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
         if (client == null)
-            return null;
+            return null!;
         var plan = client.Plans?.FirstOrDefault(x => x.Id == planId && !x.IsDeleted);
         var planResponse = mapper.Map<PlansResponse>(plan);
         return planResponse;

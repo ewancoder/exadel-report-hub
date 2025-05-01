@@ -18,7 +18,10 @@ public sealed class UpdateCurrencyHandler(ICurrencyRepository repository, IMappe
         CancellationToken cancellationToken
     )
     {
-        var currency = await repository.GetByIdAsync(request.CurrencyId.ToObjectId(), cancellationToken);
+        var currency = await repository.GetOneAsync(
+            x => x.Id == request.CurrencyId.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (currency == null)
             return new NotFoundResponse<CurrencyResponse>("Currency not Found");
         currency.CurrencyCode = request.CurrencyCode;

@@ -24,7 +24,7 @@ public interface IClientRepository : IRepository<Client>
     Task<Plans> AddPlanToClient(ObjectId clientId, PlansDto plan, CancellationToken cancellationToken = default);
     Task<PlansResponse> RemovePlanFromClient(ObjectId planId, CancellationToken cancellationToken = default);
 
-    Task<PlansResponse> UpdateClientPlan(
+    Task<PlansResponse?> UpdateClientPlan(
         ObjectId planId,
         PlansDto plansDto,
         CancellationToken cancellationToken = default

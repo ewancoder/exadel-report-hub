@@ -27,8 +27,7 @@ public sealed class UpdateClientCommandHandler(
             x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
             cancellationToken
         );
-        if (request.Client.Name != null)
-            client.Name = request.Client.Name;
+        client.Name = request.Client.Name;
         if (request.Client.Description != null)
             client.Description = request.Client.Description;
         client.UpdatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;

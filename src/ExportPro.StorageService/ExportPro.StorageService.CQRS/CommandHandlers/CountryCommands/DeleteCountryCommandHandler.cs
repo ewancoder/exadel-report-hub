@@ -12,7 +12,10 @@ public sealed class DeleteCountryCommandHandler(ICountryRepository repository)
 {
     public async Task<BaseResponse<bool>> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
     {
-        var existing = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
+        var existing = await repository.GetOneAsync(
+            x => x.Id == request.Id.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (existing == null)
             return new NotFoundResponse<bool> { Messages = ["Country not found."] };
         await repository.SoftDeleteAsync(request.Id.ToObjectId(), cancellationToken);
