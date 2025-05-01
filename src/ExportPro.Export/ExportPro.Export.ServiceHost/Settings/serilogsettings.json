@@ -24,7 +24,7 @@
               {
                 "Name": "ByIncludingOnly",
                 "Args": {
-                  "expression": "@l = 'Information'"
+                  "expression": "StartsWith(SourceContext, 'ExportPro') and @l = 'Information'"
                 }
               }
             ],
