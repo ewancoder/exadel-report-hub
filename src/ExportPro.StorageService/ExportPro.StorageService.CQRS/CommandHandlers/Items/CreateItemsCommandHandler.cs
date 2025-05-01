@@ -7,7 +7,7 @@ using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.CQRS.Commands.Items
+namespace ExportPro.StorageService.CQRS.CommandHandlers.Items
 {
     public record CreateItemsCommand(string ClientId, List<ItemDtoForClient> Items) : ICommand<bool>;
     public class CreateItemsCommandHandler(IClientRepository repository, IMapper mapper) : ICommandHandler<CreateItemsCommand, bool>

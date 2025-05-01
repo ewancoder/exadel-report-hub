@@ -6,7 +6,7 @@ using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.CQRS.Commands.Items;
+namespace ExportPro.StorageService.CQRS.CommandHandlers.Items;
 
 public record CreateItemCommand(string Name,
     string Description, 
@@ -25,7 +25,7 @@ public class CreateItemCommandHandler(IClientRepository clientRepository) : ICom
         var client = await _clientRepository.GetByIdAsync(objectId, cancellationToken);
         if (client == null || client.IsDeleted)
             return new NotFoundResponse<string>("Client not found");
-        var item = new Models.Models.Item
+        var item = new Item
         {
             Id = ObjectId.GenerateNewId(),
             Name = request.Name,

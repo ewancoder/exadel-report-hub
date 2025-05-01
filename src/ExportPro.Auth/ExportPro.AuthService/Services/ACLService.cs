@@ -1,5 +1,4 @@
 ﻿using ExportPro.Auth.SDK.DTOs;
-using ExportPro.Auth.SDK.Helpers;
 using ExportPro.Auth.SDK.Models;
 using ExportPro.AuthService.Repositories;
 using ExportPro.Common.Shared.Enums;
@@ -18,7 +17,7 @@ public class ACLService(ACLRepository aclRepository) : IACLService
         var permissions = userRoles
                 .SelectMany(roleEntry =>
                 {
-                    if (!RolePermissions.Matrix.TryGetValue(roleEntry.Role.ToAuthRole(), out var rolePermissions))
+                    if (!RolePermissions.Matrix.TryGetValue(roleEntry.Role, out var rolePermissions))
                         return [];
 
                     return rolePermissions.SelectMany(permission =>
@@ -54,7 +53,7 @@ public class ACLService(ACLRepository aclRepository) : IACLService
         var userRoles = await Roles(userId, clientId, cancellationToken);
         foreach (var roleEntry in userRoles)
         {
-            if (PermissionChecker.HasPermission(roleEntry.Role.ToAuthRole(), resource, action))
+            if (PermissionChecker.HasPermission(roleEntry.Role, resource, action))
             {
                 return true;
             }

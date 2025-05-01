@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 using ExportPro.Common.Models.MongoDB;
+using ExportPro.Common.Shared.Enums;
 
 namespace ExportPro.Auth.SDK.Models;
 

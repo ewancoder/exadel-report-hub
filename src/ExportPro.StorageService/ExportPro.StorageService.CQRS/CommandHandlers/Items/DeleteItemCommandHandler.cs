@@ -7,7 +7,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Net;
 
-namespace ExportPro.StorageService.CQRS.Commands.Items;
+namespace ExportPro.StorageService.CQRS.CommandHandlers.Items;
 
 public record DeleteItemCommand(string Id, string ClientId) : ICommand<bool>;
 

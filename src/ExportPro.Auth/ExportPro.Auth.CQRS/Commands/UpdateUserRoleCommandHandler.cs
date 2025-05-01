@@ -1,5 +1,6 @@
 ﻿using ExportPro.Auth.SDK.Models;
 using ExportPro.AuthService.Services;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using MongoDB.Bson;

@@ -1,6 +1,8 @@
 ﻿using ExportPro.Auth.CQRS.Commands;
 using ExportPro.Auth.CQRS.Queries;
+using ExportPro.Auth.SDK.DTOs;
 using ExportPro.AuthService.Services;
+using ExportPro.Common.Shared.Library;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,43 +12,29 @@ namespace ExportPro.Auth.ServiceHost.Controllers
     [Route("api/permissions")]
     public class ACLController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
 
         [HttpPost("check")]
-        public async Task<IActionResult> CheckPermission([FromBody] HasPermissionQuery request)
-        {
-            var result = await _mediator.Send(request);
-            return Ok(result);
-        }
+        public  Task<BaseResponse<bool>> CheckPermission([FromBody] HasPermissionQueryHandler request) =>
+             mediator.Send(request);
 
         [HttpGet("{userId}/{clientId}")]
-        public async Task<IActionResult> GetPermissions([FromRoute]string userId, [FromRoute] string clientId)
-        {
-            var objectUserId = new MongoDB.Bson.ObjectId(userId);
-            var objectClientId = new MongoDB.Bson.ObjectId(clientId);
-            var permissions = _mediator.Send(new GetUserClientPermissionsQuery(objectUserId, objectClientId));
-            return Ok(permissions);
-        }
-
+        public Task<BaseResponse<List<PermissionDTO>>> GetPermissions([FromRoute]string userId, [FromRoute] string clientId) =>
+             mediator.Send(new GetUserClientPermissionsQuery(userId, clientId));
+        
         [HttpPost("grant")]
         public async Task<IActionResult> GrantPermission([FromBody] GrantUserRoleCommand command)
         {
-            var result = await _mediator.Send(command);
+            var result = await mediator.Send(command);
             return Ok(result);
         }
 
         [HttpPost("revoke")]
-        public async Task<IActionResult> RevokePermission([FromBody] RemovePermissionCommand command)
-        {
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
+        public Task<BaseResponse<bool>> RevokePermission([FromBody] RemovePermissionCommand command) => 
+            mediator.Send(command);
 
         [HttpPost("update-role")]
-        public async Task<IActionResult> UpdateUserRole([FromBody] UpdateUserRoleCommand command)
-        {
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
+        public  Task<BaseResponse<bool>> UpdateUserRole([FromBody] UpdateUserRoleCommand command) 
+            => mediator.Send(command);
+
     }
 }

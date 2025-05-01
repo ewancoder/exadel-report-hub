@@ -5,7 +5,7 @@ using ExportPro.StorageService.Models.Models;
 using MongoDB.Bson;
 using System.Net;
 
-namespace ExportPro.StorageService.CQRS.Commands.Items;
+namespace ExportPro.StorageService.CQRS.CommandHandlers.Items;
 
 public record UpdateItemCommand(string ClientId, Item Item) : ICommand<bool>;
 

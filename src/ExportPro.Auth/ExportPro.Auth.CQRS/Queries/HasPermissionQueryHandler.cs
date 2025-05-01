@@ -7,6 +7,7 @@ using MongoDB.Bson;
 
 
 namespace ExportPro.Auth.CQRS.Queries;
+
 public record HasPermissionQuery(
     ObjectId UserId,
     ObjectId ClientId,
@@ -14,7 +15,7 @@ public record HasPermissionQuery(
     CrudAction Action
 ) : IQuery<bool>;
 
-public class HasPermissionQueryHandler(IACLService aclService) : IRequestHandler<HasPermissionQuery, BaseResponse<bool>>
+public class HasPermissionQueryHandler(IACLService aclService) : IQueryHandler<HasPermissionQuery, bool>
 {
 
     public async Task<BaseResponse<bool>> Handle(HasPermissionQuery request, CancellationToken cancellationToken)

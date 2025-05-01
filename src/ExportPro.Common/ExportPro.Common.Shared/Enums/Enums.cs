@@ -4,7 +4,6 @@ namespace ExportPro.Common.Shared.Enums;
 
 public enum UserRole
 {
-    SuperAdmin,
     Owner,
     ClientAdmin,
     Operator
