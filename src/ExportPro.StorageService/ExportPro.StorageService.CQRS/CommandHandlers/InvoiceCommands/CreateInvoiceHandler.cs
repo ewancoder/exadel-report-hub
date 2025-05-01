@@ -59,34 +59,24 @@ public sealed class CreateInvoiceHandler(
         {
             i.Id = ObjectId.GenerateNewId();
         }
-        //getting the customer
-        var customer = await customerRepository.GetOneAsync(
-            x => x.Id == invoice.CustomerId && !x.IsDeleted,
-            cancellationToken
-        );
-        //getting the country so that i can get costomer's currency
-        var country = await countryRepository.GetOneAsync(
-            x => x.Id == customer.CountryId && !x.IsDeleted,
-            cancellationToken
-        );
-        //getting the currency of the customer
-        var customer_currency = await currencyRepository.GetCurrencyCodeById(country.CurrencyId);
+        //getting the invoice currency
+        var invoiceCurrency = await currencyRepository.GetCurrencyCodeById(request.CurrencyId.ToObjectId());
         CurrencyExchangeModel currencyExchangeModel = new()
         {
             Date = invoice.IssueDate,
-            From = customer_currency.CurrencyCode,
+            From = invoiceCurrency.CurrencyCode,
         };
-        //converting the customer's currency to euro becuase the api converts the currency to EUR only
+        //converting the invoice's currency to euro becuase the api converts the currency to EUR only
         //if it is already EUR than there is no need to convert it
-        var customerCurrencyExchangeRateToEuro = 1.0;
-        if (customer_currency.CurrencyCode != "EUR")
+        var invoiceCurrencyExchangeRateToEuro = 1.0;
+        if (invoiceCurrency.CurrencyCode != "EUR")
         {
             //manually validating because it is not validating automatically and catching it in the middlewere.
             await validator.ValidateAndThrowAsync(currencyExchangeModel, cancellationToken);
-            customerCurrencyExchangeRateToEuro = await currencyExchangeService.ExchangeRate(currencyExchangeModel);
+            invoiceCurrencyExchangeRateToEuro = await currencyExchangeService.ExchangeRate(currencyExchangeModel);
         }
         invoice.Amount = 0;
-        //going to convert items currency to customer's currency
+        //going to convert items currency to invoice's currency
         //first converting to euro
         foreach (var i in invoice.Items)
         {
@@ -110,7 +100,7 @@ public sealed class CreateInvoiceHandler(
                 );
             }
             //converting and getting the amount
-            var amount = (i.Price * customerCurrencyExchangeRateToEuro) / itemExchangeRateToEuro;
+            var amount = (i.Price * invoiceCurrencyExchangeRateToEuro) / itemExchangeRateToEuro;
             invoice.Amount += amount;
         }
         await repository.AddOneAsync(invoice, cancellationToken);
