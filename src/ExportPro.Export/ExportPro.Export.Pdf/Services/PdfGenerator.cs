@@ -26,7 +26,6 @@ public sealed class PdfGenerator : IPdfGenerator
 
     private static void GenerateFooter(PageDescriptor page)
     {
-        // ---- Footer ----
         page.Footer()
             .AlignCenter()
             .Text($"Generated {DateTime.UtcNow:u}")
@@ -35,61 +34,59 @@ public sealed class PdfGenerator : IPdfGenerator
 
     private static void GenerateTableContent(PdfInvoiceExportDto invoice, PageDescriptor page)
     {
-        // ---- Table ----
         page.Content()
-        .PaddingVertical(10)
-        .Table(table =>
-        {
-            table.ColumnsDefinition(c =>
+            .PaddingVertical(10)
+            .Table(table =>
             {
-                for (int i = 0; i < 9; i++) c.RelativeColumn();
+                table.ColumnsDefinition(c =>
+                {
+                    for (int i = 0; i < 9; i++) c.RelativeColumn();
+                });
+
+                static IContainer Cell(IContainer c) =>
+                    c.Border(1)
+                        .BorderColor("#DDD")
+                        .Padding(4)
+                        .AlignMiddle()
+                        .AlignLeft();
+
+                string[] headers =
+                [
+                    "Customer", "Issue Date", "Due Date",
+                    "Item List", "Currency",
+                    "Payment Status", "Client", "Bank Acc. #", "Amount"
+                ];
+
+                foreach (var h in headers)
+                {
+                    table.Cell().Element(Cell).Text(h).Bold();
+                }
+
+                string itemList = string.Join("\n",
+                    invoice.Items.Select(i => $"{i.Name} — {i.Price:N2} {invoice.CurrencyCode}"));
+
+                string[] row =
+                [
+                    invoice.CustomerName ?? "-",
+                    invoice.IssueDate.ToString("yyyy‑MM‑dd"),
+                    invoice.DueDate.ToString("yyyy‑MM‑dd"),
+                    itemList,
+                    invoice.CurrencyCode ?? "—",
+                    invoice.PaymentStatus ?? "—",
+                    invoice.ClientName ?? "—",
+                    invoice.BankAccountNumber ?? "—",
+                    $"{invoice.Amount:N2} {invoice.CurrencyCode}"
+                ];
+
+                foreach (var cell in row)
+                {
+                    table.Cell().Element(Cell).Text(cell).FontSize(8);
+                }
             });
-
-            static IContainer Cell(IContainer c) =>
-                c.Border(1)
-                 .BorderColor("#DDD")
-                 .Padding(4)
-                 .AlignMiddle()
-                 .AlignLeft();
-
-            string[] headers =
-            [
-                "Customer", "Issue Date", "Due Date",
-                        "Item List", "Currency",
-                        "Payment Status", "Client", "Bank Acc. #", "Amount"
-            ];
-
-            foreach (var h in headers)
-            {
-                table.Cell().Element(Cell).Text(h).Bold();
-            }
-
-            string itemList = string.Join("\n",
-                invoice.Items.Select(i => $"{i.Name} — {i.Price:N2} {invoice.CurrencyCode}"));
-
-            string[] row =
-            [
-                invoice.CustomerName ?? "-",
-                        invoice.IssueDate.ToString("yyyy‑MM‑dd"),
-                        invoice.DueDate.ToString("yyyy‑MM‑dd"),
-                        itemList,
-                        invoice.CurrencyCode ?? "—",
-                        invoice.PaymentStatus ?? "—",
-                        invoice.ClientName ?? "—",
-                        invoice.BankAccountNumber ?? "—",
-                        $"{invoice.Amount:N2} {invoice.CurrencyCode}"
-            ];
-
-            foreach (var cell in row)
-            {
-                table.Cell().Element(Cell).Text(cell).FontSize(8);
-            }
-        });
     }
 
     private static void GenerateHeader(PdfInvoiceExportDto invoice, PageDescriptor page)
     {
-        // ---- Header ----
         page.Header()
             .AlignCenter()
             .Text($"Invoice {invoice.InvoiceNumber}")

@@ -3,7 +3,7 @@ using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.Export.SDK.DTOs;
 
-public class ReportContentDto
+public sealed class ReportContentDto
 {
     public List<InvoiceDto> Invoices { get; init; } = [];
     public List<ItemResponse> Items { get; init; } = [];

@@ -30,33 +30,36 @@ public sealed class ExcelReportGenerator : IReportGenerator
     private static void GenerateReportInfoSheet(ReportContentDto data, XLWorkbook wb)
     {
         var info = wb.Worksheets.Add("ReportInfo");
-        info.Cell("A1").Value = "GeneratedAt"; info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
-        info.Cell("A2").Value = "ClientId"; info.Cell("B2").Value = data.Filters.ClientId?.ToString() ?? "—";
+        info.Cell("A1").Value = "GeneratedAt";
+        info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
+        info.Cell("A2").Value = "ClientId";
+        info.Cell("B2").Value = data.Filters.ClientId?.ToString() ?? "—";
     }
 
     private static void GeneratePlansSheet(ReportContentDto data, XLWorkbook wb)
     {
         wb.Worksheets.Add("Plans")
-          .Cell(1, 1)
-          .InsertTable(data.Plans, "Plans", true);
+            .Cell(1, 1)
+            .InsertTable(data.Plans, "Plans", true);
     }
 
     private static void GenerateItemsSheet(ReportContentDto data, XLWorkbook wb)
     {
         wb.Worksheets.Add("Items")
-          .Cell(1, 1)
-          .InsertTable(data.Items, "Items", true);
+            .Cell(1, 1)
+            .InsertTable(data.Items, "Items", true);
     }
 
     private static void GenerateInvoicesSheet(ReportContentDto data, XLWorkbook wb)
     {
         wb.Worksheets.Add("Invoices")
-          .Cell(1, 1)
-          .InsertTable(ProjectInvoices(data.Invoices), "Invoices", true);
+            .Cell(1, 1)
+            .InsertTable(ProjectInvoices(data.Invoices), "Invoices", true);
     }
 
-    private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src) =>
-        src.Select(i => new
+    private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src)
+    {
+        return src.Select(i => new
         {
             i.Id,
             i.InvoiceNumber,
@@ -69,4 +72,5 @@ public sealed class ExcelReportGenerator : IReportGenerator
             i.ClientId,
             i.CustomerId
         });
+    }
 }
