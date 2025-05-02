@@ -2,6 +2,8 @@
 
 public enum UserRole
 {
-    Administrator,
-    User
+    SuperAdmin,
+    Owner,
+    ClientAdmin,
+    Operator
 }
