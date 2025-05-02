@@ -1,4 +1,5 @@
 ﻿using ExportPro.Export.Job.ServiceHost.Interfaces;
+using ExportPro.Export.SDK.Enums;
 using Quartz;
 
 namespace ExportPro.Export.Job.ServiceHost.Services;
@@ -24,4 +25,12 @@ public class InvoiceReportJob(
             await emailSender.SendAsync("admin@domain.com", "Report Failed", ex.Message);
         }
     }
+}
+
+public sealed class ScheduleTime
+{
+    public Guid UserId { get; set; }
+    public DateTime TimeToSend { get; set; }
+    public required string Frequency { get; set; }
+    public required ReportFormat ReportFormat { get; set; }
 }

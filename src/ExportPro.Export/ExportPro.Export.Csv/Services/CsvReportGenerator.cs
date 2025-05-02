@@ -4,14 +4,14 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Interfaces;
-using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.Export.SDK.Utilities;
 
 namespace ExportPro.Export.Csv.Services;
 
 public sealed class CsvReportGenerator : IReportGenerator
 {
     public string ContentType => "text/csv";
-    public string Extension => "csv";
+    public string Extension => ReportFileTypes.Csv;
 
     public byte[] Generate(ReportContentDto data)
     {
