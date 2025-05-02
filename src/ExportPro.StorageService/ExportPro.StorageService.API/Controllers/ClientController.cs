@@ -74,11 +74,10 @@ public class ClientController(IMediator mediator) : ControllerBase
         return StatusCode((int)clientDeleting.ApiState, clientDeleting);
     }
 
-    //[AllowAnonymous]
     [HttpGet("{clientId}/items")]
     [SwaggerOperation(Summary = "Get all items for a client")]
     [ProducesResponseType(typeof(List<ItemResponse>), 200)]
-    [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Read)]
+    [HasPermission(Resource.Items, CrudAction.Read)]
     public async Task<IActionResult> GetItems(
             [FromRoute] Guid clientId,
             CancellationToken cancellationToken)
@@ -90,7 +89,7 @@ public class ClientController(IMediator mediator) : ControllerBase
     [HttpGet("{clientId}/items/{itemId}")]
     [SwaggerOperation(Summary = "Get a single item by ID for a client")]
     [ProducesResponseType(typeof(ItemResponse), 200)]
-    [HasPermission(Common.Shared.Enums.Resource.Items, Common.Shared.Enums.CrudAction.Read)]
+    [HasPermission(Resource.Items, CrudAction.Read)]
     public async Task<IActionResult> GetItemById(
             [FromRoute] Guid clientId,
             [FromRoute] Guid itemId,
@@ -156,7 +155,6 @@ public class ClientController(IMediator mediator) : ControllerBase
         return StatusCode((int)response.ApiState, response);
     }
 
-    //[AllowAnonymous]
     [HttpGet("{clientId}/plans")]
     [SwaggerOperation(Summary = "Get Client Plans")]
     [HasPermission(Resource.Plans, CrudAction.Read)]
