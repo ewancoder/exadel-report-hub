@@ -17,14 +17,11 @@ public sealed class CustomerRepository(ICollectionProvider collectionProvider)
         CancellationToken cancellationToken = default
     )
     {
-        // Start with base filter
         var filter = includeDeleted
             ? Builders<Customer>.Filter.Empty
             : Builders<Customer>.Filter.Eq(c => c.IsDeleted, false);
-
         // Get total count for pagination
         var totalCount = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
-
         // Apply pagination
         var customers = await Collection
             .Find(filter)

@@ -13,9 +13,8 @@ public sealed class Item : IModel
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId? CustomerId { get; set; }
-
     public Status? Status { get; set; }
-    public ObjectId CurrencyId { get; set; } //maybe can be made into enum as well?
+    public ObjectId CurrencyId { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }

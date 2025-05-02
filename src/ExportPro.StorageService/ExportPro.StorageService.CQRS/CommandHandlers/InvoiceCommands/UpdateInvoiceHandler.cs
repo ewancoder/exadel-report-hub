@@ -39,7 +39,6 @@ public sealed class UpdateInvoiceHandler(IInvoiceRepository repository) : IComma
         existing.PaymentStatus = request.PaymentStatus;
         existing.BankAccountNumber = request.BankAccountNumber;
         existing.ClientId = request.ClientId.ToObjectId();
-        //existing.ItemIds = request.ItemIds ?? new List<string>();
         await repository.UpdateOneAsync(existing, cancellationToken);
         return new SuccessResponse<Invoice>(existing, "Invoice updated successfully.");
     }
