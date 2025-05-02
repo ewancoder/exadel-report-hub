@@ -2,5 +2,5 @@
 
 public class ReportFilterDto
 {
-    public string? ClientId { get; set; }
+    public Guid? ClientId { get; set; }
 }

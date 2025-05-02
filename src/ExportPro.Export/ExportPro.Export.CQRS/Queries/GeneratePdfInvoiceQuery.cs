@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ExportPro.Export.CQRS.Queries;
 
-public record GenerateInvoicePdfQuery(string InvoiceId) : IRequest<PdfFileDto>;
+public record GenerateInvoicePdfQuery(Guid InvoiceId) : IRequest<PdfFileDto>;
 
 public sealed class GenerateInvoicePdfQueryHandler(
     IStorageServiceApi storageApi,
@@ -23,7 +23,8 @@ public sealed class GenerateInvoicePdfQueryHandler(
 {
     public async Task<PdfFileDto> Handle(GenerateInvoicePdfQuery request, CancellationToken cancellationToken)
     {
-        ValidateInvoiceId(request.InvoiceId);
+        if (request.InvoiceId == Guid.Empty)
+            throw new ArgumentException("InvoiceId cannot be empty", nameof(request.InvoiceId));
 
         var userId = httpContextAccessor.HttpContext?.User?
                          .FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
@@ -44,42 +45,36 @@ public sealed class GenerateInvoicePdfQueryHandler(
         return result;
     }
 
-    private static void ValidateInvoiceId(string invoiceId)
-    {
-        if (string.IsNullOrWhiteSpace(invoiceId))
-            throw new ArgumentException("InvoiceId is required.", nameof(invoiceId));
-    }
-
-    private async Task<InvoiceDto> GetInvoiceByIdAsync(string id, CancellationToken ct)
+    private async Task<InvoiceDto> GetInvoiceByIdAsync(Guid id, CancellationToken ct)
     {
         var resp = await storageApi.GetInvoiceByIdAsync(id, ct);
         return resp.Data ?? throw new InvalidOperationException("Storage-service returned no data");
     }
 
-    private async Task<string> GetCurrencyCodeAsync(string? id, CancellationToken ct)
+    private async Task<string> GetCurrencyCodeAsync(Guid? id, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(id))
+        if (id is null || id == Guid.Empty)
             return "—";
 
-        var resp = await storageApi.GetCurrencyByIdAsync(id, ct);
+        var resp = await storageApi.GetCurrencyByIdAsync(id.Value, ct);
         return resp.Data?.CurrencyCode ?? "—";
     }
 
-    private async Task<string> GetClientNameAsync(string? id, CancellationToken ct)
+    private async Task<string> GetClientNameAsync(Guid? id, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(id))
+        if (id is null || id == Guid.Empty)
             return "—";
 
-        var resp = await storageApi.GetClientByIdAsync(id, ct);
+        var resp = await storageApi.GetClientByIdAsync(id.Value, ct);
         return resp.Data?.Name ?? "—"; // fixed for BaseResponse<ClientResponse>
     }
 
-    private async Task<string> GetCustomerNameAsync(string? id, CancellationToken ct)
+    private async Task<string> GetCustomerNameAsync(Guid? id, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(id))
+        if (id is null || id == Guid.Empty)
             return "—";
 
-        var resp = await storageApi.GetCustomerByIdAsync(id, ct);
+        var resp = await storageApi.GetCustomerByIdAsync(id.Value, ct);
         return resp.Data?.Name ?? "—";
     }
 

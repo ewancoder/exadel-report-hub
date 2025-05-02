@@ -13,16 +13,16 @@ namespace ExportPro.Export.SDK.Interfaces;
 public interface IStorageServiceApi
 {
     [Get("/api/Invoice/{id}")]
-    Task<BaseResponse<InvoiceDto>> GetInvoiceByIdAsync(string id, CancellationToken cancellationToken);
+    Task<BaseResponse<InvoiceDto>> GetInvoiceByIdAsync(Guid id, CancellationToken cancellationToken);
 
     [Get("/api/Currency/{id}")]
-    Task<BaseResponse<CurrencyResponse>> GetCurrencyByIdAsync(string id, CancellationToken cancellationToken);
+    Task<BaseResponse<CurrencyResponse>> GetCurrencyByIdAsync(Guid id, CancellationToken cancellationToken);
 
     [Get("/api/client/{id}")]
-    Task<BaseResponse<ClientResponse>> GetClientByIdAsync(string id, CancellationToken cancellationToken);
+    Task<BaseResponse<ClientResponse>> GetClientByIdAsync(Guid id, CancellationToken cancellationToken);
 
     [Get("/api/Customer/{id}")]
-    Task<BaseResponse<CustomerDto>> GetCustomerByIdAsync(string id, CancellationToken cancellationToken);
+    Task<BaseResponse<CustomerDto>> GetCustomerByIdAsync(Guid id, CancellationToken cancellationToken);
 
     [Get("/api/Invoice")]
     Task<BaseResponse<PaginatedListDto<InvoiceDto>>> GetInvoicesAsync(
@@ -33,11 +33,11 @@ public interface IStorageServiceApi
 
     [Get("/api/client/{clientId}/items")]
     Task<BaseResponse<List<ItemResponse>>> GetItemsByClientAsync(
-        string clientId,
+        Guid clientId,
         CancellationToken cancellationToken = default);
 
     [Get("/api/client/{clientId}/plans")]
     Task<BaseResponse<List<PlansResponse>>> GetPlansByClientAsync(
-        string clientId,
+        Guid clientId,
         CancellationToken cancellationToken = default);
 }

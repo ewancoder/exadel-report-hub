@@ -1,4 +1,5 @@
-﻿using ExportPro.Export.CQRS.Queries;
+﻿using System.ComponentModel.DataAnnotations;
+using ExportPro.Export.CQRS.Queries;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Enums;
 using MediatR;
@@ -15,19 +16,12 @@ public sealed class ReportExportController(IMediator mediator) : ControllerBase
     /// </summary>
     [HttpGet]
     public async Task<IActionResult> Statistics(
-        [FromQuery] string format = "csv",
-        [FromQuery] string? clientId = null,
-        CancellationToken cancellationToken = default)
+    [Required, FromQuery] ReportFormat format,
+    [FromQuery] Guid? clientId = null,
+     CancellationToken cancellationToken = default)
     {
-        if (!Enum.TryParse<ReportFormat>(format, true, out var fmt))
-            return BadRequest("format must be 'csv' or 'xlsx'");
-
         var filters = new ReportFilterDto { ClientId = clientId };
-
-        var file = await mediator.Send(
-            new GenerateReportQuery(fmt, filters), 
-            cancellationToken);
-
+        var file = await mediator.Send(new GenerateReportQuery(format, filters), cancellationToken);
         return File(file.Content, file.ContentType, file.FileName);
     }
 }

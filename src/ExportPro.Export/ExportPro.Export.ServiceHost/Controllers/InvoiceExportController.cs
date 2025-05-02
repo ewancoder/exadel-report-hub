@@ -8,8 +8,8 @@ namespace ExportPro.Export.ServiceHost.Controllers;
 [ApiController]
 public sealed class InvoiceExportController(IMediator mediator) : ControllerBase
 {
-    [HttpGet("{id}/pdf")]
-    public async Task<IActionResult> GetPdf(string id, CancellationToken cancellationToken)
+    [HttpGet("{id:guid}/pdf")]
+    public async Task<IActionResult> GetPdf(Guid id, CancellationToken cancellationToken)
     {
         var dto = await mediator.Send(new GenerateInvoicePdfQuery(id), cancellationToken);
         return File(dto.Content, "application/pdf", dto.FileName);
