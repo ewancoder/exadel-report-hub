@@ -1,51 +1,31 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using MongoDB.Bson;
-using System.Net;
+using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
-public record UpdateCountryCommand(string Id, string Name, string? Code) : ICommand<bool>;
-public class UpdateCountryCommandHandler(ICountryRepository repository) : ICommandHandler<UpdateCountryCommand, bool>
-{
-    private readonly ICountryRepository _repository = repository;
+public sealed record UpdateCountryCommand(Guid Id, UpdateCountry Country) : ICommand<bool>;
 
+public sealed class UpdateCountryCommandHandler(ICountryRepository repository)
+    : ICommandHandler<UpdateCountryCommand, bool>
+{
     public async Task<BaseResponse<bool>> Handle(UpdateCountryCommand request, CancellationToken cancellationToken)
     {
-        if (!ObjectId.TryParse(request.Id, out var objectId))
-        {
-            return new BaseResponse<bool>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.BadRequest,
-                Messages = ["Invalid country ID format."]
-            };
-        }
-
-        var existing = await _repository.GetByIdAsync(objectId, cancellationToken);
+        var existing = await repository.GetOneAsync(
+            x => x.Id == request.Id.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (existing == null)
-        {
-            return new BaseResponse<bool>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.NotFound,
-                Messages = ["Country not found."]
-            };
-        }
+            return new NotFoundResponse<bool>("Country not found.");
 
-        existing.Name = request.Name;
-        existing.Code = request.Code;
+        existing.Name = request.Country.Name;
+        existing.Code = request.Country.Code;
         existing.UpdatedAt = DateTime.UtcNow;
 
-        await _repository.UpdateOneAsync(existing, cancellationToken);
+        await repository.UpdateOneAsync(existing, cancellationToken);
 
-        return new BaseResponse<bool>
-        {
-            IsSuccess = true,
-            ApiState = HttpStatusCode.OK,
-            Data = true,
-            Messages = ["Country updated successfully."]
-        };
+        return new SuccessResponse<bool>(true, "Country updated successfully.");
     }
 }

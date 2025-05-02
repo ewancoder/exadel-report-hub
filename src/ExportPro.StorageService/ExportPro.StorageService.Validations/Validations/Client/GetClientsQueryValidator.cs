@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.Validations.Validations.Client;
 
-public class GetClientsQueryValidator : AbstractValidator<GetClientsQuery>
+public sealed class GetClientsQueryValidator : AbstractValidator<GetClientsQuery>
 {
     public GetClientsQueryValidator(IClientRepository clientRepository)
     {

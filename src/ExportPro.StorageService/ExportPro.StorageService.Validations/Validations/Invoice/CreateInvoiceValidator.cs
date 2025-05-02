@@ -1,8 +1,7 @@
 ﻿using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Validations.Validations.Client;
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Invoice;
 
@@ -14,34 +13,28 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
         ICurrencyRepository currencyRepository
     )
     {
+        RuleFor(x => x.Items).NotEmpty().WithMessage("Items cannot be empty.");
         RuleFor(x => x.InvoiceNumber).NotEmpty().WithMessage("Invoice number is required.");
         RuleFor(x => x.IssueDate).NotEmpty().WithMessage("The issue date is required");
         RuleFor(x => x)
             .Must(x =>
             {
                 if (x.DueDate >= x.IssueDate)
-                {
                     return true;
-                }
                 return false;
             })
             .WithMessage("Issue date cannot be earlier than due date.");
         RuleFor(x => x.CustomerId)
             .NotEmpty()
             .WithMessage("Customer  Id  cannot be empty.")
-            .Must(id =>
-            {
-                return ObjectId.TryParse(id, out _);
-            })
-            .WithMessage("The Customer Id is not valid in format.")
             .DependentRules(
                 () =>
                     RuleFor(x => x.CustomerId)
                         .MustAsync(
                             async (customer, cancellationToken) =>
                             {
-                                var client = await customerRepository.GetByIdAsync(
-                                    ObjectId.Parse(customer),
+                                var client = await customerRepository.GetOneAsync(
+                                    x => x.Id == customer.ToObjectId() && !x.IsDeleted,
                                     cancellationToken
                                 );
                                 return client != null;
@@ -52,18 +45,16 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
         RuleFor(x => x.ClientId)
             .NotEmpty()
             .WithMessage("Client Id  cannot be empty.")
-            .Must(id =>
-            {
-                return ObjectId.TryParse(id, out _);
-            })
-            .WithMessage("The Client Id is not valid in format.")
             .DependentRules(() =>
             {
                 RuleFor(x => x.ClientId)
                     .MustAsync(
                         async (id, cancellationToken) =>
                         {
-                            var client = await clientRepository.GetByIdAsync(ObjectId.Parse(id), cancellationToken);
+                            var client = await clientRepository.GetOneAsync(
+                                x => x.Id == id.ToObjectId() && !x.IsDeleted,
+                                cancellationToken
+                            );
                             return client != null;
                         }
                     )
@@ -72,25 +63,38 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
         RuleFor(x => x.CurrencyId)
             .NotEmpty()
             .WithMessage("Currency Id  cannot be empty.")
-            .Must(id =>
-            {
-                return ObjectId.TryParse(id, out _);
-            })
-            .WithMessage("The Currency Id is not valid in format.")
             .DependentRules(
                 () =>
                     RuleFor(x => x.CurrencyId)
                         .MustAsync(
                             async (currency, cancellationToken) =>
                             {
-                                var client = await currencyRepository.GetByIdAsync(
-                                    ObjectId.Parse(currency),
+                                var client = await currencyRepository.GetOneAsync(
+                                    x => x.Id == currency.ToObjectId() && !x.IsDeleted,
                                     cancellationToken
                                 );
                                 return client != null;
                             }
                         )
                         .WithMessage("The Currency Id does not exist")
+            );
+        RuleFor(x => x.ClientCurrencyId)
+            .NotEmpty()
+            .WithMessage("Client Currency Id  cannot be empty.")
+            .DependentRules(
+                () =>
+                    RuleFor(x => x.ClientCurrencyId)
+                        .MustAsync(
+                            async (currency, cancellationToken) =>
+                            {
+                                var client = await currencyRepository.GetOneAsync(
+                                    x => x.Id == currency.ToObjectId() && !x.IsDeleted,
+                                    cancellationToken
+                                );
+                                return client != null;
+                            }
+                        )
+                        .WithMessage("The Client Currency Id does not exist")
             );
     }
 }

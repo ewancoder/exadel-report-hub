@@ -1,11 +1,13 @@
-﻿using ExportPro.Common.DataAccess.MongoDB.Interfaces;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Models.MongoDB;
-using MongoDB.Driver;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace ExportPro.Common.DataAccess.MongoDB.Repository;
-public abstract class BaseRepository<TDocument> : IRepository<TDocument> where TDocument : IModel
+
+public abstract class BaseRepository<TDocument> : IRepository<TDocument>
+    where TDocument : IModel
 {
     private readonly ICollectionProvider _collectionProvider;
     private readonly Lazy<IMongoCollection<TDocument>> _collectionAccessor;
@@ -16,7 +18,8 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument> where T
         _collectionProvider = collectionProvider ?? throw new ArgumentNullException(nameof(collectionProvider));
         _collectionAccessor = new Lazy<IMongoCollection<TDocument>>(
             () => _collectionProvider.GetCollection<TDocument>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
+            LazyThreadSafetyMode.ExecutionAndPublication
+        );
 
         _fdb = new FilterDefinitionBuilder<TDocument>();
     }
@@ -29,7 +32,10 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument> where T
         return entity;
     }
 
-    public virtual async Task<ICollection<TDocument>> AddManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken)
+    public virtual async Task<ICollection<TDocument>> AddManyAsync(
+        ICollection<TDocument> entities,
+        CancellationToken cancellationToken
+    )
     {
         await Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
         return entities;
@@ -42,7 +48,10 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument> where T
         return entity;
     }
 
-    public virtual async Task<ICollection<TDocument>> UpdateManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken)
+    public virtual async Task<ICollection<TDocument>> UpdateManyAsync(
+        ICollection<TDocument> entities,
+        CancellationToken cancellationToken
+    )
     {
         foreach (var entity in entities)
         {
@@ -57,7 +66,10 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument> where T
         return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public virtual async Task<TDocument> GetOneAsync(Expression<Func<TDocument, bool>> filter, CancellationToken cancellationToken)
+    public virtual async Task<TDocument?> GetOneAsync(
+        Expression<Func<TDocument, bool>> filter,
+        CancellationToken cancellationToken
+    )
     {
         return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
@@ -66,7 +78,7 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument> where T
     {
         var filter = _fdb.Eq(doc => doc.Id, id);
         var document = await GetByIdAsync(id, cancellationToken);
-     
+
         await Collection.DeleteOneAsync(filter, cancellationToken);
         return document;
     }

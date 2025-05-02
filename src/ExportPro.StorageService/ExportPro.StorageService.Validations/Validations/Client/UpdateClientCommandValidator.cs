@@ -1,7 +1,7 @@
 ﻿using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Client;
 
@@ -12,11 +12,6 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
         RuleFor(x => x.ClientId)
             .NotEmpty()
             .WithMessage("Client Id  cannot be empty.")
-            .Must(id =>
-            {
-                return ObjectId.TryParse(id, out _);
-            })
-            .WithMessage("The Client Id is not valid in format.")
             .DependentRules(() =>
             {
                 RuleFor(x => x.ClientId)
@@ -24,7 +19,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
                         async (id, cancellationToken) =>
                         {
                             var client = await clientRepository.GetOneAsync(
-                                x => x.Id == ObjectId.Parse(id) && !x.IsDeleted,
+                                x => x.Id == id.ToObjectId() && !x.IsDeleted,
                                 cancellationToken
                             );
                             return client != null;
@@ -34,7 +29,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
             })
             .DependentRules(() =>
             {
-                RuleFor(x => x.client.Name)
+                RuleFor(x => x.Client.Name)
                     .NotEmpty()
                     .WithMessage("Name must not be empty")
                     .MinimumLength(3)
@@ -43,7 +38,7 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
                     .WithMessage("Name must not exceed 50 characters")
                     .DependentRules(() =>
                     {
-                        RuleFor(x => x.client.Name)
+                        RuleFor(x => x.Client.Name)
                             .MustAsync(
                                 async (Name, cancellationToken) =>
                                 {

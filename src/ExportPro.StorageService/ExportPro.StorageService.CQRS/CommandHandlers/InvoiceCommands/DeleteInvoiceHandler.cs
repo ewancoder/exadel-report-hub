@@ -1,49 +1,25 @@
-﻿using System.Net;
-using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public record DeleteInvoiceCommand(ObjectId Id) : ICommand<bool>;
-public class DeleteInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<DeleteInvoiceCommand, bool>
-{
-    private readonly IInvoiceRepository _repository = repository;
+public sealed record DeleteInvoiceCommand(Guid Id) : ICommand<bool>;
 
+public sealed class DeleteInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<DeleteInvoiceCommand, bool>
+{
     public async Task<BaseResponse<bool>> Handle(DeleteInvoiceCommand request, CancellationToken cancellationToken)
     {
-        if (request.Id == ObjectId.Empty)
-        {
-            return new BaseResponse<bool>
-            {
-                ApiState = HttpStatusCode.BadRequest,
-                IsSuccess = false,
-                Data = false,
-                Messages = ["Invalid invoice ID."]
-            };
-        }
-
-        var invoice = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        if (request.Id == Guid.Empty)
+            return new BadRequestResponse<bool>("Invalid invoice ID.");
+        var invoice = await repository.GetOneAsync(
+            x => x.Id == request.Id.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
         if (invoice == null)
-        {
-            return new BaseResponse<bool>
-            {
-                ApiState = HttpStatusCode.NotFound,
-                IsSuccess = false,
-                Data = false,
-                Messages = ["Invoice not found."]
-            };
-        }
-
-        await _repository.SoftDeleteAsync(request.Id, cancellationToken);
-
-        return new BaseResponse<bool>
-        {
-            ApiState = HttpStatusCode.OK,
-            IsSuccess = true,
-            Data = true,
-            Messages = ["Invoice deleted successfully."]
-        };
+            return new NotFoundResponse<bool>("Invoice not found.");
+        await repository.SoftDeleteAsync(request.Id.ToObjectId(), cancellationToken);
+        return new SuccessResponse<bool>(true, "Invoice deleted successfully.");
     }
 }

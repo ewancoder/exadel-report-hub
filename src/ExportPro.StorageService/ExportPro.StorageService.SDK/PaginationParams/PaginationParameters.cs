@@ -1,10 +1,10 @@
 ﻿namespace ExportPro.StorageService.SDK.PaginationParams;
 
-public class PaginationParameters
+public sealed class PaginationParameters
 {
     private const int MaxPageSize = 50;
-    private int _pageSize = 10;
     private int _pageNumber = 1;
+    private int _pageSize = 10;
 
     public int PageNumber
     {
@@ -15,6 +15,10 @@ public class PaginationParameters
     public int PageSize
     {
         get => _pageSize;
-        set => _pageSize = value > MaxPageSize ? MaxPageSize : value < 1 ? 1 : value;
+        set =>
+            _pageSize =
+                value > MaxPageSize ? MaxPageSize
+                : value < 1 ? 1
+                : value;
     }
 }
