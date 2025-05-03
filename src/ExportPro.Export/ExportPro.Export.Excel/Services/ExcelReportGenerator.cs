@@ -27,34 +27,66 @@ public sealed class ExcelReportGenerator : IReportGenerator
         return ms.ToArray();
     }
 
+    private static void GenerateInvoicesSheet(ReportContentDto data, XLWorkbook wb)
+    {
+        var ws = wb.Worksheets.Add("Invoices");
+        int row = 1;
+
+        foreach (var grp in data.Invoices.GroupBy(i => i.ClientId))
+        {
+            ws.Cell(row, 1).Value = $"ClientId: {grp.Key}";
+            ws.Cell(row, 1).Style.Font.SetBold();
+            row++;
+
+            var tbl = ws.Cell(row, 1)
+                .InsertTable(ProjectInvoices(grp), $"Inv_{grp.Key}", true);
+            row += tbl.RowCount() + 2;
+        }
+    }
+
+    private static void GenerateItemsSheet(ReportContentDto data, XLWorkbook wb)
+    {
+        var ws = wb.Worksheets.Add("Items");
+        int row = 1;
+
+        foreach (var (clientId, items) in data.ItemsByClient)
+        {
+            ws.Cell(row, 1).Value = $"ClientId: {clientId}";
+            ws.Cell(row, 1).Style.Font.SetBold();
+            row++;
+
+            var tbl = ws.Cell(row, 1).InsertTable(items, $"It_{clientId}", true);
+            row += tbl.RowCount() + 2;
+        }
+    }
+
+    private static void GeneratePlansSheet(ReportContentDto data, XLWorkbook wb)
+    {
+        var ws = wb.Worksheets.Add("Plans");
+        int row = 1;
+
+        foreach (var (clientId, plans) in data.PlansByClient)
+        {
+            ws.Cell(row, 1).Value = $"ClientId: {clientId}";
+            ws.Cell(row, 1).Style.Font.SetBold();
+            row++;
+
+            var tbl = ws.Cell(row, 1).InsertTable(plans, $"Pl_{clientId}", true);
+            row += tbl.RowCount() + 2;
+        }
+    }
+
     private static void GenerateReportInfoSheet(ReportContentDto data, XLWorkbook wb)
     {
         var info = wb.Worksheets.Add("ReportInfo");
         info.Cell("A1").Value = "GeneratedAt";
         info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
-        info.Cell("A2").Value = "ClientId";
-        info.Cell("B2").Value = data.Filters.ClientId?.ToString() ?? "—";
-    }
 
-    private static void GeneratePlansSheet(ReportContentDto data, XLWorkbook wb)
-    {
-        wb.Worksheets.Add("Plans")
-            .Cell(1, 1)
-            .InsertTable(data.Plans, "Plans", true);
-    }
+        info.Cell("A2").Value = "ClientIds";
+        info.Cell("B2").Value = string.Join(", ", data.Filters.ClientIds ?? []);
 
-    private static void GenerateItemsSheet(ReportContentDto data, XLWorkbook wb)
-    {
-        wb.Worksheets.Add("Items")
-            .Cell(1, 1)
-            .InsertTable(data.Items, "Items", true);
-    }
-
-    private static void GenerateInvoicesSheet(ReportContentDto data, XLWorkbook wb)
-    {
-        wb.Worksheets.Add("Invoices")
-            .Cell(1, 1)
-            .InsertTable(ProjectInvoices(data.Invoices), "Invoices", true);
+        info.Cell("A3").Value = "IssueDateFrom";                       // NEW
+        info.Cell("B3").Value = data.Filters.IssueDateFrom?.ToString("u") ?? "—"; // NEW
     }
 
     private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src)
