@@ -74,10 +74,10 @@ public class InvoiceController(IMediator mediator) : ControllerBase
         return StatusCode((int)response.ApiState, response);
     }
 
-    [HttpGet("overdue-payments")]
+    [HttpGet("overdue-payments/{clientId}")]
     [HasPermission(Resource.Invoices, CrudAction.Read)]
-    public Task<BaseResponse<OverduePaymentsResponse>> GetOverduePayments(
+    public Task<BaseResponse<OverduePaymentsResponse>> GetOverduePayments([FromRoute]string clientId,
         CancellationToken cancellationToken) =>  
-        mediator.Send(new GetOverduePaymentsQuery(), cancellationToken);
+        mediator.Send(new GetOverduePaymentsQuery(clientId), cancellationToken);
 
 }

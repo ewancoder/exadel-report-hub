@@ -5,12 +5,13 @@ using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Services;
+using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
 
-public record GetOverduePaymentsQuery: IQuery<OverduePaymentsResponse>;
+public record GetOverduePaymentsQuery(string ClientId): IQuery<OverduePaymentsResponse>;
 
 public sealed class GetOverduePaymentsQueryHandler(IInvoiceRepository invoiceRepository, 
     ICurrencyExchangeService currencyExchangeService,
@@ -18,8 +19,11 @@ public sealed class GetOverduePaymentsQueryHandler(IInvoiceRepository invoiceRep
 {
     public async Task<BaseResponse<OverduePaymentsResponse>> Handle(GetOverduePaymentsQuery request, CancellationToken cancellationToken)
     {
-        var overdueInvoices = await invoiceRepository.GetOverdueInvoices(cancellationToken);
-        if(overdueInvoices == null || overdueInvoices.Count == 0)
+        if (!ObjectId.TryParse(request.ClientId, out var clientObjectId))
+            return new BadRequestResponse<OverduePaymentsResponse>("Invalid client ID.");
+
+        var overdueInvoices = await invoiceRepository.GetOverdueInvoices(clientObjectId, cancellationToken);
+        if (overdueInvoices == null || overdueInvoices.Count == 0)
             return new BadRequestResponse<OverduePaymentsResponse>("No invoices issued in selected period.");
         double totalAmount = 0;
 

@@ -18,5 +18,5 @@ public interface IInvoiceRepository : IRepository<Invoice>
     );
 
     Task<bool> ExistsAsync(ObjectId id, CancellationToken cancellationToken);
-    Task<List<Invoice>> GetOverdueInvoices(CancellationToken cancellationToken = default);
+    Task<List<Invoice>> GetOverdueInvoices(ObjectId ClientId, CancellationToken cancellationToken = default);
 }

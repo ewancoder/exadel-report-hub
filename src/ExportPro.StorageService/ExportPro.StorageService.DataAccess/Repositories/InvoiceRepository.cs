@@ -19,13 +19,14 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
         var filter = Builders<Invoice>.Filter.Eq(x => x.ClientId, clientId);
         return await Collection.Find(filter).ToListAsync(cancellationToken);
     }
-    public Task<List<Invoice>> GetOverdueInvoices(CancellationToken cancellationToken = default)
+    public Task<List<Invoice>> GetOverdueInvoices(ObjectId ClientId, CancellationToken cancellationToken = default)
     {
 
         var filter = Builders<Invoice>.Filter.And(
             Builders<Invoice>.Filter.Eq(x => x.PaymentStatus, Status.Unpaid),
             Builders<Invoice>.Filter.Lt(x => x.DueDate, DateTime.UtcNow),
-            Builders<Invoice>.Filter.Eq("IsDeleted", false)
+            Builders<Invoice>.Filter.Eq("IsDeleted", false),
+            Builders<Invoice>.Filter.Eq(x => x.ClientId, ClientId)
         );
 
         return  Collection.Find(filter).ToListAsync(cancellationToken);
