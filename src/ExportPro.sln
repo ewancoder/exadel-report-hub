@@ -57,7 +57,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Gateway.ServiceHo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.Tests", "ExportPro.StorageService\ExportPro.StorageService.Tests\ExportPro.StorageService.Tests.csproj", "{A4E8E67A-34CF-4E82-B5E4-099BCF2DF9C2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Export.Job", "ExportPro.Export.Job", "{74393D3D-91AB-4917-84C2-DAE188253C60}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Jobs", "ExportPro.Jobs", "{74393D3D-91AB-4917-84C2-DAE188253C60}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.Job.ServiceHost", "ExportPro.Export.Job.ServiceHost\ExportPro.Export.Job.ServiceHost.csproj", "{B01A6F0D-7C81-4694-9C33-FBCAA9D27127}"
 EndProject

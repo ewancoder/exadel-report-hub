@@ -27,10 +27,12 @@ public class InvoiceReportJob(
     }
 }
 
-public sealed class ScheduleTime
+public sealed class UserSettings
 {
     public Guid UserId { get; set; }
-    public DateTime TimeToSend { get; set; }
+    //report DTO
+    public TimeOnly TimeToSend { get; set; }
     public required string Frequency { get; set; }
     public required ReportFormat ReportFormat { get; set; }
+    public List<Guid> CliendIds { get; set; } = []; 
 }
