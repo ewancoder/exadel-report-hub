@@ -16,7 +16,7 @@
           "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
         }
       },
-      {
+        {
         "Name": "Logger",
         "Args": {
           "configureLogger": {
@@ -33,7 +33,7 @@
               {
                 "Name": "File",
                 "Args": {
-                  "path": "C:/Logs/log-.txt",
+                  "path": "Logs/log-.txt",
                   "rollingInterval": "Day",
                   "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
                 }
