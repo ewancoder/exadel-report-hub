@@ -8,7 +8,6 @@ public class MappingProfile : AutoMapper.Profile
 {
     public MappingProfile()
     {
-        // Map InvoiceDto to PdfInvoiceExportDto
         CreateMap<InvoiceDto, PdfInvoiceExportDto>()
             .ForMember(dest => dest.InvoiceNumber, opt => opt.MapFrom(src => src.InvoiceNumber))
             .ForMember(dest => dest.IssueDate, opt => opt.MapFrom(src => src.IssueDate))
@@ -21,7 +20,6 @@ public class MappingProfile : AutoMapper.Profile
             .ForMember(dest => dest.CustomerName, opt => opt.Ignore()) // Set manually in handler
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
 
-        // Map ItemDtoForClient to PdfItemExportDto
         CreateMap<ItemDtoForClient, PdfItemExportDto>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))

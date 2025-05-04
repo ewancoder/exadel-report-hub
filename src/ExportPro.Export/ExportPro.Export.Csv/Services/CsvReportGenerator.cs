@@ -29,17 +29,12 @@ public sealed class CsvReportGenerator : IReportGenerator
         return ms.ToArray();
     }
 
-    private static void GeneratePlanSection(ReportContentDto data, StreamWriter writer, CsvWriter csv)
+    private static void GenerateReportMetaData(ReportContentDto data, StreamWriter writer)
     {
-        writer.WriteLine("Plans");
-        csv.WriteRecords(data.Plans);
-        writer.WriteLine();
-    }
-
-    private static void GenerateItemSection(ReportContentDto data, StreamWriter writer, CsvWriter csv)
-    {
-        writer.WriteLine("Items");
-        csv.WriteRecords(data.Items);
+        writer.WriteLine($"Generated at,{DateTime.UtcNow:u}");
+        writer.WriteLine($"ClientIds,{string.Join('|', data.Filters.ClientIds ?? [])}");
+        if (data.Filters.IssueDateFrom is { } dt)
+            writer.WriteLine($"IssueDateFrom,{dt:yyyy-MM-dd}");
         writer.WriteLine();
     }
 
@@ -49,8 +44,28 @@ public sealed class CsvReportGenerator : IReportGenerator
         CsvWriter csv)
     {
         writer.WriteLine("Invoices");
+        foreach (var grp in data.Invoices.GroupBy(i => i.ClientId))
+        {
+            writer.WriteLine($"ClientId,{grp.Key}");
+            csv.WriteRecords(ProjectInvoices(grp));
+            writer.WriteLine();
+        }
+    }
 
-        var rows = data.Invoices.Select(i => new
+    private static void GenerateItemSection(ReportContentDto data, StreamWriter writer, CsvWriter csv)
+    {
+        writer.WriteLine("Items");
+        foreach (var (clientId, items) in data.ItemsByClient)
+        {
+            writer.WriteLine($"ClientId,{clientId}");
+            csv.WriteRecords(items);
+            writer.WriteLine();
+        }
+    }
+
+    private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src)
+    {
+        return src.Select(i => new
         {
             i.Id,
             i.InvoiceNumber,
@@ -63,16 +78,17 @@ public sealed class CsvReportGenerator : IReportGenerator
             i.ClientId,
             i.CustomerId
         });
-
-        csv.WriteRecords(rows);
-        writer.WriteLine();
     }
 
-    private static void GenerateReportMetaData(ReportContentDto data, StreamWriter writer)
+    private static void GeneratePlanSection(ReportContentDto data, StreamWriter writer, CsvWriter csv)
     {
-        writer.WriteLine($"Generated at,{DateTime.UtcNow:u}");
-        writer.WriteLine($"Filters,ClientId:{data.Filters.ClientId}");
-        writer.WriteLine();
+        writer.WriteLine("Plans");
+        foreach (var (clientId, plans) in data.PlansByClient)
+        {
+            writer.WriteLine($"ClientId,{clientId}");
+            csv.WriteRecords(plans);
+            writer.WriteLine();
+        }
     }
 
     private static void SetupCsvStream(out MemoryStream ms, out StreamWriter writer, out CsvWriter csv)
