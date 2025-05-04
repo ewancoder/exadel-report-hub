@@ -6,13 +6,13 @@ namespace ExportPro.Common.Shared.Extensions;
 
 public static class SwaggerExtensions
 {
-    public static IServiceCollection AddSwaggerServices(this IServiceCollection services)
+    public static IServiceCollection AddSwaggerServices(this IServiceCollection services,string title)
     {
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "ExportPro Gateway API",
+                Title = title,
                 Version = "v1"
             });
 

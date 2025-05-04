@@ -1,6 +1,6 @@
 {
   "Serilog": {
-    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File"],
+    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File", "Serilog.Sinks.Seq" ],
     "MinimumLevel": {
       "Default": "Information",
       "Override": {
@@ -10,25 +10,30 @@
       }
     },
     "WriteTo": [
-      //{
-      //  "Name": "Console",
-      //  "Args": {
-      //    "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-      //  }
-      //},
       {
-        "Name": "File",
-        "Args": {
-          "path": "C:/Logs/log-.txt",
-          "rollingInterval": "Day",
-          "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+       "Name": "Console",
+       "Args": {
+         "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+       }
+      },
+        {
+            "Name": "File",
+            "Args": {
+                "path": "C:/Logs/log-.txt",
+                "rollingInterval": "Day",
+                "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+            }
+        },
+        {
+            "Name": "Seq",
+            "Args": { "serverUrl": "http://exportproseq:5341" }
         }
-      }
     ],
     "Enrich": [
       "FromLogContext",
       "WithMachineName",
       "WithExceptionDetails",
+      "WithThreadId",
       "Elapsed"
     ],
     "Properties": {
