@@ -10,5 +10,6 @@ public sealed class ReportContentDto
     public List<PlansResponse> Plans { get; init; } = [];
     public Dictionary<Guid, List<ItemResponse>> ItemsByClient { get; init; } = [];
     public Dictionary<Guid, List<PlansResponse>> PlansByClient { get; init; } = [];
+    public Dictionary<Guid, string> ClientNames { get; init; } = [];
     public ReportFilterDto Filters { get; init; } = new();
 }
