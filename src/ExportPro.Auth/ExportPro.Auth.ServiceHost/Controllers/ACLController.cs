@@ -14,7 +14,7 @@ namespace ExportPro.Auth.ServiceHost.Controllers
     {
 
         [HttpPost("check")]
-        public  Task<BaseResponse<bool>> CheckPermission([FromBody] HasPermissionQueryHandler request) =>
+        public  Task<BaseResponse<bool>> CheckPermission([FromBody] HasPermissionQuery request) =>
              mediator.Send(request);
 
         [HttpGet("{userId}/{clientId}")]
@@ -22,11 +22,9 @@ namespace ExportPro.Auth.ServiceHost.Controllers
              mediator.Send(new GetUserClientPermissionsQuery(userId, clientId));
         
         [HttpPost("grant")]
-        public async Task<IActionResult> GrantPermission([FromBody] GrantUserRoleCommand command)
-        {
-            var result = await mediator.Send(command);
-            return Ok(result);
-        }
+        public Task<BaseResponse<bool>> GrantPermission([FromBody] GrantUserRoleCommand command) =>
+           mediator.Send(command);
+ 
 
         [HttpPost("revoke")]
         public Task<BaseResponse<bool>> RevokePermission([FromBody] RemovePermissionCommand command) => 
@@ -35,6 +33,10 @@ namespace ExportPro.Auth.ServiceHost.Controllers
         [HttpPost("update-role")]
         public  Task<BaseResponse<bool>> UpdateUserRole([FromBody] UpdateUserRoleCommand command) 
             => mediator.Send(command);
+
+        [HttpGet("user-clients")]
+        public Task<BaseResponse<List<string>>> UserClients()
+            => mediator.Send(new GetUserClientsQuery());
 
     }
 }

@@ -4,7 +4,6 @@ using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using MongoDB.Bson;
-using ExportPro.Auth.SDK.Helpers;
 using ExportPro.AuthService.Services;
 
 namespace ExportPro.Auth.CQRS.Queries;

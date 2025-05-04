@@ -29,6 +29,17 @@ public class ACLRepository(ICollectionProvider collectionProvider) : BaseReposit
         );
 
     }
+    public async Task<List<ObjectId>> GetClientIdsForUserAsync(ObjectId userId, CancellationToken cancellationToken = default)
+    {
+        var filter = Builders<UserClientRoles>.Filter.Eq(x => x.UserId, userId);
+
+        var clientIds = await Collection
+            .Find(filter)
+            .Project(x => x.ClientId)
+            .ToListAsync(cancellationToken);
+
+        return clientIds;
+    }
 
     public async Task<bool> UpdateUserClientRoleAsync(
         ObjectId userId,

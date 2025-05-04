@@ -1,5 +1,4 @@
-﻿using ExportPro.Common.Shared.Attributes;
-using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 using ExportPro.StorageService.Models.Models;
@@ -15,13 +14,11 @@ namespace ExportPro.StorageService.API.Controllers;
 public class CustomerController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Create)]
     public async Task<IActionResult> Create([FromBody] CreateCustomerCommand command, CancellationToken cancellationToken)
         => Ok(await mediator.Send(command, cancellationToken));
 
  
     [HttpPut("{id}")]
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Update)]
     public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateCustomerCommand command, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -32,7 +29,6 @@ public class CustomerController(IMediator mediator) : ControllerBase
     }
   
     [HttpDelete("{id}")]
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Delete)]
     public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -42,7 +38,6 @@ public class CustomerController(IMediator mediator) : ControllerBase
     }
     
     [HttpGet("{id}")]
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
     public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -51,7 +46,6 @@ public class CustomerController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new GetCustomerByIdQuery(objectId), cancellationToken));
     }
 
-    [HasPermission(Common.Shared.Enums.Resource.Customers, Common.Shared.Enums.CrudAction.Read)]
     [HttpGet]
     public async Task<ActionResult<BaseResponse<PaginatedList<Customer>>>> GetAll(
         CancellationToken cancellationToken, 

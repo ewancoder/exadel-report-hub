@@ -14,7 +14,9 @@ public class UpdateUserRoleCommandHandler(IACLService aclService) : ICommandHand
 
     public async Task<BaseResponse<bool>> Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
     {
-        await aclService.UpdateUserRole(request.UserId, request.ClientId, request.NewRole, cancellationToken);
+        var res = await aclService.UpdateUserRole(request.UserId, request.ClientId, request.NewRole, cancellationToken);
+        if(!res)
+            return new BadRequestResponse<bool>("Failed to update user role");
         return new SuccessResponse<bool>(true);
     }
 }

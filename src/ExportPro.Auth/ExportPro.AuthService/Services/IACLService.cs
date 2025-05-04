@@ -13,6 +13,7 @@ public interface IACLService
     Task<List<PermissionDTO>> GetPermissions(ObjectId userId, ObjectId clientId = default, CancellationToken cancellationToken = default);
     Task GrantPermission(ObjectId userId, ObjectId clientId, UserRole role, CancellationToken cancellationToken = default);
     Task RemovePermission(ObjectId userId, ObjectId clientId, CancellationToken cancellationToken = default);
-    Task UpdateUserRole(ObjectId userId, ObjectId clientId, UserRole newRole, CancellationToken cancellationToken = default);
+    Task<bool> UpdateUserRole(ObjectId userId, ObjectId clientId, UserRole newRole, CancellationToken cancellationToken = default);
+    Task<List<ObjectId>> GetAccessibleClientIdsAsync(ObjectId userId, CancellationToken cancellationToken = default);
 }
 

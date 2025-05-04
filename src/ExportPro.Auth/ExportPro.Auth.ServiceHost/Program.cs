@@ -16,13 +16,15 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Auth Service");
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddScoped<ExportProMongoContext>();
 builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
 builder.Services.AddScoped<IACLRepository, ACLRepository>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IACLService, ACLService>();
+builder.Services.AddScoped<ACLRepository>();
 
 builder.Services.AddMediatR(cfg =>
 {

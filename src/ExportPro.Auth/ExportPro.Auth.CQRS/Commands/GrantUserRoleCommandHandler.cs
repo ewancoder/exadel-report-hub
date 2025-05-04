@@ -7,13 +7,19 @@ using MongoDB.Bson;
 
 namespace ExportPro.Auth.CQRS.Commands;
 
-public record GrantUserRoleCommand(ObjectId UserId, ObjectId ClientId, UserRole Role) : ICommand<bool>;
+public record GrantUserRoleCommand(string UserId, string ClientId, UserRole Role) : ICommand<bool>;
 
 public class GrantUserRoleCommandHandler(IACLService aclService) : ICommandHandler<GrantUserRoleCommand, bool>
 {
     public async Task<BaseResponse<bool>> Handle(GrantUserRoleCommand request, CancellationToken cancellationToken)
     {
-        await aclService.GrantPermission(request.UserId, request.ClientId, request.Role, cancellationToken);
+        if (!ObjectId.TryParse(request.UserId, out var userId))
+            return new BadRequestResponse<bool>("Invalid UserId");
+
+        if (!ObjectId.TryParse(request.ClientId, out var clientId))
+             return new BadRequestResponse<bool>("Invalid ClientId");
+
+        await aclService.GrantPermission(userId, clientId, request.Role, cancellationToken);
         return new SuccessResponse<bool>(true);
     }
 }

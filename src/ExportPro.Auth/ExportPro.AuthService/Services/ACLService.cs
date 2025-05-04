@@ -4,11 +4,10 @@ using ExportPro.AuthService.Repositories;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Helpers;
 using MongoDB.Bson;
-using System.Threading;
 
 namespace ExportPro.AuthService.Services;
 
-public class ACLService(ACLRepository aclRepository) : IACLService
+public sealed class ACLService(ACLRepository aclRepository) : IACLService
 {
 
     public async Task<List<PermissionDTO>> GetPermissions(ObjectId userId, ObjectId clientId = default, CancellationToken cancellationToken = default)
@@ -62,31 +61,28 @@ public class ACLService(ACLRepository aclRepository) : IACLService
         return false;
     }
 
-    public async Task RemovePermission(ObjectId userId, ObjectId clientId, CancellationToken cancellationToken = default)
+    public  Task RemovePermission(ObjectId userId, ObjectId clientId, CancellationToken cancellationToken = default)
     {
-         await aclRepository.RemoveUserClientRoleAsync(userId, clientId, cancellationToken);
+         return aclRepository.RemoveUserClientRoleAsync(userId, clientId, cancellationToken);
     }
 
-    public async Task UpdateUserRole(ObjectId userId, ObjectId clientId, UserRole newRole, CancellationToken cancellationToken = default)
-    {
-        await aclRepository.UpdateUserClientRoleAsync(userId, clientId, newRole, cancellationToken);
-    }
+    public  Task<bool> UpdateUserRole(ObjectId userId, ObjectId clientId, UserRole newRole, CancellationToken cancellationToken = default) => 
+        aclRepository.UpdateUserClientRoleAsync(userId, clientId, newRole, cancellationToken);
 
+    public  Task<List<ObjectId>> GetAccessibleClientIdsAsync(ObjectId userId, CancellationToken cancellationToken = default) =>
+        aclRepository.GetClientIdsForUserAsync(userId, cancellationToken);
+ 
 
     private async Task<List<UserClientRoles>> Roles(ObjectId userId, ObjectId clientId, CancellationToken cancellationToken)
     {
-        _ = new List<UserClientRoles>();
-        List<UserClientRoles>? userRoles;
         if (clientId != default)
         {
-            userRoles = await aclRepository.GetUserClientRolesAsync(userId, clientId, cancellationToken);
+            return await aclRepository.GetUserClientRolesAsync(userId, clientId, cancellationToken);
         }
-        else
-        {
-            userRoles = await aclRepository.GetUserRolesAsync(userId, cancellationToken);
-        }
-        return userRoles;
+        return await aclRepository.GetUserRolesAsync(userId, cancellationToken);
     }
+
+
 
 }
 

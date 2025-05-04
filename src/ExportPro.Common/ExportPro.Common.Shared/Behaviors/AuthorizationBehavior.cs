@@ -16,34 +16,50 @@ public class AuthorizationBehavior<TRequest, TResponse>(
     {
         if (request is IPermissionedRequest permissionedRequest)
         {
-            var user = httpContextAccessor.HttpContext?.User;
-            if (user == null)
-                throw new UnauthorizedAccessException("User context not found.");
-
-            var userRoleClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role || c.Type == "Role")?.Value;
-            if (!Enum.TryParse<Role>(userRoleClaim, out var userRole))
-                throw new UnauthorizedAccessException("Invalid role.");
+            var user = (httpContextAccessor.HttpContext?.User) ?? throw new UnauthorizedAccessException("User context not found.");
+            var userRole = TokenHelper.GetUserRole(user);
             if (userRole == Role.SuperAdmin &&
                 (permissionedRequest.Resource == Resource.Clients || permissionedRequest.Resource == Resource.Users))
             {
                 return await next(cancellationToken);
             }
+            var userId = TokenHelper.GetUserId(user);
 
-            var userIdClaim = (user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier || c.Type == "sub")?.Value) ?? throw new UnauthorizedAccessException("UserId not found in claims.");
-            var userId = ObjectId.Parse(userIdClaim);
-
-            var clientId = permissionedRequest.ClientId;
-            var hasPermission = await permissionChecker.CheckPermissionAsync(
-                new Models.CheckPermissionRequest
+            if (permissionedRequest.ClientIds != null && permissionedRequest.ClientIds.Any())
+            {
+                foreach (var clientId in permissionedRequest.ClientIds)
                 {
-                    UserId = userId,
-                    ClientId = clientId ?? default,
+                    var hasPermission = await permissionChecker.CheckPermissionAsync(new Models.CheckPermissionRequest
+                    {
+                        UserId = userId.ToString(),
+                        ClientId = clientId,
+                        Resource = permissionedRequest.Resource,
+                        Action = permissionedRequest.Action
+                    });
+
+                    if (!hasPermission)
+                    {
+                        throw new UnauthorizedAccessException(
+                            $"No permission for client {clientId} - Action: {permissionedRequest.Action}, Resource: {permissionedRequest.Resource}");
+                    }
+                }
+            }
+            else
+            {
+                var hasPermission = await permissionChecker.CheckPermissionAsync(new Models.CheckPermissionRequest
+                {
+                    UserId = userId.ToString(),
+                    ClientId = default,
                     Resource = permissionedRequest.Resource,
                     Action = permissionedRequest.Action
                 });
 
-            if (!hasPermission)
-                throw new UnauthorizedAccessException($"You do not have permission to perform this action. Action: {permissionedRequest.Action}, Resource: {permissionedRequest.Resource}");
+                if (!hasPermission)
+                {
+                    throw new UnauthorizedAccessException(
+                        $"No permission - Action: {permissionedRequest.Action}, Resource: {permissionedRequest.Resource}");
+                }
+            }
         }
 
         return await next(cancellationToken);

@@ -4,8 +4,8 @@ using MongoDB.Bson;
 namespace ExportPro.Common.Shared.Models;
 public class CheckPermissionRequest
 {
-    public ObjectId UserId { get; set; }
-    public ObjectId ClientId { get; set; }
+    public string? UserId { get; set; }
+    public string? ClientId { get; set; }
     public Resource Resource { get; set; }
     public CrudAction Action { get; set; }
 }

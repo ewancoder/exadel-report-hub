@@ -1,7 +1,6 @@
 using ExportPro.Common.DataAccess.MongoDB.Configurations;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
-using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.StorageService.CQRS;
 using ExportPro.StorageService.Models.Models;
@@ -15,15 +14,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Refit;
 using ExportPro.StorageService.API.Configurations;
+using ExportPro.Common.Shared.Refit;
 var builder = WebApplication.CreateBuilder(args);
 
 //builder.Host.UseSharedSerilogAndConfiguration();
 // Add services to the container.
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<PermissionFilter>();
-});
+builder.Services.AddControllers();
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 
@@ -63,6 +60,8 @@ builder.Services
     {
         c.BaseAddress = new Uri(builder.Configuration["Refit:currencyUrl"]);
     });
+builder.Services.AddRefitClient<IACLSharedApi>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7067"));
 builder.Services.AddLogging();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Storage Service");
