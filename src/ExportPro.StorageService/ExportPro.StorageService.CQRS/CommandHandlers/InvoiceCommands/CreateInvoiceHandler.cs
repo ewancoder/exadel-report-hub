@@ -23,6 +23,7 @@ public sealed class CreateInvoiceCommand : ICommand<InvoiceResponse>
     public Guid CustomerId { get; set; }
     public string? BankAccountNumber { get; set; }
     public Guid ClientId { get; set; }
+    public Guid ClientCurrencyId { get; set; }
     public List<ItemDtoForClient>? Items { get; set; }
 }
 
@@ -51,6 +52,7 @@ public sealed class CreateInvoiceHandler(
             BankAccountNumber = request.BankAccountNumber,
             ClientId = request.ClientId.ToObjectId(),
             CustomerId = request.CustomerId.ToObjectId(),
+            ClientCurrencyId = request.ClientCurrencyId.ToObjectId(),
             Items = request.Items!.Select(c => mapper.Map<Item>(c)).ToList(),
         };
         foreach (var i in invoice.Items)

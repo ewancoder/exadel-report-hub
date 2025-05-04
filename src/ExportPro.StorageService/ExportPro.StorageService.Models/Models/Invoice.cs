@@ -14,6 +14,7 @@ public sealed class Invoice : IModel
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId CurrencyId { get; set; }
+    public ObjectId ClientCurrencyId { get; set; }
 
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
