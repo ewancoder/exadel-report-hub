@@ -5,11 +5,10 @@ using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.Responses;
-using Microsoft.AspNetCore.Routing.Constraints;
 
 namespace ExportPro.StorageService.CQRS.Profiles;
 
-public class MappingProfile : Profile
+public sealed class MappingProfile : Profile
 {
     public MappingProfile()
     {
@@ -31,9 +30,16 @@ public class MappingProfile : Profile
         CreateMap<Client, ClientDto>().ReverseMap();
         CreateMap<Invoice, InvoiceResponse>()
             .ForMember(dest => dest.Id, src => src.MapFrom(x => x.Id.ToGuid()))
+            .ForMember(dest => dest.CurrencyId, src => src.MapFrom(x => x.CurrencyId.ToGuid()))
+            .ForMember(dest => dest.CustomerId, src => src.MapFrom(x => x.CustomerId.ToGuid()))
+            .ForMember(dest => dest.ClientId, src => src.MapFrom(x => x.ClientId.ToGuid()))
+            .ForMember(dest => dest.ClientCurrencyId, src => src.MapFrom(x => x.ClientCurrencyId.ToGuid()))
             .ReverseMap()
-            .ForMember(dest => dest.Id, src => src.MapFrom(y => y.Id.ToObjectId()));
-
+            .ForMember(dest => dest.Id, src => src.MapFrom(y => y.Id.ToObjectId()))
+            .ForMember(dest => dest.CurrencyId, src => src.MapFrom(y => y.CurrencyId.ToObjectId()))
+            .ForMember(dest => dest.CustomerId, src => src.MapFrom(y => y.CustomerId.ToObjectId()))
+            .ForMember(dest => dest.ClientId, src => src.MapFrom(y => y.ClientId.ToObjectId()))
+            .ForMember(dest => dest.ClientCurrencyId, src => src.MapFrom(y => y.ClientCurrencyId.ToObjectId()));
         // Customer -> CustomerDto
         CreateMap<Customer, CustomerDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToGuid()))

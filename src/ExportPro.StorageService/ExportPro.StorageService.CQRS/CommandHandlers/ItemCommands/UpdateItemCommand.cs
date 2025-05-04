@@ -8,21 +8,19 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
-public record UpdateItemCommand(Guid ClientId, Item Item) : ICommand<bool>;
+public sealed record UpdateItemCommand(Guid ClientId, Item Item) : ICommand<bool>;
 
-public class UpdateItemCommandHandler(IClientRepository repository) : ICommandHandler<UpdateItemCommand, bool>
+public sealed class UpdateItemCommandHandler(IClientRepository repository) : ICommandHandler<UpdateItemCommand, bool>
 {
     public async Task<BaseResponse<bool>> Handle(UpdateItemCommand request, CancellationToken cancellationToken)
     {
-        if (request.Item is null || request.Item.Id == ObjectId.Empty)
-        {
+        if (request.Item.Id == ObjectId.Empty)
             return new BaseResponse<bool>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.BadRequest,
                 Messages = ["Item is null or missing valid Id."],
             };
-        }
 
         var updated = await repository.UpdateItemInClient(
             request.ClientId.ToObjectId(),
@@ -31,9 +29,7 @@ public class UpdateItemCommandHandler(IClientRepository repository) : ICommandHa
         );
 
         if (!updated)
-        {
             return new NotFoundResponse<bool>($"Item with ID {request.Item.Id} not found in client.");
-        }
 
         return new SuccessResponse<bool>(true);
     }

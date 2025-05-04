@@ -1,13 +1,12 @@
 ﻿using ExportPro.Common.Shared.Attributes;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.API.Controllers;
 
@@ -16,7 +15,7 @@ namespace ExportPro.StorageService.API.Controllers;
 public class InvoiceController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Create)]
+    [HasPermission(Resource.Invoices, CrudAction.Create)]
     public async Task<IActionResult> Create(
         [FromBody] CreateInvoiceCommand command,
         CancellationToken cancellationToken
@@ -55,7 +54,7 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [HasPermission(Common.Shared.Enums.Resource.Invoices, Common.Shared.Enums.CrudAction.Read)]
+    [HasPermission(Resource.Invoices, CrudAction.Read)]
     public async Task<ActionResult<BaseResponse<PaginatedList<Invoice>>>> GetInvoices(
         CancellationToken cancellationToken,
         [FromQuery] int pageNumber = 1,

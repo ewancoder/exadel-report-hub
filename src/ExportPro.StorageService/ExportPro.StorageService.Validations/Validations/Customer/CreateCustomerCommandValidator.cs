@@ -2,11 +2,10 @@
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Validations.Validations.Customer;
 
-public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCommand>
+public sealed class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCommand>
 {
     public CreateCustomerCommandValidator(ICountryRepository countryRepository)
     {
@@ -34,9 +33,7 @@ public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCo
                                 cancellation
                             );
                             if (country == null)
-                            {
                                 return false;
-                            }
                             return true;
                         }
                     )

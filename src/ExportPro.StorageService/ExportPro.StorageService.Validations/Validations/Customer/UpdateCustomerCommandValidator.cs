@@ -1,4 +1,3 @@
-using AutoMapper;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -6,23 +5,19 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.Validations.Validations.Customer;
 
-public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>
+public sealed class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>
 {
-    public UpdateCustomerCommandValidator(
-        ICountryRepository countryRepository,
-        ICustomerRepository repository,
-        IMapper mapper
-    )
+    public UpdateCustomerCommandValidator(ICountryRepository countryRepository, ICustomerRepository repository)
     {
         RuleFor(x => x.Id)
             .NotEmpty()
             .WithMessage("The id is required")
             .MustAsync(
-                async (id, CancellationToken) =>
+                async (id, cancellationToken) =>
                 {
                     var client = await repository.GetOneAsync(
                         x => x.Id == id.ToObjectId() && !x.IsDeleted,
-                        CancellationToken
+                        cancellationToken
                     );
                     return client != null;
                 }
@@ -32,7 +27,10 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
             .MustAsync(
                 async (id, token) =>
                 {
-                    var country = countryRepository.GetOneAsync(x => x.Id == id.ToObjectId() && !x.IsDeleted, token);
+                    var country = await countryRepository.GetOneAsync(
+                        x => x.Id == id.ToObjectId() && !x.IsDeleted,
+                        token
+                    );
                     return country != null;
                 }
             )

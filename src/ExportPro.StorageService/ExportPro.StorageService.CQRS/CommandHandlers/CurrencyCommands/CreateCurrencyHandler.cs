@@ -7,9 +7,9 @@ using MediatR;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 
-public record CreateCurrencyCommand(string Code) : IRequest<BaseResponse<CurrencyResponse>>;
+public sealed record CreateCurrencyCommand(string Code) : IRequest<BaseResponse<CurrencyResponse>>;
 
-public class CreateCurrencyHandler(ICurrencyRepository repository, IMapper mapper)
+public sealed class CreateCurrencyHandler(ICurrencyRepository repository, IMapper mapper)
     : IRequestHandler<CreateCurrencyCommand, BaseResponse<CurrencyResponse>>
 {
     public async Task<BaseResponse<CurrencyResponse>> Handle(
@@ -18,7 +18,6 @@ public class CreateCurrencyHandler(ICurrencyRepository repository, IMapper mappe
     )
     {
         var currency = new Currency { CurrencyCode = request.Code };
-
         await repository.AddOneAsync(currency, cancellationToken);
         var curResponse = mapper.Map<CurrencyResponse>(currency);
         return new BaseResponse<CurrencyResponse> { Data = curResponse };

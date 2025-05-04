@@ -1,19 +1,15 @@
-using System.Net;
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
-using FluentValidation;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
 
-public record GetClientByIdQuery(Guid ClientId) : IQuery<ClientResponse>;
+public sealed record GetClientByIdQuery(Guid ClientId) : IQuery<ClientResponse>;
 
-public class GetClientByIdQueryHandler(IClientRepository clientRepository, IMapper mapper)
+public sealed class GetClientByIdQueryHandler(IClientRepository clientRepository, IMapper mapper)
     : IQueryHandler<GetClientByIdQuery, ClientResponse>
 {
     public async Task<BaseResponse<ClientResponse>> Handle(

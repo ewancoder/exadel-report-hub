@@ -6,9 +6,9 @@ using MediatR;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 
-public class GetAllCurrenciesQuery : IRequest<BaseResponse<List<CurrencyResponse>>> { }
+public sealed class GetAllCurrenciesQuery : IRequest<BaseResponse<List<CurrencyResponse>>> { }
 
-public class GetAllCurrenciesHandler(ICurrencyRepository repository, IMapper mapper)
+public sealed class GetAllCurrenciesHandler(ICurrencyRepository repository, IMapper mapper)
     : IRequestHandler<GetAllCurrenciesQuery, BaseResponse<List<CurrencyResponse>>>
 {
     public async Task<BaseResponse<List<CurrencyResponse>>> Handle(
@@ -17,7 +17,7 @@ public class GetAllCurrenciesHandler(ICurrencyRepository repository, IMapper map
     )
     {
         var currencies = await repository.GetAllAsync(cancellationToken);
-        List<CurrencyResponse> currency = currencies.Select(x => mapper.Map<CurrencyResponse>(x)).ToList();
+        var currency = currencies.Select(x => mapper.Map<CurrencyResponse>(x)).ToList();
         return new BaseResponse<List<CurrencyResponse>> { Data = currency };
     }
 }

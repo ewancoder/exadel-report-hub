@@ -1,18 +1,16 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public record GetInvoiceByIdQuery(Guid Id) : IQuery<InvoiceDto>;
+public sealed record GetInvoiceByIdQuery(Guid Id) : IQuery<InvoiceDto>;
 
-public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper)
+public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper)
     : IQueryHandler<GetInvoiceByIdQuery, InvoiceDto>
 {
     public async Task<BaseResponse<InvoiceDto>> Handle(GetInvoiceByIdQuery request, CancellationToken cancellationToken)
@@ -22,29 +20,22 @@ public class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper mapper
             cancellationToken
         );
         if (invoice == null)
-        {
-            return new BaseResponse<InvoiceDto>
-            {
-                ApiState = HttpStatusCode.NotFound,
-                IsSuccess = false,
-                Messages = ["Invoice not found."],
-            };
-        }
-
+            return new NotFoundResponse<InvoiceDto>("Invoice not found.");
         var dto = new InvoiceDto
         {
             Id = invoice.Id.ToGuid(),
             InvoiceNumber = invoice.InvoiceNumber,
             IssueDate = invoice.IssueDate,
             DueDate = invoice.DueDate,
-            CurrencyId = invoice.CurrencyId?.ToGuid(),
-            CustomerId = invoice.CustomerId?.ToGuid(),
+            CurrencyId = invoice.CurrencyId.ToGuid(),
+            CustomerId = invoice.CustomerId.ToGuid(),
             PaymentStatus = invoice.PaymentStatus,
             BankAccountNumber = invoice.BankAccountNumber,
-            ClientId = invoice.ClientId?.ToGuid(),
+            ClientId = invoice.ClientId.ToGuid(),
+            ClientCurrencyId = invoice.ClientCurrencyId.ToGuid(),
             Amount = invoice.Amount,
-            Items = invoice.Items.Select(x => mapper.Map<ItemDtoForClient>(x)).ToList(),
+            Items = invoice.Items?.Select(x => mapper.Map<ItemDtoForClient>(x)).ToList(),
         };
-        return new SuccessResponse<InvoiceDto>(dto);
+        return new SuccessResponse<InvoiceDto>(dto, "Invoice found successfully.");
     }
 }

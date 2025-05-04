@@ -4,32 +4,24 @@ using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using MongoDB.Bson;
-using System.Net;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 
-public record GetCustomerByIdQuery(ObjectId Id) : IQuery<CustomerDto>;
+public sealed record GetCustomerByIdQuery(ObjectId Id) : IQuery<CustomerDto>;
 
-public class GetCustomerByIdQueryHandler(ICustomerRepository repository, IMapper mapper)
+public sealed class GetCustomerByIdQueryHandler(ICustomerRepository repository, IMapper mapper)
     : IQueryHandler<GetCustomerByIdQuery, CustomerDto>
 {
-    private readonly ICustomerRepository _repository = repository;
-    private readonly IMapper _mapper = mapper;
-
-    public async Task<BaseResponse<CustomerDto>> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<CustomerDto>> Handle(
+        GetCustomerByIdQuery request,
+        CancellationToken cancellationToken
+    )
     {
-        var customer = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var customer = await repository.GetOneAsync(x => x.Id == request.Id && !x.IsDeleted, cancellationToken);
         if (customer == null || customer.IsDeleted)
-        {
-            return new BaseResponse<CustomerDto>
-            {
-                IsSuccess = false,
-                ApiState = HttpStatusCode.NotFound,
-                Messages = ["Customer not found."]
-            };
-        }
+            return new NotFoundResponse<CustomerDto>("Customer not found.");
 
-        var dto = _mapper.Map<CustomerDto>(customer);
-        return new BaseResponse<CustomerDto> { Data = dto };
+        var dto = mapper.Map<CustomerDto>(customer);
+        return new SuccessResponse<CustomerDto>(dto, "Successfully retrieved customer.");
     }
 }

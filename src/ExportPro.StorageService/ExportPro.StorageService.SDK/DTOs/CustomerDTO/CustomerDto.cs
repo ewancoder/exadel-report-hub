@@ -1,6 +1,6 @@
 ﻿namespace ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 
-public class CustomerDto
+public sealed class CustomerDto
 {
     public required Guid Id { get; set; }
     public string? Name { get; set; }
