@@ -6,6 +6,7 @@ using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Threading;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
@@ -18,7 +19,18 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
         var filter = Builders<Invoice>.Filter.Eq(x => x.ClientId, clientId);
         return await Collection.Find(filter).ToListAsync(cancellationToken);
     }
+    public Task<List<Invoice>> GetOverdueInvoices(ObjectId ClientId, CancellationToken cancellationToken = default)
+    {
 
+        var filter = Builders<Invoice>.Filter.And(
+            Builders<Invoice>.Filter.Eq(x => x.PaymentStatus, Status.Unpaid),
+            Builders<Invoice>.Filter.Lt(x => x.DueDate, DateTime.UtcNow),
+            Builders<Invoice>.Filter.Eq("IsDeleted", false),
+            Builders<Invoice>.Filter.Eq(x => x.ClientId, ClientId)
+        );
+
+        return  Collection.Find(filter).ToListAsync(cancellationToken);
+    }
     public async Task<List<Invoice>> GetByStatusAsync(Status status, CancellationToken cancellationToken)
     {
         var filter = Builders<Invoice>.Filter.Eq(x => x.PaymentStatus, status);

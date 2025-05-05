@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿
+using System.Xml;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
 
@@ -6,45 +7,24 @@ namespace ExportPro.StorageService.SDK.Services;
 
 public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeService
 {
-    public async Task<double> ExchangeRate(
-        CurrencyExchangeModel currenyExchangeModel,
-        CancellationToken cancellationToken = default
-    )
+   public async Task<double> ExchangeRate(
+    CurrencyExchangeModel currenyExchangeModel,
+    CancellationToken cancellationToken = default)
     {
-        //getting the day of the date
-        //because if it is saturday or sunday then we need to
-        //go back to the last working day because the api is resting on that day
-        var day = currenyExchangeModel.Date.ToString("dddd");
-        if (day == "Saturday")
-            currenyExchangeModel.Date = currenyExchangeModel.Date.AddDays(-1);
-        if (day == "Sunday")
-            currenyExchangeModel.Date = currenyExchangeModel.Date.AddDays(-2);
-        var dateCorrectFormat = currenyExchangeModel.Date.ToString("yyyy-MM-dd");
-        //need to confirm that the date is not a holiday
-        var data_exists = await DateExists("USD", dateCorrectFormat);
-        var sub = -1;
-        var ind = 7;
-        // if it a holiday then we need to go back to the last working day
-        while (!data_exists && ind > 0)
-        {
-            currenyExchangeModel.Date = currenyExchangeModel.Date.AddDays(sub);
-            dateCorrectFormat = currenyExchangeModel.Date.ToString("yyyy-MM-dd");
-            //checking if the date is a holiday or not
-            data_exists = await DateExists("USD", dateCorrectFormat);
-            if (data_exists)
-                break;
-            ind--;
-            sub--;
-        }
+        var validDate = await GetLastValidDateAsync(currenyExchangeModel.From, currenyExchangeModel.Date);
+        var dateString = validDate.ToString("yyyy-MM-dd");
 
-        //getting the xml document
-        var xmlDocument = await ecbApi.GetXmlDocument(currenyExchangeModel.From, dateCorrectFormat);
+        var xmlDocument = await ecbApi.GetXmlDocument(currenyExchangeModel.From, dateString);
         var namespaceManager = new XmlNamespaceManager(xmlDocument.NameTable);
         namespaceManager.AddNamespace("generic", "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic");
-        //getting the exchange rate
-        var value = xmlDocument.SelectSingleNode("//generic:ObsValue", namespaceManager);
-        var currencyValue = value?.Attributes?["value"]?.Value;
-        return currencyValue != null ? Convert.ToDouble(currencyValue) : 0;
+
+        var valueNode = xmlDocument.SelectSingleNode("//generic:ObsValue", namespaceManager);
+        var rateString = valueNode?.Attributes?["value"]?.Value;
+
+        if (!double.TryParse(rateString, out var rate))
+            throw new InvalidOperationException("Could not parse exchange rate.");
+
+        return rate;
     }
 
     //checks if the date is holiday
@@ -56,5 +36,28 @@ public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeS
         if (string.IsNullOrWhiteSpace(content))
             return false;
         return true;
+    }
+
+    private async Task<DateTime> GetLastValidDateAsync(string currencyCode, DateTime date)
+    {
+        var currentDate = date;
+
+        // if weekend, go back to Friday
+        if (currentDate.DayOfWeek == DayOfWeek.Saturday)
+            currentDate = currentDate.AddDays(-1);
+        else if (currentDate.DayOfWeek == DayOfWeek.Sunday)
+            currentDate = currentDate.AddDays(-2);
+
+        // check for holidays by verifying data exists
+        for (int attempts = 0; attempts < 7; attempts++)
+        {
+            var formatted = currentDate.ToString("yyyy-MM-dd");
+            if (await DateExists(currencyCode, formatted))
+                return currentDate;
+
+            currentDate = currentDate.AddDays(-1);
+        }
+
+        throw new InvalidOperationException("Could not find a valid exchange rate date within 7 days.");
     }
 }

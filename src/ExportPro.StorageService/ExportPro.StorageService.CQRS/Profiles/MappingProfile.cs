@@ -64,5 +64,6 @@ public sealed class MappingProfile : Profile
             .ReverseMap()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToObjectId()))
             .ForMember(dest => dest.CountryId, src => src.MapFrom(x => x.CountryId.ToObjectId()));
+            
     }
 }
