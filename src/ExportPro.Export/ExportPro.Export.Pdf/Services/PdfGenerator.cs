@@ -63,7 +63,7 @@ public sealed class PdfGenerator : IPdfGenerator
                 }
 
                 string itemList = string.Join("\n",
-                    invoice.Items.Select(i => $"{i.Name} — {i.Price:N2} {invoice.CurrencyCode}"));
+                    invoice.Items.Select(i => $"{i.Name} — {i.Price:N2} {i.CurrencyCode}"));
 
                 string[] row =
                 [
@@ -89,7 +89,7 @@ public sealed class PdfGenerator : IPdfGenerator
     {
         page.Header()
             .AlignCenter()
-            .Text($"Invoice {invoice.InvoiceNumber}")
+            .Text($"Invoice {invoice.InvoiceNumber}")
             .FontSize(20)
             .Bold();
     }

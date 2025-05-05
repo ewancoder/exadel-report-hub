@@ -21,28 +21,60 @@ public sealed class GenerateInvoicePdfQueryHandler(
     ILogger<GenerateInvoicePdfQueryHandler> logger)
     : IRequestHandler<GenerateInvoicePdfQuery, PdfFileDto>
 {
-    public async Task<PdfFileDto> Handle(GenerateInvoicePdfQuery request, CancellationToken cancellationToken)
+    public async Task<PdfFileDto> Handle(
+        GenerateInvoicePdfQuery request,
+        CancellationToken cancellationToken)
     {
         if (request.InvoiceId == Guid.Empty)
             throw new ArgumentException("InvoiceId cannot be empty", nameof(request.InvoiceId));
 
         var userId = httpContextAccessor.HttpContext?.User?
-                         .FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
 
         logger.LogInformation("GenerateInvoicePdf START: user {UserId}, invoice {InvoiceId}, ts {Ts}",
-                              userId, request.InvoiceId, DateTime.UtcNow);
+            userId, request.InvoiceId, DateTime.UtcNow);
 
         var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
         string currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
         string client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
         string customer = await GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
         var invoice = MapToPdfInvoiceExportDto(invoiceDto, currency, client, customer);
+        await PopulateItemCurrencyCodesAsync(invoiceDto, invoice, cancellationToken);
         var result = GeneratePdfFile(invoice);
 
         logger.LogInformation("GenerateInvoicePdf DONE: user {UserId}, invoice {InvoiceId}, ts {Ts}",
-                              userId, request.InvoiceId, DateTime.UtcNow);
+            userId, request.InvoiceId, DateTime.UtcNow);
 
         return result;
+    }
+
+    private async Task PopulateItemCurrencyCodesAsync(
+        InvoiceDto srcInvoice,
+        PdfInvoiceExportDto destInvoice,
+        CancellationToken ct)
+    {
+        if (srcInvoice.Items is null || destInvoice.Items.Count == 0)
+            return;
+
+        var cache = new Dictionary<Guid, string>();
+
+        for (int i = 0; i < srcInvoice.Items.Count; i++)
+        {
+            Guid curId = srcInvoice.Items[i].CurrencyId;
+            if (curId == Guid.Empty)
+            {
+                destInvoice.Items[i].CurrencyCode = "—";
+                continue;
+            }
+
+            if (!cache.TryGetValue(curId, out string code))
+            {
+                code = await GetCurrencyCodeAsync(curId, ct);
+                cache[curId] = code;
+            }
+
+            destInvoice.Items[i].CurrencyCode = code;
+        }
     }
 
     private async Task<InvoiceDto> GetInvoiceByIdAsync(Guid id, CancellationToken ct)
