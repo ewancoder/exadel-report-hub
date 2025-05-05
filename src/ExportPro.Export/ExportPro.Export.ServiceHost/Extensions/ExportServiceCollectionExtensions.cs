@@ -64,12 +64,8 @@ public static class ExportServiceCollectionExtensions
             o.AddOpenBehavior(typeof(ValidationBehavior<,>));
             o.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
         });
-
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-
         // —— AutoMapper ——
         services.AddAutoMapper(typeof(MappingProfile));
-
         // —— PDF ——
         services.AddSingleton<IPdfGenerator, PdfGenerator>();
         QuestPDF.Settings.License = LicenseType.Community;
@@ -81,7 +77,6 @@ public static class ExportServiceCollectionExtensions
         // —— HttpContext / auth forwarding ——
         services.AddHttpContextAccessor();
         services.AddTransient<ForwardAuthHeaderHandler>();
-
         // —— Refit client to Storage-service ——
         var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
         services
@@ -99,7 +94,6 @@ public static class ExportServiceCollectionExtensions
             )
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
             .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
-
         return services;
     }
 }
