@@ -65,4 +65,13 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
         var filter = Builders<Invoice>.Filter.Eq(x => x.Id, id);
         return await Collection.Find(filter).AnyAsync(cancellationToken);
     }
+
+    public Task<List<Invoice>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+    public async Task<long> CountAsync(FilterDefinition<Invoice> filter, CancellationToken cancellationToken)
+    {
+        return await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+    }
 }
