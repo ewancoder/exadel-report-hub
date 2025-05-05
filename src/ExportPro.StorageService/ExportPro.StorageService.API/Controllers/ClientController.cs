@@ -13,6 +13,7 @@ using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -25,7 +26,7 @@ public class ClientController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     [SwaggerOperation(Summary = "Creating a client")]
-    [ProducesResponseType(typeof(ClientResponse), 200)]
+    [ProducesResponseType(typeof(NotFoundResponse<ClientResponse>), 404)]
     [HasPermission(Resource.Clients, CrudAction.Create)]
     public Task<BaseResponse<ClientResponse>> CreateClient([FromBody] CreateClientCommand clientCommand) =>
         mediator.Send(clientCommand);
@@ -39,7 +40,8 @@ public class ClientController(IMediator mediator) : ControllerBase
 
     [HttpGet("{clientId}")]
     [SwaggerOperation(Summary = "Getting  client by client id")]
-    [ProducesResponseType(typeof(ClientResponse), 200)]
+    [ProducesResponseType(typeof(SuccessResponse<ClientResponse>), 200)]
+    [ProducesResponseType(typeof(NotFoundResponse<ClientResponse>), 404)]
     [HasPermission(Resource.Clients, CrudAction.Read)]
     public Task<BaseResponse<ClientResponse>> GetClientById([Required] [FromRoute] Guid clientId) =>
         mediator.Send(new GetClientByIdQuery(clientId));

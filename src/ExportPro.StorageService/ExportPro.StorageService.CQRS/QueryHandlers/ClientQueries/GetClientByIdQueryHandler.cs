@@ -1,3 +1,4 @@
+using System.Net;
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
@@ -21,6 +22,13 @@ public sealed class GetClientByIdQueryHandler(IClientRepository clientRepository
             x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
             cancellationToken
         );
+        if (client == null)
+            return new BaseResponse<ClientResponse>()
+            {
+                ApiState = HttpStatusCode.NotFound,
+                Messages = ["Client Not Found"],
+                IsSuccess = false,
+            };
         var clientResponse = mapper.Map<ClientResponse>(client);
         return new SuccessResponse<ClientResponse>(clientResponse, "Client Retrieved");
     }
