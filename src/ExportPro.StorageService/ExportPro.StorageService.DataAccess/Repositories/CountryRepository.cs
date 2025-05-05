@@ -13,13 +13,10 @@ public sealed class CountryRepository(ICollectionProvider collectionProvider)
 {
     public async Task<PaginatedList<Country>> GetAllPaginatedAsync(
         PaginationParameters parameters,
-        bool includeDeleted,
         CancellationToken cancellationToken
     )
     {
-        var filter = includeDeleted
-            ? Builders<Country>.Filter.Empty
-            : Builders<Country>.Filter.Eq(x => x.IsDeleted, false);
+        var filter = Builders<Country>.Filter.Eq(x => x.IsDeleted, false);
         var total = (int)await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
 
         var items = await Collection

@@ -1,5 +1,7 @@
-﻿using ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
+﻿using ExportPro.Common.Shared.Library;
+using ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
+using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,44 +12,27 @@ namespace ExportPro.StorageService.API.Controllers;
 public class CurrencyController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create(
+    public Task<BaseResponse<CurrencyResponse>> Create(
         [FromBody] CreateCurrencyCommand command,
         CancellationToken cancellationToken
-    )
-    {
-        var response = await mediator.Send(command, cancellationToken);
-        return Ok(response);
-    }
+    ) => mediator.Send(command, cancellationToken);
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(
+    public Task<BaseResponse<CurrencyResponse>> Update(
         [FromRoute] Guid id,
         [FromBody] string CurrencyCode,
         CancellationToken cancellationToken
-    )
-    {
-        var response = await mediator.Send(new UpdateCurrencyCommand(id, CurrencyCode));
-        return Ok(response);
-    }
+    ) => mediator.Send(new UpdateCurrencyCommand(id, CurrencyCode));
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
-    {
-        var response = await mediator.Send(new DeleteCurrencyCommand(id), cancellationToken);
-        return Ok(response);
-    }
+    public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken) =>
+        mediator.Send(new DeleteCurrencyCommand(id), cancellationToken);
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
-    {
-        var response = await mediator.Send(new GetCurrencyByIdQuery(id), cancellationToken);
-        return Ok(response);
-    }
+    public Task<BaseResponse<CurrencyResponse>> GetById([FromRoute] Guid id, CancellationToken cancellationToken) =>
+        mediator.Send(new GetCurrencyByIdQuery(id), cancellationToken);
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
-    {
-        var response = await mediator.Send(new GetAllCurrenciesQuery(), cancellationToken);
-        return Ok(response);
-    }
+    public Task<BaseResponse<List<CurrencyResponse>>> GetAll(CancellationToken cancellationToken) =>
+        mediator.Send(new GetAllCurrenciesQuery(), cancellationToken);
 }

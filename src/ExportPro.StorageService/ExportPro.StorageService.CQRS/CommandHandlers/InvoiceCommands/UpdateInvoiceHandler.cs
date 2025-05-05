@@ -9,7 +9,6 @@ namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
 public sealed class UpdateInvoiceCommand : ICommand<Invoice>
 {
-    public Guid Id { get; set; }
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }

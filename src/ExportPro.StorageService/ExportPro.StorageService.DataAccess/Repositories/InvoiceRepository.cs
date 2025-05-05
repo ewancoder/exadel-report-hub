@@ -27,13 +27,12 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
 
     public async Task<PaginatedList<Invoice>> GetAllPaginatedAsync(
         PaginationParameters parameters,
-        bool includeDeleted = false,
         CancellationToken cancellationToken = default
     )
     {
         var filter = Builders<Invoice>.Filter.Empty;
 
-        if (!includeDeleted && typeof(Invoice).GetProperty("IsDeleted") != null)
+        if (typeof(Invoice).GetProperty("IsDeleted") != null)
             filter = Builders<Invoice>.Filter.Eq("IsDeleted", false);
 
         var totalCount = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);

@@ -13,7 +13,6 @@ public interface IInvoiceRepository : IRepository<Invoice>
 
     Task<PaginatedList<Invoice>> GetAllPaginatedAsync(
         PaginationParameters parameters,
-        bool includeDeleted = false,
         CancellationToken cancellationToken = default
     );
 
