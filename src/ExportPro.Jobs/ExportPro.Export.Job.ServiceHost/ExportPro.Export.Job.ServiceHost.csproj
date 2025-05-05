@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ExportPro.Export\ExportPro.Export.Csv\ExportPro.Export.Csv.csproj" />
-    <ProjectReference Include="..\ExportPro.StorageService\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj" />
   </ItemGroup>
 
 </Project>

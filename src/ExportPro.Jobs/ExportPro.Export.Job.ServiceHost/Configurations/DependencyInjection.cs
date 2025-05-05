@@ -10,7 +10,9 @@ public static class DependencyInjection
     {
         var smtpSettings = config.GetSection("SmtpSettings").Get<SmtpSettings>();
         services.AddSingleton(smtpSettings);
+        services.AddSingleton<IReportGeneratorFactory, ReportGeneratorFactory>();
 
         services.AddTransient<IEmailSender, SmtpEmailSender>();
+        services.AddTransient<IInvoiceReportService, InvoiceReportService>();
     }
 }
