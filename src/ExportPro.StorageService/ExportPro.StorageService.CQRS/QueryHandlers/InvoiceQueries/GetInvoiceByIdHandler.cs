@@ -28,10 +28,11 @@ public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper
             IssueDate = invoice.IssueDate,
             DueDate = invoice.DueDate,
             CurrencyId = invoice.CurrencyId.ToGuid(),
-            CustomerId = invoice.CustomerId.ToGuid(),
             PaymentStatus = invoice.PaymentStatus,
             BankAccountNumber = invoice.BankAccountNumber,
             ClientId = invoice.ClientId.ToGuid(),
+            CustomerId = invoice.CustomerId.ToGuid(),
+
             ClientCurrencyId = invoice.ClientCurrencyId.ToGuid(),
             Amount = invoice.Amount,
             Items = invoice.Items?.Select(x => mapper.Map<ItemDtoForClient>(x)).ToList(),
