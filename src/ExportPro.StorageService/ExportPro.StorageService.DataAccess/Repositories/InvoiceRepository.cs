@@ -18,9 +18,9 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
         var filter = Builders<Invoice>.Filter.Eq(x => x.ClientId, clientId);
         return await Collection.Find(filter).ToListAsync(cancellationToken);
     }
+
     public Task<List<Invoice>> GetOverdueInvoices(ObjectId ClientId, CancellationToken cancellationToken = default)
     {
-
         var filter = Builders<Invoice>.Filter.And(
             Builders<Invoice>.Filter.Eq(x => x.PaymentStatus, Status.Unpaid),
             Builders<Invoice>.Filter.Lt(x => x.DueDate, DateTime.UtcNow),
@@ -28,8 +28,9 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
             Builders<Invoice>.Filter.Eq(x => x.ClientId, ClientId)
         );
 
-        return  Collection.Find(filter).ToListAsync(cancellationToken);
+        return Collection.Find(filter).ToListAsync(cancellationToken);
     }
+
     public async Task<List<Invoice>> GetByStatusAsync(Status status, CancellationToken cancellationToken)
     {
         var filter = Builders<Invoice>.Filter.Eq(x => x.PaymentStatus, status);
@@ -64,21 +65,17 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
         var filter = Builders<Invoice>.Filter.Eq(x => x.Id, id);
         return await Collection.Find(filter).AnyAsync(cancellationToken);
     }
-}
 
     public Task<List<Invoice>> GetAllAsync(CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
+
     public async Task<List<Invoice>> GetInvoicesInDateRangeAsync(DateTime startDate, DateTime endDate)
     {
         return await Collection.Find(x => x.IssueDate >= startDate && x.IssueDate <= endDate).ToListAsync();
     }
-}
-    public Task<List<Invoice>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+
     public async Task<long> CountAsync(FilterDefinition<Invoice> filter, CancellationToken cancellationToken)
     {
         return await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);

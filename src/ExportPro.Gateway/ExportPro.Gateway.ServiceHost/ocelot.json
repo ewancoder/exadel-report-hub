@@ -130,6 +130,20 @@
             "DownstreamPathTemplate": "/api/invoice/overdue-payments/{clientId}",
             "SwaggerKey": "StorageService"
         },
+       
+        {
+            "UpstreamPathTemplate": "/api/invoice/revenue",
+            "UpstreamHttpMethod": [ "Get"],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "storageservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/invoice/revenue",
+            "SwaggerKey": "StorageService"
+        },
         {
             "UpstreamPathTemplate": "/api/invoice/count",
             "UpstreamHttpMethod": [ "Get"],
@@ -155,6 +169,22 @@
             ],
             "DownstreamPathTemplate": "/api/client",
             "SwaggerKey": "StorageService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/ReportExport/list",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [ { "Host": "exportservice", "Port": 8080 } ],
+            "DownstreamPathTemplate": "/api/ReportExport/list",
+            "SwaggerKey": "exportservice"
+        },
+        {
+            "UpstreamPathTemplate": "/api/ReportExport",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [ { "Host": "exportservice", "Port": 8080 } ],
+            "DownstreamPathTemplate": "/api/ReportExport",
+            "SwaggerKey": "exportservice"
         },
         {
             "UpstreamPathTemplate": "/api/client/{clientId}",
