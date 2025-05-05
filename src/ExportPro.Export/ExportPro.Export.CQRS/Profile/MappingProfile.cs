@@ -1,6 +1,6 @@
 ﻿using ExportPro.Export.SDK.DTOs;
-using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.Export.CQRS.Profile;
 
@@ -14,7 +14,10 @@ public class MappingProfile : AutoMapper.Profile
             .ForMember(dest => dest.DueDate, opt => opt.MapFrom(src => src.DueDate))
             .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
             .ForMember(dest => dest.CurrencyCode, opt => opt.Ignore()) // Set manually in handler
-            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.PaymentStatus.HasValue ? src.PaymentStatus.ToString() : null))
+            .ForMember(
+                dest => dest.PaymentStatus,
+                opt => opt.MapFrom(src => src.PaymentStatus.HasValue ? src.PaymentStatus.ToString() : null)
+            )
             .ForMember(dest => dest.BankAccountNumber, opt => opt.MapFrom(src => src.BankAccountNumber))
             .ForMember(dest => dest.ClientName, opt => opt.Ignore()) // Set manually in handler
             .ForMember(dest => dest.CustomerName, opt => opt.Ignore()) // Set manually in handler
@@ -23,8 +26,6 @@ public class MappingProfile : AutoMapper.Profile
         CreateMap<ItemDtoForClient, PdfItemExportDto>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
-            .ForMember(d => d.CurrencyCode, o => o.Ignore());
+            .ForMember(d => d.CurrencyCode, o => o.MapFrom(src => src.CurrencyId));
     }
 }
-
-

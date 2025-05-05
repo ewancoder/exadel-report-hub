@@ -11,7 +11,7 @@ public class ExportLoggingBehavior<TRequest, TResponse>(
     IHttpContextAccessor httpContextAccessor,
     ILogger<ExportLoggingBehavior<TRequest, TResponse>> logger
 ) : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : GeneratePdfInvoiceQuery
+    where TRequest : GenerateInvoicePdfQuery
 {
     public async Task<TResponse> Handle(
         TRequest request,

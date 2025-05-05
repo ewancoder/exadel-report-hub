@@ -10,7 +10,7 @@ public sealed class DownloadTodaysLogQueryHandler : IRequestHandler<DownloadToda
     {
         var today = DateTime.UtcNow.ToString("yyyyMMdd");
         var fileName = $"log-{today}.txt";
-        var logPath = Path.Combine("C:/Logs", fileName);
+        var logPath = Path.Combine("Logs", fileName);
         if (!File.Exists(logPath))
             return null;
         return await File.ReadAllBytesAsync(logPath, cancellationToken);
