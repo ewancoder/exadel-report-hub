@@ -5,6 +5,7 @@ using CsvHelper.Configuration;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.SDK.Utilities;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.Export.Csv.Services;
 
