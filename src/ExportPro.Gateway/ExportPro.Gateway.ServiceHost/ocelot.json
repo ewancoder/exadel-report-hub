@@ -118,6 +118,32 @@
             "SwaggerKey": "StorageService"
         },
         {
+            "UpstreamPathTemplate": "/api/invoice/overdue-payments/{clientId}",
+            "UpstreamHttpMethod": [ "Get"],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "storageservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/invoice/overdue-payments/{clientId}",
+            "SwaggerKey": "StorageService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/invoice/count",
+            "UpstreamHttpMethod": [ "Get"],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "storageservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/invoice/count",
+            "SwaggerKey": "StorageService"
+        },
+        {
             "UpstreamPathTemplate": "/api/client",
             "UpstreamHttpMethod": [ "Get", "Post" ],
             "DownstreamScheme": "http",

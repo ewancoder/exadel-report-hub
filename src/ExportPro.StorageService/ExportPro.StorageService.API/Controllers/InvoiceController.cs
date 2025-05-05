@@ -5,6 +5,7 @@ using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
+using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -77,6 +78,9 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetTotalInvoices([FromQuery] GetTotalInvoicesQuery query)
     {
         var response = await mediator.Send(query);
+
+        return StatusCode((int)response.ApiState, response);
+    }
 
     [HttpGet("overdue-payments/{clientId}")]
     [HasPermission(Resource.Invoices, CrudAction.Read)]
