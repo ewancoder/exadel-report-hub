@@ -6,7 +6,6 @@ using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Threading;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
@@ -65,7 +64,17 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
         var filter = Builders<Invoice>.Filter.Eq(x => x.Id, id);
         return await Collection.Find(filter).AnyAsync(cancellationToken);
     }
+}
 
+    public Task<List<Invoice>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+    public async Task<List<Invoice>> GetInvoicesInDateRangeAsync(DateTime startDate, DateTime endDate)
+    {
+        return await Collection.Find(x => x.IssueDate >= startDate && x.IssueDate <= endDate).ToListAsync();
+    }
+}
     public Task<List<Invoice>> GetAllAsync(CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

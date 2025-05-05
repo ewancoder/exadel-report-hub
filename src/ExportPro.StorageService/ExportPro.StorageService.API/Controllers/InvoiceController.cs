@@ -5,7 +5,6 @@ using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
-using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -72,6 +71,13 @@ public class InvoiceController(IMediator mediator) : ControllerBase
 
         var response = await mediator.Send(query, cancellationToken);
         return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpGet("revenue")]
+    public async Task<IActionResult> GetTotalRevenue([FromQuery] GetTotalRevenueQuery query)
+    {
+        var result = await mediator.Send(query);
+        return StatusCode((int)result.ApiState, result);
     }
 
     [HttpGet("count")]
