@@ -21,9 +21,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
     ILogger<GenerateInvoicePdfQueryHandler> logger)
     : IRequestHandler<GenerateInvoicePdfQuery, PdfFileDto>
 {
-    public async Task<PdfFileDto> Handle(
-        GenerateInvoicePdfQuery request,
-        CancellationToken cancellationToken)
+    public async Task<PdfFileDto> Handle(GenerateInvoicePdfQuery request, CancellationToken cancellationToken)
     {
         if (request.InvoiceId == Guid.Empty)
             throw new ArgumentException("InvoiceId cannot be empty", nameof(request.InvoiceId));
@@ -53,21 +51,21 @@ public sealed class GenerateInvoicePdfQueryHandler(
         PdfInvoiceExportDto destInvoice,
         CancellationToken ct)
     {
-        if (srcInvoice.Items is null || destInvoice.Items.Count == 0)
+        if (srcInvoice.Items is null)
             return;
 
         var cache = new Dictionary<Guid, string>();
 
         for (int i = 0; i < srcInvoice.Items.Count; i++)
         {
-            Guid curId = srcInvoice.Items[i].CurrencyId;
+            var curId = srcInvoice.Items[i].CurrencyId;
             if (curId == Guid.Empty)
             {
                 destInvoice.Items[i].CurrencyCode = "—";
                 continue;
             }
 
-            if (!cache.TryGetValue(curId, out string code))
+            if (!cache.TryGetValue(curId, out var code))
             {
                 code = await GetCurrencyCodeAsync(curId, ct);
                 cache[curId] = code;

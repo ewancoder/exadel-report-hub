@@ -10,104 +10,79 @@ using Microsoft.Extensions.Logging;
 namespace ExportPro.Export.CQRS.Queries;
 
 public sealed record GenerateReportQuery(
-    ReportFormat Format,
-    ReportFilterDto Filters)
+        ReportFormat Format,
+        ReportFilterDto Filters)
     : IRequest<ReportFileDto>;
 
-/// <summary>Generates CSV/XLSX statistics reports.</summary>
 public sealed class GenerateReportQueryHandler(
-        IStorageServiceApi                storageApi,
-        IEnumerable<IReportGenerator>     generators,
+        IStorageServiceApi storageApi,
+        IEnumerable<IReportGenerator> generators,
         ILogger<GenerateReportQueryHandler> log)
     : IRequestHandler<GenerateReportQuery, ReportFileDto>
 {
     public async Task<ReportFileDto> Handle(
         GenerateReportQuery request,
-        CancellationToken   cancellationToken)
+        CancellationToken cancellationToken)
     {
         log.LogInformation("Statistics export start (format={Format})", request.Format);
 
+        // 1️⃣ fetch all invoices
         var allInvoices = await FetchInvoicesAsync(cancellationToken);
 
-        List<InvoiceDto> invoices =
-            request.Filters.ClientIds?.Any() == true
-                ? allInvoices.Where(i => i.ClientId.HasValue &&
-                                          request.Filters.ClientIds!.Contains(i.ClientId.Value))
-                             .ToList()
-            : request.Filters.ClientId is { } single && single != Guid.Empty
-                ? allInvoices.Where(i => i.ClientId == single).ToList()
-                : allInvoices;
+        // 2️⃣ filter by the single client (if provided)
+        var clientId = request.Filters.ClientId;
+        var invoices = (clientId.HasValue && clientId.Value != Guid.Empty)
+            ? allInvoices.Where(i => i.ClientId == clientId).ToList()
+            : allInvoices;
 
-        if (request.Filters.IssueDateFrom is DateTime d)
-            invoices = invoices.Where(i => i.IssueDate.Date >= d.Date).ToList();
+        // 3️⃣ fetch items and plans for that client
+        var (items, plans) = await FetchItemsAndPlansAsync(clientId, cancellationToken);
 
-        var (itemsByClient, plansByClient, namesByClient) =
-            await FetchPerClientDataAsync(request.Filters, cancellationToken);
+        // 4️⃣ look up the client name
+        string clientName = "—";
+        if (clientId.HasValue && clientId.Value != Guid.Empty)
+        {
+            var clientResp = await storageApi.GetClientByIdAsync(clientId.Value, cancellationToken);
+            clientName = clientResp.Data?.Name ?? "—";
+        }
 
+        // 5️⃣ build the report DTO, including the single client’s name
         var dto = new ReportContentDto
         {
-            Invoices       = invoices,
-            Items          = itemsByClient.Values.SelectMany(x => x).ToList(),
-            Plans          = plansByClient.Values.SelectMany(x => x).ToList(),
-            ItemsByClient  = itemsByClient,
-            PlansByClient  = plansByClient,
-            ClientNames    = namesByClient,
-            Filters        = request.Filters
+            Invoices   = invoices,
+            Items      = items,
+            Plans      = plans,
+            Filters    = request.Filters,
+            ClientName = clientName
         };
 
+        // 6️⃣ generate the file
         var file = CreateReportFile(dto, request.Format, generators);
+
         log.LogInformation("Statistics export done (bytes={Len})", file.Content.Length);
         return file;
     }
-    
-    private async Task<List<InvoiceDto>> FetchInvoicesAsync(CancellationToken ct)
+
+    private async Task<List<InvoiceDto>> FetchInvoicesAsync(CancellationToken cancellationToken)
+        => (await storageApi.GetInvoicesAsync(1, int.MaxValue, false, cancellationToken))
+               .Data?.Items ?? [];
+
+    private async Task<(List<ItemResponse>, List<PlansResponse>)>
+        FetchItemsAndPlansAsync(Guid? clientId, CancellationToken cancellationToken)
     {
-        var resp = await storageApi.GetInvoicesAsync(1, int.MaxValue, false, ct);
-        return resp.Data?.Items ?? [];
-    }
+        if (clientId == null || clientId == Guid.Empty)
+            return (new(), new());
 
-    private async Task<(Dictionary<Guid,List<ItemResponse>>,
-                        Dictionary<Guid,List<PlansResponse>>,
-                        Dictionary<Guid,string>)>
-            FetchPerClientDataAsync(ReportFilterDto f, CancellationToken ct)
-    {
-        var ids = f.ClientIds?.Any() == true
-            ? f.ClientIds!
-            : f.ClientId is { } single && single != Guid.Empty
-                ? [ single ]
-                : [];
+        var itemsTask = storageApi.GetItemsByClientAsync(clientId.Value, cancellationToken);
+        var plansTask = storageApi.GetPlansByClientAsync(clientId.Value, cancellationToken);
+        await Task.WhenAll(itemsTask, plansTask);
 
-        var itemsBy  = new Dictionary<Guid, List<ItemResponse>>();
-        var plansBy  = new Dictionary<Guid, List<PlansResponse>>();
-        var namesBy  = new Dictionary<Guid, string>();
-
-        var tasks = ids.Select(async id =>
-        {
-            var itemsTask  = storageApi.GetItemsByClientAsync(id, ct);
-            var plansTask  = storageApi.GetPlansByClientAsync(id, ct);
-            var nameTask   = storageApi.GetClientByIdAsync(id, ct);
-
-            await Task.WhenAll(itemsTask, plansTask, nameTask);
-
-            return (id,
-                    itemsTask.Result.Data ?? [],
-                    plansTask.Result.Data ?? [],
-                    nameTask.Result.Data?.Name ?? "—");
-        });
-
-        foreach (var t in await Task.WhenAll(tasks))
-        {
-            itemsBy[t.id] = t.Item2;
-            plansBy[t.id] = t.Item3;
-            namesBy[t.id] = t.Item4;
-        }
-
-        return (itemsBy, plansBy, namesBy);
+        return (itemsTask.Result.Data ?? new(), plansTask.Result.Data ?? new());
     }
 
     private static ReportFileDto CreateReportFile(
-        ReportContentDto              dto,
-        ReportFormat                  fmt,
+        ReportContentDto dto,
+        ReportFormat fmt,
         IEnumerable<IReportGenerator> generators)
     {
         var key       = fmt == ReportFormat.Csv ? "csv" : "xlsx";
