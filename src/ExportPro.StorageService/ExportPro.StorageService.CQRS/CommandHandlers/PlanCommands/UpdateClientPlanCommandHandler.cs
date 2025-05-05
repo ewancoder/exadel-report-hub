@@ -17,6 +17,9 @@ public sealed class UpdateClientPlanCommandHandler(IClientRepository clientRepos
         CancellationToken cancellationToken
     )
     {
+        var plansResponse = await clientRepository.GetPlan(request.PlanId.ToObjectId(), cancellationToken);
+        if (plansResponse == null)
+            return new NotFoundResponse<PlansResponse>("Plan Not Found");
         var plan = await clientRepository.UpdateClientPlan(
             request.PlanId.ToObjectId(),
             request.PlansDto,

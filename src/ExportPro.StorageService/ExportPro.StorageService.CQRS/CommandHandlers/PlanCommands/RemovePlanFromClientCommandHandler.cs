@@ -16,6 +16,9 @@ public sealed class RemovePlanFromClientCommandHandler(IClientRepository clientR
         CancellationToken cancellationToken
     )
     {
+        var plansResponse = await clientRepository.GetPlan(request.PlanId, cancellationToken);
+        if (plansResponse == null)
+            return new NotFoundResponse<PlansResponse>("Plan Not Found");
         var plan = await clientRepository.RemovePlanFromClient(request.PlanId, cancellationToken);
         return new SuccessResponse<PlansResponse>(plan, "Plan removed from the client");
     }

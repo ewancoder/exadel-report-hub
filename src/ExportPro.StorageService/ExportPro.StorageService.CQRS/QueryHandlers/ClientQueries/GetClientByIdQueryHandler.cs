@@ -23,12 +23,7 @@ public sealed class GetClientByIdQueryHandler(IClientRepository clientRepository
             cancellationToken
         );
         if (client == null)
-            return new BaseResponse<ClientResponse>()
-            {
-                ApiState = HttpStatusCode.NotFound,
-                Messages = ["Client Not Found"],
-                IsSuccess = false,
-            };
+            return new NotFoundResponse<ClientResponse>("Client Not Found");
         var clientResponse = mapper.Map<ClientResponse>(client);
         return new SuccessResponse<ClientResponse>(clientResponse, "Client Retrieved");
     }

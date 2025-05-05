@@ -16,6 +16,12 @@ public sealed class GetClientsPlansQueryHandler(IClientRepository clientReposito
         CancellationToken cancellationToken
     )
     {
+        var client = await clientRepository.GetOneAsync(
+            x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
+        if (client == null)
+            return new NotFoundResponse<List<PlansResponse>>("Client Not Found");
         var plans = await clientRepository.GetClientPlans(
             request.ClientId.ToObjectId(),
             request.Top,
