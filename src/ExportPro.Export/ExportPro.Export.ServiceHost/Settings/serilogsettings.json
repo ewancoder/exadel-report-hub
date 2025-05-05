@@ -1,0 +1,62 @@
+﻿{
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File", "Serilog.Sinks.Seq" ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Warning",
+        "Microsoft.AspNetCore.Hosting": "Information"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": {
+          "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+        }
+      },
+        {
+        "Name": "Logger",
+        "Args": {
+          "configureLogger": {
+            "Filter": [
+              {
+                "Name": "ByIncludingOnly",
+                "Args": {
+                  "expression": "StartsWith(SourceContext, 'ExportPro') and @l = 'Information'"
+                }
+              }
+            ],
+            
+            "WriteTo": [
+              {
+                "Name": "File",
+                "Args": {
+                  "path": "Logs/log-.txt",
+                  "rollingInterval": "Day",
+                  "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "Name": "Seq",
+        "Args": { "serverUrl": "http://exportproseq:5341" }
+      }
+    ],
+    "Enrich": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithExceptionDetails",
+      "WithThreadId",
+      "Elapsed"
+    ],
+    "Properties": {
+      "Application": "ExportPro.WebAPI"
+    },
+    "AllowedHosts": "*"
+  }
+}

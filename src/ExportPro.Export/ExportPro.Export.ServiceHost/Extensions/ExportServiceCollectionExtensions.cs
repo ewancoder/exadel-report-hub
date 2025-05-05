@@ -32,38 +32,39 @@ public static class ExportServiceCollectionExtensions
 
         // —— auth ——
         var jwt = cfg.GetSection("JwtSettings").Get<JwtSettings>();
-        services.AddAuthentication(o => o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(o =>
+        services
+            .AddAuthentication(o => o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(o =>
+            {
+                o.Authority = "https://localhost:7067/";
+                o.RequireHttpsMetadata = false;
+                o.TokenValidationParameters = new TokenValidationParameters
                 {
-                    o.Authority = "https://localhost:7067/";
-                    o.RequireHttpsMetadata = false;
-                    o.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwt?.Issuer,
-                        ValidAudience = jwt?.Audience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt?.Secret))
-                    };
-                });
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwt?.Issuer,
+                    ValidAudience = jwt?.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt?.Secret)),
+                };
+            });
 
-        // —— Mongo —— 
+        // —— Mongo ——
         services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
         services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 
-        // —— MediatR —— 
-        services.AddMediatR(o => o.RegisterServicesFromAssemblies(
-            typeof(GenerateInvoicePdfQuery).Assembly,
-            typeof(IPdfGenerator).Assembly));
+        // —— MediatR ——
+        services.AddMediatR(o =>
+            o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly)
+        );
 
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
-        // —— AutoMapper —— 
+        // —— AutoMapper ——
         services.AddAutoMapper(typeof(MappingProfile));
 
-        // —— PDF —— 
+        // —— PDF ——
         services.AddSingleton<IPdfGenerator, PdfGenerator>();
         QuestPDF.Settings.License = LicenseType.Community;
 
@@ -71,24 +72,27 @@ public static class ExportServiceCollectionExtensions
         services.AddSingleton<IReportGenerator, CsvReportGenerator>();
         services.AddSingleton<IReportGenerator, ExcelReportGenerator>();
 
-        // —— HttpContext / auth forwarding —— 
+        // —— HttpContext / auth forwarding ——
         services.AddHttpContextAccessor();
         services.AddTransient<ForwardAuthHeaderHandler>();
 
-        // —— Refit client to Storage-service —— 
+        // —— Refit client to Storage-service ——
         var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
-        services.AddRefitClient<IStorageServiceApi>(new RefitSettings
-        {
-            ContentSerializer = new NewtonsoftJsonContentSerializer(
-                new JsonSerializerSettings
+        services
+            .AddRefitClient<IStorageServiceApi>(
+                new RefitSettings
                 {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    DateTimeZoneHandling = DateTimeZoneHandling.Utc
+                    ContentSerializer = new NewtonsoftJsonContentSerializer(
+                        new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                        }
+                    ),
                 }
             )
-        })
-        .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
-        .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+            .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
 
         return services;
     }

@@ -63,6 +63,11 @@ services:
       - storageservice
       - mongodb
       - exportproseq
+    volumes:
+      - type: bind
+        # source: C:/.log_export_pro
+        source: /home/randoma/logs_exadel
+        target: '/app/Logs'
   exportproseq:
     image: datalust/seq:latest
     container_name: exportproseq
