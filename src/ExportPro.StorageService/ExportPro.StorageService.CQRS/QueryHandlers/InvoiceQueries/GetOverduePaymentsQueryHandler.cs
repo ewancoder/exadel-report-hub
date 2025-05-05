@@ -1,28 +1,33 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using System.ComponentModel.DataAnnotations;
+using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Services;
 using MongoDB.Bson;
-using System.ComponentModel.DataAnnotations;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
+public record GetOverduePaymentsQuery(Guid ClientId) : IQuery<OverduePaymentsResponse>;
 
-public record GetOverduePaymentsQuery(string ClientId): IQuery<OverduePaymentsResponse>;
-
-public sealed class GetOverduePaymentsQueryHandler(IInvoiceRepository invoiceRepository, 
+public sealed class GetOverduePaymentsQueryHandler(
+    IInvoiceRepository invoiceRepository,
     ICurrencyExchangeService currencyExchangeService,
-    ICurrencyRepository currencyRepository) : IQueryHandler<GetOverduePaymentsQuery, OverduePaymentsResponse>
+    ICurrencyRepository currencyRepository
+) : IQueryHandler<GetOverduePaymentsQuery, OverduePaymentsResponse>
 {
-    public async Task<BaseResponse<OverduePaymentsResponse>> Handle(GetOverduePaymentsQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<OverduePaymentsResponse>> Handle(
+        GetOverduePaymentsQuery request,
+        CancellationToken cancellationToken
+    )
     {
-        if (!ObjectId.TryParse(request.ClientId, out var clientObjectId))
-            return new BadRequestResponse<OverduePaymentsResponse>("Invalid client ID.");
-
-        var overdueInvoices = await invoiceRepository.GetOverdueInvoices(clientObjectId, cancellationToken);
+        var overdueInvoices = await invoiceRepository.GetOverdueInvoices(
+            request.ClientId.ToObjectId(),
+            cancellationToken
+        );
         if (overdueInvoices == null || overdueInvoices.Count == 0)
             return new BadRequestResponse<OverduePaymentsResponse>("No invoices issued in selected period.");
         double totalAmount = 0;
@@ -48,13 +53,19 @@ public sealed class GetOverduePaymentsQueryHandler(IInvoiceRepository invoiceRep
             };
             if (invoiceCurrency.CurrencyCode != "EUR")
             {
-                invoiceCurrencyExchangeRateToEuro = await currencyExchangeService.ExchangeRate(currencyExchangeModel, cancellationToken);
+                invoiceCurrencyExchangeRateToEuro = await currencyExchangeService.ExchangeRate(
+                    currencyExchangeModel,
+                    cancellationToken
+                );
             }
             double convertedAmount = 0;
 
             if (clientCurrency.CurrencyCode != "EUR")
             {
-                var clientCurrencyRate = await currencyExchangeService.ExchangeRate(new CurrencyExchangeModel { Date = invoice.IssueDate, From = clientCurrency.CurrencyCode}, cancellationToken);
+                var clientCurrencyRate = await currencyExchangeService.ExchangeRate(
+                    new CurrencyExchangeModel { Date = invoice.IssueDate, From = clientCurrency.CurrencyCode },
+                    cancellationToken
+                );
                 convertedAmount = (double)(invoice.Amount * clientCurrencyRate);
             }
             totalAmount += convertedAmount;
@@ -63,9 +74,8 @@ public sealed class GetOverduePaymentsQueryHandler(IInvoiceRepository invoiceRep
         var result = new OverduePaymentsResponse
         {
             OverdueInvoicesCount = overdueInvoices.Count,
-            TotalOverdueAmount = (double?)totalAmount
+            TotalOverdueAmount = (double?)totalAmount,
         };
         return new SuccessResponse<OverduePaymentsResponse>(result);
     }
 }
-
