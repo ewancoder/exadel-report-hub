@@ -21,7 +21,6 @@ public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper
         );
         if (invoice == null)
             return new NotFoundResponse<InvoiceDto>("Invoice not found.");
-
         var dto = new InvoiceDto
         {
             Id = invoice.Id.ToGuid(),
@@ -33,6 +32,7 @@ public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper
             PaymentStatus = invoice.PaymentStatus,
             BankAccountNumber = invoice.BankAccountNumber,
             ClientId = invoice.ClientId.ToGuid(),
+            ClientCurrencyId = invoice.ClientCurrencyId.ToGuid(),
             Amount = invoice.Amount,
             Items = invoice.Items?.Select(x => mapper.Map<ItemDtoForClient>(x)).ToList(),
         };

@@ -19,8 +19,6 @@ using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Host.UseSharedSerilogAndConfiguration();
-// Add services to the container.
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers(options =>
 {
@@ -51,7 +49,6 @@ builder
         };
     });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder
     .Services.AddRefitClient<IECBApi>(new RefitSettings { ContentSerializer = new XmlContentSerializer() })
     .ConfigureHttpClient(c =>

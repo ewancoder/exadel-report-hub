@@ -13,6 +13,7 @@ public sealed class InvoiceDto
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
     public Guid? ClientId { get; set; }
+    public Guid? ClientCurrencyId { get; set; }
     public Guid? CustomerId { get; set; }
     public List<ItemDtoForClient>? Items { get; set; }
 }
