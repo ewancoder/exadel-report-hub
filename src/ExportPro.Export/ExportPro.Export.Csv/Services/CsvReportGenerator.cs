@@ -12,6 +12,7 @@ public sealed class CsvReportGenerator : IReportGenerator
 {
     public string ContentType => "text/csv";
     public string Extension => "csv";
+    private static readonly string Separator = new string('#', 75);
 
     public byte[] Generate(ReportContentDto data)
     {
@@ -26,8 +27,8 @@ public sealed class CsvReportGenerator : IReportGenerator
 
     private static void GenerateReportMetaData(ReportContentDto data, StreamWriter writer)
     {
+        writer.WriteLine($"Client,{data.ClientName}");
         writer.WriteLine($"Generated at,{DateTime.UtcNow:u}");
-        writer.WriteLine($"Client,{data.ClientName},{data.Filters.ClientId}");
         writer.WriteLine();
     }
 
@@ -36,21 +37,18 @@ public sealed class CsvReportGenerator : IReportGenerator
         StreamWriter writer,
         CsvWriter csv)
     {
-        writer.WriteLine($"Client,{data.ClientName},{data.Filters.ClientId}");
+        writer.WriteLine(Separator);
         writer.WriteLine("Invoices");
 
         var rows = data.Invoices.Select(i => new
         {
-            i.Id,
             i.InvoiceNumber,
             IssueDate = i.IssueDate.ToString("yyyy-MM-dd"),
             DueDate = i.DueDate.ToString("yyyy-MM-dd"),
             i.Amount,
             i.CurrencyId,
             i.PaymentStatus,
-            i.BankAccountNumber,
-            i.ClientId,
-            i.CustomerId
+            i.BankAccountNumber
         });
 
         csv.WriteRecords(rows);
@@ -62,9 +60,25 @@ public sealed class CsvReportGenerator : IReportGenerator
         StreamWriter writer,
         CsvWriter csv)
     {
-        writer.WriteLine($"Client,{data.ClientName},{data.Filters.ClientId}");
+        writer.WriteLine(Separator);
         writer.WriteLine("Items");
-        csv.WriteRecords(data.Items);
+
+        var itemCsv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true,
+            NewLine = Environment.NewLine
+        });
+
+        itemCsv.WriteRecords(data.Items.Select(i => new
+        {
+            i.Name,
+            i.Description,
+            i.Price,
+            i.Status,
+            i.CurrencyId,
+            i.CreatedAt,
+            i.UpdatedAt
+        }));
         writer.WriteLine();
     }
 
@@ -73,9 +87,23 @@ public sealed class CsvReportGenerator : IReportGenerator
         StreamWriter writer,
         CsvWriter csv)
     {
-        writer.WriteLine($"Client,{data.ClientName},{data.Filters.ClientId}");
+        writer.WriteLine(Separator);
         writer.WriteLine("Plans");
-        csv.WriteRecords(data.Plans);
+
+        var planCsv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true,
+            NewLine = Environment.NewLine
+        });
+        
+        planCsv.WriteRecords(data.Plans.Select(p => new
+        {
+            p.StartDate,
+            p.EndDate,
+            p.Amount,
+            p.CreatedAt,
+            p.UpdatedAt
+        }));
         writer.WriteLine();
     }
 

@@ -32,50 +32,67 @@ public sealed class ExcelReportGenerator : IReportGenerator
         var info = wb.Worksheets.Add("ReportInfo");
         info.Cell("A1").Value = "GeneratedAt";
         info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
-        info.Cell("A2").Value = "ClientId";
-        info.Cell("B2").Value = data.Filters.ClientId?.ToString() ?? "—";
-        info.Cell("A2").Value = "Client";
-        info.Cell("B2").Value = $"{data.ClientName} ({data.Filters.ClientId})";
+        info.Cell("A2").Value = "Client:";
+        info.Cell("B2").Value = data.ClientName;
     }
 
     private static void GeneratePlansSheet(ReportContentDto data, XLWorkbook wb)
     {
         var ws = wb.Worksheets.Add("Plans");
-        ws.Cell(1, 1).Value = $"Client: {data.ClientName} ({data.Filters.ClientId})";
+        ws.Cell(1, 1).Value = $"Client: {data.ClientName}";
         ws.Cell(1, 1).Style.Font.SetBold();
-        ws.Cell(2, 1).InsertTable(data.Plans, "Plans", true);
+        ws.Cell(2, 1).InsertTable(
+            data.Plans.Select(p => new
+            {
+                p.StartDate,
+                p.EndDate,
+                p.Amount,
+                p.CreatedAt,
+                p.UpdatedAt
+            }),
+            "Plans",
+            true
+        );
     }
 
     private static void GenerateItemsSheet(ReportContentDto data, XLWorkbook wb)
     {
         var ws = wb.Worksheets.Add("Items");
-        ws.Cell(1, 1).Value = $"Client: {data.ClientName} ({data.Filters.ClientId})";
+        ws.Cell(1, 1).Value = $"Client: {data.ClientName}";
         ws.Cell(1, 1).Style.Font.SetBold();
-        ws.Cell(2, 1).InsertTable(data.Items, "Items", true);
+        ws.Cell(2, 1).InsertTable(
+            data.Items.Select(i => new
+            {
+                i.Name,
+                i.Description,
+                i.Price,
+                i.Status,
+                i.CurrencyId,
+                i.CreatedAt,
+                i.UpdatedAt
+            }),
+            "Items",
+            true
+        );
     }
 
     private static void GenerateInvoicesSheet(ReportContentDto data, XLWorkbook wb)
     {
         var ws = wb.Worksheets.Add("Invoices");
-        ws.Cell(1, 1).Value = $"Client: {data.ClientName} ({data.Filters.ClientId})";
+        ws.Cell(1, 1).Value = $"Client: {data.ClientName}";
         ws.Cell(1, 1).Style.Font.SetBold();
         ws.Cell(2, 1).InsertTable(ProjectInvoices(data.Invoices), "Invoices", true);
     }
 
     private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src)
-    {
-        return src.Select(i => new
+        => src.Select(i => new
         {
-            i.Id,
             i.InvoiceNumber,
             IssueDate = i.IssueDate.ToString("yyyy-MM-dd"),
             DueDate = i.DueDate.ToString("yyyy-MM-dd"),
             i.Amount,
             i.CurrencyId,
             i.PaymentStatus,
-            i.BankAccountNumber,
-            i.ClientId,
-            i.CustomerId
+            i.BankAccountNumber
         });
-    }
 }
