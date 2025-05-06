@@ -1,6 +1,7 @@
 ﻿using ExportPro.Export.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.Export.CQRS.Profile;
 
@@ -24,6 +25,14 @@ public class MappingProfile : AutoMapper.Profile
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
             .ForMember(d => d.CurrencyCode, o => o.Ignore());
+        
+        CreateMap<(List<InvoiceDto> Invoices, List<ItemResponse> Items, List<PlansResponse> Plans, 
+                ReportFilterDto Filters, string ClientName), ReportContentDto>()
+            .ForMember(dest => dest.Invoices, opt => opt.MapFrom(src => src.Invoices))
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items))
+            .ForMember(dest => dest.Plans, opt => opt.MapFrom(src => src.Plans))
+            .ForMember(dest => dest.Filters, opt => opt.MapFrom(src => src.Filters))
+            .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.ClientName));
     }
 }
 

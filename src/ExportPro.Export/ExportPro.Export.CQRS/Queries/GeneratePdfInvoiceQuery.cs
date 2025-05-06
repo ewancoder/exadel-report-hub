@@ -59,6 +59,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
         for (int i = 0; i < srcInvoice.Items.Count; i++)
         {
             var curId = srcInvoice.Items[i].CurrencyId;
+            
             if (curId == Guid.Empty)
             {
                 destInvoice.Items[i].CurrencyCode = "—";
@@ -96,7 +97,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
             return "—";
 
         var resp = await storageApi.GetClientByIdAsync(id.Value, ct);
-        return resp.Data?.Name ?? "—"; // fixed for BaseResponse<ClientResponse>
+        return resp.Data?.Name ?? "—";
     }
 
     private async Task<string> GetCustomerNameAsync(Guid? id, CancellationToken ct)

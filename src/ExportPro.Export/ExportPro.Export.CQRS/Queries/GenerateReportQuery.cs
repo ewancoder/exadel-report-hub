@@ -6,6 +6,8 @@ using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
+
 
 namespace ExportPro.Export.CQRS.Queries;
 
@@ -17,6 +19,7 @@ public sealed record GenerateReportQuery(
 public sealed class GenerateReportQueryHandler(
     IStorageServiceApi storageApi,
     IEnumerable<IReportGenerator> generators,
+    IMapper mapper,
     ILogger<GenerateReportQueryHandler> log)
     : IRequestHandler<GenerateReportQuery, ReportFileDto>
 {
@@ -53,15 +56,7 @@ public sealed class GenerateReportQueryHandler(
             clientName = clientResp.Data?.Name ?? "—";
         }
 
-        var dto = new ReportContentDto
-        {
-            Invoices = invoices,
-            Items = items,
-            Plans = plans,
-            Filters = request.Filters,
-            ClientName = clientName
-        };
-        return dto;
+        return mapper.Map<ReportContentDto>((invoices, items, plans, request.Filters, clientName));
     }
 
     private static List<InvoiceDto> FilterInvoicesByClientId(Guid clientId, List<InvoiceDto> allInvoices)
