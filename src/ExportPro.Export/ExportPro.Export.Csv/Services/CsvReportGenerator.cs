@@ -4,15 +4,14 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Interfaces;
-using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.Export.Csv.Services;
 
 public sealed class CsvReportGenerator : IReportGenerator
 {
+    private static readonly string Separator = new('#', 75);
     public string ContentType => "text/csv";
     public string Extension => "csv";
-    private static readonly string Separator = new string('#', 75);
 
     public byte[] Generate(ReportContentDto data)
     {
@@ -95,7 +94,7 @@ public sealed class CsvReportGenerator : IReportGenerator
             HasHeaderRecord = true,
             NewLine = Environment.NewLine
         });
-        
+
         planCsv.WriteRecords(data.Plans.Select(p => new
         {
             p.StartDate,

@@ -85,7 +85,8 @@ public sealed class ExcelReportGenerator : IReportGenerator
     }
 
     private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src)
-        => src.Select(i => new
+    {
+        return src.Select(i => new
         {
             i.InvoiceNumber,
             IssueDate = i.IssueDate.ToString("yyyy-MM-dd"),
@@ -95,4 +96,5 @@ public sealed class ExcelReportGenerator : IReportGenerator
             i.PaymentStatus,
             i.BankAccountNumber
         });
+    }
 }

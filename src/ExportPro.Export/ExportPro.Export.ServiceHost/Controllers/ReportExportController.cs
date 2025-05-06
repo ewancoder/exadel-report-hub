@@ -11,13 +11,12 @@ namespace ExportPro.Export.ServiceHost.Controllers;
 [ApiController]
 public sealed class ReportExportController(IMediator mediator) : ControllerBase
 {
-    /// <summary>
-    /// Export statistics of invoices, items and plans.
-    /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Statistics(
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<FileResult> Statistics(
         [Required, FromQuery] ReportFormat format,
-        [FromQuery] Guid? clientId = null,
+        [Required, FromQuery] Guid clientId,
         CancellationToken cancellationToken = default)
     {
         var filters = new ReportFilterDto { ClientId = clientId };

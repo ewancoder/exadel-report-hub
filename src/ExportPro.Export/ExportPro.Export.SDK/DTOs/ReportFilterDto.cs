@@ -2,5 +2,5 @@
 
 public sealed class ReportFilterDto
 {
-    public Guid? ClientId { get; set; }
+    public Guid ClientId { get; set; }
 }

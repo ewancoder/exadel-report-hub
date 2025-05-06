@@ -39,7 +39,7 @@ public sealed class GenerateReportQueryHandler(
 
     private async Task<ReportContentDto> RetrieveClientNameAsync(
         GenerateReportQuery request,
-        Guid? clientId,
+        Guid clientId,
         List<InvoiceDto> invoices,
         List<ItemResponse> items,
         List<PlansResponse> plans,
@@ -47,9 +47,9 @@ public sealed class GenerateReportQueryHandler(
     {
         string clientName = "—";
 
-        if (clientId.HasValue && clientId.Value != Guid.Empty)
+        if (clientId != Guid.Empty)
         {
-            var clientResp = await storageApi.GetClientByIdAsync(clientId.Value, cancellationToken);
+            var clientResp = await storageApi.GetClientByIdAsync(clientId, cancellationToken);
             clientName = clientResp.Data?.Name ?? "—";
         }
 
@@ -64,9 +64,9 @@ public sealed class GenerateReportQueryHandler(
         return dto;
     }
 
-    private static List<InvoiceDto> FilterInvoicesByClientId(Guid? clientId, List<InvoiceDto> allInvoices)
+    private static List<InvoiceDto> FilterInvoicesByClientId(Guid clientId, List<InvoiceDto> allInvoices)
     {
-        var invoices = (clientId.HasValue && clientId.Value != Guid.Empty)
+        var invoices = (clientId != Guid.Empty)
             ? allInvoices.Where(i => i.ClientId == clientId).ToList()
             : allInvoices;
         return invoices;
@@ -77,13 +77,13 @@ public sealed class GenerateReportQueryHandler(
             .Data?.Items ?? [];
 
     private async Task<(List<ItemResponse>, List<PlansResponse>)>
-        FetchItemsAndPlansAsync(Guid? clientId, CancellationToken cancellationToken)
+        FetchItemsAndPlansAsync(Guid clientId, CancellationToken cancellationToken)
     {
-        if (clientId == null || clientId == Guid.Empty)
+        if (clientId == Guid.Empty)
             return (new(), new());
 
-        var itemsTask = storageApi.GetItemsByClientAsync(clientId.Value, cancellationToken);
-        var plansTask = storageApi.GetPlansByClientAsync(clientId.Value, cancellationToken);
+        var itemsTask = storageApi.GetItemsByClientAsync(clientId, cancellationToken);
+        var plansTask = storageApi.GetPlansByClientAsync(clientId, cancellationToken);
         await Task.WhenAll(itemsTask, plansTask);
 
         return (itemsTask.Result.Data ?? new(), plansTask.Result.Data ?? new());
