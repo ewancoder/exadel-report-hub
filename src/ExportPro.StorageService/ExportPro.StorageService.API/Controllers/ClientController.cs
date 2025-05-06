@@ -28,8 +28,8 @@ public class ClientController(IMediator mediator) : ControllerBase
     [SwaggerOperation(Summary = "Creating a client")]
     [ProducesResponseType(typeof(NotFoundResponse<ClientResponse>), 404)]
     [HasPermission(Resource.Clients, CrudAction.Create)]
-    public Task<BaseResponse<ClientResponse>> CreateClient([FromBody] CreateClientCommand clientCommand) =>
-        mediator.Send(clientCommand);
+    public Task<BaseResponse<ClientResponse>> CreateClient([FromBody] ClientDto clientDto) =>
+        mediator.Send(new CreateClientCommand(clientDto));
 
     [HttpGet]
     [SwaggerOperation(Summary = "Getting  clients")]

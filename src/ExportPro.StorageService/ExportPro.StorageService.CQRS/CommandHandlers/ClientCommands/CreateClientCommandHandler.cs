@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 
-public sealed record CreateClientCommand(string Name, string? Description) : ICommand<ClientResponse>;
+public sealed record CreateClientCommand(ClientDto ClientDto) : ICommand<ClientResponse>;
 
 public sealed class CreateClientCommandHandler(
     IClientRepository clientRepository,
@@ -23,7 +23,7 @@ public sealed class CreateClientCommandHandler(
         CancellationToken cancellationToken
     )
     {
-        ClientDto clientDto = new() { Name = request.Name, Description = request.Description };
+        ClientDto clientDto = new() { Name = request.ClientDto.Name, Description = request.ClientDto.Description };
         var userName = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
         var client = mapper.Map<Client>(clientDto);
         client.CreatedBy = userName;
