@@ -20,9 +20,9 @@ public class CustomerController(IMediator mediator) : ControllerBase
     [HttpPost]
     [HasPermission(Resource.Customers, CrudAction.Create)]
     public Task<BaseResponse<CustomerResponse>> Create(
-        [FromBody] CreateCustomerCommand command,
+        [FromBody] CreateUpdateCustomerDto CustomerDto,
         CancellationToken cancellationToken
-    ) => mediator.Send(command, cancellationToken);
+    ) => mediator.Send(new CreateCustomerCommand(CustomerDto), cancellationToken);
 
     [HttpPut("{id}")]
     [HasPermission(Resource.Customers, CrudAction.Update)]
@@ -48,5 +48,5 @@ public class CustomerController(IMediator mediator) : ControllerBase
         CancellationToken cancellationToken,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10
-    ) => mediator.Send(new GetPaginatedCustomersQuery(pageNumber, pageSize));
+    ) => mediator.Send(new GetPaginatedCustomersQuery(pageNumber, pageSize), cancellationToken);
 }

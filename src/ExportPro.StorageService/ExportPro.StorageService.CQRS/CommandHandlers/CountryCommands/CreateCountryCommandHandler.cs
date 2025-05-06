@@ -9,12 +9,7 @@ using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
-public sealed class CreateCountryCommand : ICommand<CountryDto>
-{
-    public required string Name { get; set; }
-    public string? Code { get; set; }
-    public required Guid CurrencyId { get; set; }
-}
+public sealed record CreateCountryCommand(CreateCountryDto CountryDto) : ICommand<CountryDto>;
 
 public sealed class CreateCountryCommandHandler(ICountryRepository repository, IMapper mapper)
     : ICommandHandler<CreateCountryCommand, CountryDto>
@@ -26,16 +21,11 @@ public sealed class CreateCountryCommandHandler(ICountryRepository repository, I
     {
         var country = new Country
         {
-            Name = request.Name,
-            Code = request.Code,
-            CurrencyId = request.CurrencyId.ToObjectId(),
+            Name = request.CountryDto.Name,
+            Code = request.CountryDto.Code,
+            CurrencyId = request.CountryDto.CurrencyId.ToObjectId(),
         };
         await repository.AddOneAsync(country, cancellationToken);
-        return new BaseResponse<CountryDto>
-        {
-            IsSuccess = true,
-            ApiState = HttpStatusCode.Created,
-            Data = mapper.Map<CountryDto>(country),
-        };
+        return new SuccessResponse<CountryDto>(mapper.Map<CountryDto>(country));
     }
 }

@@ -9,27 +9,27 @@ public sealed class CreateCustomerCommandValidator : AbstractValidator<CreateCus
 {
     public CreateCustomerCommandValidator(ICountryRepository countryRepository)
     {
-        RuleFor(x => x.Name)
+        RuleFor(x => x.CustomerDto.Name)
             .NotEmpty()
             .WithMessage("Name is required.")
             .MaximumLength(100)
             .WithMessage("Name must not exceed 100 characters.");
-        RuleFor(x => x.Email)
+        RuleFor(x => x.CustomerDto.Email)
             .NotEmpty()
             .WithMessage("Email is required.")
             .EmailAddress()
             .WithMessage("Invalid email format.");
-        RuleFor(x => x.CountryId)
+        RuleFor(x => x.CustomerDto.CountryId)
             .NotEmpty()
             .WithMessage("The country id is required")
             .DependentRules(() =>
             {
-                RuleFor(x => x.CountryId)
+                RuleFor(x => x.CustomerDto.CountryId)
                     .MustAsync(
                         async (countryId, cancellation) =>
                         {
                             var country = await countryRepository.GetOneAsync(
-                                x => x.Id == countryId.ToObjectId(),
+                                x => x.Id == countryId.ToObjectId() && !x.IsDeleted,
                                 cancellation
                             );
                             if (country == null)

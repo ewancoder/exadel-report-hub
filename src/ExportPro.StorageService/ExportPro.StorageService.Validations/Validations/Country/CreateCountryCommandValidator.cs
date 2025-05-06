@@ -9,13 +9,13 @@ public sealed class CreateCountryCommandValidator : AbstractValidator<CreateCoun
 {
     public CreateCountryCommandValidator(ICurrencyRepository currencyRepository)
     {
-        RuleFor(x => x.Name).NotEmpty().WithMessage("The Country name is required");
-        RuleFor(x => x.CurrencyId)
+        RuleFor(x => x.CountryDto.Name).NotEmpty().WithMessage("The Country name is required");
+        RuleFor(x => x.CountryDto.CurrencyId)
             .NotEmpty()
             .WithMessage("The Currency Id is required")
             .DependentRules(
                 () =>
-                    RuleFor(x => x.CurrencyId)
+                    RuleFor(x => x.CountryDto.CurrencyId)
                         .MustAsync(
                             async (currency, CancellationToken_) =>
                             {

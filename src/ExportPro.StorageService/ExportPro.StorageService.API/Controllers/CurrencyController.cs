@@ -13,16 +13,16 @@ public class CurrencyController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     public Task<BaseResponse<CurrencyResponse>> Create(
-        [FromBody] CreateCurrencyCommand command,
+        [FromBody] string currencyCode,
         CancellationToken cancellationToken
-    ) => mediator.Send(command, cancellationToken);
+    ) => mediator.Send(new CreateCurrencyCommand(currencyCode), cancellationToken);
 
     [HttpPut("{id}")]
     public Task<BaseResponse<CurrencyResponse>> Update(
         [FromRoute] Guid id,
-        [FromBody] string CurrencyCode,
+        [FromBody] string currencyCode,
         CancellationToken cancellationToken
-    ) => mediator.Send(new UpdateCurrencyCommand(id, CurrencyCode));
+    ) => mediator.Send(new UpdateCurrencyCommand(id, currencyCode));
 
     [HttpDelete("{id}")]
     public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken) =>
