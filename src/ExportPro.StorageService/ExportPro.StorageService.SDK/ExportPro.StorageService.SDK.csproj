@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj"/>
+        <ProjectReference Include="..\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -17,11 +17,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.8"/>
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0-preview1"/>
-        <PackageReference Include="Refit" Version="8.0.0"/>
+        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.8" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0-preview1" />
+        <PackageReference Include="Refit" Version="8.0.0" />
 
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
     </ItemGroup>
 
 </Project>

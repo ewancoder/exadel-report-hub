@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ExportPro.Export\ExportPro.Export.Csv\ExportPro.Export.Csv.csproj" />
     <ProjectReference Include="..\ExportPro.StorageService\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj" />
   </ItemGroup>
 

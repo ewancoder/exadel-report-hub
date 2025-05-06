@@ -12,17 +12,11 @@ public sealed class ReportPreference : IModel
     
     public required ObjectId ClientId { get; set; }
 
-    public ReportFormat Format { get; set; } = ReportFormat.Csv;
+    public ReportFormat ReportFormat { get; set; } = ReportFormat.Csv;
+    
+    public required string CronExpression { get; set; }
 
-    public ReportFrequency Frequency { get; set; } = ReportFrequency.Weekly;
-
-    public DayOfWeek? DayOfWeek { get; set; } // For weekly schedule (e.g., Monday)
-
-    public int? DayOfMonth { get; set; } // For monthly schedule (e.g., 1st, 15th)
-
-    public TimeOnly SendTime { get; set; } // Time to send (e.g., 08:00 AM)
-
-    public bool SendToClient { get; set; } // Whether to send to client's email
+    public bool IsDelivered { get; set; }
 
     public bool IsEnabled { get; set; } = true;
 

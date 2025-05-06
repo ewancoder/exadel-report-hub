@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
+using ExportPro.Export.Job.ServiceHost.DTOs;
+using ExportPro.Export.Job.ServiceHost.Helpers;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
@@ -11,10 +13,7 @@ namespace ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
 public sealed record UpdateReportPreferenceCommand(
     Guid Id,
     ReportFormat ReportFormat,
-    ReportFrequency Frequency,
-    DayOfWeek? DayOfWeek,
-    int? DayOfMonth,
-    TimeOnly SendTime,
+    ReportScheduleDto Schedule,
     bool IsEnabled
 ) : IRequest<BaseResponse<ReportPreferenceResponse>>;
 
@@ -29,13 +28,28 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
         var preference = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
 
         if (preference is null)
-            return new NotFoundResponse<ReportPreferenceResponse> { Messages = ["Report preference not found."] };
+        {
+            return new NotFoundResponse<ReportPreferenceResponse>
+            {
+                Messages = ["Report preference not found."]
+            };
+        }
 
-        preference.Format = request.ReportFormat;
-        preference.Frequency = request.Frequency;
-        preference.DayOfWeek = request.DayOfWeek;
-        preference.DayOfMonth = request.DayOfMonth;
-        preference.SendTime = request.SendTime;
+        string cronExpression;
+        try
+        {
+            cronExpression = CronHelper.ToCron(request.Schedule);
+        }
+        catch (Exception ex)
+        {
+            return new BaseResponse<ReportPreferenceResponse>
+            {
+                Messages = [$"Failed to generate cron expression: {ex.Message}"]
+            };
+        }
+
+        preference.ReportFormat = request.ReportFormat;
+        preference.CronExpression = cronExpression;
         preference.IsEnabled = request.IsEnabled;
         preference.UpdatedAt = DateTime.UtcNow;
 
