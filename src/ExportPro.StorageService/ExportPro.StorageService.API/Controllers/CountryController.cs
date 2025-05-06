@@ -14,9 +14,9 @@ public class CountryController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     public Task<BaseResponse<CountryDto>> Create(
-        [FromBody] CreateCountryCommand command,
+        [FromBody] CreateCountryDto country,
         CancellationToken cancellationToken
-    ) => mediator.Send(command, cancellationToken);
+    ) => mediator.Send(new CreateCountryCommand(country), cancellationToken);
 
     [HttpPut("{id}")]
     public Task<BaseResponse<bool>> Update(

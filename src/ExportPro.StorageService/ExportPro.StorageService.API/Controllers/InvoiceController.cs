@@ -3,7 +3,6 @@ using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
@@ -19,21 +18,16 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     [HttpPost]
     [HasPermission(Resource.Invoices, CrudAction.Create)]
     public Task<BaseResponse<InvoiceResponse>> Create(
-        [FromBody] CreateInvoiceCommand command,
+        [FromBody] CreateInvoiceDto invoice,
         CancellationToken cancellationToken
-    ) => mediator.Send(command, cancellationToken);
+    ) => mediator.Send(new CreateInvoiceCommand(invoice), cancellationToken);
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(
+    public Task<BaseResponse<InvoiceResponse>> Update(
         [FromRoute] Guid id,
-        [FromBody] UpdateInvoiceCommand command,
+        [FromBody] CreateInvoiceDto invoice,
         CancellationToken cancellationToken
-    )
-    {
-        command.Id = id;
-        var response = await mediator.Send(command, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
-    }
+    ) => mediator.Send(new UpdateInvoiceCommand(id, invoice), cancellationToken);
 
     [HttpDelete("{id}")]
     public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken) =>

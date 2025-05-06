@@ -1,5 +1,4 @@
 ﻿using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
@@ -20,10 +19,10 @@ public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClien
             {
                 RuleFor(x => x.Client.Name)
                     .MustAsync(
-                        async (Name, cancellationToken) =>
+                        async (name, cancellationToken) =>
                         {
                             var client = await clientRepository.GetOneAsync(
-                                x => x.Name == Name && !x.IsDeleted,
+                                x => x.Name == name && !x.IsDeleted,
                                 cancellationToken
                             );
                             return client == null;

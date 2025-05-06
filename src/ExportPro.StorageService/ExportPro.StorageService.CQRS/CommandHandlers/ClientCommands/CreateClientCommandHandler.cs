@@ -23,9 +23,8 @@ public sealed class CreateClientCommandHandler(
         CancellationToken cancellationToken
     )
     {
-        ClientDto clientDto = new() { Name = request.ClientDto.Name, Description = request.ClientDto.Description };
         var userName = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
-        var client = mapper.Map<Client>(clientDto);
+        var client = mapper.Map<Client>(request.ClientDto);
         client.CreatedBy = userName;
         await clientRepository.AddOneAsync(client, cancellationToken);
         var clientResponse = mapper.Map<ClientResponse>(client);

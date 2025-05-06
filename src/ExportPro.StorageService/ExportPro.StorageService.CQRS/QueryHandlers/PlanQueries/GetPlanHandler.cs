@@ -15,6 +15,6 @@ public sealed class GetPlanQueryHandler(IClientRepository clientRepository) : IQ
         var plan = await clientRepository.GetPlan(request.PlanId.ToObjectId(), cancellationToken);
         if (plan == null)
             return new NotFoundResponse<PlansResponse>("Plan Not Found");
-        return new SuccessResponse<PlansResponse>(plan!, "Plan retrieved successfully");
+        return new SuccessResponse<PlansResponse>(plan, "Plan retrieved successfully");
     }
 }

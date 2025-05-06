@@ -4,7 +4,6 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
@@ -20,9 +19,9 @@ public class CustomerController(IMediator mediator) : ControllerBase
     [HttpPost]
     [HasPermission(Resource.Customers, CrudAction.Create)]
     public Task<BaseResponse<CustomerResponse>> Create(
-        [FromBody] CreateCustomerCommand command,
+        [FromBody] CreateUpdateCustomerDto customerDto,
         CancellationToken cancellationToken
-    ) => mediator.Send(command, cancellationToken);
+    ) => mediator.Send(new CreateCustomerCommand(customerDto), cancellationToken);
 
     [HttpPut("{id}")]
     [HasPermission(Resource.Customers, CrudAction.Update)]
@@ -48,5 +47,5 @@ public class CustomerController(IMediator mediator) : ControllerBase
         CancellationToken cancellationToken,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10
-    ) => mediator.Send(new GetPaginatedCustomersQuery(pageNumber, pageSize));
+    ) => mediator.Send(new GetPaginatedCustomersQuery(pageNumber, pageSize), cancellationToken);
 }
