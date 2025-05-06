@@ -1,4 +1,3 @@
-using System.Net;
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;

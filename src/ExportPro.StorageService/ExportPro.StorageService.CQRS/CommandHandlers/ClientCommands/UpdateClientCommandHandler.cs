@@ -29,7 +29,7 @@ public sealed class UpdateClientCommandHandler(
         );
         if (client == null)
             return new NotFoundResponse<ClientResponse>("Client Not Found");
-        client!.Name = request.Client.Name;
+        client.Name = request.Client.Name;
         if (request.Client.Description != null)
             client.Description = request.Client.Description;
         client.UpdatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;

@@ -19,10 +19,10 @@ public sealed class CreateClientCommandValidator : AbstractValidator<CreateClien
             {
                 RuleFor(x => x.ClientDto.Name)
                     .MustAsync(
-                        async (Name, cancellationtoken) =>
+                        async (name, cancellationtoken) =>
                         {
                             var client = await clientRepository.GetOneAsync(
-                                x => x.Name == Name && !x.IsDeleted,
+                                x => x.Name == name && !x.IsDeleted,
                                 cancellationtoken
                             );
                             return client == null;

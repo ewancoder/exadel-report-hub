@@ -17,11 +17,11 @@ public sealed class CreateCountryCommandValidator : AbstractValidator<CreateCoun
                 () =>
                     RuleFor(x => x.CountryDto.CurrencyId)
                         .MustAsync(
-                            async (currency, CancellationToken_) =>
+                            async (currency, cancellationToken) =>
                             {
                                 var client = await currencyRepository.GetOneAsync(
                                     x => x.Id == currency.ToObjectId() && !x.IsDeleted,
-                                    CancellationToken_
+                                    cancellationToken
                                 );
                                 return client != null;
                             }

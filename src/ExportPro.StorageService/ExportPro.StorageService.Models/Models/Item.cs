@@ -13,6 +13,7 @@ public sealed class Item : IModel
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId? CustomerId { get; set; }
+
     public Status? Status { get; set; }
     public ObjectId CurrencyId { get; set; }
     public bool IsDeleted { get; set; } = false;

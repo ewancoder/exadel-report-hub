@@ -10,8 +10,6 @@ public class ApiResponseStatusCodeFilter : IAsyncActionFilter
     {
         var executedContext = await next();
         if (executedContext.Result is ObjectResult objectResult && objectResult.Value is BaseResponse baseResponse)
-        {
             executedContext.HttpContext.Response.StatusCode = (int)baseResponse.ApiState;
-        }
     }
 }

@@ -6,7 +6,6 @@ namespace ExportPro.StorageService.Models.Models;
 
 public sealed class Customer : IModel
 {
-    public ObjectId Id { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
 
@@ -16,4 +15,5 @@ public sealed class Customer : IModel
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
+    public ObjectId Id { get; set; }
 }
