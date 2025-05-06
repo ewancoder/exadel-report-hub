@@ -1,5 +1,5 @@
-﻿using ExportPro.Export.SDK.DTOs;
-using ExportPro.Export.Pdf.Interfaces;
+﻿using ExportPro.Export.Pdf.Interfaces;
+using ExportPro.Export.SDK.DTOs;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -40,15 +40,17 @@ public sealed class PdfGenerator : IPdfGenerator
             {
                 table.ColumnsDefinition(c =>
                 {
-                    for (int i = 0; i < 9; i++) c.RelativeColumn();
+                    for (var i = 0; i < 9; i++) c.RelativeColumn();
                 });
 
-                static IContainer Cell(IContainer c) =>
-                    c.Border(1)
+                static IContainer Cell(IContainer c)
+                {
+                    return c.Border(1)
                         .BorderColor("#DDD")
                         .Padding(4)
                         .AlignMiddle()
                         .AlignLeft();
+                }
 
                 string[] headers =
                 [
@@ -57,12 +59,9 @@ public sealed class PdfGenerator : IPdfGenerator
                     "Payment Status", "Client", "Bank Acc. #", "Amount"
                 ];
 
-                foreach (var h in headers)
-                {
-                    table.Cell().Element(Cell).Text(h).Bold();
-                }
+                foreach (var h in headers) table.Cell().Element(Cell).Text(h).Bold();
 
-                string itemList = string.Join("\n",
+                var itemList = string.Join("\n",
                     invoice.Items.Select(i => $"{i.Name} — {i.Price:N2} {i.CurrencyCode}"));
 
                 string[] row =
@@ -78,10 +77,7 @@ public sealed class PdfGenerator : IPdfGenerator
                     $"{invoice.Amount:N2} {invoice.CurrencyCode}"
                 ];
 
-                foreach (var cell in row)
-                {
-                    table.Cell().Element(Cell).Text(cell).FontSize(8);
-                }
+                foreach (var cell in row) table.Cell().Element(Cell).Text(cell).FontSize(8);
             });
     }
 

@@ -15,8 +15,8 @@ public sealed class ReportExportController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<FileResult> Statistics(
-        [Required, FromQuery] ReportFormat format,
-        [Required, FromQuery] Guid clientId,
+        [Required] [FromQuery] ReportFormat format,
+        [Required] [FromQuery] Guid clientId,
         CancellationToken cancellationToken = default)
     {
         var filters = new ReportFilterDto { ClientId = clientId };

@@ -16,6 +16,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using QuestPDF;
 using QuestPDF.Infrastructure;
 using Refit;
 
@@ -33,21 +34,21 @@ public static class ExportServiceCollectionExtensions
         // —— auth ——
         var jwt = cfg.GetSection("JwtSettings").Get<JwtSettings>();
         services.AddAuthentication(o => o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(o =>
+            .AddJwtBearer(o =>
+            {
+                o.Authority = "https://localhost:7067/";
+                o.RequireHttpsMetadata = false;
+                o.TokenValidationParameters = new TokenValidationParameters
                 {
-                    o.Authority = "https://localhost:7067/";
-                    o.RequireHttpsMetadata = false;
-                    o.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwt?.Issuer,
-                        ValidAudience = jwt?.Audience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt?.Secret))
-                    };
-                });
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwt?.Issuer,
+                    ValidAudience = jwt?.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt?.Secret))
+                };
+            });
 
         // —— Mongo —— 
         services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
@@ -65,7 +66,7 @@ public static class ExportServiceCollectionExtensions
 
         // —— PDF —— 
         services.AddSingleton<IPdfGenerator, PdfGenerator>();
-        QuestPDF.Settings.License = LicenseType.Community;
+        Settings.License = LicenseType.Community;
 
         // —— CSV / XLSX generators ——
         services.AddSingleton<IReportGenerator, CsvReportGenerator>();
@@ -78,17 +79,17 @@ public static class ExportServiceCollectionExtensions
         // —— Refit client to Storage-service —— 
         var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
         services.AddRefitClient<IStorageServiceApi>(new RefitSettings
-        {
-            ContentSerializer = new NewtonsoftJsonContentSerializer(
-                new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    DateTimeZoneHandling = DateTimeZoneHandling.Utc
-                }
-            )
-        })
-        .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
-        .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
+            {
+                ContentSerializer = new NewtonsoftJsonContentSerializer(
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        DateTimeZoneHandling = DateTimeZoneHandling.Utc
+                    }
+                )
+            })
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+            .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
 
         return services;
     }

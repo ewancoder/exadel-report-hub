@@ -1,4 +1,5 @@
-﻿using ExportPro.Export.SDK.DTOs;
+﻿using AutoMapper;
+using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Enums;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.SDK.Utilities;
@@ -6,8 +7,6 @@ using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
-
 
 namespace ExportPro.Export.CQRS.Queries;
 
@@ -28,16 +27,22 @@ public sealed class GenerateReportQueryHandler(
         CancellationToken cancellationToken)
     {
         log.LogInformation("Statistics export start (format={Format})", request.Format);
+        var reportFile = await GenerateReportFileAsync(request, cancellationToken);
+        log.LogInformation("Statistics export done (bytes={Len})", reportFile.Content.Length);
+        return reportFile;
+    }
 
+    private async Task<ReportFileDto> GenerateReportFileAsync(GenerateReportQuery request,
+        CancellationToken cancellationToken)
+    {
         var allInvoices = await FetchInvoicesAsync(cancellationToken);
         var clientId = request.Filters.ClientId;
         var invoices = FilterInvoicesByClientId(clientId, allInvoices);
         var (items, plans) = await FetchItemsAndPlansAsync(clientId, cancellationToken);
-        var dto = await RetrieveClientNameAsync(request, clientId, invoices, items, plans, cancellationToken);
-        var file = CreateReportFile(dto, request.Format, generators);
-
-        log.LogInformation("Statistics export done (bytes={Len})", file.Content.Length);
-        return file;
+        var reportContentDto =
+            await RetrieveClientNameAsync(request, clientId, invoices, items, plans, cancellationToken);
+        var reportFileDto = CreateReportFileDto(reportContentDto, request.Format, generators);
+        return reportFileDto;
     }
 
     private async Task<ReportContentDto> RetrieveClientNameAsync(
@@ -48,7 +53,7 @@ public sealed class GenerateReportQueryHandler(
         List<PlansResponse> plans,
         CancellationToken cancellationToken)
     {
-        string clientName = "—";
+        var clientName = "—";
 
         if (clientId != Guid.Empty)
         {
@@ -61,30 +66,32 @@ public sealed class GenerateReportQueryHandler(
 
     private static List<InvoiceDto> FilterInvoicesByClientId(Guid clientId, List<InvoiceDto> allInvoices)
     {
-        var invoices = (clientId != Guid.Empty)
+        var invoices = clientId != Guid.Empty
             ? allInvoices.Where(i => i.ClientId == clientId).ToList()
             : allInvoices;
         return invoices;
     }
 
     private async Task<List<InvoiceDto>> FetchInvoicesAsync(CancellationToken cancellationToken)
-        => (await storageApi.GetInvoicesAsync(1, int.MaxValue, false, cancellationToken))
+    {
+        return (await storageApi.GetInvoicesAsync(1, int.MaxValue, false, cancellationToken))
             .Data?.Items ?? [];
+    }
 
     private async Task<(List<ItemResponse>, List<PlansResponse>)>
         FetchItemsAndPlansAsync(Guid clientId, CancellationToken cancellationToken)
     {
         if (clientId == Guid.Empty)
-            return (new(), new());
+            return (new List<ItemResponse>(), new List<PlansResponse>());
 
         var itemsTask = storageApi.GetItemsByClientAsync(clientId, cancellationToken);
         var plansTask = storageApi.GetPlansByClientAsync(clientId, cancellationToken);
         await Task.WhenAll(itemsTask, plansTask);
 
-        return (itemsTask.Result.Data ?? new(), plansTask.Result.Data ?? new());
+        return (itemsTask.Result.Data ?? new List<ItemResponse>(), plansTask.Result.Data ?? new List<PlansResponse>());
     }
 
-    private static ReportFileDto CreateReportFile(
+    private static ReportFileDto CreateReportFileDto(
         ReportContentDto dto,
         ReportFormat fmt,
         IEnumerable<IReportGenerator> generators)

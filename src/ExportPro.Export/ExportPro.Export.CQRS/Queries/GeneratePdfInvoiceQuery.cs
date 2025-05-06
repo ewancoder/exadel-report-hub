@@ -32,17 +32,24 @@ public sealed class GenerateInvoicePdfQueryHandler(
         logger.LogInformation("GenerateInvoicePdf START: user {UserId}, invoice {InvoiceId}, ts {Ts}",
             userId, request.InvoiceId, DateTime.UtcNow);
 
-        var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
-        string currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
-        string client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
-        string customer = await GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
-        var invoice = MapToPdfInvoiceExportDto(invoiceDto, currency, client, customer);
-        await PopulateItemCurrencyCodesAsync(invoiceDto, invoice, cancellationToken);
-        var result = GeneratePdfFile(invoice);
+        var result = await CreateInvoicePdfAsync(request, cancellationToken);
 
         logger.LogInformation("GenerateInvoicePdf DONE: user {UserId}, invoice {InvoiceId}, ts {Ts}",
             userId, request.InvoiceId, DateTime.UtcNow);
 
+        return result;
+    }
+
+    private async Task<PdfFileDto> CreateInvoicePdfAsync(GenerateInvoicePdfQuery request,
+        CancellationToken cancellationToken)
+    {
+        var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
+        var currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
+        var client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
+        var customer = await GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
+        var invoice = MapToPdfInvoiceExportDto(invoiceDto, currency, client, customer);
+        await PopulateItemCurrencyCodesAsync(invoiceDto, invoice, cancellationToken);
+        var result = GeneratePdfFileDto(invoice);
         return result;
     }
 
@@ -56,10 +63,10 @@ public sealed class GenerateInvoicePdfQueryHandler(
 
         var cache = new Dictionary<Guid, string>();
 
-        for (int i = 0; i < srcInvoice.Items.Count; i++)
+        for (var i = 0; i < srcInvoice.Items.Count; i++)
         {
             var curId = srcInvoice.Items[i].CurrencyId;
-            
+
             if (curId == Guid.Empty)
             {
                 destInvoice.Items[i].CurrencyCode = "—";
@@ -119,10 +126,10 @@ public sealed class GenerateInvoicePdfQueryHandler(
         return dest;
     }
 
-    private PdfFileDto GeneratePdfFile(PdfInvoiceExportDto invoice)
+    private PdfFileDto GeneratePdfFileDto(PdfInvoiceExportDto invoice)
     {
-        byte[] bytes = pdfGenerator.GeneratePdfDocument(invoice);
-        string name = FileNameTemplates.InvoicePdfFileName(invoice.InvoiceNumber);
+        var bytes = pdfGenerator.GeneratePdfDocument(invoice);
+        var name = FileNameTemplates.InvoicePdfFileName(invoice.InvoiceNumber);
         return new PdfFileDto(name, bytes);
     }
 }
