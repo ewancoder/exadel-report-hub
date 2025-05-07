@@ -1,5 +1,5 @@
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
