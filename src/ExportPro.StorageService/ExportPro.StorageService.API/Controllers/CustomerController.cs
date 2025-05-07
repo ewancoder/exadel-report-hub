@@ -53,7 +53,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
     [HasPermission(Resource.Customers, CrudAction.Create)]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ImportCustomers(
-        IFormFile file,                              // no attribute needed
+        IFormFile file,
         CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new ImportCustomersCommand(file), cancellationToken);
