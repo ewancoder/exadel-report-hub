@@ -25,6 +25,7 @@ public class ClientController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     [SwaggerOperation(Summary = "Creating a client")]
+    [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     [ProducesResponseType(typeof(NotFoundResponse<ClientResponse>), 404)]
     [HasPermission(Resource.Clients, CrudAction.Create)]
     public Task<BaseResponse<ClientResponse>> CreateClient(
