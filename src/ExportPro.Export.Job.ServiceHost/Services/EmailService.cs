@@ -5,7 +5,7 @@ using System.Net.Mail;
 
 namespace ExportPro.Export.Job.ServiceHost.Services;
 
-public sealed class SmtpEmailSender(SmtpSettings settings) : IEmailSender
+public sealed class EmailService(SmtpSettings settings) : IEmailService
 {
     private readonly SmtpSettings _settings = settings;
 

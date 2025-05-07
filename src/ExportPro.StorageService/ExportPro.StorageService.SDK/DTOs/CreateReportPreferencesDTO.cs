@@ -2,7 +2,7 @@
 
 namespace ExportPro.StorageService.SDK.DTOs;
 
-public sealed class PreferencesDTO
+public record CreateReportPreferencesDTO
 {
     public required string UserId { get; set; }
     public Guid Id { get; set; }

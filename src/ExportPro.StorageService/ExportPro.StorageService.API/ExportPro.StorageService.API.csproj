@@ -7,25 +7,25 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.9"/>
-        <PackageReference Include="ExportPro.Auth.Service" Version="1.0.1"/>
-        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.25"/>
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0-preview1"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2"/>
-        <PackageReference Include="Refit" Version="8.0.0"/>
-        <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
-        <PackageReference Include="Refit.Xml" Version="8.0.0"/>
-        <PackageReference Include="Serilog" Version="4.2.0"/>
-        <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
-        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0"/>
+        <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.9" />
+        <PackageReference Include="ExportPro.Auth.Service" Version="1.0.1" />
+        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.27" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0-preview1" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
+        <PackageReference Include="Refit" Version="8.0.0" />
+        <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
+        <PackageReference Include="Refit.Xml" Version="8.0.0" />
+        <PackageReference Include="Serilog" Version="4.2.0" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ExportPro.StorageService.CQRS\ExportPro.StorageService.CQRS.csproj"/>
-        <ProjectReference Include="..\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj"/>
-        <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj"/>
-        <ProjectReference Include="..\ExportPro.StorageService.Validations\ExportPro.StorageService.Validations.csproj"/>
+        <ProjectReference Include="..\ExportPro.StorageService.CQRS\ExportPro.StorageService.CQRS.csproj" />
+        <ProjectReference Include="..\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj" />
+        <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
+        <ProjectReference Include="..\ExportPro.StorageService.Validations\ExportPro.StorageService.Validations.csproj" />
     </ItemGroup>
 </Project>

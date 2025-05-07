@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
-using ExportPro.Export.Job.ServiceHost.DTOs;
 using ExportPro.Export.Job.ServiceHost.Helpers;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
