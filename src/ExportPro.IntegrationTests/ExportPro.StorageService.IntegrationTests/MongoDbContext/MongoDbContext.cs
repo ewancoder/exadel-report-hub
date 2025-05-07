@@ -1,15 +1,17 @@
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
-using ExportPro.StorageService.Models.Models;
+using ExportPro.Common.Models.MongoDB;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
 
-namespace ExportPro.StorageService.IntegrationTests.Controllers;
+namespace ExportPro.StorageService.IntegrationTests.MongoDbContext;
 
-[TestFixture]
-public class ClientControllerIntegrationTests
+public class MongoDbContext<T> : IMongoDbContext<T>
+    where T : IModel
 {
-    [SetUp]
-    public void Setup()
+    public IMongoCollection<T> Collection { get; }
+
+    public MongoDbContext()
     {
         IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(
@@ -20,8 +22,9 @@ public class ClientControllerIntegrationTests
                 }!
             )
             .Build();
+
         IMongoDbConnectionFactory connectionFactory = new MongoDbConnectionFactory(configuration);
         ICollectionProvider collectionProvider = new DefaultCollectionProvider(connectionFactory);
-        // var client = collectionProvider.GetCollection<Client>();
+        Collection = collectionProvider.GetCollection<T>();
     }
 }
