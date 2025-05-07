@@ -10,6 +10,5 @@ public sealed class Plans : AuditModel, IModel
     public bool IsDeleted { get; set; } = false;
     public List<Item> items { get; set; } = [];
     public int Amount { get; set; }
-    public string? CreatedBy { get; set; }
     public ObjectId Id { get; set; }
 }
