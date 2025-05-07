@@ -5,7 +5,6 @@ using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.StorageService.API.Configurations;
-using ExportPro.StorageService.API.Filters;
 using ExportPro.StorageService.CQRS;
 using ExportPro.StorageService.CQRS.Profiles;
 using ExportPro.StorageService.Models.Models;

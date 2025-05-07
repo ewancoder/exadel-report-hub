@@ -1,8 +1,9 @@
-﻿using ExportPro.StorageService.Models.Enums;
+﻿using ExportPro.Common.Models.MongoDB;
+using ExportPro.StorageService.Models.Enums;
 
 namespace ExportPro.StorageService.SDK.Responses;
 
-public sealed class ItemResponse
+public sealed class ItemResponse : AuditModel
 {
     public required Guid Id { get; set; }
     public string? Name { get; set; }
@@ -11,6 +12,4 @@ public sealed class ItemResponse
     public Guid? CustomerId { get; set; }
     public Status? Status { get; set; }
     public Guid CurrencyId { get; set; } //maybe can be made into enum as well?
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; }
 }

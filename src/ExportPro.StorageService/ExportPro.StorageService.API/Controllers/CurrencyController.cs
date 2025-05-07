@@ -22,7 +22,7 @@ public class CurrencyController(IMediator mediator) : ControllerBase
         [FromRoute] Guid id,
         [FromBody] string currencyCode,
         CancellationToken cancellationToken
-    ) => mediator.Send(new UpdateCurrencyCommand(id, currencyCode));
+    ) => mediator.Send(new UpdateCurrencyCommand(id, currencyCode), cancellationToken);
 
     [HttpDelete("{id}")]
     public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken) =>

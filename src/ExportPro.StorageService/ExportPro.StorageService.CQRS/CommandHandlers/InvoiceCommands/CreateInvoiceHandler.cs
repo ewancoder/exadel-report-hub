@@ -1,13 +1,15 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
@@ -19,6 +21,7 @@ public sealed class CreateInvoiceHandler(
     IMapper mapper,
     ICurrencyExchangeService currencyExchangeService,
     ICurrencyRepository currencyRepository,
+    IHttpContextAccessor httpContext,
     //i need to use this manually because it is not validating automatically
     IValidator<CurrencyExchangeModel> validator
 ) : ICommandHandler<CreateInvoiceCommand, InvoiceResponse>
@@ -40,6 +43,7 @@ public sealed class CreateInvoiceHandler(
             ClientId = request.CreateInvoiceDto.ClientId.ToObjectId(),
             CustomerId = request.CreateInvoiceDto.CustomerId.ToObjectId(),
             ClientCurrencyId = request.CreateInvoiceDto.ClientCurrencyId.ToObjectId(),
+            CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value,
             Items = request.CreateInvoiceDto.Items!.Select(c => mapper.Map<Item>(c)).ToList(),
         };
         foreach (var i in invoice.Items)

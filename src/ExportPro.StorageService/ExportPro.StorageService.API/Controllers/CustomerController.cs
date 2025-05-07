@@ -1,8 +1,8 @@
 ﻿using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.PaginationParams;

@@ -51,6 +51,7 @@ public sealed class ClientRepository(
         {
             item.Id = ObjectId.GenerateNewId();
             item.CreatedAt = DateTime.UtcNow;
+            item.CreatedBy = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;
         }
 
         var update = Builders<Client>.Update.PushEach(x => x.Items, items);

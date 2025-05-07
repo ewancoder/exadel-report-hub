@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ExportPro.StorageService.API.Filters;
+namespace ExportPro.Common.Shared.Filters;
 
 public class ApiResponseStatusCodeFilter : IAsyncActionFilter
 {
