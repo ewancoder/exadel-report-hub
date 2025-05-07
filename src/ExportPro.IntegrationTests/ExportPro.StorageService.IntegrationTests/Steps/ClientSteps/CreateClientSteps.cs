@@ -9,7 +9,7 @@ using MongoDB.Driver;
 using Refit;
 using TechTalk.SpecFlow;
 
-namespace ExportPro.StorageService.IntegrationTests.Controllers.ClientSteps
+namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps
 {
     [Binding]
     public class CreateClientSteps
@@ -40,9 +40,6 @@ namespace ExportPro.StorageService.IntegrationTests.Controllers.ClientSteps
         public async Task WhenTheUserSendsTheClientCreationRequest()
         {
             _refitClientDto = await _storageServiceApi!.CreateClient(_clientDto!);
-            Assert.That(_refitClientDto, Is.Not.Null);
-            Assert.That(_refitClientDto.Data!.Name, Is.EqualTo(_clientDto!.Name));
-            Assert.That(_refitClientDto.Data.Description, Is.EqualTo(_clientDto.Description));
         }
 
         [Then("the response status should be Success")]
@@ -56,7 +53,7 @@ namespace ExportPro.StorageService.IntegrationTests.Controllers.ClientSteps
         {
             var client = await _mongoDbContext!.Collection.Find(x => x.Name == _clientDto!.Name).FirstOrDefaultAsync();
             Assert.That(client, Is.Not.Null);
-            Assert.That(client.Name, Is.EqualTo(_clientDto.Name));
+            Assert.That(client.Name, Is.EqualTo(_clientDto!.Name));
             Assert.That(client.Description, Is.EqualTo(_clientDto.Description));
         }
 

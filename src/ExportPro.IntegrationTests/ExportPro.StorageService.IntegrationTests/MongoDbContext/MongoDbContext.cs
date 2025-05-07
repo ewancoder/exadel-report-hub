@@ -22,7 +22,6 @@ public class MongoDbContext<T> : IMongoDbContext<T>
                 }!
             )
             .Build();
-
         IMongoDbConnectionFactory connectionFactory = new MongoDbConnectionFactory(configuration);
         ICollectionProvider collectionProvider = new DefaultCollectionProvider(connectionFactory);
         Collection = collectionProvider.GetCollection<T>();
