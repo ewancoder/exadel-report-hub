@@ -1,46 +1,39 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using AutoMapper;
+using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Enums;
-using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public sealed class UpdateInvoiceCommand : ICommand<Invoice>
-{
-    public Guid Id { get; set; }
-    public string? InvoiceNumber { get; set; }
-    public DateTime IssueDate { get; set; }
-    public DateTime DueDate { get; set; }
-    public double Amount { get; set; }
-    public Guid CurrencyId { get; set; }
-    public Status? PaymentStatus { get; set; }
-    public string? BankAccountNumber { get; set; }
-    public Guid ClientId { get; set; }
-    public List<Guid>? ItemIds { get; set; }
-}
+public sealed record UpdateInvoiceCommand(Guid Id, CreateInvoiceDto InvoiceDto) : ICommand<InvoiceResponse>;
 
-public sealed class UpdateInvoiceHandler(IInvoiceRepository repository) : ICommandHandler<UpdateInvoiceCommand, Invoice>
+public sealed class UpdateInvoiceHandler(IInvoiceRepository repository, IMapper mapper)
+    : ICommandHandler<UpdateInvoiceCommand, InvoiceResponse>
 {
-    public async Task<BaseResponse<Invoice>> Handle(UpdateInvoiceCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<InvoiceResponse>> Handle(
+        UpdateInvoiceCommand request,
+        CancellationToken cancellationToken
+    )
     {
         var existing = await repository.GetOneAsync(
             x => x.Id == request.Id.ToObjectId() && !x.IsDeleted,
             cancellationToken
         );
         if (existing == null)
-            return new NotFoundResponse<Invoice>("Invoice not found.");
-        existing.InvoiceNumber = request.InvoiceNumber;
-        existing.IssueDate = request.IssueDate;
-        existing.DueDate = request.DueDate;
-        existing.Amount = request.Amount;
-        existing.CurrencyId = request.CurrencyId.ToObjectId();
-        existing.PaymentStatus = request.PaymentStatus;
-        existing.BankAccountNumber = request.BankAccountNumber;
-        existing.ClientId = request.ClientId.ToObjectId();
-        //existing.ItemIds = request.ItemIds ?? new List<string>();
+            return new NotFoundResponse<InvoiceResponse>("Invoice not found.");
+        existing.InvoiceNumber = request.InvoiceDto.InvoiceNumber;
+        existing.IssueDate = request.InvoiceDto.IssueDate;
+        existing.DueDate = request.InvoiceDto.DueDate;
+        existing.CurrencyId = request.InvoiceDto.CurrencyId.ToObjectId();
+        existing.PaymentStatus = request.InvoiceDto.PaymentStatus;
+        existing.BankAccountNumber = request.InvoiceDto.BankAccountNumber;
+        existing.ClientId = request.InvoiceDto.ClientId.ToObjectId();
         await repository.UpdateOneAsync(existing, cancellationToken);
-        return new SuccessResponse<Invoice>(existing, "Invoice updated successfully.");
+        var invoiceResponse = mapper.Map<InvoiceResponse>(request.InvoiceDto);
+        invoiceResponse.Id = existing.Id.ToGuid();
+        return new SuccessResponse<InvoiceResponse>(invoiceResponse, "Invoice updated successfully.");
     }
 }

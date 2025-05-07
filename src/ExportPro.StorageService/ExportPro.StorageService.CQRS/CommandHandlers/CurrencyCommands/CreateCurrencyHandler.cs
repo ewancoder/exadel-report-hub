@@ -18,9 +18,8 @@ public sealed class CreateCurrencyHandler(ICurrencyRepository repository, IMappe
     )
     {
         var currency = new Currency { CurrencyCode = request.Code };
-
         await repository.AddOneAsync(currency, cancellationToken);
         var curResponse = mapper.Map<CurrencyResponse>(currency);
-        return new BaseResponse<CurrencyResponse> { Data = curResponse };
+        return new SuccessResponse<CurrencyResponse>(curResponse, "Currency Successfully created");
     }
 }

@@ -18,6 +18,12 @@ public sealed class AddPlanToClientCommandHandler(IClientRepository clientReposi
         CancellationToken cancellationToken
     )
     {
+        var client = await clientRepository.GetOneAsync(
+            x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
+        if (client == null)
+            return new NotFoundResponse<PlansResponse>("Client Not Found");
         var plan = await clientRepository.AddPlanToClient(
             request.ClientId.ToObjectId(),
             request.Plan,

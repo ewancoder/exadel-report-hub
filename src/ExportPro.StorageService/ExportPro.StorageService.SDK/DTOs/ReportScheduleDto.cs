@@ -1,6 +1,6 @@
 ﻿using ExportPro.StorageService.Models.Enums;
 
-namespace ExportPro.Export.Job.ServiceHost.DTOs;
+namespace ExportPro.StorageService.SDK.DTOs;
 
 public sealed class ReportScheduleDto
 {

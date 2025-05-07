@@ -9,48 +9,25 @@ public class GetClientPlansValidator : AbstractValidator<GetClientPlansQuery>
 {
     public GetClientPlansValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.ClientId)
-            .NotEmpty()
-            .WithMessage("The client id is required")
-            .NotEmpty()
-            .WithMessage("Client Id  cannot be empty.")
+        RuleFor(x => x.Top).GreaterThan(0).WithMessage("Top must be higher than 0");
+        RuleFor(x => x.Skip)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Skip must be greater than or equal to 0")
             .DependentRules(() =>
             {
-                RuleFor(x => x.ClientId)
+                RuleFor(x => x)
                     .MustAsync(
-                        async (clientid, cancellationToken) =>
+                        async (x, cancellationToken) =>
                         {
-                            var client = await clientRepository.GetOneAsync(
-                                x => x.Id == clientid.ToObjectId() && !x.IsDeleted,
+                            var res = await clientRepository.GetOneAsync(
+                                y => y.Id == x.ClientId.ToObjectId() && !y.IsDeleted,
                                 cancellationToken
                             );
-                            return client != null;
+                            var cnt = res?.Plans?.Count;
+                            return x.Skip <= cnt;
                         }
                     )
-                    .WithMessage("The Client id does not exist in the client");
-            })
-            .DependentRules(() =>
-            {
-                RuleFor(x => x.Top).GreaterThan(0).WithMessage("Top must be higher than 0");
-                RuleFor(x => x.Skip)
-                    .GreaterThanOrEqualTo(0)
-                    .WithMessage("Skip must be greater than or equal to 0")
-                    .DependentRules(() =>
-                    {
-                        RuleFor(x => x)
-                            .MustAsync(
-                                async (x, cancellationToken) =>
-                                {
-                                    var res = await clientRepository.GetOneAsync(
-                                        y => y.Id == x.ClientId.ToObjectId() && !y.IsDeleted,
-                                        cancellationToken
-                                    );
-                                    var cnt = res?.Plans?.Count;
-                                    return x.Skip <= cnt;
-                                }
-                            )
-                            .WithMessage("Skip can't be higher than the max size");
-                    });
+                    .WithMessage("Skip can't be higher than the max size");
             });
     }
 }

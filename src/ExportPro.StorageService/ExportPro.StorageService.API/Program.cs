@@ -5,6 +5,7 @@ using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.StorageService.API.Configurations;
+using ExportPro.StorageService.API.Filters;
 using ExportPro.StorageService.CQRS;
 using ExportPro.StorageService.CQRS.Profiles;
 using ExportPro.StorageService.Models.Models;
@@ -19,11 +20,10 @@ using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Host.UseSharedSerilogAndConfiguration();
-// Add services to the container.
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers(options =>
 {
+    options.Filters.Add<ApiResponseStatusCodeFilter>();
     options.Filters.Add<PermissionFilter>();
 });
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -51,7 +51,6 @@ builder
         };
     });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder
     .Services.AddRefitClient<IECBApi>(new RefitSettings { ContentSerializer = new XmlContentSerializer() })
     .ConfigureHttpClient(c =>

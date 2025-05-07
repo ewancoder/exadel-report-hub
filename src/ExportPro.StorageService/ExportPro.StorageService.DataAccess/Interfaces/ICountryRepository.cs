@@ -8,7 +8,6 @@ public interface ICountryRepository : IRepository<Country>
 {
     Task<PaginatedList<Country>> GetAllPaginatedAsync(
         PaginationParameters parameters,
-        bool includeDeleted,
         CancellationToken cancellationToken
     );
 }

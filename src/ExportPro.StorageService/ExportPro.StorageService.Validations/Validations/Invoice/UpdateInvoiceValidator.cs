@@ -5,31 +5,31 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.Validations.Validations.Invoice;
 
-public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
+public class UpdateInvoiceValidator : AbstractValidator<UpdateInvoiceCommand>
 {
-    public CreateInvoiceValidator(
+    public UpdateInvoiceValidator(
         IClientRepository clientRepository,
         ICustomerRepository customerRepository,
         ICurrencyRepository currencyRepository
     )
     {
-        RuleFor(x => x.CreateInvoiceDto.Items).NotEmpty().WithMessage("Items cannot be empty.");
-        RuleFor(x => x.CreateInvoiceDto.InvoiceNumber).NotEmpty().WithMessage("Invoice number is required.");
-        RuleFor(x => x.CreateInvoiceDto.IssueDate).NotEmpty().WithMessage("The issue date is required");
+        RuleFor(x => x.InvoiceDto.Items).NotEmpty().WithMessage("Items cannot be empty.");
+        RuleFor(x => x.InvoiceDto.InvoiceNumber).NotEmpty().WithMessage("Invoice number is required.");
+        RuleFor(x => x.InvoiceDto.IssueDate).NotEmpty().WithMessage("The issue date is required");
         RuleFor(x => x)
             .Must(x =>
             {
-                if (x.CreateInvoiceDto.DueDate >= x.CreateInvoiceDto.IssueDate)
+                if (x.InvoiceDto.DueDate >= x.InvoiceDto.IssueDate)
                     return true;
                 return false;
             })
             .WithMessage("Issue date cannot be earlier than due date.");
-        RuleFor(x => x.CreateInvoiceDto.CustomerId)
+        RuleFor(x => x.InvoiceDto.CustomerId)
             .NotEmpty()
             .WithMessage("Customer  Id  cannot be empty.")
             .DependentRules(
                 () =>
-                    RuleFor(x => x.CreateInvoiceDto.CustomerId)
+                    RuleFor(x => x.InvoiceDto.CustomerId)
                         .MustAsync(
                             async (customer, cancellationToken) =>
                             {
@@ -42,12 +42,12 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
                         )
                         .WithMessage("The Customer Id does not exist")
             );
-        RuleFor(x => x.CreateInvoiceDto.ClientId)
+        RuleFor(x => x.InvoiceDto.ClientId)
             .NotEmpty()
             .WithMessage("Client Id  cannot be empty.")
             .DependentRules(() =>
             {
-                RuleFor(x => x.CreateInvoiceDto.ClientId)
+                RuleFor(x => x.InvoiceDto.ClientId)
                     .MustAsync(
                         async (id, cancellationToken) =>
                         {
@@ -60,12 +60,12 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
                     )
                     .WithMessage("The Client Id does not exist");
             });
-        RuleFor(x => x.CreateInvoiceDto.CurrencyId)
+        RuleFor(x => x.InvoiceDto.CurrencyId)
             .NotEmpty()
             .WithMessage("Currency Id  cannot be empty.")
             .DependentRules(
                 () =>
-                    RuleFor(x => x.CreateInvoiceDto.CurrencyId)
+                    RuleFor(x => x.InvoiceDto.CurrencyId)
                         .MustAsync(
                             async (currency, cancellationToken) =>
                             {
@@ -78,12 +78,12 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
                         )
                         .WithMessage("The Currency Id does not exist")
             );
-        RuleFor(x => x.CreateInvoiceDto.ClientCurrencyId)
+        RuleFor(x => x.InvoiceDto.ClientCurrencyId)
             .NotEmpty()
             .WithMessage("Client Currency Id  cannot be empty.")
             .DependentRules(
                 () =>
-                    RuleFor(x => x.CreateInvoiceDto.ClientCurrencyId)
+                    RuleFor(x => x.InvoiceDto.ClientCurrencyId)
                         .MustAsync(
                             async (currency, cancellationToken) =>
                             {

@@ -3,8 +3,9 @@ using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
-using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
+using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,60 +17,31 @@ public class InvoiceController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     [HasPermission(Resource.Invoices, CrudAction.Create)]
-    public async Task<IActionResult> Create(
-        [FromBody] CreateInvoiceCommand command,
+    public Task<BaseResponse<InvoiceResponse>> Create(
+        [FromBody] CreateInvoiceDto invoice,
         CancellationToken cancellationToken
-    )
-    {
-        var response = await mediator.Send(command, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
-    }
+    ) => mediator.Send(new CreateInvoiceCommand(invoice), cancellationToken);
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(
+    public Task<BaseResponse<InvoiceResponse>> Update(
         [FromRoute] Guid id,
-        [FromBody] UpdateInvoiceCommand command,
+        [FromBody] CreateInvoiceDto invoice,
         CancellationToken cancellationToken
-    )
-    {
-        command.Id = id;
-        var response = await mediator.Send(command, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
-    }
+    ) => mediator.Send(new UpdateInvoiceCommand(id, invoice), cancellationToken);
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
-    {
-        var command = new DeleteInvoiceCommand(id);
-        var response = await mediator.Send(command, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken) =>
+        mediator.Send(new DeleteInvoiceCommand(id), cancellationToken);
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
-    {
-        var query = new GetInvoiceByIdQuery(id);
-        var response = await mediator.Send(query, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<InvoiceDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken) =>
+        mediator.Send(new GetInvoiceByIdQuery(id), cancellationToken);
 
     [HttpGet]
     [HasPermission(Resource.Invoices, CrudAction.Read)]
-    public async Task<ActionResult<BaseResponse<PaginatedList<Invoice>>>> GetInvoices(
+    public Task<BaseResponse<PaginatedListDto<InvoiceDto>>> GetInvoices(
         CancellationToken cancellationToken,
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10,
-        [FromQuery] bool includeDeleted = false
-    )
-    {
-        var query = new GetAllInvoicesQuery
-        {
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            IncludeDeleted = includeDeleted,
-        };
-
-        var response = await mediator.Send(query, cancellationToken);
-        return StatusCode((int)response.ApiState, response);
-    }
+        [FromQuery] int pageSize = 10
+    ) => mediator.Send(new GetAllInvoicesQuery(pageNumber, pageSize), cancellationToken);
 }

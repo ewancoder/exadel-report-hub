@@ -42,7 +42,6 @@ public class GetItemsQueryHandler(
 
         var paginatedInvoices = await invoiceRepository.GetAllPaginatedAsync(
             parameters,
-            false,
             cancellationToken);
 
         var invoices = paginatedInvoices.Items.Where(i =>

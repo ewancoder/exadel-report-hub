@@ -6,8 +6,8 @@ namespace ExportPro.StorageService.Models.Models;
 
 public sealed class Customer : IModel
 {
-    public string? Name { get; set; }
-    public string? Email { get; set; }
+    public required string Name { get; set; }
+    public required string Email { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId CountryId { get; set; }
