@@ -10,4 +10,8 @@ public interface ICustomerRepository : IRepository<Customer>
         PaginationParameters parameters,
         CancellationToken cancellationToken = default
     );
+    
+    Task<int> AddManyAsync(
+        IEnumerable<Customer> customers, 
+        CancellationToken cancellationToken = default);
 }

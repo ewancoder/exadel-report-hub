@@ -29,4 +29,16 @@ public sealed class CustomerRepository(ICollectionProvider collectionProvider)
 
         return new PaginatedList<Customer>(customers, (int)totalCount, parameters.PageNumber, parameters.PageSize);
     }
+
+    public async Task<int> AddManyAsync(
+        IEnumerable<Customer> customers, 
+        CancellationToken cancellationToken = default)
+    {
+        var list = customers.ToList();
+        if (list.Count == 0)
+            return 0;
+
+        await Collection.InsertManyAsync(list, cancellationToken: cancellationToken);
+        return list.Count;
+    }
 }

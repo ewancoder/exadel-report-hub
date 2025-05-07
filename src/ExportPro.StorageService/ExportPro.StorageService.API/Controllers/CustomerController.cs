@@ -48,4 +48,15 @@ public class CustomerController(IMediator mediator) : ControllerBase
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10
     ) => mediator.Send(new GetPaginatedCustomersQuery(pageNumber, pageSize), cancellationToken);
+    
+    [HttpPost("import")]
+    [HasPermission(Resource.Customers, CrudAction.Create)]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> ImportCustomers(
+        IFormFile file,                              // no attribute needed
+        CancellationToken cancellationToken)
+    {
+        var response = await mediator.Send(new ImportCustomersCommand(file), cancellationToken);
+        return StatusCode((int)response.ApiState, response);
+    }
 }
