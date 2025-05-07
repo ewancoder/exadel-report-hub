@@ -5,7 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ExportPro.StorageService.Models.Models;
 
-public sealed class Invoice : IModel
+public sealed class Invoice : AuditModel, IModel
 {
     public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; } = DateTime.Now;

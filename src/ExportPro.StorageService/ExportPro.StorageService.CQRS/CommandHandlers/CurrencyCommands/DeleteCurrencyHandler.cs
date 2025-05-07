@@ -1,5 +1,5 @@
-﻿using ExportPro.Common.Shared.Library;
-using ExportPro.StorageService.CQRS.Extensions;
+﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using MediatR;
 
