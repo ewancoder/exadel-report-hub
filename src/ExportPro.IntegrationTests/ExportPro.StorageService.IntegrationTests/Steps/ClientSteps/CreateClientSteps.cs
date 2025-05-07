@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using ExportPro.Common.Shared.Library;
-using ExportPro.StorageService.IntegrationTests.MongoDbContext;
+using ExportPro.Shared.IntegrationTests.MongoDbContext;
+using ExportPro.Shared.IntegrationTests.Seed;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Refit;
@@ -20,11 +21,10 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps
         private BaseResponse<ClientResponse>? _refitClientDto;
 
         [BeforeScenario]
-        public void Setup()
+        public async Task Setup()
         {
             _mongoDbContext = new MongoDbContext<Client>();
-            var jwtToken =
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2ODE0ODI0M2U1NTE3ZTM0MWRiZmEzYWUiLCJ1bmlxdWVfbmFtZSI6InN0cmluZyIsInJvbGUiOiJTdXBlckFkbWluIiwibmJmIjoxNzQ2NjA4NDY3LCJleHAiOjE3NDY2MTIwNjcsImlhdCI6MTc0NjYwODQ2NywiaXNzIjoiRXhwb3J0UHJvSXNzdWVyIiwiYXVkIjoiRXhwb3J0UHJvQXVkaWVuY2UifQ.AhF-E6zUBFFVRqk2qC7MybSFamBATeCG31JMFoc1rcA";
+            var jwtToken = await AddUser.AddClientAdmin();
             var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
             httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
             _storageServiceApi = RestService.For<IStorageServiceApi>(httpClient);

@@ -4,7 +4,7 @@ using ExportPro.Common.Models.MongoDB;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
-namespace ExportPro.StorageService.IntegrationTests.MongoDbContext;
+namespace ExportPro.Shared.IntegrationTests.MongoDbContext;
 
 public class MongoDbContext<T> : IMongoDbContext<T>
     where T : IModel
@@ -17,7 +17,7 @@ public class MongoDbContext<T> : IMongoDbContext<T>
             .AddInMemoryCollection(
                 new[]
                 {
-                    new KeyValuePair<string, string>("ConnectionStrings:MongoDB", "mongodb://localhost:27017"),
+                    new KeyValuePair<string, string>("ConnectionStrings:MongoDB", "mongodb://localhost:27017/"),
                     new KeyValuePair<string, string>("MongoDB:DatabaseName", "ExportProDb"),
                 }!
             )

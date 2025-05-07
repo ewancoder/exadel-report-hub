@@ -1,10 +1,9 @@
 ﻿using ExportPro.Common.Models.MongoDB;
 using MongoDB.Driver;
 
-namespace ExportPro.StorageService.IntegrationTests.MongoDbContext;
+namespace ExportPro.Shared.IntegrationTests.MongoDbContext;
 
 public interface IMongoDbContext<T>
-    where T : IModel
 {
     public IMongoCollection<T> Collection { get; }
 }

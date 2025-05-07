@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\ExportPro.StorageService\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj" />
+      <ProjectReference Include="..\ExportPro.Shared.IntegrationTests\ExportPro.Shared.IntegrationTests.csproj" />
     </ItemGroup>
 
 </Project>
