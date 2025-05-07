@@ -11,7 +11,7 @@ public class MongoDbContext<T> : IMongoDbContext<T>
 {
     public IMongoCollection<T> Collection { get; }
 
-    public MongoDbContext()
+    public MongoDbContext(string? name = null)
     {
         IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(
@@ -24,6 +24,6 @@ public class MongoDbContext<T> : IMongoDbContext<T>
             .Build();
         IMongoDbConnectionFactory connectionFactory = new MongoDbConnectionFactory(configuration);
         ICollectionProvider collectionProvider = new DefaultCollectionProvider(connectionFactory);
-        Collection = collectionProvider.GetCollection<T>();
+        Collection = collectionProvider.GetCollection<T>(name);
     }
 }
