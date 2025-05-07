@@ -1,6 +1,8 @@
-﻿namespace ExportPro.StorageService.SDK.Responses;
+﻿using ExportPro.Common.Models.MongoDB;
 
-public sealed class CurrencyResponse
+namespace ExportPro.StorageService.SDK.Responses;
+
+public sealed class CurrencyResponse : AuditModel
 {
     public required Guid Id { get; set; }
     public required string CurrencyCode { get; set; } // e.g. "USD"

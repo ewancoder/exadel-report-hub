@@ -1,9 +1,11 @@
-﻿using ExportPro.Common.Shared.Extensions;
+﻿using System.Security.Claims;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
@@ -17,7 +19,7 @@ public sealed record CreateItemCommand(
     Guid ClientId
 ) : ICommand<string>;
 
-public sealed class CreateItemCommandHandler(IClientRepository clientRepository)
+public sealed class CreateItemCommandHandler(IHttpContextAccessor httpContext, IClientRepository clientRepository)
     : ICommandHandler<CreateItemCommand, string>
 {
     public async Task<BaseResponse<string>> Handle(CreateItemCommand request, CancellationToken cancellationToken)
@@ -35,6 +37,8 @@ public sealed class CreateItemCommandHandler(IClientRepository clientRepository)
             Description = request.Description,
             Price = request.Price,
             Status = request.Status,
+            CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value,
+
             CurrencyId = request.CurrencyId.ToObjectId(),
         };
         client.Items ??= new List<Item>();

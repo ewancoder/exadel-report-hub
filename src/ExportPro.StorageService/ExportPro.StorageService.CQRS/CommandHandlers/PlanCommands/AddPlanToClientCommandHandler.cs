@@ -30,6 +30,7 @@ public sealed class AddPlanToClientCommandHandler(IClientRepository clientReposi
             cancellationToken
         );
         var planResponse = mapper.Map<PlansResponse>(plan);
+
         return new SuccessResponse<PlansResponse>(planResponse, "Added plan to the client");
     }
 }
