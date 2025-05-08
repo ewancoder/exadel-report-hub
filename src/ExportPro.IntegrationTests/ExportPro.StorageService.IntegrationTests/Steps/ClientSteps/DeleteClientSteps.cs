@@ -33,14 +33,7 @@ public class DeleteClientSteps
     {
         ClientDto clientDto = new() { Name = "DeleteIsI", Description = "Description" };
         await _storageServiceApi.CreateClient(clientDto);
-        if (_mongoDbContext == null)
-        {
-            Console.WriteLine("help it is null");
-        }
-
-        Assert.That(_mongoDbContext, Is.Not.EqualTo(null));
         var client = await _mongoDbContext!.Collection.Find(x => x.Name == "DeleteIsI").FirstOrDefaultAsync();
-        Assert.That(client, Is.Not.EqualTo(null));
         _clientId = client.Id.ToGuid();
     }
 
