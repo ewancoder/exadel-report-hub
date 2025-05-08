@@ -36,7 +36,7 @@ public class AuthService(
             Username = dto.Username,
             Email = dto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Roles = [UserRole.User]
+            Role = UserRole.Operator,
         };
 
         user = await _userRepository.CreateAsync(user);
@@ -91,7 +91,6 @@ public class AuthService(
         var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
         if (user != null)
         {
-            user.TokenVersion += 1;
             user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
             await _userRepository.UpdateAsync(user);
         }
@@ -110,14 +109,12 @@ public class AuthService(
     {
         user.RefreshTokens.RemoveAll(rt => rt.ExpiresAt <= DateTime.UtcNow);
         var newRefreshTokenValue = _jwtTokenService.GenerateRefreshToken();
-        var tokenVersion = 0;
 
         RefreshToken newRefreshToken = new()
         {
             Token = newRefreshTokenValue,
             CreatedAt = DateTime.UtcNow,
             ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays),
-            TokenVersion = tokenVersion
         };
 
         user.RefreshTokens.Add(newRefreshToken);
@@ -127,13 +124,9 @@ public class AuthService(
         [
             new (ClaimTypes.NameIdentifier, user.Id.ToString()),
             new (ClaimTypes.Name, user.Username),
-            new ("tokenVersion", tokenVersion.ToString())
+            new (ClaimTypes.Role,user.Role.ToString() )
         ];
 
-        foreach (var role in user.Roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
-        }
 
         var accessToken = _jwtTokenService.GenerateAccessToken(user, claims);
 
