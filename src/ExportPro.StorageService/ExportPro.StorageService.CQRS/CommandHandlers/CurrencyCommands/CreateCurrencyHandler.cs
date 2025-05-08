@@ -3,13 +3,14 @@ using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 
-public sealed record CreateCurrencyCommand(string Code) : IRequest<BaseResponse<CurrencyResponse>>;
+public sealed record CreateCurrencyCommand(CurrencyDto Currency) : IRequest<BaseResponse<CurrencyResponse>>;
 
 public sealed class CreateCurrencyHandler(
     IHttpContextAccessor httpContext,
@@ -24,7 +25,7 @@ public sealed class CreateCurrencyHandler(
     {
         var currency = new Currency
         {
-            CurrencyCode = request.Code,
+            CurrencyCode = request.Currency.CurrencyCode,
             CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value,
         };
         await repository.AddOneAsync(currency, cancellationToken);
