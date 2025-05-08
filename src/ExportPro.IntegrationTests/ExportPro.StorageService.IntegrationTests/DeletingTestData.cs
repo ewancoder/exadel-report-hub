@@ -32,7 +32,14 @@ public class DeletingTestData
             .FirstOrDefaultAsync();
         if (currency != null)
         {
-            _mongoCollectionCurrency.Collection.DeleteOne(x => x.Id == currency.Id);
+            await _mongoCollectionCurrency.Collection.DeleteOneAsync(x => x.Id == currency.Id);
+        }
+        var currencyDelete = await _mongoCollectionCurrency
+            .Collection.Find(x => x.CurrencyCode == "ZZZ")
+            .FirstOrDefaultAsync();
+        if (currencyDelete != null)
+        {
+            await _mongoCollectionCurrency.Collection.DeleteOneAsync(x => x.Id == currencyDelete.Id);
         }
     }
 }

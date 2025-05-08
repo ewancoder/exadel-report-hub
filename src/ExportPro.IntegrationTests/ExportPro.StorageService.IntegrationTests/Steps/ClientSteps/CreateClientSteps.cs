@@ -20,19 +20,19 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps
         private ClientDto? _clientDto;
         private BaseResponse<ClientResponse>? _refitClientDto;
 
-        [Given(@"The user have a client with name and description")]
-        public void GivenIHaveAClientWithNameAndDescription()
-        {
-            _clientDto = new ClientDto { Name = "ClientISme", Description = "Description" };
-        }
-
-        [Given(@"The user have a valid token")]
+        [Given(@"The user have a valid token for creating")]
         public async Task HaveValidUserToken()
         {
             string jwtToken = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
             HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
             httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
             _clientApi = RestService.For<IClientApi>(httpClient);
+        }
+
+        [Given(@"The user have a client with name and description")]
+        public void GivenIHaveAClientWithNameAndDescription()
+        {
+            _clientDto = new ClientDto { Name = "ClientISme", Description = "Description" };
         }
 
         [When(@"the user sends the client creation request")]

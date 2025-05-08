@@ -12,25 +12,25 @@ using TechTalk.SpecFlow;
 namespace ExportPro.StorageService.IntegrationTests.Steps.CurrencySteps;
 
 [Binding]
-public class CreateCurrency
+public class CreateCurrencySteps
 {
     private readonly IMongoDbContext<Currency> _mongoDbContext = new MongoDbContext<Currency>();
     private CurrencyDto _currency;
     private ICurrencyApi _currencyApi;
 
-    [Given(@"The user have a currency")]
-    public void GivenTheUserHaveCurrency()
-    {
-        _currency = new() { CurrencyCode = "DDD" };
-    }
-
-    [Given("The user has a valid token")]
+    [Given("The user has a valid token for creating")]
     public async Task GivenTheUserHasValidToken()
     {
         string jwtToken = await UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@");
         HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
         httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
+    }
+
+    [Given(@"The user has a currency")]
+    public void GivenTheUserHaveCurrency()
+    {
+        _currency = new() { CurrencyCode = "DDD" };
     }
 
     [When(@"The user sends the currency creation request")]

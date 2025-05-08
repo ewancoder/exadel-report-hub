@@ -18,7 +18,7 @@ public class DeleteClientSteps
     private Guid _clientId;
     private IClientApi? _clientApi;
 
-    [Given(@"User have a valid token")]
+    [Given(@"User have a valid token for deleting")]
     public async Task GivenUserHasValidToken()
     {
         string jwtToken = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
