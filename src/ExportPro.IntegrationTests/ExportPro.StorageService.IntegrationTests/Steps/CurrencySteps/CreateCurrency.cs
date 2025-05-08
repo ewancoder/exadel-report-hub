@@ -25,28 +25,26 @@ public class CreateCurrency
     }
 
     [Given("The user has a valid token")]
-    public void GivenTheUserHasValidToken()
+    public async Task GivenTheUserHasValidToken()
     {
-        string jwtToken = UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@").GetAwaiter().GetResult();
+        string jwtToken = await UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@");
         HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
         httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
 
     [When(@"The user sends the currency creation request")]
-    public void WhenUserSendsTheCurrencyCreationRequest()
+    public async Task WhenUserSendsTheCurrencyCreationRequest()
     {
-        _currencyApi.Create(_currency).GetAwaiter().GetResult();
+        await _currencyApi.Create(_currency);
     }
 
     [Then("The currency should be saved in the database")]
-    public void ThenTheCurrencyShouldBeSavedInTheDb()
+    public async Task ThenTheCurrencyShouldBeSavedInTheDb()
     {
-        var currency = _mongoDbContext
+        var currency = await _mongoDbContext
             .Collection.Find(x => x.CurrencyCode == _currency.CurrencyCode)
-            .FirstOrDefaultAsync()
-            .GetAwaiter()
-            .GetResult();
+            .FirstOrDefaultAsync();
         Assert.That(currency, Is.Not.EqualTo(null));
         Assert.That(currency.CurrencyCode, Is.EqualTo(_currency.CurrencyCode));
     }
