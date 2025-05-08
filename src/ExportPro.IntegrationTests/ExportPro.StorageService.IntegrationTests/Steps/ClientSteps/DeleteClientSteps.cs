@@ -19,7 +19,7 @@ public class DeleteClientSteps
     private IStorageServiceApi? _storageServiceApi;
 
     [Given("User have a valid token")]
-    public async Task ValidUserToken()
+    public async Task GivenUserHasValidToken()
     {
         string jwtToken = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
         HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
@@ -29,7 +29,7 @@ public class DeleteClientSteps
     }
 
     [Given("User have a client id")]
-    public async Task ClientId()
+    public async Task GivenUserHasClientId()
     {
         ClientDto clientDto = new() { Name = "DeleteIsI", Description = "Description" };
         await _storageServiceApi.CreateClient(clientDto);
@@ -38,13 +38,13 @@ public class DeleteClientSteps
     }
 
     [When("User send a delete request")]
-    public async Task DeleteRequest()
+    public async Task WhenUserSendsDeleteRequest()
     {
         await _storageServiceApi!.SoftDeleteClient(_clientId);
     }
 
     [Then("The client should be deleted")]
-    public async Task ShouldBeDeleted()
+    public async Task ThenTheClientShouldBeDeleted()
     {
         var client = await _mongoDbContext.Collection.Find(x => x.Id == _clientId.ToObjectId()).FirstOrDefaultAsync();
         Assert.That(client, Is.Not.Null);
