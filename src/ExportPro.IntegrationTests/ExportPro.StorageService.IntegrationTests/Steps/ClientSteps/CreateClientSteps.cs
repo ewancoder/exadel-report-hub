@@ -15,7 +15,7 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps
     [Binding]
     public class CreateClientSteps
     {
-        private IMongoDbContext<Client>? _mongoDbContext = new MongoDbContext<Client>();
+        private readonly IMongoDbContext<Client> _mongoDbContext = new MongoDbContext<Client>();
         private IClientApi? _clientApi;
         private ClientDto? _clientDto;
         private BaseResponse<ClientResponse>? _refitClientDto;
@@ -54,20 +54,6 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps
             Assert.That(client, Is.Not.Null);
             Assert.That(client.Name, Is.EqualTo(_clientDto!.Name));
             Assert.That(client.Description, Is.EqualTo(_clientDto.Description));
-        }
-
-        [AfterScenario]
-        public void Cleanup()
-        {
-            var client = _mongoDbContext!
-                .Collection.Find(x => x.Name == "ClientISme")
-                .FirstOrDefaultAsync()
-                .GetAwaiter()
-                .GetResult();
-            if (client != null)
-            {
-                _mongoDbContext.Collection.DeleteOne(x => x.Id == client.Id);
-            }
         }
     }
 }

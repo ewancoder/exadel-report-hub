@@ -2,6 +2,7 @@
 using ExportPro.Shared.IntegrationTests.Auth;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Refit;
 using MongoDB.Driver;
 using NSubstitute.ReturnsExtensions;
@@ -13,49 +14,40 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.CurrencySteps;
 [Binding]
 public class CreateCurrency
 {
-    private IMongoDbContext<Currency>? _mongoDbContext = new MongoDbContext<Currency>();
-    private string _currencyCode;
+    private readonly IMongoDbContext<Currency> _mongoDbContext = new MongoDbContext<Currency>();
+    private CurrencyDto _currency;
     private ICurrencyApi _currencyApi;
 
     [Given(@"The user have a currency")]
     public void GivenTheUserHaveCurrency()
     {
-        _currencyCode = "test";
+        _currency = new() { CurrencyCode = "DDD" };
     }
 
     [Given("The user has a valid token")]
-    public async Task GivenTheUserHasValidToken()
+    public void GivenTheUserHasValidToken()
     {
-        string jwtToken = await UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@");
+        string jwtToken = UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@").GetAwaiter().GetResult();
         HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
         httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
 
     [When(@"The user sends the currency creation request")]
-    public async Task WhenUserSendsTheCurrencyCreationRequest()
+    public void WhenUserSendsTheCurrencyCreationRequest()
     {
-        await _currencyApi.Create(_currencyCode);
+        _currencyApi.Create(_currency).GetAwaiter().GetResult();
     }
 
     [Then("The currency should be saved in the database")]
-    public async Task ThenTheCurrencyShouldBeSavedInTheDb()
+    public void ThenTheCurrencyShouldBeSavedInTheDb()
     {
-        var currency = await _mongoDbContext
-            .Collection.Find(x => x.CurrencyCode == _currencyCode)
-            .FirstOrDefaultAsync();
-        Assert.That(currency, Is.Not.EqualTo(null));
-        Assert.That(currency.CurrencyCode, Is.EqualTo(_currencyCode));
-    }
-
-    [AfterScenario]
-    public void CleanUp()
-    {
-        var cleanup = _mongoDbContext
-            .Collection.Find(x => x.CurrencyCode == "test")
+        var currency = _mongoDbContext
+            .Collection.Find(x => x.CurrencyCode == _currency.CurrencyCode)
             .FirstOrDefaultAsync()
             .GetAwaiter()
             .GetResult();
-        _mongoDbContext.Collection.DeleteOne(x => x.Id == cleanup.Id);
+        Assert.That(currency, Is.Not.EqualTo(null));
+        Assert.That(currency.CurrencyCode, Is.EqualTo(_currency.CurrencyCode));
     }
 }

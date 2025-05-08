@@ -1,4 +1,5 @@
 ﻿using ExportPro.Common.Shared.Library;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using Refit;
 
@@ -8,7 +9,7 @@ public interface ICurrencyApi
 {
     [Post("/api/Currency")]
     Task<BaseResponse<CurrencyResponse>> Create(
-        [Body] string currencyCode,
+        [Body] CurrencyDto currency,
         CancellationToken cancellationToken = default
     );
 

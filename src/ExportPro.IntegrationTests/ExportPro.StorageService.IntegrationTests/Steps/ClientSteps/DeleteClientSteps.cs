@@ -14,7 +14,7 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps;
 [Binding]
 public class DeleteClientSteps
 {
-    private IMongoDbContext<Client> _mongoDbContext = new MongoDbContext<Client>();
+    private readonly IMongoDbContext<Client> _mongoDbContext = new MongoDbContext<Client>();
     private Guid _clientId;
     private IClientApi? _clientApi;
 
@@ -49,11 +49,5 @@ public class DeleteClientSteps
         var client = await _mongoDbContext.Collection.Find(x => x.Id == _clientId.ToObjectId()).FirstOrDefaultAsync();
         Assert.That(client, Is.Not.Null);
         Assert.That(client.IsDeleted, Is.EqualTo(true));
-    }
-
-    [AfterScenario]
-    public void Cleanup()
-    {
-        _mongoDbContext.Collection.DeleteOne(x => x.Id == _clientId.ToObjectId());
     }
 }
