@@ -7,11 +7,14 @@ public class CreateReportPreferenceCommandValidator : AbstractValidator<CreateRe
 {
     public CreateReportPreferenceCommandValidator()
     {
-        RuleFor(x => x.ClientId)
+        RuleFor(x => x.dto.ReportFormat)
            .NotEmpty().WithMessage("ClientId is required.");
 
-        RuleFor(x => x.Schedule)
-            .NotNull().WithMessage("Schedule is required.")
-            .SetValidator(new ReportScheduleDtoValidator());
+        //RuleFor(x => x.dto.ReportFormat)
+        //    .NotNull().WithMessage("Schedule is required.")
+        //    .SetValidator(new ReportScheduleDtoValidator());
+        RuleFor(x => x.dto.Email)
+            .NotEmpty().WithMessage("Email is required.")
+            .EmailAddress().WithMessage("Email format is invalid.");
     }
 }

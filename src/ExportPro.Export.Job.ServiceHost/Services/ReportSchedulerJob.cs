@@ -1,6 +1,7 @@
 ﻿using ExportPro.Common.Shared.Extensions;
 using ExportPro.Export.Job.ServiceHost.Interfaces;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
 using Quartz;
@@ -8,13 +9,13 @@ using Quartz;
 namespace ExportPro.Export.Job.ServiceHost.Services;
 
 public sealed class ReportSchedulerJob(
-    IReportPreference repository,
+    IReportPreference reportRepository,
     IReportExportApi reportExportApi,
     IEmailService emailService) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        var preferences = await repository.GetAllPreferences(context.CancellationToken);
+        var preferences = await reportRepository.GetAllPreferences(context.CancellationToken);
 
         foreach (var pref in preferences)
         {
@@ -29,14 +30,19 @@ public sealed class ReportSchedulerJob(
             if (!reportResponse.IsSuccessStatusCode)
                 continue;
 
-            var content = await reportResponse.Content.ReadAsByteArrayAsync();
-            var contentType = reportResponse.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
-            var fileName = $"report_{DateTime.UtcNow:yyyyMMddHHmm}.csv";
+            var (extension, mimeType) = pref.ReportFormat switch
+            {
+                ReportFormat.Excel => ("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                ReportFormat.Csv => ("csv", "text/csv"),
+                _ => ("dat", "application/octet-stream") // fallback
+            };
 
-            var subject = "Scheduled Report";
+            var fileName = $"report_{DateTime.UtcNow:yyyyMMddHHmm}.{extension}";
+            var contentType = reportResponse.Content.Headers.ContentType?.MediaType ?? mimeType;
+            var content = await reportResponse.Content.ReadAsByteArrayAsync(context.CancellationToken);
+            var subject = $"Scheduled Report - {DateTime.UtcNow:MMMM dd, yyyy}";
             var body = $"Dear user,\n\nPlease find your scheduled report attached.";
-
-            var userEmail = pref.Email; // Replace 
+            var userEmail = pref.Email;
 
             if (!string.IsNullOrWhiteSpace(userEmail))
             {

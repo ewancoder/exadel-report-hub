@@ -1,9 +1,10 @@
-﻿using ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
+﻿using ExportPro.Common.Shared.Library;
+using ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.ReportPreferenceQueries;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace ExportPro.StorageService.API.Controllers;
 
@@ -12,20 +13,9 @@ namespace ExportPro.StorageService.API.Controllers;
 public class ReportPreferenceController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create(
-        [FromBody] CreateReportPreferencesDTO pref,
-        CancellationToken cancellationToken)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (string.IsNullOrWhiteSpace(userId))
-            return Unauthorized("User ID is missing from token.");
-
-        var enrichedCommand = pref with { UserId = userId };
-        var response = await mediator.Send(enrichedCommand, cancellationToken);
-        return Ok(response);
-    }
-
+    public async Task<BaseResponse<ReportPreferenceResponse>> Create(
+        [FromBody] CreateReportPreferencesDTO pref, CancellationToken cancellationToken)
+             => await mediator.Send(new CreateReportPreferenceCommand(pref), cancellationToken);
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(

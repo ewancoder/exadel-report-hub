@@ -10,6 +10,8 @@ public sealed class ReportPreference : IModel
     
     public required ObjectId UserId { get; set; }
     
+    public required string Email { get; set; }
+
     public required ObjectId ClientId { get; set; }
 
     public ReportFormat ReportFormat { get; set; } = ReportFormat.Csv;

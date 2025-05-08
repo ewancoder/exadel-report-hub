@@ -16,6 +16,11 @@
         "Path": "ExportPro.Export\\ExportPro.Export.ServiceHost\\ExportPro.Export.ServiceHost.csproj",
         "Action": "Start",
         "DebugTarget": "http"
+      },
+      {
+        "Path": "ExportPro.Export.Job.ServiceHost\\ExportPro.Export.Job.ServiceHost.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
       }
     ]
   }

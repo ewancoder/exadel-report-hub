@@ -13,6 +13,7 @@ namespace ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
 public sealed record UpdateReportPreferenceCommand(
     Guid Id,
     ReportFormat ReportFormat,
+    string Email,
     ReportScheduleDto Schedule,
     bool IsEnabled
 ) : IRequest<BaseResponse<ReportPreferenceResponse>>;
@@ -49,6 +50,7 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
         }
 
         preference.ReportFormat = request.ReportFormat;
+        preference.Email = request.Email;
         preference.CronExpression = cronExpression;
         preference.IsEnabled = request.IsEnabled;
         preference.UpdatedAt = DateTime.UtcNow;

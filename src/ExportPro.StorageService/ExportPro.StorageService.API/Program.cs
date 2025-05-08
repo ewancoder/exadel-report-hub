@@ -5,7 +5,6 @@ using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.StorageService.API.Configurations;
-using ExportPro.StorageService.API.Filters;
 using ExportPro.StorageService.CQRS;
 using ExportPro.StorageService.CQRS.Profiles;
 using ExportPro.StorageService.Models.Models;
@@ -23,7 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<ApiResponseStatusCodeFilter>();
+    options.Filters.Add<ExportPro.StorageService.API.Filters.ApiResponseStatusCodeFilter>();
     options.Filters.Add<PermissionFilter>();
 });
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));

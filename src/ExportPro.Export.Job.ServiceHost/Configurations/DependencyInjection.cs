@@ -1,6 +1,8 @@
 ﻿using ExportPro.Export.Job.ServiceHost.DTOs;
 using ExportPro.Export.Job.ServiceHost.Interfaces;
 using ExportPro.Export.Job.ServiceHost.Services;
+using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.SDK.Refit;
 using Refit;
 
@@ -13,8 +15,11 @@ public static class DependencyInjection
         var smtpSettings = config.GetSection("SmtpSettings").Get<SmtpSettings>();
         services.AddSingleton(smtpSettings);
         services.AddRefitClient<IReportExportApi>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://your-api-base-url"));
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(config["ReportExportApi:BaseUrl"]));
 
         services.AddTransient<IEmailService, EmailService>();
+        services.AddScoped<IReportPreference, ReportPreferenceRepository>();
+        services.AddTransient<ReportSchedulerJob>();
+        Console.WriteLine("Quartz job registration completed");
     }
 }
