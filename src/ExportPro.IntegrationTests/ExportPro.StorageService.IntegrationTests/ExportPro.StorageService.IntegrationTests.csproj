@@ -31,4 +31,8 @@
       <ProjectReference Include="..\ExportPro.Shared.IntegrationTests\ExportPro.Shared.IntegrationTests.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Steps\CurrencySteps\" />
+    </ItemGroup>
+
 </Project>
