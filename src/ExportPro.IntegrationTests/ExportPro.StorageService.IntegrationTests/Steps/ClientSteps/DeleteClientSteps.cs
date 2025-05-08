@@ -61,6 +61,6 @@ public class DeleteClientSteps
     [AfterScenario]
     public void Cleanup()
     {
-        _mongoDbContext.Collection.DeleteOneAsync(x => x.Id == _clientId.ToObjectId()).GetAwaiter().GetResult();
+        _mongoDbContext.Collection.DeleteOne(x => x.Id == _clientId.ToObjectId());
     }
 }

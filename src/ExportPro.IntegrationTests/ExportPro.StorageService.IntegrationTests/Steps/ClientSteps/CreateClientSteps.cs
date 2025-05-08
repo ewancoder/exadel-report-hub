@@ -67,7 +67,7 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps
                 .GetResult();
             if (client != null)
             {
-                _mongoDbContext.Collection.DeleteOneAsync(x => x.Id == client.Id).GetAwaiter().GetResult();
+                _mongoDbContext.Collection.DeleteOne(x => x.Id == client.Id);
             }
         }
     }
