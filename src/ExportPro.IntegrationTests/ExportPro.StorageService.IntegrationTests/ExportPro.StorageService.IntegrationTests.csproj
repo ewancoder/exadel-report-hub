@@ -11,8 +11,9 @@
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.2"/>
         <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.3" />
+        <PackageReference Include="ExportPro.Common.Models.MongoDB" Version="1.0.3" />
         <PackageReference Include="ExportPro.Common.Shared" Version="1.0.27" />
-        <PackageReference Include="ExportPro.StorageService.SDK" Version="1.0.5" />
+<!--        <PackageReference Include="ExportPro.StorageService.SDK" Version="1.0.8" />-->
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.4" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
         <PackageReference Include="NSubstitute" Version="5.3.0" />
@@ -28,11 +29,16 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\ExportPro.StorageService\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
       <ProjectReference Include="..\ExportPro.Shared.IntegrationTests\ExportPro.Shared.IntegrationTests.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Steps\CurrencySteps\" />
+      <UpToDateCheckInput Remove="Features\CurrencyFeatures\CreateCurrency.feature" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <UpToDateCheckBuild Remove="Features\CurrencyFeatures\CreateCurrency.feature.cs" />
     </ItemGroup>
 
 </Project>

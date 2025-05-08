@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Shared.IntegrationTests.Auth;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
@@ -17,32 +16,32 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps
     public class CreateClientSteps
     {
         private IMongoDbContext<Client>? _mongoDbContext = new MongoDbContext<Client>();
-        private IStorageServiceApi? _storageServiceApi;
+        private IClientApi? _clientApi;
         private ClientDto? _clientDto;
         private BaseResponse<ClientResponse>? _refitClientDto;
 
-        [Given(@"The user have a client with name  and description")]
+        [Given(@"The user have a client with name and description")]
         public void GivenIHaveAClientWithNameAndDescription()
         {
             _clientDto = new ClientDto { Name = "ClientISme", Description = "Description" };
         }
 
-        [Given("The user have a valid  token")]
+        [Given(@"The user have a valid token")]
         public async Task HaveValidUserToken()
         {
             string jwtToken = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
             HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
             httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
-            _storageServiceApi = RestService.For<IStorageServiceApi>(httpClient);
+            _clientApi = RestService.For<IClientApi>(httpClient);
         }
 
         [When(@"the user sends the client creation request")]
         public async Task WhenTheUserSendsTheClientCreationRequest()
         {
-            _refitClientDto = await _storageServiceApi!.CreateClient(_clientDto!);
+            _refitClientDto = await _clientApi!.CreateClient(_clientDto!);
         }
 
-        [Then("the response status should be Success")]
+        [Then(@"the response status should be Success")]
         public void ThenTheResponseStatusShouldBeSuccess()
         {
             Assert.That(_refitClientDto!.ApiState, Is.EqualTo(HttpStatusCode.OK));

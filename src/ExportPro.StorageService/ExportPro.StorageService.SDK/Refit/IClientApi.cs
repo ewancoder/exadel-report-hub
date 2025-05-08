@@ -6,7 +6,7 @@ using Refit;
 
 namespace ExportPro.StorageService.SDK.Refit;
 
-public interface IStorageServiceApi
+public interface IClientApi
 {
     [Post("/api/client")]
     Task<BaseResponse<ClientResponse>> CreateClient(
