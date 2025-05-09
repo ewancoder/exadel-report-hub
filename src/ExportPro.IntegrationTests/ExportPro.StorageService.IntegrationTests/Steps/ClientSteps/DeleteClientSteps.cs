@@ -26,7 +26,6 @@ public class DeleteClientSteps
         string jwtToken = await UserLogin.Login(table.Rows[0]["Email"], table.Rows[0]["Password"]);
         HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _clientApi = RestService.For<IClientApi>(httpClient);
-        Assert.That(_clientApi, Is.Not.EqualTo(null));
     }
 
     [Given("The user creates a client and The stores the client id")]

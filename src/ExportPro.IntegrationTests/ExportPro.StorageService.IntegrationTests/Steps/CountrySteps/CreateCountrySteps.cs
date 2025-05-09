@@ -35,20 +35,22 @@ public class CreateCountrySteps
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
 
-    [Given("The following currency exists")]
+    [Given("The user created following currency and stored the currency id")]
     public async Task GivenTheFollowingCurrencyExists(Table table)
     {
         CurrencyDto cur = table.CreateInstance<CurrencyDto>();
         var currency = await _currencyApi.Create(cur);
         var currencyExists = await _mongoDbContextCurrency
-            .Collection.Find(x => x.CurrencyCode == currency.Data.CurrencyCode)
+            .Collection.Find(x =>
+                x.CurrencyCode == currency.Data.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
+            )
             .FirstOrDefaultAsync();
         _currencyId = currency.Data.Id;
         Assert.That(currencyExists, Is.Not.EqualTo(null));
         Assert.That(currencyExists.CurrencyCode, Is.EqualTo(cur.CurrencyCode));
     }
 
-    [Given("The user has a country to create")]
+    [Given("The user wants to create following country")]
     public void GivenTheUserHasACountryToCreate(Table table)
     {
         _createCountryDto = table.CreateInstance<CreateCountryDto>();
