@@ -9,28 +9,30 @@ using MongoDB.Driver;
 using NSubstitute.ReturnsExtensions;
 using Refit;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace ExportPro.StorageService.IntegrationTests.Steps.CurrencySteps;
 
 [Binding]
+[Scope(Tag = "CreateCurrency")]
 public class CreateCurrencySteps
 {
     private readonly IMongoDbContext<Currency> _mongoDbContext = new MongoDbContext<Currency>();
     private CurrencyDto _currency;
     private ICurrencyApi _currencyApi;
 
-    [Given("The user has a valid token for creating")]
-    public async Task GivenTheUserHasValidToken()
+    [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
+    public async Task GivenTheUserHasValidToken(string email, string password)
     {
-        string jwtToken = await UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@");
+        string jwtToken = await UserLogin.Login(email, password);
         HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
 
     [Given(@"The user has a currency")]
-    public void GivenTheUserHaveCurrency()
+    public void GivenTheUserHasCurrency(Table table)
     {
-        _currency = new() { CurrencyCode = "DDD" };
+        _currency = new CurrencyDto() { CurrencyCode = table.Rows[0]["CurrencyCode"] };
     }
 
     [When(@"The user sends the currency creation request")]

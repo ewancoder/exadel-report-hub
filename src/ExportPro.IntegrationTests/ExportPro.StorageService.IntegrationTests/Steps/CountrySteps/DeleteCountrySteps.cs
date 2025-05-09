@@ -36,7 +36,7 @@ public class DeleteCountrySteps
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
 
-    [Given(@"The following currency exists")]
+    [Given("The user created following currency and stored the currency id")]
     public async Task GivenTheFollowingCurrencyExists(Table table)
     {
         var currency = table.CreateInstance<CurrencyDto>();
@@ -49,7 +49,7 @@ public class DeleteCountrySteps
         _currencyId = currencyResponse.Data.Id;
     }
 
-    [Given("The country exists and the user has the country id")]
+    [Given("The user created country and the stored the country id")]
     public async Task GivenTheCountryExists(Table table)
     {
         var country = table.CreateInstance<CreateCountryDto>();

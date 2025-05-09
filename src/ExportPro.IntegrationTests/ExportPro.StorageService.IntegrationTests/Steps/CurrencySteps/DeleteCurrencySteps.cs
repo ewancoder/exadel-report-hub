@@ -8,28 +8,33 @@ using ExportPro.StorageService.SDK.Refit;
 using MongoDB.Driver;
 using Refit;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace ExportPro.StorageService.IntegrationTests.Steps.CurrencySteps;
 
 [Binding]
+[Scope(Tag = "DeleteCurrency")]
 public class DeleteCurrencySteps
 {
     private readonly IMongoDbContext<Currency> _mongoDbContext = new MongoDbContext<Currency>();
     private ICurrencyApi _currencyApi;
     private Guid _currencyId;
 
-    [Given(@"The user has a valid token for deleting")]
-    public async Task GivenTheUserHasValidToken()
+    [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
+    public async Task GivenTheUserIsLoggedInWithEmailAndPasswordAndHasNecessaryPermissions(
+        string email,
+        string password
+    )
     {
-        string jwtToken = await UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@");
+        string jwtToken = await UserLogin.Login(email, password);
         HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
 
-    [Given(@"The user has currency id")]
-    public async Task GivenTheUserHasCurrencyId()
+    [Given("the user has created the following currency and stored the currency id")]
+    public async Task GivenTheUserHasCreatedTheFollowingCurrencyAndStoredTheCurrencyId(Table table)
     {
-        CurrencyDto currencyDto = new() { CurrencyCode = "ZZZ" };
+        CurrencyDto currencyDto = table.CreateInstance<CurrencyDto>();
         var currency = await _currencyApi.Create(currencyDto);
         _currencyId = currency.Data.Id;
     }

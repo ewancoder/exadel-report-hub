@@ -29,7 +29,7 @@ public class DeleteClientSteps
         Assert.That(_clientApi, Is.Not.EqualTo(null));
     }
 
-    [Given("the client exists and The user has a client id")]
+    [Given("The user creates a client and The stores the client id")]
     public async Task GivenTheClientExists(Table table)
     {
         ClientDto clientDto = table.CreateInstance<ClientDto>();

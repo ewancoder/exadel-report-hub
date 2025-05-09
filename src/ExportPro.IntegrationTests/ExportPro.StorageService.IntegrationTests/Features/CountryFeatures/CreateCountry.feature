@@ -1,5 +1,5 @@
 ﻿Feature: Create a country
-    Scenario Outline: The user wants to create a country
+    Scenario Outline: The user creates a country
       Given  The user is logged in with email '<email>' and password '<password>' and has necessary permissions
         And The following currency exists
           | CurrencyCode |

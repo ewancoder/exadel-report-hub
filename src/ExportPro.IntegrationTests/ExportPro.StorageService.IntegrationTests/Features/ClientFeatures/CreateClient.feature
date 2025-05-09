@@ -1,6 +1,6 @@
+@CreateClient
 Feature: Creating a client
-    @CreateClient
-    Scenario: Successfully creating a client with valid credentials
+    Scenario: The user creates a client
         Given The user is logged in with email  and password  and has necessary permissions
             | Email                    | Password         |
             | SuperAdminTest@gmail.com | SuperAdminTest2@ |
