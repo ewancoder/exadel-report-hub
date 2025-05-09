@@ -26,6 +26,8 @@ public class DeletingTestData
         await _mongoDbContextCurrency.Collection.DeleteManyAsync(x => x.CreatedBy == "ClientAdminTest");
         await _mongoDbContextCurrency.Collection.DeleteManyAsync(x => x.CreatedBy == "OperatorTest");
         await _mongoDbContextCustomer.Collection.DeleteManyAsync(x => x.CreatedBy == "OwnerUserTest");
+        await _mongoDbContextCustomer.Collection.DeleteManyAsync(x => x.CreatedBy == "ClientAdminTest");
+        await _mongoDbContextCustomer.Collection.DeleteManyAsync(x => x.CreatedBy == "OperatorTest");
         await _mongoDbContextInvoice.Collection.DeleteManyAsync(x => x.CreatedBy == "OwnerUserTest");
     }
 }

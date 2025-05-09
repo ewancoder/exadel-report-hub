@@ -1,4 +1,5 @@
-﻿Feature: Create a country
+﻿@CreateCountry
+Feature: Create a country
     Scenario Outline: The user creates a country after creating a currency
       Given  The user is logged in with email '<email>' and password '<password>' and has necessary permissions
         And The user created following currency and stored the currency id

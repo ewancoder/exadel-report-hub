@@ -14,6 +14,7 @@ using TechTalk.SpecFlow.Assist;
 namespace ExportPro.StorageService.IntegrationTests.Steps.CountrySteps;
 
 [Binding]
+[Scope(Tag = "CreateCountry")]
 public class CreateCountrySteps
 {
     private readonly IMongoDbContext<Country> _mongoDbContext = new MongoDbContext<Country>();
