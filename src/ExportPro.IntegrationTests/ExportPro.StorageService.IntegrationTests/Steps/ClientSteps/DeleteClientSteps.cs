@@ -1,5 +1,6 @@
 ﻿using ExportPro.Common.Shared.Extensions;
 using ExportPro.Shared.IntegrationTests.Auth;
+using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -8,6 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Refit;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps;
 
@@ -18,26 +20,27 @@ public class DeleteClientSteps
     private Guid _clientId;
     private IClientApi? _clientApi;
 
-    [Given(@"User have a valid token for deleting")]
-    public async Task GivenUserHasValidToken()
+    [Given("The user is logged in with email  and password  and has necessary permissions")]
+    public async Task GivenUserHasValidToken(Table table)
     {
-        string jwtToken = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
-        HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
-        httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
+        string jwtToken = await UserLogin.Login(table.Rows[0]["Email"], table.Rows[0]["Password"]);
+        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _clientApi = RestService.For<IClientApi>(httpClient);
         Assert.That(_clientApi, Is.Not.EqualTo(null));
     }
 
-    [Given(@"User have a client id")]
-    public async Task GivenUserHasClientId()
+    [Given("the client exists and The user has a client id")]
+    public async Task GivenTheClientExists(Table table)
     {
-        ClientDto clientDto = new() { Name = "DeleteIsI", Description = "Description" };
-        await _clientApi.CreateClient(clientDto);
-        var client = await _mongoDbContext!.Collection.Find(x => x.Name == "DeleteIsI").FirstOrDefaultAsync();
+        ClientDto clientDto = table.CreateInstance<ClientDto>();
+        await _clientApi!.CreateClient(clientDto);
+        var client = await _mongoDbContext!.Collection.Find(x => x.Name == clientDto.Name).FirstOrDefaultAsync();
+        Assert.That(client, Is.Not.Null);
+        Assert.That(client.Name, Is.EqualTo(clientDto.Name));
         _clientId = client.Id.ToGuid();
     }
 
-    [When("User send a delete request")]
+    [When("The user send a delete request")]
     public async Task WhenUserSendsDeleteRequest()
     {
         await _clientApi!.SoftDeleteClient(_clientId);

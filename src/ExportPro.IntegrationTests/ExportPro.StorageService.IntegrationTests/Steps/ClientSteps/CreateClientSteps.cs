@@ -1,6 +1,8 @@
-﻿using System.Net;
+﻿using System.Data;
+using System.Net;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Shared.IntegrationTests.Auth;
+using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -9,42 +11,36 @@ using ExportPro.StorageService.SDK.Responses;
 using MongoDB.Driver;
 using Refit;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps
 {
     [Binding]
+    [Scope(Tag = "CreateClient")]
     public class CreateClientSteps
     {
         private readonly IMongoDbContext<Client> _mongoDbContext = new MongoDbContext<Client>();
         private IClientApi? _clientApi;
         private ClientDto? _clientDto;
-        private BaseResponse<ClientResponse>? _refitClientDto;
 
-        [Given(@"The user have a valid token for creating")]
-        public async Task HaveValidUserToken()
+        [Given("The user is logged in with email  and password  and has necessary permissions")]
+        public async Task HaveValidUserToken(Table table)
         {
-            string jwtToken = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
-            HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
-            httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
+            string jwtToken = await UserLogin.Login(table.Rows[0]["Email"], table.Rows[0]["Password"]);
+            HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
             _clientApi = RestService.For<IClientApi>(httpClient);
         }
 
         [Given(@"The user have a client with name and description")]
-        public void GivenIHaveAClientWithNameAndDescription()
+        public void GivenIHaveAClientWithNameAndDescription(Table table)
         {
-            _clientDto = new ClientDto { Name = "ClientISme", Description = "Description" };
+            _clientDto = table.CreateInstance<ClientDto>();
         }
 
         [When(@"the user sends the client creation request")]
         public async Task WhenTheUserSendsTheClientCreationRequest()
         {
-            _refitClientDto = await _clientApi!.CreateClient(_clientDto!);
-        }
-
-        [Then(@"the response status should be Success")]
-        public void ThenTheResponseStatusShouldBeSuccess()
-        {
-            Assert.That(_refitClientDto!.ApiState, Is.EqualTo(HttpStatusCode.OK));
+            await _clientApi!.CreateClient(_clientDto!);
         }
 
         [Then(@"the client should be saved in the database")]

@@ -3,4 +3,4 @@
         Given The user has a valid token for creating invoice
         And The user has a invoice to create
         When the user sends the invoice creation request
-        Then  the user should be saved in the database
+        Then  the invoice should be saved in the database

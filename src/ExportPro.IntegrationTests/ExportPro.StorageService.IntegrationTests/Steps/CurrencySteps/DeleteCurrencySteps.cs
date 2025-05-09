@@ -1,5 +1,6 @@
 ﻿using ExportPro.Common.Shared.Extensions;
 using ExportPro.Shared.IntegrationTests.Auth;
+using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -21,8 +22,7 @@ public class DeleteCurrencySteps
     public async Task GivenTheUserHasValidToken()
     {
         string jwtToken = await UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@");
-        HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
-        httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
+        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
 

@@ -1,4 +1,5 @@
 ﻿using ExportPro.Shared.IntegrationTests.Auth;
+using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -24,8 +25,7 @@ public class CreateCustomerSteps
     public async Task GivenTheUserHasValidTokenForCreatingCustomer()
     {
         string jwtToken = await UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@");
-        HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
-        httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
+        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _countryApi = RestService.For<ICountryApi>(httpClient);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
         _customerApi = RestService.For<ICustomerApi>(httpClient);

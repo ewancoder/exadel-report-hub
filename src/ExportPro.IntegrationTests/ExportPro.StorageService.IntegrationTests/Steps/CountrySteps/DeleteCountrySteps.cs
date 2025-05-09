@@ -1,4 +1,6 @@
-﻿using ExportPro.Shared.IntegrationTests.Auth;
+﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.Shared.IntegrationTests.Auth;
+using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -7,40 +9,58 @@ using ExportPro.StorageService.SDK.Refit;
 using MongoDB.Driver;
 using Refit;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace ExportPro.StorageService.IntegrationTests.Steps.CountrySteps;
 
 [Binding]
+[Scope(Tag = "DeleteCountry")]
 public class DeleteCountrySteps
 {
     private readonly IMongoDbContext<Country> _mongoDbContext = new MongoDbContext<Country>();
+    private readonly IMongoDbContext<Currency> _mongoDbContextCurrency = new MongoDbContext<Currency>();
     private ICurrencyApi _currencyApi;
     private ICountryApi _countryApi;
+    private Guid _currencyId;
     private Guid _countryId;
 
-    [Given("The user has a valid token for deleting a country")]
-    public async Task GivenTheUserHasValidTokenForDeleting()
+    [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
+    public async Task GivenTheUserIsLoggedInWithEmailAndPasswordAndHasNecessaryPermissions(
+        string email,
+        string password
+    )
     {
-        string jwtToken = await UserLogin.Login("OwnerUserTest@gmail.com", "OwnerUserTest2@");
-        HttpClient httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1500") };
-        httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
+        string jwtToken = await UserLogin.Login(email, password);
+        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _countryApi = RestService.For<ICountryApi>(httpClient);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
 
-    [Given("The user has country id")]
-    public async Task GivenTheUserHasCountryId()
+    [Given(@"The following currency exists")]
+    public async Task GivenTheFollowingCurrencyExists(Table table)
     {
-        CurrencyDto cur = new() { CurrencyCode = "QQQ" };
-        var currency = await _currencyApi.Create(cur);
-        CreateCountryDto createCountryDto = new()
-        {
-            Code = "USA",
-            Name = "ShouldBeDeletedTest####",
-            CurrencyId = currency.Data.Id,
-        };
-        var country = await _countryApi.Create(createCountryDto);
-        _countryId = country.Data.Id;
+        var currency = table.CreateInstance<CurrencyDto>();
+        var currencyResponse = await _currencyApi.Create(currency);
+        var currencyResponseExists = await _mongoDbContextCurrency
+            .Collection.Find(x => x.Id == currencyResponse.Data.Id.ToObjectId())
+            .FirstOrDefaultAsync();
+        Assert.That(currencyResponseExists, Is.Not.Null);
+        Assert.That(currencyResponseExists.Id, Is.EqualTo(currencyResponse.Data.Id.ToObjectId()));
+        _currencyId = currencyResponse.Data.Id;
+    }
+
+    [Given("The country exists and the user has the country id")]
+    public async Task GivenTheCountryExists(Table table)
+    {
+        var country = table.CreateInstance<CreateCountryDto>();
+        country.CurrencyId = _currencyId;
+        var countryResponse = await _countryApi.Create(country);
+        var countryResponseExists = await _mongoDbContext
+            .Collection.Find(x => x.Id == countryResponse.Data.Id.ToObjectId())
+            .FirstOrDefaultAsync();
+        _countryId = countryResponse.Data.Id;
+        Assert.That(countryResponseExists, Is.Not.Null);
+        Assert.That(countryResponseExists.Id, Is.EqualTo(countryResponse.Data.Id.ToObjectId()));
     }
 
     [When("The user sends the country delete request")]
@@ -50,11 +70,9 @@ public class DeleteCountrySteps
     }
 
     [Then("The country should be deleted")]
-    public async Task ThenTheCountryShouldBeSavedInTheDb()
+    public async Task ThenTheCountryShouldBeDeleted()
     {
-        var country = await _mongoDbContext
-            .Collection.Find(x => x.Name == "ShouldBeDeletedTest####")
-            .FirstOrDefaultAsync();
+        var country = await _mongoDbContext.Collection.Find(x => x.Id == _countryId.ToObjectId()).FirstOrDefaultAsync();
         Assert.That(country, Is.Not.EqualTo(null));
         Assert.That(country.IsDeleted, Is.EqualTo((true)));
     }

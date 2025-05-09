@@ -29,8 +29,8 @@ public interface IInvoiceApi
 
     [Get("/api/Invoice")]
     Task<BaseResponse<PaginatedListDto<InvoiceDto>>> GetInvoices(
+        CancellationToken cancellationToken = default,
         [Query] int pageNumber = 1,
-        [Query] int pageSize = 10,
-        CancellationToken cancellationToken = default
+        [Query] int pageSize = 10
     );
 }
