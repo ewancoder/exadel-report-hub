@@ -52,4 +52,10 @@ public class DeleteClientSteps
         Assert.That(client, Is.Not.Null);
         Assert.That(client.IsDeleted, Is.EqualTo(true));
     }
+
+    [AfterScenario("@DeleteClient")]
+    public async Task CleanUp()
+    {
+        await _mongoDbContext.Collection.DeleteOneAsync(x => x.Id == _clientId.ToObjectId());
+    }
 }

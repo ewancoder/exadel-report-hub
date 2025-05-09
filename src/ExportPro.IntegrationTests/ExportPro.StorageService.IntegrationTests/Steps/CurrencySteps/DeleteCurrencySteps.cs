@@ -54,4 +54,10 @@ public class DeleteCurrencySteps
         Assert.That(currency, Is.Not.EqualTo(null));
         Assert.That(currency.IsDeleted, Is.EqualTo(true));
     }
+
+    [AfterScenario("@DeleteCurrency")]
+    public async Task CleanUp()
+    {
+        await _mongoDbContext.Collection.DeleteOneAsync(x => x.Id == _currencyId.ToObjectId());
+    }
 }

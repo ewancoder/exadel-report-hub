@@ -6,6 +6,6 @@ Feature: Creating a client
             | SuperAdminTest@gmail.com | SuperAdminTest2@ |
         And The user have a client with name and description 
             | Name        | Description |
-            | Test Client | Test Client |
+            | TestClient | Test Client |
         When the user sends the client creation request
         Then the client should be saved in the database

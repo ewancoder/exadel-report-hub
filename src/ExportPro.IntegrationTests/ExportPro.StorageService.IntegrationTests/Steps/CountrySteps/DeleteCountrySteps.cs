@@ -76,4 +76,11 @@ public class DeleteCountrySteps
         Assert.That(country, Is.Not.EqualTo(null));
         Assert.That(country.IsDeleted, Is.EqualTo((true)));
     }
+
+    [AfterScenario("@DeleteCountry")]
+    public async Task CleanUp()
+    {
+        await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyId.ToObjectId());
+        await _mongoDbContext.Collection.DeleteOneAsync(x => x.Id == _countryId.ToObjectId());
+    }
 }

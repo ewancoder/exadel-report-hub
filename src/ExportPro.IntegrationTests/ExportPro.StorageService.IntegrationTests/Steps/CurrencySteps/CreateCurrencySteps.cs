@@ -50,4 +50,13 @@ public class CreateCurrencySteps
         Assert.That(currency, Is.Not.EqualTo(null));
         Assert.That(currency.CurrencyCode, Is.EqualTo(_currency.CurrencyCode));
     }
+
+    [AfterScenario("@CreateCurrency")]
+    public async Task CleanUp()
+    {
+        await _mongoDbContext.Collection.DeleteOneAsync(x =>
+            (x.CreatedBy == "OwnerUserTest" || x.CreatedBy == "ClientAdminTest" || x.CreatedBy == "OperatorTest")
+            && x.CurrencyCode == _currency.CurrencyCode
+        );
+    }
 }

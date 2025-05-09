@@ -97,4 +97,12 @@ public class DeleteCustomerSteps
         Assert.That(customer.Name, Is.EqualTo(("TESTUSER####TESTCUSTOMER")));
         Assert.That(customer.IsDeleted, Is.EqualTo(true));
     }
+
+    [AfterScenario("@DeleteCustomer")]
+    public async Task CleanUp()
+    {
+        await _mongoDbContextCountry.Collection.DeleteOneAsync(x => x.Id == _countryId.ToObjectId());
+        await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyId.ToObjectId());
+        await _mongoDbContext.Collection.DeleteOneAsync(x => x.Id == _customerId.ToObjectId());
+    }
 }

@@ -51,5 +51,13 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps
             Assert.That(client.Name, Is.EqualTo(_clientDto!.Name));
             Assert.That(client.Description, Is.EqualTo(_clientDto.Description));
         }
+
+        [AfterScenario("@CreateClient")]
+        public async Task CleanUp()
+        {
+            await _mongoDbContext.Collection.DeleteOneAsync(x =>
+                x.CreatedBy == "SuperAdminTest" && x.Name == _clientDto!.Name
+            );
+        }
     }
 }

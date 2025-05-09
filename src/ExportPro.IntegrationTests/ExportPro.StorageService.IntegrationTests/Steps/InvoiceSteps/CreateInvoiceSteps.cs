@@ -1,4 +1,5 @@
-﻿using ExportPro.Shared.IntegrationTests.Auth;
+﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.Shared.IntegrationTests.Auth;
 using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Enums;
@@ -180,11 +181,24 @@ public class CreateInvoiceSteps
     public async Task ThenTheInvoiceShouldBeSavedInTheDb()
     {
         var invoice = await _mongoDbContext
-            .Collection.Find(x => x.InvoiceNumber == "123456789#######000")
+            .Collection.Find(x => x.InvoiceNumber == _invoiceDto.InvoiceNumber)
             .FirstOrDefaultAsync();
         Assert.That(invoice, Is.Not.EqualTo(null));
-        Assert.That(invoice.InvoiceNumber, Is.EqualTo("123456789#######000"));
         Assert.That(invoice.Items.Count, Is.EqualTo(1));
-        Assert.That(invoice.Items[0].Name, Is.EqualTo("ItemTESTInvoice"));
+        Assert.That(invoice.Items[0].Name, Is.EqualTo(_invoiceDto.Items[0].Name));
+    }
+
+    [AfterScenario("@CreateInvoice")]
+    public async Task CleanUp()
+    {
+        await _mongoDbContextCountry.Collection.DeleteOneAsync(x => x.Id == _countryId.ToObjectId());
+        await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyId.ToObjectId());
+        await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyIdForItem.ToObjectId());
+        await _mongoDbContextCustomer.Collection.DeleteOneAsync(x => x.Id == _customerId.ToObjectId());
+        await _mongoDbContextClient.Collection.DeleteOneAsync(x => x.Id == _clientId.ToObjectId());
+        await _mongoDbContext.Collection.DeleteOneAsync(x =>
+            x.InvoiceNumber == _invoiceDto.InvoiceNumber
+            && (x.CreatedBy == "OwnerUserTest" | x.CreatedBy == "ClientAdminTest" || x.CreatedBy == "OperatorTest")
+        );
     }
 }

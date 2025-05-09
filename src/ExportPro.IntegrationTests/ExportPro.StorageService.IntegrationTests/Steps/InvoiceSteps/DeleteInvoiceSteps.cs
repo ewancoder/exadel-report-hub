@@ -179,7 +179,18 @@ public class DeleteInvoiceSteps
     {
         var invoice = await _mongoDbContext.Collection.Find(x => x.Id == _invoiceId.ToObjectId()).FirstOrDefaultAsync();
         Assert.That(invoice, Is.Not.EqualTo(null));
-        Assert.That(invoice.InvoiceNumber, Is.EqualTo("123456789#######000InvoiceDelete"));
+        Assert.That(invoice.InvoiceNumber, Is.EqualTo(_invoiceDto.InvoiceNumber));
         Assert.That(invoice.IsDeleted, Is.EqualTo(true));
+    }
+
+    [AfterScenario("@DeleteInvoice")]
+    public async Task CleanUp()
+    {
+        await _mongoDbContextCountry.Collection.DeleteOneAsync(x => x.Id == _countryId.ToObjectId());
+        await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyId.ToObjectId());
+        await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyIdForItem.ToObjectId());
+        await _mongoDbContextCustomer.Collection.DeleteOneAsync(x => x.Id == _customerId.ToObjectId());
+        await _mongoDbContextClient.Collection.DeleteOneAsync(x => x.Id == _clientId.ToObjectId());
+        await _mongoDbContext.Collection.DeleteOneAsync(x => x.Id == _invoiceId.ToObjectId());
     }
 }

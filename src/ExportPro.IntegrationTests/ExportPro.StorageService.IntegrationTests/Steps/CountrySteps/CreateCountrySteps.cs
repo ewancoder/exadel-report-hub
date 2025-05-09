@@ -71,4 +71,14 @@ public class CreateCountrySteps
         Assert.That(country, Is.Not.EqualTo(null));
         Assert.That(country.Code, Is.EqualTo(("TESTCOUNTRYCODE")));
     }
+
+    [AfterScenario("@CreateCountry")]
+    public async Task CleanUp()
+    {
+        await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyId.ToObjectId());
+        await _mongoDbContext.Collection.DeleteOneAsync(x =>
+            (x.CreatedBy == "OwnerUserTest" || x.CreatedBy == "ClientAdminTest" || x.CreatedBy == "OperatorTest")
+            && x.Name == _createCountryDto.Name
+        );
+    }
 }

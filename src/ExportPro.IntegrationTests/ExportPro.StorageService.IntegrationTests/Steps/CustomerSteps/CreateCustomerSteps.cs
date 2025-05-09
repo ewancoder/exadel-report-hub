@@ -1,4 +1,5 @@
-﻿using ExportPro.Shared.IntegrationTests.Auth;
+﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.Shared.IntegrationTests.Auth;
 using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
@@ -83,12 +84,23 @@ public class CreateCustomerSteps
     }
 
     [Then("the customer should be saved in the database")]
-    public async Task ThenTheCountryShouldBeSavedInTheDb()
+    public async Task ThenTheCustomerShouldBeSavedInTheDb()
     {
-        var country = await _mongoDbContext
+        var customer = await _mongoDbContext
             .Collection.Find(x => x.Email == "TESTUSER####TESTCUSTOMER@gmail.com")
             .FirstOrDefaultAsync();
-        Assert.That(country, Is.Not.EqualTo(null));
-        Assert.That(country.Name, Is.EqualTo(("TESTUSER####TESTCUSTOMER")));
+        Assert.That(customer, Is.Not.EqualTo(null));
+        Assert.That(customer.Name, Is.EqualTo(("TESTUSER####TESTCUSTOMER")));
+    }
+
+    [AfterScenario("@CreateCustomer")]
+    public async Task CleanUp()
+    {
+        await _mongoDbContextCountry.Collection.DeleteOneAsync(x => x.Id == _countryId.ToObjectId());
+        await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyId.ToObjectId());
+        await _mongoDbContext.Collection.DeleteOneAsync(x =>
+            (x.CreatedBy == "OwnerUserTest" || x.CreatedBy == "ClientAdminTest" || x.CreatedBy == "OperatorTest")
+            && x.Name == _customerDto.Name
+        );
     }
 }
