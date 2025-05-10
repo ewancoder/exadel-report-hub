@@ -30,7 +30,7 @@ public sealed class ReportSchedulerJob(
             Username = "GPPP",
             Password = "G10@gmail.com",
         };
-        var register = await authAPi.RegisterAsync(user);
+
         UserLoginDto login = new() { Email = user.Email, Password = user.Password };
         var jwtTokenDto = await authAPi.LoginAsync(login);
         string jwtToken = jwtTokenDto.AccessToken;
