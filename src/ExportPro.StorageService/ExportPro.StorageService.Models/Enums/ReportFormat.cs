@@ -1,7 +1,10 @@
-﻿namespace ExportPro.StorageService.Models.Enums;
+﻿using System.Text.Json.Serialization;
 
-public enum ReportFormat : byte
+namespace ExportPro.StorageService.Models.Enums;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ReportFormat
 {
     Csv,
-    Excel
+    Xlsx
 }

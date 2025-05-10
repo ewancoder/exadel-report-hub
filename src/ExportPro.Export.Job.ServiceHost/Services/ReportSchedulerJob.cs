@@ -11,10 +11,12 @@ namespace ExportPro.Export.Job.ServiceHost.Services;
 public sealed class ReportSchedulerJob(
     IReportPreference reportRepository,
     IReportExportApi reportExportApi,
-    IEmailService emailService) : IJob
+    IEmailService emailService,
+    IHttpContextAccessor httpContext) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
+        var authHeader = httpContext.HttpContext?.Request.Headers["Authorization"].ToString();
         var preferences = await reportRepository.GetAllPreferences(context.CancellationToken);
 
         foreach (var pref in preferences)
@@ -32,7 +34,7 @@ public sealed class ReportSchedulerJob(
 
             var (extension, mimeType) = pref.ReportFormat switch
             {
-                ReportFormat.Excel => ("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                ReportFormat.Xlsx => ("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
                 ReportFormat.Csv => ("csv", "text/csv"),
                 _ => ("dat", "application/octet-stream") // fallback
             };
@@ -62,6 +64,16 @@ public sealed class ReportSchedulerJob(
         };
 
         var now = DateTime.UtcNow;
-        return cron.IsSatisfiedBy(now);
+        var previous = cron.GetTimeBefore(now);
+        var next = cron.GetNextValidTimeAfter(previous ?? now.AddMinutes(-1)); // fallback if previous is null
+
+        // We want to run the job once per scheduled minute, at any second
+        if (!next.HasValue)
+            return false;
+
+        var nextFire = next.Value.UtcDateTime;
+
+        // Allow execution if now is within the current fire minute
+        return now >= nextFire && now < nextFire.AddMinutes(1);
     }
 }

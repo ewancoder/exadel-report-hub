@@ -18,6 +18,6 @@ public sealed class ReportPreferenceRepository(ICollectionProvider collectionPro
 
     public async Task<List<ReportPreference>> GetAllPreferences(CancellationToken cancellationToken)
     {
-        return await Collection.Find(c => (c.IsDeleted == false || c.IsDeleted == null) && (c.IsEnabled == false || c.IsEnabled == null)).ToListAsync(cancellationToken);
+        return await Collection.Find(c => !c.IsDeleted).ToListAsync(cancellationToken);
     }
 }
