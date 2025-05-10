@@ -1,6 +1,40 @@
 {
     "Routes": [
         {
+            "UpstreamPathTemplate": "/api/InvoiceExport/{id}/pdf",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "exportservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/InvoiceExport/{id}/pdf",
+            "SwaggerKey": "exportservice"
+        },
+        {
+            "UpstreamPathTemplate": "/api/ReportExport/list",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [ { "Host": "exportservice", "Port": 8080 } ],
+            "DownstreamPathTemplate": "/api/ReportExport/list",
+            "SwaggerKey": "exportservice"
+        },
+        {
+            "UpstreamPathTemplate": "/api/Log/today-log",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "exportservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Log/today-log",
+            "SwaggerKey": "exportservice"
+        },
+        {
             "UpstreamPathTemplate": "/api/currency",
             "UpstreamHttpMethod": [ "Get", "Post" ],
             "DownstreamScheme": "http",
@@ -78,7 +112,6 @@
             "DownstreamPathTemplate": "/api/invoice/{id}",
             "SwaggerKey": "StorageService"
         },
-
         {
             "UpstreamPathTemplate": "/api/client",
             "UpstreamHttpMethod": [ "Get", "Post" ],
@@ -88,7 +121,6 @@
                     "Host": "storageservice",
                     "Port": 8080
                 }
-
             ],
             "DownstreamPathTemplate": "/api/client",
             "SwaggerKey": "StorageService"
@@ -121,7 +153,7 @@
         },
         {
             "UpstreamPathTemplate": "/api/client/{clientId}/items",
-            "UpstreamHttpMethod": [ "Patch", "Put" ],
+            "UpstreamHttpMethod": [ "Get", "Patch", "Put" ],
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -133,7 +165,7 @@
             "SwaggerKey": "StorageService"
         },
         {
-            "UpstreamPathTemplate": "/api/{clientId}/item/{itemId}",
+            "UpstreamPathTemplate": "/api/client/{clientId}/item/{itemId}",
             "UpstreamHttpMethod": [ "Delete" ],
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
@@ -142,11 +174,50 @@
                     "Port": 8080
                 }
             ],
-            "DownstreamPathTemplate": "/api/{clientId}/item/{itemId}",
+            "DownstreamPathTemplate": "/api/client/{clientId}/item/{itemId}",
             "SwaggerKey": "StorageService"
         },
         {
-            "UpstreamPathTemplate": "/api/{clientId}/plan",
+            "UpstreamPathTemplate": "/api/client/{clientId}/items/{itemId}",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "storageservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/client/{clientId}/items/{itemId}",
+            "SwaggerKey": "StorageService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/client/plan/{planId}",
+            "UpstreamHttpMethod": [ "Get", "Delete", "Patch" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "storageservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/client/plan/{planId}",
+            "SwaggerKey": "StorageService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/client/{clientId}/plans",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "storageservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/client/{clientId}/plans",
+            "SwaggerKey": "StorageService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/client/{clientId}/plan",
             "UpstreamHttpMethod": [ "Patch" ],
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
@@ -155,23 +226,9 @@
                     "Port": 8080
                 }
             ],
-            "DownstreamPathTemplate": "/api/{clientId}/plan",
+            "DownstreamPathTemplate": "/api/client/{clientId}/plan",
             "SwaggerKey": "StorageService"
         },
-        {
-            "UpstreamPathTemplate": "/api/{clientId}/plan/{planId}",
-            "UpstreamHttpMethod": [ "Delete", "Patch" ],
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "storageservice",
-                    "Port": 8080
-                }
-            ],
-            "DownstreamPathTemplate": "/api/{clientId}/plan/{planId}",
-            "SwaggerKey": "StorageService"
-        },
-
         {
             "UpstreamPathTemplate": "/api/customer",
             "UpstreamHttpMethod": [ "Post" ],
@@ -212,33 +269,6 @@
             "SwaggerKey": "StorageService"
         },
         {
-            "UpstreamPathTemplate": "/api/client/{clientId}/plan",
-            "UpstreamHttpMethod": [ "Patch" ],
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "storageservice",
-                    "Port": 8080
-                }
-            ],
-            "DownstreamPathTemplate": "/api/client/{clientId}/plan",
-            "SwaggerKey": "StorageService"
-        },
-
-        {
-            "UpstreamPathTemplate": "/api/client/{clientId}/plan/{planId}",
-            "UpstreamHttpMethod": [ "Delete", "Patch" ],
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "storageservice",
-                    "Port": 8080
-                }
-            ],
-            "DownstreamPathTemplate": "/api/client/{clientId}/plan/{planId}",
-            "SwaggerKey": "StorageService"
-        },
-        {
             "UpstreamPathTemplate": "/api/Auth/register",
             "UpstreamHttpMethod": [ "Post" ],
             "DownstreamScheme": "http",
@@ -251,46 +281,45 @@
             "DownstreamPathTemplate": "/api/Auth/register",
             "SwaggerKey": "AuthService"
         },
-
-            {
-                "UpstreamPathTemplate": "/api/Auth/login",
-                "UpstreamHttpMethod": [ "Post" ],
-                "DownstreamScheme": "http",
-                "DownstreamHostAndPorts": [
-                    {
-                        "Host": "authservice",
-                        "Port": 8080
-                    }
-                ],
-                "DownstreamPathTemplate": "/api/Auth/login",
-                "SwaggerKey": "AuthService"
-            },
-            {
-                "UpstreamPathTemplate": "/api/Auth/refresh-token",
-                "UpstreamHttpMethod": [ "Post" ],
-                "DownstreamScheme": "http",
-                "DownstreamHostAndPorts": [
-                    {
-                        "Host": "authservice",
-                        "Port": 8080
-                    }
-                ],
-                "DownstreamPathTemplate": "/api/Auth/refresh-token",
-                "SwaggerKey": "AuthService"
-            },
-            {
-                "UpstreamPathTemplate": "/api/Auth/logout",
-                "UpstreamHttpMethod": [ "Post" ],
-                "DownstreamScheme": "http",
-                "DownstreamHostAndPorts": [
-                    {
-                        "Host": "authservice",
-                        "Port": 8080
-                    }
-                ],
-                "DownstreamPathTemplate": "/api/Auth/logout",
-                "SwaggerKey": "AuthService"
-            }
+        {
+            "UpstreamPathTemplate": "/api/Auth/login",
+            "UpstreamHttpMethod": [ "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "authservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Auth/login",
+            "SwaggerKey": "AuthService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/Auth/refresh-token",
+            "UpstreamHttpMethod": [ "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "authservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Auth/refresh-token",
+            "SwaggerKey": "AuthService"
+        },
+        {
+            "UpstreamPathTemplate": "/api/Auth/logout",
+            "UpstreamHttpMethod": [ "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "authservice",
+                    "Port": 8080
+                }
+            ],
+            "DownstreamPathTemplate": "/api/Auth/logout",
+            "SwaggerKey": "AuthService"
+        }
     ],
     "GlobalConfiguration": {
         "BaseUrl": "http://localhost:1200"
@@ -302,7 +331,7 @@
                 {
                     "Name": "Storage Service",
                     "Version": "v1",
-                    "Url": " http://storageservice:8080/swagger/v1/swagger.json"
+                    "Url": "http://storageservice:8080/swagger/v1/swagger.json"
                 }
             ]
         },
@@ -313,6 +342,16 @@
                     "Name": "Auth Service",
                     "Version": "v1",
                     "Url": "http://authservice:8080/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "exportservice",
+            "Config": [
+                {
+                    "Name": "Invoice Export Service",
+                    "Version": "v1",
+                    "Url": "http://exportservice:8080/swagger/v1/swagger.json"
                 }
             ]
         }

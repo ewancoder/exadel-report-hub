@@ -36,7 +36,7 @@ public class AuthService(
             Username = dto.Username,
             Email = dto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = UserRole.Operator,
+            Role = UserRole.Owner,
         };
 
         user = await _userRepository.CreateAsync(user);
