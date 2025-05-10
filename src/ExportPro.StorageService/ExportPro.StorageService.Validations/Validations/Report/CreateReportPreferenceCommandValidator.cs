@@ -7,8 +7,8 @@ public class CreateReportPreferenceCommandValidator : AbstractValidator<CreateRe
 {
     public CreateReportPreferenceCommandValidator()
     {
-        RuleFor(x => x.dto.ReportFormat)
-           .NotEmpty().WithMessage("ClientId is required.");
+        //RuleFor(x => x.dto.ReportFormat)
+        //   .NotEmpty().WithMessage("ClientId is required.");
 
         //RuleFor(x => x.dto.ReportFormat)
         //    .NotNull().WithMessage("Schedule is required.")

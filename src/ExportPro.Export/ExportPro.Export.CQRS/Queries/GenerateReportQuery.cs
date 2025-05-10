@@ -5,6 +5,7 @@ using ExportPro.Export.SDK.Utilities;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace ExportPro.Export.CQRS.Queries;
@@ -17,7 +18,8 @@ public sealed record GenerateReportQuery(
 public sealed class GenerateReportQueryHandler(
     IStorageServiceApi storageApi,
     IEnumerable<IReportGenerator> generators,
-    ILogger<GenerateReportQueryHandler> log)
+    ILogger<GenerateReportQueryHandler> log,
+    IHttpContextAccessor httpContext)
     : IRequestHandler<GenerateReportQuery, ReportFileDto>
 {
     public async Task<ReportFileDto> Handle(
@@ -105,6 +107,7 @@ public sealed class GenerateReportQueryHandler(
 
     private async Task<List<InvoiceDto>> FetchInvoicesAsync(CancellationToken ct)
     {
+        var authHeader = httpContext.HttpContext?.Request.Headers["Authorization"].ToString();
         var resp = await storageApi.GetInvoicesAsync(1, int.MaxValue, false, ct);
         return resp.Data?.Items ?? [];
     }

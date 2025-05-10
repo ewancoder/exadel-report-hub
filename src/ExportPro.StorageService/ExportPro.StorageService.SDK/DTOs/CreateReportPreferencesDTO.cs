@@ -4,7 +4,6 @@ namespace ExportPro.StorageService.SDK.DTOs;
 
 public record CreateReportPreferencesDTO
 {
-    public required string UserId { get; set; }
     public required string Email { get; set; }
     public Guid ClientId { get; set; }
     public ReportFormat ReportFormat { get; set; }
