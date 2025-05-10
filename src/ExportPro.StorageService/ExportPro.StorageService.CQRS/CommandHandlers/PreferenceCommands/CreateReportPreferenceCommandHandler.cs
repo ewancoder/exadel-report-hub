@@ -60,7 +60,7 @@ public sealed class CreateReportPreferenceHandler(
                 Messages = [$"Failed to generate cron expression: {ex.Message}"]
             };
         }
-
+        var jwtToken = httpContext.HttpContext?.Request.Headers["Authorization"].ToString();
         var preference = new ReportPreference
         {
             UserId = userObjectId,
@@ -70,6 +70,7 @@ public sealed class CreateReportPreferenceHandler(
             CronExpression = cronExpression,
             IsDelivered = false,
             IsEnabled = true,
+            jwtToken = jwtToken.Split(" ").Last(),
             CreatedAt = DateTime.UtcNow
         };
 

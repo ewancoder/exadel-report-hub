@@ -20,7 +20,7 @@
       {
         "Path": "ExportPro.Export.Job.ServiceHost\\ExportPro.Export.Job.ServiceHost.csproj",
         "Action": "Start",
-        "DebugTarget": "http"
+        "DebugTarget": "https"
       }
     ]
   }

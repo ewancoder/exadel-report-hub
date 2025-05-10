@@ -1,16 +1,17 @@
-﻿using ExportPro.Common.Shared.Extensions;
+﻿using ExportPro.Auth.SDK.Interfaces;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Export.Job.ServiceHost.Interfaces;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
 using Quartz;
+using Refit;
 
 namespace ExportPro.Export.Job.ServiceHost.Services;
 
 public sealed class ReportSchedulerJob(
     IReportPreference reportRepository,
-    IReportExportApi reportExportApi,
     IEmailService emailService,
     IHttpContextAccessor httpContext) : IJob
 {
@@ -23,7 +24,15 @@ public sealed class ReportSchedulerJob(
         {
             if (!IsTimeToSend(pref))
                 continue;
-
+            HttpClient httpClient = new();
+            httpClient.BaseAddress=new Uri("http://localhost:5294");
+            httpClient.DefaultRequestHeaders.Authorization =new("Bearer",pref.jwtToken);
+            //HttpClient httpClient2 = new();
+            //httpClient2.BaseAddress = new Uri("http://localhost:5044");
+            //httpClient2.DefaultRequestHeaders.Authorization = new("Bearer", pref.jwtToken);
+            //IAuth auth = RestService.For<IAuth>(httpClient2);
+            //var jwtTOKEN = await auth.RefreshTokenAsync();
+            IReportExportApi reportExportApi = RestService.For<IReportExportApi>(httpClient);
             var reportResponse = await reportExportApi.GetStatisticsAsync(
                 pref.ReportFormat,
                 pref.ClientId.ToGuid(),

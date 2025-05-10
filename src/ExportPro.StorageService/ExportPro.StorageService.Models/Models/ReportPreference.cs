@@ -25,6 +25,7 @@ public sealed class ReportPreference : IModel
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdatedAt { get; set; }
+    public  string jwtToken { get; set; } 
 
     public bool IsDeleted { get; set; } = false;    
 }

@@ -12,6 +12,7 @@ namespace ExportPro.StorageService.API.Controllers;
 [Route("api/[controller]")]
 public class ReportPreferenceController(IMediator mediator) : ControllerBase
 {
+
     [HttpPost]
     public async Task<BaseResponse<ReportPreferenceResponse>> Create(
         [FromBody] CreateReportPreferencesDTO pref, CancellationToken cancellationToken)
