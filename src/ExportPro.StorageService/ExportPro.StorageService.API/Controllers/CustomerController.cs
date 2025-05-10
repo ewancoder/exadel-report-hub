@@ -31,6 +31,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
         CancellationToken cancellationToken
     ) => mediator.Send(new UpdateCustomerCommand(id, customerDto), cancellationToken);
 
+    
     [HttpDelete("{id}")]
     [HasPermission(Resource.Customers, CrudAction.Delete)]
     public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken) =>
