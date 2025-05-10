@@ -7,15 +7,15 @@ namespace ExportPro.StorageService.Models.Models;
 public sealed class ReportPreference : IModel
 {
     public ObjectId Id { get; set; }
-    
+
     public required ObjectId UserId { get; set; }
-    
+
     public required string Email { get; set; }
 
     public required ObjectId ClientId { get; set; }
 
     public ReportFormat ReportFormat { get; set; } = ReportFormat.Csv;
-    
+
     public required string CronExpression { get; set; }
 
     public bool IsDelivered { get; set; }
@@ -26,7 +26,5 @@ public sealed class ReportPreference : IModel
 
     public DateTime? UpdatedAt { get; set; }
 
-    public string JwtToken { get; set; } 
-
-    public bool IsDeleted { get; set; } = false;    
+    public bool IsDeleted { get; set; } = false;
 }

@@ -1,4 +1,5 @@
-﻿using ExportPro.Auth.SDK.Interfaces;
+﻿using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Export.Job.ServiceHost.Interfaces;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -13,25 +14,39 @@ namespace ExportPro.Export.Job.ServiceHost.Services;
 public sealed class ReportSchedulerJob(
     IReportPreference reportRepository,
     IEmailService emailService,
-    IHttpContextAccessor httpContext) : IJob
+    IHttpContextAccessor httpContext
+) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
         var authHeader = httpContext.HttpContext?.Request.Headers["Authorization"].ToString();
         var preferences = await reportRepository.GetAllPreferences(context.CancellationToken);
-
+        HttpClient client = new();
+        client.BaseAddress = new Uri("https://localhost:7067");
+        IAuth authAPi = RestService.For<IAuth>(client);
+        UserRegisterDto user = new()
+        {
+            Email = "G10@gmail.com",
+            Username = "GPPP",
+            Password = "G10@gmail.com",
+        };
+        var register = await authAPi.RegisterAsync(user);
+        UserLoginDto login = new() { Email = user.Email, Password = user.Password };
+        var jwtTokenDto = await authAPi.LoginAsync(login);
+        string jwtToken = jwtTokenDto.AccessToken;
         foreach (var pref in preferences)
         {
             if (!IsTimeToSend(pref))
                 continue;
             HttpClient httpClient = new();
             httpClient.BaseAddress = new Uri("https://localhost:7195");
-            httpClient.DefaultRequestHeaders.Authorization = new("Bearer", pref.JwtToken);
+            httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
             IReportExportApi reportExportApi = RestService.For<IReportExportApi>(httpClient);
             var reportResponse = await reportExportApi.GetStatisticsAsync(
                 pref.ReportFormat,
                 pref.ClientId.ToGuid(),
-                context.CancellationToken);
+                context.CancellationToken
+            );
 
             if (!reportResponse.IsSuccessStatusCode)
                 continue;
@@ -40,7 +55,7 @@ public sealed class ReportSchedulerJob(
             {
                 ReportFormat.Xlsx => ("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
                 ReportFormat.Csv => ("csv", "text/csv"),
-                _ => ("dat", "application/octet-stream") // fallback
+                _ => ("dat", "application/octet-stream"), // fallback
             };
 
             var fileName = $"report_{DateTime.UtcNow:yyyyMMddHHmm}.{extension}";
@@ -62,10 +77,7 @@ public sealed class ReportSchedulerJob(
         if (string.IsNullOrWhiteSpace(pref.CronExpression))
             return false;
 
-        var cron = new CronExpression(pref.CronExpression)
-        {
-            TimeZone = TimeZoneInfo.Utc
-        };
+        var cron = new CronExpression(pref.CronExpression) { TimeZone = TimeZoneInfo.Utc };
 
         var now = DateTime.UtcNow;
         var previous = cron.GetTimeBefore(now);

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.Export.Job.ServiceHost.Helpers;
@@ -9,42 +10,37 @@ using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
-using System.Security.Claims;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
 
-public sealed record CreateReportPreferenceCommand(
-    CreateReportPreferencesDTO dto
-) : ICommand<ReportPreferenceResponse>;
+public sealed record CreateReportPreferenceCommand(CreateReportPreferencesDTO dto) : ICommand<ReportPreferenceResponse>;
 
 public sealed class CreateReportPreferenceHandler(
     IReportPreference repository,
     IMapper mapper,
     IHttpContextAccessor httpContext,
-    IClientRepository clientRepository)
-    : ICommandHandler<CreateReportPreferenceCommand, ReportPreferenceResponse>
+    IClientRepository clientRepository
+) : ICommandHandler<CreateReportPreferenceCommand, ReportPreferenceResponse>
 {
     public async Task<BaseResponse<ReportPreferenceResponse>> Handle(
         CreateReportPreferenceCommand request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var userId = httpContext.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
+
         if (!ObjectId.TryParse(userId, out var userObjectId))
         {
-            return new BaseResponse<ReportPreferenceResponse>
-            {
-                Messages = ["Could not parse the UserId"]
-            };
+            return new BaseResponse<ReportPreferenceResponse> { Messages = ["Could not parse the UserId"] };
         }
 
         var client = await clientRepository.GetByIdAsync(request.dto.ClientId.ToObjectId(), cancellationToken);
-        
+
         if (client is null)
         {
             return new NotFoundResponse<ReportPreferenceResponse>
             {
-                Messages = [$"Client with Id: {request.dto.ClientId} not found."]
+                Messages = [$"Client with Id: {request.dto.ClientId} not found."],
             };
         }
 
@@ -57,10 +53,9 @@ public sealed class CreateReportPreferenceHandler(
         {
             return new BaseResponse<ReportPreferenceResponse>
             {
-                Messages = [$"Failed to generate cron expression: {ex.Message}"]
+                Messages = [$"Failed to generate cron expression: {ex.Message}"],
             };
         }
-        var JwtToken = httpContext.HttpContext?.Request.Headers["Authorization"].ToString();
         var preference = new ReportPreference
         {
             UserId = userObjectId,
@@ -70,8 +65,7 @@ public sealed class CreateReportPreferenceHandler(
             CronExpression = cronExpression,
             IsDelivered = false,
             IsEnabled = true,
-            JwtToken = JwtToken.Split(" ").Last(),
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
         };
 
         await repository.AddOneAsync(preference, cancellationToken);
