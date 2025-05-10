@@ -108,9 +108,6 @@ public sealed class GenerateReportQueryHandler(
 
     private async Task<List<InvoiceDto>> FetchInvoicesAsync(CancellationToken ct)
     {
-        var authHeader = httpContext.HttpContext?.Request.Headers["Authorization"].ToString();
-        var userId = httpContext.HttpContext?.User?
-                         .FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
         var resp = await storageApi.GetInvoicesAsync(1, int.MaxValue, false, ct);
         return resp.Data?.Items ?? [];
     }

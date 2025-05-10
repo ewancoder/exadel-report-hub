@@ -25,13 +25,8 @@ public sealed class ReportSchedulerJob(
             if (!IsTimeToSend(pref))
                 continue;
             HttpClient httpClient = new();
-            httpClient.BaseAddress=new Uri("http://localhost:5294");
-            httpClient.DefaultRequestHeaders.Authorization =new("Bearer",pref.jwtToken);
-            //HttpClient httpClient2 = new();
-            //httpClient2.BaseAddress = new Uri("http://localhost:5044");
-            //httpClient2.DefaultRequestHeaders.Authorization = new("Bearer", pref.jwtToken);
-            //IAuth auth = RestService.For<IAuth>(httpClient2);
-            //var jwtTOKEN = await auth.RefreshTokenAsync();
+            httpClient.BaseAddress = new Uri("https://localhost:7195");
+            httpClient.DefaultRequestHeaders.Authorization = new("Bearer", pref.JwtToken);
             IReportExportApi reportExportApi = RestService.For<IReportExportApi>(httpClient);
             var reportResponse = await reportExportApi.GetStatisticsAsync(
                 pref.ReportFormat,
