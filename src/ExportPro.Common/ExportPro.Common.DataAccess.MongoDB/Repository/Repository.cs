@@ -26,32 +26,26 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument>
 
     protected virtual IMongoCollection<TDocument> Collection => _collectionAccessor.Value;
 
-    public virtual async Task<TDocument> AddOneAsync(TDocument entity, CancellationToken cancellationToken)
+    public virtual async Task<TDocument> AddOneAsync(TDocument entity, CancellationToken cancellationToken = default)
     {
         await Collection.InsertOneAsync(entity, cancellationToken: cancellationToken);
         return entity;
     }
 
-    public virtual async Task<ICollection<TDocument>> AddManyAsync(
-        ICollection<TDocument> entities,
-        CancellationToken cancellationToken
-    )
+    public virtual async Task<ICollection<TDocument>> AddManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken = default)
     {
         await Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
         return entities;
     }
 
-    public virtual async Task<TDocument> UpdateOneAsync(TDocument entity, CancellationToken cancellationToken)
+    public virtual async Task<TDocument> UpdateOneAsync(TDocument entity, CancellationToken cancellationToken = default)
     {
         var filter = _fdb.Eq(doc => doc.Id, entity.Id);
         await Collection.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
         return entity;
     }
 
-    public virtual async Task<ICollection<TDocument>> UpdateManyAsync(
-        ICollection<TDocument> entities,
-        CancellationToken cancellationToken
-    )
+    public virtual async Task<ICollection<TDocument>> UpdateManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken = default)
     {
         foreach (var entity in entities)
         {
@@ -60,21 +54,18 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument>
         return entities;
     }
 
-    public virtual async Task<TDocument> GetByIdAsync(ObjectId id, CancellationToken cancellationToken)
+    public virtual async Task<TDocument> GetByIdAsync(ObjectId id, CancellationToken cancellationToken = default)
     {
         var filter = _fdb.Eq(doc => doc.Id, id);
         return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public virtual async Task<TDocument?> GetOneAsync(
-        Expression<Func<TDocument, bool>> filter,
-        CancellationToken cancellationToken
-    )
+    public virtual async Task<TDocument> GetOneAsync(Expression<Func<TDocument, bool>> filter, CancellationToken cancellationToken = default)
     {
         return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public virtual async Task<TDocument> DeleteAsync(ObjectId id, CancellationToken cancellationToken)
+    public virtual async Task<TDocument> DeleteAsync(ObjectId id, CancellationToken cancellationToken = default)
     {
         var filter = _fdb.Eq(doc => doc.Id, id);
         var document = await GetByIdAsync(id, cancellationToken);
@@ -83,7 +74,7 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument>
         return document;
     }
 
-    public virtual async Task<TDocument> SoftDeleteAsync(ObjectId id, CancellationToken cancellationToken)
+    public virtual async Task<TDocument> SoftDeleteAsync(ObjectId id, CancellationToken cancellationToken = default)
     {
         var filter = _fdb.Eq(doc => doc.Id, id);
         var update = Builders<TDocument>.Update.Set("IsDeleted", true);

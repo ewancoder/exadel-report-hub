@@ -1,6 +1,4 @@
-﻿using ExportPro.Common.Shared.Attributes;
-using ExportPro.Common.Shared.Enums;
-using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
@@ -16,7 +14,6 @@ namespace ExportPro.StorageService.API.Controllers;
 public class InvoiceController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    [HasPermission(Resource.Invoices, CrudAction.Create)]
     public Task<BaseResponse<InvoiceResponse>> Create(
         [FromBody] CreateInvoiceDto invoice,
         CancellationToken cancellationToken
@@ -38,8 +35,7 @@ public class InvoiceController(IMediator mediator) : ControllerBase
         mediator.Send(new GetInvoiceByIdQuery(id), cancellationToken);
 
     [HttpGet]
-    [HasPermission(Resource.Invoices, CrudAction.Read)]
-    public Task<BaseResponse<PaginatedListDto<InvoiceDto>>> GetInvoices(
+    public async Task<ActionResult<BaseResponse<PaginatedList<Invoice>>>> GetInvoices(
         CancellationToken cancellationToken,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10

@@ -8,11 +8,11 @@ using ExportPro.Auth.SDK.DTOs;
 namespace ExportPro.AuthService.Services;
 
 public class AuthService(
-    IUserRepository userRepository,
+    UserRepository userRepository,
     IJwtTokenService jwtTokenService,
     IOptions<JwtSettings> jwtOptions) : IAuthService
 {
-    private readonly IUserRepository _userRepository = userRepository;
+    private readonly UserRepository _userRepository = userRepository;
     private readonly IJwtTokenService _jwtTokenService = jwtTokenService;
     private readonly JwtSettings _jwtSettings = jwtOptions.Value;
 
@@ -36,10 +36,10 @@ public class AuthService(
             Username = dto.Username,
             Email = dto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = UserRole.Operator,
+            Role = Common.Shared.Enums.Role.None,
         };
 
-        user = await _userRepository.CreateAsync(user);
+        user = await _userRepository.AddOneAsync(user);
         return await GenerateTokenAndSetRefreshToken(user);
     }
 
@@ -92,7 +92,7 @@ public class AuthService(
         if (user != null)
         {
             user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
-            await _userRepository.UpdateAsync(user);
+            await _userRepository.UpdateOneAsync(user);
         }
     }
 
@@ -118,7 +118,7 @@ public class AuthService(
         };
 
         user.RefreshTokens.Add(newRefreshToken);
-        await _userRepository.UpdateAsync(user);
+        await _userRepository.UpdateOneAsync(user);
 
         List<Claim> claims =
         [

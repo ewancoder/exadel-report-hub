@@ -2,7 +2,6 @@ using System.Text;
 using ExportPro.Common.DataAccess.MongoDB.Configurations;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
-using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.StorageService.API.Configurations;
 using ExportPro.StorageService.CQRS;
@@ -16,16 +15,14 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Refit;
-
+using ExportPro.StorageService.API.Configurations;
+using ExportPro.Common.Shared.Refit;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<ApiResponseStatusCodeFilter>();
-    options.Filters.Add<PermissionFilter>();
-});
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddControllers();
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("JwtSettings"));
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
@@ -54,13 +51,17 @@ builder
     .Services.AddRefitClient<IECBApi>(new RefitSettings { ContentSerializer = new XmlContentSerializer() })
     .ConfigureHttpClient(c =>
     {
-        c.BaseAddress = new Uri(builder.Configuration["Refit:appurl"] ?? string.Empty);
+        c.BaseAddress = new Uri(builder.Configuration["Refit:currencyUrl"]);
     });
+builder.Services.AddRefitClient<IACLSharedApi>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7067"));
 builder.Services.AddLogging();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Storage Service");
 builder.Services.AddValidatorsFromAssembly(typeof(CreateClientCommandValidator).Assembly);
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
+builder.Services.AddAutoMapper(typeof(ExportPro.StorageService.CQRS.Profiles.MappingProfile));
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddCommonRegistrations();
 builder.Services.AddRepositoryConfig();

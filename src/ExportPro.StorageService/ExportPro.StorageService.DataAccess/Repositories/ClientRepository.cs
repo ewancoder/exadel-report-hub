@@ -18,11 +18,17 @@ public sealed class ClientRepository(
     IMapper mapper
 ) : BaseRepository<Client>(collectionProvider), IClientRepository
 {
-    public Task<List<Client>> GetClients(int top, int skip, CancellationToken cancellationToken = default)
+    public Task<List<Client>> GetClientsByIdsAsync(List<ObjectId> clientIds, int top, int skip, CancellationToken cancellationToken = default)
     {
-        var clients = Collection.Find(c => !c.IsDeleted);
-        var paginated = clients.Skip(skip).Limit(top).ToListAsync(cancellationToken);
-        return paginated;
+        var filter = Builders<Client>.Filter.And(
+            Builders<Client>.Filter.In(c => c.Id, clientIds),
+            Builders<Client>.Filter.Eq(c => c.IsDeleted, false)
+        );
+
+        return Collection.Find(filter)
+            .Skip(skip)
+            .Limit(top)
+            .ToListAsync(cancellationToken);
     }
 
     public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)
@@ -231,5 +237,13 @@ public sealed class ClientRepository(
         var client = await GetOneAsync(x => x.Id == clientId && !x.IsDeleted, cancellationToken);
         var plans = client!.Plans!.Skip(skip).Take(top).Select(x => mapper.Map<PlansResponse>(x)).ToList();
         return plans;
+    }
+
+    public Task<List<Client>> GetAllClientsAsync(int top, int skip, CancellationToken cancellationToken = default)
+    {
+        return Collection.Find(c => !c.IsDeleted)
+            .Skip(skip)
+            .Limit(top)
+            .ToListAsync(cancellationToken);
     }
 }
