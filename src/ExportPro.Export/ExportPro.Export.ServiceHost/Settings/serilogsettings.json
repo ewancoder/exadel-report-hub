@@ -1,6 +1,6 @@
 ﻿{
   "Serilog": {
-    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File", "Serilog.Sinks.Seq" ],
+    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File", "Serilog.Sinks.Seq" ,"Serilog.Expressions" ],
     "MinimumLevel": {
       "Default": "Information",
       "Override": {
@@ -16,7 +16,7 @@
           "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
         }
       },
-      {
+        {
         "Name": "Logger",
         "Args": {
           "configureLogger": {
@@ -24,11 +24,11 @@
               {
                 "Name": "ByIncludingOnly",
                 "Args": {
-                  "expression": "StartsWith(SourceContext, 'ExportPro') and @l = 'Information'"
+                  "expression": "SourceContext = 'AuditLogs'"
                 }
               }
             ],
-
+            
             "WriteTo": [
               {
                 "Name": "File",

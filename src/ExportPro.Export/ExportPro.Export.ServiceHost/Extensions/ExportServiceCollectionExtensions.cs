@@ -4,6 +4,7 @@ using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Export.CQRS.Behaviors;
 using ExportPro.Export.CQRS.Profile;
 using ExportPro.Export.CQRS.Queries;
 using ExportPro.Export.Csv.Services;
@@ -12,6 +13,8 @@ using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.ServiceHost.Infrastructure;
+using ExportPro.Export.Validations.Validations;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -56,12 +59,13 @@ public static class ExportServiceCollectionExtensions
         services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 
         // —— MediatR ——
+        services.AddValidatorsFromAssembly(typeof(DownloadLogByDateRangeQueryValidator).Assembly);
         services.AddMediatR(o =>
-            o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly)
-        );
-
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-
+        {
+            o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly);
+            o.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
+            o.AddOpenBehavior(typeof(ValidationBehavior<,>));
+        });
         // —— AutoMapper ——
         services.AddAutoMapper(typeof(MappingProfile));
 
