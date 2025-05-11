@@ -15,17 +15,29 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Refit;
-using ExportPro.StorageService.API.Configurations;
 using ExportPro.Common.Shared.Refit;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(opts =>
+{
+    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-
+var refitSettings = new RefitSettings
+{
+    ContentSerializer = new SystemTextJsonContentSerializer(
+        new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = false
+        })
+};
 builder
     .Services.AddAuthentication(options =>
     {
@@ -53,7 +65,7 @@ builder
     {
         c.BaseAddress = new Uri(builder.Configuration["Refit:currencyUrl"]);
     });
-builder.Services.AddRefitClient<IACLSharedApi>()
+builder.Services.AddRefitClient<IACLSharedApi>(refitSettings)
     .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.Configuration["Refit:authUrl"]));
 builder.Services.AddLogging();
 builder.Services.AddOpenApi();

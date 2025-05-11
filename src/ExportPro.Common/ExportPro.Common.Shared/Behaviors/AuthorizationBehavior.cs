@@ -1,9 +1,11 @@
 ﻿using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Helpers;
+using ExportPro.Common.Shared.Models;
 using ExportPro.Common.Shared.Refit;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 
 
@@ -39,7 +41,7 @@ public class AuthorizationBehavior<TRequest, TResponse>(
                         Action = permissionedRequest.Action
                     });
 
-                    if (!hasPermission)
+                    if (!hasPermission.Data)
                     {
                         throw new UnauthorizedAccessException(
                             $"No permission for client {clientId} - Action: {permissionedRequest.Action}, Resource: {permissionedRequest.Resource}");
@@ -56,7 +58,7 @@ public class AuthorizationBehavior<TRequest, TResponse>(
                     Action = permissionedRequest.Action
                 });
 
-                if (!hasPermission)
+                if (!hasPermission.Data)
                 {
                     throw new UnauthorizedAccessException(
                         $"No permission - Action: {permissionedRequest.Action}, Resource: {permissionedRequest.Resource}");

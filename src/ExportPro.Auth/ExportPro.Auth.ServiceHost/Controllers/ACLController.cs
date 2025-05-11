@@ -6,6 +6,7 @@ using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
+using ExportPro.Common.Shared.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -19,7 +20,7 @@ namespace ExportPro.Auth.ServiceHost.Controllers
 
         [HttpPost("check")]
         public  Task<BaseResponse<bool>> CheckPermission([FromBody] CheckPermissionRequest request) =>
-             mediator.Send(new HasPermissionQuery(request.UserId, request.ClientId, request.Resource, request.Action));
+             mediator.Send(new HasPermissionQuery((Guid)request.UserId, request.ClientId, request.Resource, request.Action));
 
         [HttpGet("{userId}/{clientId}")]
         public Task<BaseResponse<List<PermissionDTO>>> GetPermissions([FromRoute]string userId, [FromRoute] string clientId) =>

@@ -52,7 +52,7 @@ public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository,
             }
         );
 
-        if (!permission)
+        if (!permission.Data)
             return new NotFoundResponse<InvoiceDto>("You do not have permission to view this invoice.");
 
         var customer = await customerRepo.GetByIdAsync(
