@@ -10,7 +10,7 @@ using MediatR;
 var builder = WebApplication.CreateBuilder(args);
 
 // Shared logging and config
-builder.Host.UseSharedSerilogAndConfiguration();
+//builder.Host.UseSharedSerilogAndConfiguration();
 
 // Add services to the container
 builder.Services.AddControllers();

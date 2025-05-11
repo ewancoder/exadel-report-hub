@@ -54,7 +54,7 @@ builder
         c.BaseAddress = new Uri(builder.Configuration["Refit:currencyUrl"]);
     });
 builder.Services.AddRefitClient<IACLSharedApi>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7067"));
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.Configuration["Refit:authUrl"]));
 builder.Services.AddLogging();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Storage Service");
