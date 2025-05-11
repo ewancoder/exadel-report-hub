@@ -1,12 +1,12 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using System.Threading;
 using ExportPro.Common.Shared.Exceptions;
 using ExportPro.Common.Shared.Library;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace ExportPro.Common.Shared.Middlewares;
 
@@ -49,8 +49,9 @@ public class ErrorHandlingMiddleware
                 return context.Response.WriteAsync(JsonSerializer.Serialize(validationResponse));
             case FluentValidation.ValidationException validationException:
                 context.Response.StatusCode = (int)HttpStatusCode.UnprocessableEntity;
-                var dict = validationException.Errors
-                    .GroupBy(x => x.PropertyName).ToDictionary(g => g.Key, g => g.Select(x => x.ErrorMessage).ToArray());
+                var dict = validationException
+                    .Errors.GroupBy(x => x.PropertyName)
+                    .ToDictionary(g => g.Key.Split('.').Last(), g => g.Select(x => x.ErrorMessage).ToArray());
                 ValidationFailedResponse validationFailedResponse = new(dict);
                 validationFailedResponse.Messages = ["Validation Failed"];
                 return context.Response.WriteAsync(JsonSerializer.Serialize(validationFailedResponse));
