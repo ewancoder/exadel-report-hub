@@ -24,7 +24,7 @@ public sealed class ImportCustomersCommandHandler(
         ImportCustomersCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.ExcelFile == null || request.ExcelFile.Length == 0)
+        if (request.ExcelFile.Length == 0)
             return new BadRequestResponse<int>("Empty file.");
 
         List<CreateUpdateCustomerDto> customers;
@@ -37,20 +37,15 @@ public sealed class ImportCustomersCommandHandler(
             return new BadRequestResponse<int>($"Excel parsing failed: {ex.Message}");
         }
 
-        // Forward to Storage‑service and bubble the response unchanged
-        // return await storageApi.CreateCustomersBulkAsync(customers, cancellationToken);
-
         try
         {
             return await storageApi.CreateCustomersBulkAsync(customers, cancellationToken);
         }
         catch (ApiException ex) when (ex.HasContent)
         {
-            // Storage‑service already sent a BaseResponse<int> payload
             var resp = JsonConvert.DeserializeObject<BaseResponse<int>>(ex.Content);
             if (resp is not null) return resp;
 
-            // Fallback: wrap unknown body
             return new BaseResponse<int>
             {
                 ApiState = ex.StatusCode,
@@ -83,6 +78,7 @@ public sealed class ImportCustomersCommandHandler(
             throw new Exception($"Missing columns: {string.Join(", ", missing)}");
 
         List<CreateUpdateCustomerDto> list = [];
+        
         foreach (var row in header.Worksheet.RowsUsed().Skip(1)) // skip header
         {
             var name = row.Cell(col["Name"]).GetString().Trim();
