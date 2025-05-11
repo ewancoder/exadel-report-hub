@@ -1,4 +1,6 @@
-﻿using ExportPro.Common.Shared.Extensions;
+﻿using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -6,7 +8,12 @@ using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 
-public sealed record GetPlanQuery(Guid PlanId) : IQuery<PlansResponse>;
+public sealed record GetPlanQuery(Guid PlanId) : IQuery<PlansResponse>, IPermissionedRequest
+{
+    public List<Guid>? ClientIds => null;
+    public Resource Resource => Resource.Plans;
+    public CrudAction Action => CrudAction.Read;
+};
 
 public sealed class GetPlanQueryHandler(IClientRepository clientRepository) : IQueryHandler<GetPlanQuery, PlansResponse>
 {

@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -14,7 +16,12 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public sealed record CreateInvoiceCommand(CreateInvoiceDto CreateInvoiceDto) : ICommand<InvoiceResponse>;
+public sealed record CreateInvoiceCommand(CreateInvoiceDto CreateInvoiceDto) : ICommand<InvoiceResponse>, IPermissionedRequest
+{
+    public List<Guid>? ClientIds { get; init; } = [CreateInvoiceDto.ClientId];
+    public Resource Resource { get; init; } = Resource.Invoices;
+    public CrudAction Action { get; init; } = CrudAction.Create;
+};
 
 public sealed class CreateInvoiceHandler(
     IInvoiceRepository repository,

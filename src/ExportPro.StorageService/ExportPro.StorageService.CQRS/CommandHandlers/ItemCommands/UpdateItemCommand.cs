@@ -1,5 +1,7 @@
 ﻿using System.Net;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -8,7 +10,12 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
-public sealed record UpdateItemCommand(Guid ClientId, Item Item) : ICommand<bool>;
+public sealed record UpdateItemCommand(Guid ClientId, Item Item) : ICommand<bool>, IPermissionedRequest
+{
+    public List<Guid>? ClientIds { get; init; } = [ClientId];
+    public Resource Resource { get; init; } = Resource.Items;
+    public CrudAction Action { get; init; } = CrudAction.Update;
+};
 
 public sealed class UpdateItemCommandHandler(IClientRepository repository) : ICommandHandler<UpdateItemCommand, bool>
 {

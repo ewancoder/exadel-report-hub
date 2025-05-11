@@ -5,7 +5,7 @@ using MongoDB.Bson;
 namespace ExportPro.Common.Shared.Helpers;
 public interface IPermissionedRequest
 {
-    List<string>? ClientIds { get; }
+    List<Guid>? ClientIds { get; }
     Resource Resource { get; }
     CrudAction Action { get; }
 }

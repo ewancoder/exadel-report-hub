@@ -15,7 +15,7 @@ namespace ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 
 public sealed record CreateClientCommand(ClientDto ClientDto) : ICommand<ClientResponse>, IPermissionedRequest
 {
-    public List<string>? ClientIds { get; init; } = null;
+    public List<Guid>? ClientIds { get; init; } = null;
     public Resource Resource { get; init; } = Resource.Clients;
     public CrudAction Action { get; init; } = CrudAction.Create;
 };

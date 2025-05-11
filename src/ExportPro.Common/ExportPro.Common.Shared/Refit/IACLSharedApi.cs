@@ -9,6 +9,6 @@ namespace ExportPro.Common.Shared.Refit
         Task<bool> CheckPermissionAsync(CheckPermissionRequest request);
 
         [Get("api/permissions/user-clients")]
-        Task<List<string>> GetUserClientsAsync(CancellationToken cancellationToken = default);
+        Task<List<Guid>> GetUserClientsAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -10,7 +12,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public sealed record UpdateInvoiceCommand(Guid Id, CreateInvoiceDto InvoiceDto) : ICommand<InvoiceResponse>;
+public sealed record UpdateInvoiceCommand(Guid Id, CreateInvoiceDto InvoiceDto) : ICommand<InvoiceResponse>, IPermissionedRequest
+{
+    public List<Guid>? ClientIds { get; init; } = [InvoiceDto.ClientId];
+    public Resource Resource { get; init; } = Resource.Invoices;
+    public CrudAction Action { get; init; } = CrudAction.Update;
+};
 
 public sealed class UpdateInvoiceHandler(
     IHttpContextAccessor httpContext,

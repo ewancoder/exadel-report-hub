@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
-using ExportPro.StorageService.CQRS.CommandHandlers.Items;
+using ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 using ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
 using ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
@@ -40,77 +42,75 @@ public class ClientController(IMediator mediator) : ControllerBase
     [SwaggerOperation(Summary = "Getting  client by client id")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
     [ProducesResponseType(typeof(NotFoundResponse<ClientResponse>), 404)]
-    public Task<BaseResponse<ClientResponse>> GetClientById([Required] [FromRoute] string clientId, CancellationToken cancellationToken = default)
+    public Task<BaseResponse<ClientResponse>> GetClientById([Required] [FromRoute] Guid clientId, CancellationToken cancellationToken = default)
     => mediator.Send(new GetClientByIdQuery(clientId), cancellationToken);
 
     [HttpPatch("{clientId}")]
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
-    public Task<BaseResponse<ClientResponse>> UpdateClient([FromRoute] string clientId, [FromBody] ClientDto client)
+    public Task<BaseResponse<ClientResponse>> UpdateClient([FromRoute] Guid clientId, [FromBody] ClientDto client)
    => mediator.Send(new UpdateClientCommand(client, clientId));
 
 
     [HttpDelete("{clientId}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]
     [ProducesResponseType(typeof(BaseResponse<ClientResponse>), 200)]
-    public async Task<IActionResult> SoftDeleteClient([FromRoute] string clientId)
-    {
-        var clientDeleting = await mediator.Send(new SoftDeleteClientCommand(clientId));
-        return StatusCode((int)clientDeleting.ApiState, clientDeleting);
-    }
+    public Task<BaseResponse<ClientResponse>> SoftDeleteClient([FromRoute] Guid clientId)
+     =>  mediator.Send(new SoftDeleteClientCommand(clientId));
 
     [HttpPatch("{clientId}/item")]
     [SwaggerOperation(Summary = "add single item to client")]
-    public async Task<IActionResult> AddItemToClient(string clientId, [FromBody] ItemDtoForClient item)
-    {
-        var response = await mediator.Send(
-            new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.CurrencyId, clientId)
+    public Task<BaseResponse<string>> AddItemToClient(
+        Guid clientId,
+        [FromBody] ItemDtoForClient item,
+        CancellationToken cancellationToken = default
+    ) =>
+        mediator.Send(
+            new CreateItemCommand(item.Name, item.Description, item.Price, item.Status, item.CurrencyId, clientId),
+            cancellationToken
         );
 
     [HttpPatch("{clientId}/items")]
     [SwaggerOperation(Summary = "add many items to client")]
-    public async Task<IActionResult> AddItemsToClient(string clientId, [FromBody] List<ItemDtoForClient> items)
-    {
-        var response = await mediator.Send(new CreateItemsCommand(clientId, items));
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<bool>> AddItemsToClient(
+        Guid clientId,
+        [FromBody] List<ItemDtoForClient> items,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new CreateItemsCommand(clientId, items), cancellationToken);
 
     [HttpDelete("{clientId}/item/{itemId}")]
     [SwaggerOperation(Summary = "remove item from client")]
-    public async Task<IActionResult> RemoveItemFromClient(string clientId, string itemId)
-    {
-        var response = await mediator.Send(new DeleteItemCommand(itemId, clientId));
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<bool>> RemoveItemFromClient(
+        Guid clientId,
+        Guid itemId,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new DeleteItemCommand(itemId, clientId), cancellationToken);
 
     [HttpPut("{clientId}/item")]
     [SwaggerOperation(Summary = "update item in client")]
-    public async Task<IActionResult> UpdateItemInClient(string clientId, [FromBody] Item item)
-    {
-        var response = await mediator.Send(new UpdateItemCommand(clientId, item));
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<bool>> UpdateItemInClient(
+        Guid clientId,
+        [FromBody] Item item,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new UpdateItemCommand(clientId, item), cancellationToken);
 
     [HttpPut("{clientId}/items")]
     [SwaggerOperation(Summary = "update many items in client")]
-    public async Task<IActionResult> UpdateItemsInClient(string clientId, [FromBody] List<Item> items)
-    {
-        var response = await mediator.Send(new UpdateItemsCommand(clientId, items));
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<bool>> UpdateItemsInClient(
+        Guid clientId,
+        [FromBody] List<Item> items,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new UpdateItemsCommand(clientId, items), cancellationToken);
 
     [HttpGet("plan/{planId}")]
     [SwaggerOperation(Summary = "Get Plan by id ")]
-    public async Task<IActionResult> GetPlan(string planId)
-    {
-        var response = await mediator.Send(new GetPlanQuery(planId));
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<PlansResponse>> GetPlan(Guid planId, CancellationToken cancellationToken = default) =>
+        mediator.Send(new GetPlanQuery(planId), cancellationToken);
 
     [HttpGet("{clientId}/plans")]
     [SwaggerOperation(Summary = "Get Client Plans")]
-    public async Task<IActionResult> GetClientPlans(
-        [FromRoute] string clientId,
+    public Task<BaseResponse<List<PlansResponse>>> GetClientPlans(
+        [FromRoute] Guid clientId,
         [FromQuery] int top = 5,
         [FromQuery] int skip = 0,
         CancellationToken cancellationToken = default
@@ -118,25 +118,24 @@ public class ClientController(IMediator mediator) : ControllerBase
 
     [HttpPatch("{clientId}/plan")]
     [SwaggerOperation(Summary = "add single plan to client")]
-    public async Task<IActionResult> AddPlanToClient([FromRoute] string clientId, [FromBody] PlansDto plan)
-    {
-        var response = await mediator.Send(new AddPlanToClientCommand(clientId, plan));
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<PlansResponse>> AddPlanToClient(
+        [FromRoute] Guid clientId,
+        [FromBody] PlansDto plan,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new AddPlanToClientCommand(clientId, plan), cancellationToken);
 
     [HttpDelete("plan/{planId}")]
     [SwaggerOperation(Summary = "remove plan from client")]
-    public async Task<IActionResult> RemovePlanFromClient([FromRoute] string planId)
-    {
-        var response = await mediator.Send(new RemovePlanFromClientCommand(planId));
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<PlansResponse>> RemovePlanFromClient(
+        [FromRoute] Guid planId,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new RemovePlanFromClientCommand(planId.ToObjectId()), cancellationToken);
 
     [HttpPatch("plan/{planId}")]
     [SwaggerOperation(Summary = "Update Client's Plan")]
-    public async Task<IActionResult> UpdateClientPlan([FromRoute] string planId, [FromBody] PlansDto plansDto)
-    {
-        var response = await mediator.Send(new UpdateClientPlanCommand(planId, plansDto));
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<PlansResponse>> UpdateClientPlan(
+        [FromRoute] Guid planId,
+        [FromBody] PlansDto plansDto,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new UpdateClientPlanCommand(planId, plansDto), cancellationToken);
 }

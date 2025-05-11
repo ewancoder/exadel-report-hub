@@ -1,15 +1,18 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExportPro.StorageService.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class CustomerController(IMediator mediator) : ControllerBase
 {

@@ -1,5 +1,6 @@
 ﻿using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using MediatR;
@@ -9,8 +10,8 @@ using MongoDB.Bson;
 namespace ExportPro.Auth.CQRS.Queries;
 
 public record HasPermissionQuery(
-    string UserId,
-    string? ClientId,
+    Guid UserId,
+    Guid? ClientId,
     Resource Resource,
     CrudAction Action
 ) : IQuery<bool>;
@@ -20,20 +21,10 @@ public class HasPermissionQueryHandler(IACLService aclService) : IQueryHandler<H
 
     public async Task<BaseResponse<bool>> Handle(HasPermissionQuery request, CancellationToken cancellationToken)
     {
-        if (!ObjectId.TryParse(request.UserId, out var userId))
-            return new BadRequestResponse<bool>("Invalid UserId");
-
-        ObjectId clientId = ObjectId.Empty;
-
-        if (!string.IsNullOrEmpty(request.ClientId))
-        {
-            if (!ObjectId.TryParse(request.ClientId, out clientId))
-                return new BadRequestResponse<bool>("Invalid ClientId");
-        }
 
         var hasPermission = await aclService.HasPermission(
-            userId,
-            clientId,
+            request.UserId.ToObjectId(),
+            request.ClientId.GetValueOrDefault().ToObjectId(),
             request.Resource,
             request.Action,
             cancellationToken

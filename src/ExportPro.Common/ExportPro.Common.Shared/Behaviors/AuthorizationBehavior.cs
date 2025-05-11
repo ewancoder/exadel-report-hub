@@ -1,10 +1,10 @@
 ﻿using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Refit;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using MongoDB.Bson;
-using System.Security.Claims;
+
 
 
 namespace ExportPro.Common.Shared.Behaviors;
@@ -18,6 +18,8 @@ public class AuthorizationBehavior<TRequest, TResponse>(
         {
             var user = (httpContextAccessor.HttpContext?.User) ?? throw new UnauthorizedAccessException("User context not found.");
             var userRole = TokenHelper.GetUserRole(user);
+            if(userRole == Role.JobAdmin)
+                return await next(cancellationToken);
             if (userRole == Role.SuperAdmin &&
                 (permissionedRequest.Resource == Resource.Clients || permissionedRequest.Resource == Resource.Users))
             {
@@ -25,13 +27,13 @@ public class AuthorizationBehavior<TRequest, TResponse>(
             }
             var userId = TokenHelper.GetUserId(user);
 
-            if (permissionedRequest.ClientIds != null && permissionedRequest.ClientIds.Any())
+            if (permissionedRequest.ClientIds != null && permissionedRequest.ClientIds.Count != 0)
             {
                 foreach (var clientId in permissionedRequest.ClientIds)
                 {
                     var hasPermission = await permissionChecker.CheckPermissionAsync(new Models.CheckPermissionRequest
                     {
-                        UserId = userId.ToString(),
+                        UserId = userId.ToGuid(),
                         ClientId = clientId,
                         Resource = permissionedRequest.Resource,
                         Action = permissionedRequest.Action
@@ -48,7 +50,7 @@ public class AuthorizationBehavior<TRequest, TResponse>(
             {
                 var hasPermission = await permissionChecker.CheckPermissionAsync(new Models.CheckPermissionRequest
                 {
-                    UserId = userId.ToString(),
+                    UserId = userId.ToGuid(),
                     ClientId = default,
                     Resource = permissionedRequest.Resource,
                     Action = permissionedRequest.Action

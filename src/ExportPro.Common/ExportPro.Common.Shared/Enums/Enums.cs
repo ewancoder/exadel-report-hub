@@ -31,6 +31,7 @@ public enum Resource
 public enum Role
 {
     None,
-    SuperAdmin
+    SuperAdmin,
+    JobAdmin
 }
 

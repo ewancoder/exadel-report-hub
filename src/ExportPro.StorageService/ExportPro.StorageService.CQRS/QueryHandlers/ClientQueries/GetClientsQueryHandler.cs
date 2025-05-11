@@ -1,5 +1,6 @@
 using AutoMapper;
 using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
@@ -13,7 +14,7 @@ namespace ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
 
 public record GetClientsQuery(int Top, int Skip) : IQuery<List<ClientResponse>>, IPermissionedRequest
 {
-    public List<string>? ClientIds { get; init; } = null;
+    public List<Guid>? ClientIds { get; init; } = null;
     public Resource Resource { get; init; } = Resource.Clients;
     public CrudAction Action { get; init; } = CrudAction.Read;
 };
@@ -34,8 +35,7 @@ public class GetClientsQueryHandler(IClientRepository clientRepository, IMapper 
         }
         var availableClients = await aclApi.GetUserClientsAsync(cancellationToken);
         var clientIds = availableClients
-                            .Where(id => ObjectId.TryParse(id, out _))
-                            .Select(ObjectId.Parse)
+                            .Select(id => id.ToObjectId())
                             .ToList();
         var clients = await clientRepository.GetClientsByIdsAsync(clientIds, request.Top, request.Skip, cancellationToken);
         if (clients.Count == 0)

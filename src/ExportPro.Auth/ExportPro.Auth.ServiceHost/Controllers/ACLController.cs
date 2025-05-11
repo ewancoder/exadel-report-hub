@@ -14,8 +14,8 @@ namespace ExportPro.Auth.ServiceHost.Controllers
     {
 
         [HttpPost("check")]
-        public  Task<BaseResponse<bool>> CheckPermission([FromBody] HasPermissionQuery request) =>
-             mediator.Send(request);
+        public  Task<BaseResponse<bool>> CheckPermission([FromBody] CheckPermissionRequest request) =>
+             mediator.Send(new HasPermissionQuery(request.UserId, request.ClientId, request.Resource, request.Action));
 
         [HttpGet("{userId}/{clientId}")]
         public Task<BaseResponse<List<PermissionDTO>>> GetPermissions([FromRoute]string userId, [FromRoute] string clientId) =>
@@ -35,7 +35,7 @@ namespace ExportPro.Auth.ServiceHost.Controllers
             => mediator.Send(command);
 
         [HttpGet("user-clients")]
-        public Task<BaseResponse<List<string>>> UserClients()
+        public Task<BaseResponse<List<Guid>>> UserClients()
             => mediator.Send(new GetUserClientsQuery());
 
     }
