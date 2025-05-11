@@ -31,7 +31,7 @@
       git:
         repo: /exadel/
         dest: /exadel/
-        version: Giorgi/24/Serilog
+        version: ForHosting 
     
 - name: Installing Docker
   hosts: all
