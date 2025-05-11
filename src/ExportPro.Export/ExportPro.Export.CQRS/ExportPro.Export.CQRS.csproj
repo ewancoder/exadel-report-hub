@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="ClosedXML" Version="0.104.2" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="ExportPro.Common.Shared" Version="1.0.29" />
     </ItemGroup>
 
@@ -15,10 +16,6 @@
         <ProjectReference Include="..\ExportPro.Export.Pdf\ExportPro.Export.Pdf.csproj"/>
         <ProjectReference Include="..\ExportPro.Export.SDK\ExportPro.Export.SDK.csproj"/>
         <PackageReference Include="AutoMapper" Version="14.0.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Commands\" />
     </ItemGroup>
 
 </Project>
