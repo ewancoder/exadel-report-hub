@@ -16,5 +16,6 @@ public static class RepositoryConfigs
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<ICurrencyRepository, CurrencyRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<IReportPreference, ReportPreferenceRepository>();
     }
 }
