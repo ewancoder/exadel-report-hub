@@ -35,6 +35,19 @@
             "SwaggerKey": "exportservice"
         },
         {
+            "UpstreamPathTemplate": "/api/CustomerImport/bulk",
+            "UpstreamHttpMethod": [ "Post" ],
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [ 
+                { 
+                    "Host": "exportservice", 
+                    "Port": 8080
+                } 
+            ],
+            "DownstreamPathTemplate": "/api/CustomerImport/bulk",
+            "SwaggerKey": "exportservice"
+        },
+        {
             "UpstreamPathTemplate": "/api/currency",
             "UpstreamHttpMethod": [ "Get", "Post" ],
             "DownstreamScheme": "http",
