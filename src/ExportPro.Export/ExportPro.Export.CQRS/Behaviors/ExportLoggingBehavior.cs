@@ -2,9 +2,7 @@
 using ExportPro.Export.CQRS.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Serilog;
-using ILogger = Serilog.ILogger;
 
 namespace ExportPro.Export.CQRS.Behaviors
 {
