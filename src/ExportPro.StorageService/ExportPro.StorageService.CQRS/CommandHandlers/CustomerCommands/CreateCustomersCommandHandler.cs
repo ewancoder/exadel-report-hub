@@ -34,7 +34,7 @@ public sealed class CreateCustomersCommandHandler(
         for (var i = 0; i < request.Customers.Count; i++)
         {
             var customerDto = request.Customers[i];
-            var errors = new List<string>();
+            List<string> errors = [];
 
             // Validate required fields
             if (string.IsNullOrEmpty(customerDto.Name))
@@ -99,7 +99,7 @@ public sealed class CreateCustomersCommandHandler(
         {
             // Convert validation errors to a flat list of messages
             var errorMessages = validationErrors
-                .SelectMany(kvp => kvp.Value.Select(error => $"Customer[{kvp.Key}]: {error}"))
+                .SelectMany(kvp => kvp.Value.Select(error => $"Customer {kvp.Key + 1}: {error}"))
                 .ToList();
 
             return new BadRequestResponse<int>
