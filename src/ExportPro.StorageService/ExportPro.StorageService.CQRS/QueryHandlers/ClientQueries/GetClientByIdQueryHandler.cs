@@ -1,7 +1,7 @@
 using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.Responses;
 
@@ -21,6 +21,8 @@ public sealed class GetClientByIdQueryHandler(IClientRepository clientRepository
             x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
             cancellationToken
         );
+        if (client == null)
+            return new NotFoundResponse<ClientResponse>("Client Not Found");
         var clientResponse = mapper.Map<ClientResponse>(client);
         return new SuccessResponse<ClientResponse>(clientResponse, "Client Retrieved");
     }

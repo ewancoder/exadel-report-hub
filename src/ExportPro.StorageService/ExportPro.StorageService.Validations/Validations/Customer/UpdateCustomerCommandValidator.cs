@@ -1,5 +1,5 @@
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
@@ -9,6 +9,54 @@ public sealed class UpdateCustomerCommandValidator : AbstractValidator<UpdateCus
 {
     public UpdateCustomerCommandValidator(ICountryRepository countryRepository, ICustomerRepository repository)
     {
+        RuleFor(x => x.Customer.Name)
+            .NotEmpty()
+            .WithMessage("Name is required.")
+            .MaximumLength(100)
+            .WithMessage("Name must not exceed 100 characters.")
+            .MustAsync(
+                async (name, cancellation) =>
+                {
+                    var customer = await repository.GetOneAsync(x => x.Name == name && !x.IsDeleted, cancellation);
+                    if (customer == null)
+                        return true;
+                    return false;
+                }
+            )
+            .WithMessage("Name already exists.");
+        RuleFor(x => x.Customer.Email)
+            .NotEmpty()
+            .WithMessage("Email is required.")
+            .EmailAddress()
+            .WithMessage("Invalid email format.")
+            .MustAsync(
+                async (email, cancellation) =>
+                {
+                    var customer = await repository.GetOneAsync(x => x.Email == email && !x.IsDeleted, cancellation);
+                    if (customer == null)
+                        return true;
+                    return false;
+                }
+            )
+            .WithMessage("Email already exists.");
+        RuleFor(x => x.Customer.Address)
+            .NotEmpty()
+            .WithMessage("Address is required.")
+            .MaximumLength(200)
+            .WithMessage("Address must not exceed 200 characters.")
+            .MustAsync(
+                async (address, cancellation) =>
+                {
+                    var customer = await repository.GetOneAsync(
+                        x => x.Address == address && !x.IsDeleted,
+                        cancellation
+                    );
+                    if (customer == null)
+                        return true;
+                    return false;
+                }
+            )
+            .WithMessage("Address already exists.");
         RuleFor(x => x.Id)
             .NotEmpty()
             .WithMessage("The id is required")

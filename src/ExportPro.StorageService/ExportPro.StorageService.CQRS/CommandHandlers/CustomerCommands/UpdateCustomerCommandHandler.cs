@@ -1,17 +1,22 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.Responses;
+using Microsoft.AspNetCore.Http;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
 public sealed record UpdateCustomerCommand(Guid Id, CreateUpdateCustomerDto Customer) : ICommand<CustomerResponse>;
 
-public sealed class UpdateCustomerCommandHandler(ICustomerRepository repository, IMapper mapper)
-    : ICommandHandler<UpdateCustomerCommand, CustomerResponse>
+public sealed class UpdateCustomerCommandHandler(
+    IHttpContextAccessor httpContext,
+    ICustomerRepository repository,
+    IMapper mapper
+) : ICommandHandler<UpdateCustomerCommand, CustomerResponse>
 {
     public async Task<BaseResponse<CustomerResponse>> Handle(
         UpdateCustomerCommand request,
@@ -34,7 +39,7 @@ public sealed class UpdateCustomerCommandHandler(ICustomerRepository repository,
             existingCustomer.CountryId = request.Customer.CountryId.ToObjectId();
 
         existingCustomer.UpdatedAt = DateTime.UtcNow;
-
+        existingCustomer.UpdatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;
         await repository.UpdateOneAsync(existingCustomer, cancellationToken);
         var customerResp = mapper.Map<CustomerResponse>(existingCustomer);
         return new SuccessResponse<CustomerResponse>(customerResp, "The customer Updated successfully.");

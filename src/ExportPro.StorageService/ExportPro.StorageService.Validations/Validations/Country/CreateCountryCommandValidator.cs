@@ -1,5 +1,5 @@
-﻿using ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
-using ExportPro.StorageService.CQRS.Extensions;
+﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
@@ -9,19 +9,19 @@ public sealed class CreateCountryCommandValidator : AbstractValidator<CreateCoun
 {
     public CreateCountryCommandValidator(ICurrencyRepository currencyRepository)
     {
-        RuleFor(x => x.Name).NotEmpty().WithMessage("The Country name is required");
-        RuleFor(x => x.CurrencyId)
+        RuleFor(x => x.CountryDto.Name).NotEmpty().WithMessage("The Country name is required");
+        RuleFor(x => x.CountryDto.CurrencyId)
             .NotEmpty()
             .WithMessage("The Currency Id is required")
             .DependentRules(
                 () =>
-                    RuleFor(x => x.CurrencyId)
+                    RuleFor(x => x.CountryDto.CurrencyId)
                         .MustAsync(
-                            async (currency, CancellationToken_) =>
+                            async (currency, cancellationToken) =>
                             {
                                 var client = await currencyRepository.GetOneAsync(
                                     x => x.Id == currency.ToObjectId() && !x.IsDeleted,
-                                    CancellationToken_
+                                    cancellationToken
                                 );
                                 return client != null;
                             }

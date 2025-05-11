@@ -1,6 +1,6 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.Responses;
 
@@ -13,6 +13,8 @@ public sealed class GetPlanQueryHandler(IClientRepository clientRepository) : IQ
     public async Task<BaseResponse<PlansResponse>> Handle(GetPlanQuery request, CancellationToken cancellationToken)
     {
         var plan = await clientRepository.GetPlan(request.PlanId.ToObjectId(), cancellationToken);
-        return new SuccessResponse<PlansResponse>(plan!, "Plan retrieved successfully");
+        if (plan == null)
+            return new NotFoundResponse<PlansResponse>("Plan Not Found");
+        return new SuccessResponse<PlansResponse>(plan, "Plan retrieved successfully");
     }
 }

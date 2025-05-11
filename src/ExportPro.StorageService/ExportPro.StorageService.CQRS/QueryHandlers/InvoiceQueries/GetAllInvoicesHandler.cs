@@ -1,8 +1,7 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
@@ -10,12 +9,7 @@ using ExportPro.StorageService.SDK.PaginationParams;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public sealed class GetAllInvoicesQuery : IQuery<PaginatedListDto<InvoiceDto>>
-{
-    public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
-    public bool IncludeDeleted { get; set; } = false;
-}
+public sealed record GetAllInvoicesQuery(int PageNumber = 1, int PageSize = 10) : IQuery<PaginatedListDto<InvoiceDto>>;
 
 public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper)
     : IQueryHandler<GetAllInvoicesQuery, PaginatedListDto<InvoiceDto>>
@@ -30,11 +24,7 @@ public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper
         if (request.PageSize < 1)
             return new BadRequestResponse<PaginatedListDto<InvoiceDto>>("Page size must be greater than zero.");
         var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
-        var paginatedInvoices = await repository.GetAllPaginatedAsync(
-            parameters,
-            request.IncludeDeleted,
-            cancellationToken
-        );
+        var paginatedInvoices = await repository.GetAllPaginatedAsync(parameters, cancellationToken);
         var invoiceDtos = paginatedInvoices
             .Items.Select(invoice => new InvoiceDto
             {

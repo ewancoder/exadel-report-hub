@@ -1,23 +1,22 @@
-﻿using System.Net;
+﻿using System.Security.Claims;
 using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
+using Microsoft.AspNetCore.Http;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CountryCommands;
 
-public sealed class CreateCountryCommand : ICommand<CountryDto>
-{
-    public required string Name { get; set; }
-    public string? Code { get; set; }
-    public required Guid CurrencyId { get; set; }
-}
+public sealed record CreateCountryCommand(CreateCountryDto CountryDto) : ICommand<CountryDto>;
 
-public sealed class CreateCountryCommandHandler(ICountryRepository repository, IMapper mapper)
-    : ICommandHandler<CreateCountryCommand, CountryDto>
+public sealed class CreateCountryCommandHandler(
+    IHttpContextAccessor httpContext,
+    ICountryRepository repository,
+    IMapper mapper
+) : ICommandHandler<CreateCountryCommand, CountryDto>
 {
     public async Task<BaseResponse<CountryDto>> Handle(
         CreateCountryCommand request,
@@ -26,16 +25,12 @@ public sealed class CreateCountryCommandHandler(ICountryRepository repository, I
     {
         var country = new Country
         {
-            Name = request.Name,
-            Code = request.Code,
-            CurrencyId = request.CurrencyId.ToObjectId(),
+            Name = request.CountryDto.Name,
+            Code = request.CountryDto.Code,
+            CurrencyId = request.CountryDto.CurrencyId.ToObjectId(),
+            CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value,
         };
         await repository.AddOneAsync(country, cancellationToken);
-        return new BaseResponse<CountryDto>
-        {
-            IsSuccess = true,
-            ApiState = HttpStatusCode.Created,
-            Data = mapper.Map<CountryDto>(country),
-        };
+        return new SuccessResponse<CountryDto>(mapper.Map<CountryDto>(country));
     }
 }

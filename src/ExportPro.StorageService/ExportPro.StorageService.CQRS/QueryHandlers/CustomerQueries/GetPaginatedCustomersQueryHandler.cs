@@ -1,18 +1,14 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 
-public sealed class GetPaginatedCustomersQuery : IQuery<PaginatedListDto<CustomerDto>>
-{
-    public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
-    public bool IncludeDeleted { get; set; } = false;
-}
+public sealed record GetPaginatedCustomersQuery(int PageNumber = 1, int PageSize = 10)
+    : IQuery<PaginatedListDto<CustomerDto>>;
 
 public sealed class GetPaginatedCustomersQueryHandler(ICustomerRepository repository)
     : IQueryHandler<GetPaginatedCustomersQuery, PaginatedListDto<CustomerDto>>
@@ -24,11 +20,7 @@ public sealed class GetPaginatedCustomersQueryHandler(ICustomerRepository reposi
     {
         var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
 
-        var paginatedCustomers = await repository.GetAllPaginatedAsync(
-            parameters,
-            request.IncludeDeleted,
-            cancellationToken
-        );
+        var paginatedCustomers = await repository.GetAllPaginatedAsync(parameters, cancellationToken);
 
         var customerDtos = paginatedCustomers
             .Items.Select(c => new CustomerDto

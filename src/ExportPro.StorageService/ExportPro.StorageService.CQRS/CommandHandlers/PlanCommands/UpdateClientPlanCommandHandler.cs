@@ -1,6 +1,6 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
@@ -17,6 +17,9 @@ public sealed class UpdateClientPlanCommandHandler(IClientRepository clientRepos
         CancellationToken cancellationToken
     )
     {
+        var plansResponse = await clientRepository.GetPlan(request.PlanId.ToObjectId(), cancellationToken);
+        if (plansResponse == null)
+            return new NotFoundResponse<PlansResponse>("Plan Not Found");
         var plan = await clientRepository.UpdateClientPlan(
             request.PlanId.ToObjectId(),
             request.PlansDto,

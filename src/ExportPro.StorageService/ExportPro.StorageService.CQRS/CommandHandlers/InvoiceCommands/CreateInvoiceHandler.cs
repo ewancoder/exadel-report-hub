@@ -1,37 +1,27 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
-using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public sealed class CreateInvoiceCommand : ICommand<InvoiceResponse>
-{
-    public string? InvoiceNumber { get; set; }
-    public DateTime IssueDate { get; set; } = DateTime.UtcNow;
-    public DateTime DueDate { get; set; }
-    public required Guid CurrencyId { get; set; }
-    public Status? PaymentStatus { get; set; }
-    public Guid CustomerId { get; set; }
-    public string? BankAccountNumber { get; set; }
-    public Guid ClientId { get; set; }
-    public Guid ClientCurrencyId { get; set; }
-    public List<ItemDtoForClient>? Items { get; set; }
-}
+public sealed record CreateInvoiceCommand(CreateInvoiceDto CreateInvoiceDto) : ICommand<InvoiceResponse>;
 
 public sealed class CreateInvoiceHandler(
     IInvoiceRepository repository,
     IMapper mapper,
     ICurrencyExchangeService currencyExchangeService,
     ICurrencyRepository currencyRepository,
+    IHttpContextAccessor httpContext,
     //i need to use this manually because it is not validating automatically
     IValidator<CurrencyExchangeModel> validator
 ) : ICommandHandler<CreateInvoiceCommand, InvoiceResponse>
@@ -44,21 +34,24 @@ public sealed class CreateInvoiceHandler(
         var invoice = new Invoice
         {
             Id = ObjectId.GenerateNewId(),
-            InvoiceNumber = request.InvoiceNumber,
-            IssueDate = request.IssueDate,
-            DueDate = request.DueDate,
-            CurrencyId = request.CurrencyId.ToObjectId(),
-            PaymentStatus = request.PaymentStatus,
-            BankAccountNumber = request.BankAccountNumber,
-            ClientId = request.ClientId.ToObjectId(),
-            CustomerId = request.CustomerId.ToObjectId(),
-            ClientCurrencyId = request.ClientCurrencyId.ToObjectId(),
-            Items = request.Items!.Select(c => mapper.Map<Item>(c)).ToList(),
+            InvoiceNumber = request.CreateInvoiceDto.InvoiceNumber,
+            IssueDate = request.CreateInvoiceDto.IssueDate,
+            DueDate = request.CreateInvoiceDto.DueDate,
+            CurrencyId = request.CreateInvoiceDto.CurrencyId.ToObjectId(),
+            PaymentStatus = request.CreateInvoiceDto.PaymentStatus,
+            BankAccountNumber = request.CreateInvoiceDto.BankAccountNumber,
+            ClientId = request.CreateInvoiceDto.ClientId.ToObjectId(),
+            CustomerId = request.CreateInvoiceDto.CustomerId.ToObjectId(),
+            ClientCurrencyId = request.CreateInvoiceDto.ClientCurrencyId.ToObjectId(),
+            CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value,
+            Items = request.CreateInvoiceDto.Items!.Select(c => mapper.Map<Item>(c)).ToList(),
         };
         foreach (var i in invoice.Items)
             i.Id = ObjectId.GenerateNewId();
         //getting the invoice currency
-        var invoiceCurrency = await currencyRepository.GetCurrencyCodeById(request.CurrencyId.ToObjectId());
+        var invoiceCurrency = await currencyRepository.GetCurrencyCodeById(
+            request.CreateInvoiceDto.CurrencyId.ToObjectId()
+        );
         CurrencyExchangeModel currencyExchangeModel = new()
         {
             Date = invoice.IssueDate,

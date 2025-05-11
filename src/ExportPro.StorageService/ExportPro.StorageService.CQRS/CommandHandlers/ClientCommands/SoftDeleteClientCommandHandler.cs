@@ -17,6 +17,12 @@ public sealed class SoftDeleteClientCommandHandler(IClientRepository clientRepos
         CancellationToken cancellationToken
     )
     {
+        var client = await clientRepository.GetOneAsync(
+            x => x.Id == request.ClientId && !x.IsDeleted,
+            cancellationToken
+        );
+        if (client == null)
+            return new NotFoundResponse<ClientResponse>("Client Not Found");
         var clientDeleted = await clientRepository.SoftDeleteAsync(request.ClientId, cancellationToken);
         var clientResponse = mapper.Map<ClientResponse>(clientDeleted);
         return new SuccessResponse<ClientResponse>(clientResponse, "Client Deleted Successfully");

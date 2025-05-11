@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
@@ -27,7 +27,9 @@ public sealed class UpdateClientCommandHandler(
             x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
             cancellationToken
         );
-        client!.Name = request.Client.Name;
+        if (client == null)
+            return new NotFoundResponse<ClientResponse>("Client Not Found");
+        client.Name = request.Client.Name;
         if (request.Client.Description != null)
             client.Description = request.Client.Description;
         client.UpdatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;

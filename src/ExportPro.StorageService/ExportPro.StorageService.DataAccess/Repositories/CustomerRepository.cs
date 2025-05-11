@@ -13,13 +13,10 @@ public sealed class CustomerRepository(ICollectionProvider collectionProvider)
 {
     public async Task<PaginatedList<Customer>> GetAllPaginatedAsync(
         PaginationParameters parameters,
-        bool includeDeleted = false,
         CancellationToken cancellationToken = default
     )
     {
-        var filter = includeDeleted
-            ? Builders<Customer>.Filter.Empty
-            : Builders<Customer>.Filter.Eq(c => c.IsDeleted, false);
+        var filter = Builders<Customer>.Filter.Eq(c => c.IsDeleted, false);
         // Get total count for pagination
         var totalCount = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
         // Apply pagination
