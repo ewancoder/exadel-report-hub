@@ -45,6 +45,25 @@ public sealed class CreateCustomerCommandValidator : AbstractValidator<CreateCus
                 }
             )
             .WithMessage("Email already exists.");
+        RuleFor(x => x.CustomerDto.Address)
+            .NotEmpty()
+            .WithMessage("Address is required.")
+            .MaximumLength(200)
+            .WithMessage("Address must not exceed 200 characters.")
+            .MustAsync(
+                async (address, cancellation) =>
+                {
+                    var customer = await customerRepository.GetOneAsync(
+                        x => x.Address == address && !x.IsDeleted,
+                        cancellation
+                    );
+                    if (customer == null)
+                        return true;
+                    return false;
+                }
+            )
+            .WithMessage("Address already exists.");
+
         RuleFor(x => x.CustomerDto.CountryId)
             .NotEmpty()
             .WithMessage("The country id is required")
