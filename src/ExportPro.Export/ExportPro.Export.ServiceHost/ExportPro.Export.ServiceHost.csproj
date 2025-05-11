@@ -26,7 +26,6 @@
         <ProjectReference Include="..\ExportPro.Export.CQRS\ExportPro.Export.CQRS.csproj"/>
         <ProjectReference Include="..\ExportPro.Export.Csv\ExportPro.Export.Csv.csproj"/>
         <ProjectReference Include="..\ExportPro.Export.Excel\ExportPro.Export.Excel.csproj"/>
-        <ProjectReference Include="..\ExportPro.Export.Validations\ExportPro.Export.Validations.csproj" />
     </ItemGroup>
 
 </Project>
