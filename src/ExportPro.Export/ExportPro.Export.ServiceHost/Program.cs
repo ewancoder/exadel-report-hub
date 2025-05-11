@@ -20,6 +20,7 @@ builder.Services.AddCommonRegistrations();
 // Register MongoDB dependencies
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
 
 // MediatR behavior
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
