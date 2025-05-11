@@ -22,7 +22,8 @@ public sealed class ReportSchedulerJob(
         var authHeader = httpContext.HttpContext?.Request.Headers["Authorization"].ToString();
         var preferences = await reportRepository.GetAllPreferences(context.CancellationToken);
         HttpClient client = new();
-        client.BaseAddress = new Uri("https://localhost:7067");
+        var baseUrlForAuth = Environment.GetEnvironmentVariable("DockerForAuth")?? "https://localhost:7067";
+        client.BaseAddress = new Uri(baseUrlForAuth);
         IAuth authAPi = RestService.For<IAuth>(client);
         UserRegisterDto user = new()
         {
@@ -39,7 +40,8 @@ public sealed class ReportSchedulerJob(
             if (!IsTimeToSend(pref))
                 continue;
             HttpClient httpClient = new();
-            httpClient.BaseAddress = new Uri("https://localhost:7195");
+            var baseurl = Environment.GetEnvironmentVariable("DockerForReport")?? "https://localhost:7195";
+            httpClient.BaseAddress = new Uri(baseurl);
             httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
             IReportExportApi reportExportApi = RestService.For<IReportExportApi>(httpClient);
             var reportResponse = await reportExportApi.GetStatisticsAsync(

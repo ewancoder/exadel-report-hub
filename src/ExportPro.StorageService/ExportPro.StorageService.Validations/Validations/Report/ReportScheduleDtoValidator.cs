@@ -1,5 +1,4 @@
-﻿using ExportPro.Export.Job.ServiceHost.DTOs;
-using ExportPro.StorageService.Models.Enums;
+﻿using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.SDK.DTOs;
 using FluentValidation;
 

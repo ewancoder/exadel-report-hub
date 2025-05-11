@@ -4,18 +4,18 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <PackageId>ExportPro.Export.Job.ServiceHost</PackageId>
+    <Authors>Exadel-Group-3</Authors>
+    <Version>1.0.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExportPro.Common.Shared" Version="1.0.27" />
+    <PackageReference Include="ExportPro.StorageService.DataAccess" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.14.0" />
     <PackageReference Include="Quartz.Serialization.Json" Version="3.14.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-	<ProjectReference Include="..\ExportPro.StorageService\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj" />
-	<ProjectReference Include="..\ExportPro.StorageService\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
   </ItemGroup>
 
 </Project>
