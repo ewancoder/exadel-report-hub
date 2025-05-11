@@ -7,8 +7,8 @@ public class GetTotalRevenueQueryValidator : AbstractValidator<GetTotalRevenueQu
 {
     public GetTotalRevenueQueryValidator()
     {
-        RuleFor(x => x.StartDate)
-            .LessThanOrEqualTo(x => x.EndDate)
+        RuleFor(x => x.RevenueDto.StartDate)
+            .LessThanOrEqualTo(x => x.RevenueDto.EndDate)
             .WithMessage("StartDate must be before EndDate.");
     }
 }

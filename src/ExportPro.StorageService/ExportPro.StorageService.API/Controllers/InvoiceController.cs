@@ -3,6 +3,7 @@ using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
@@ -46,17 +47,19 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     ) => mediator.Send(new GetAllInvoicesQuery(pageNumber, pageSize), cancellationToken);
 
     [HttpGet("count")]
-    public async Task<IActionResult> GetTotalInvoices([FromQuery] GetTotalInvoicesQuery query)
+    public async Task<IActionResult> GetTotalInvoices([FromQuery] TotalInvoicesDto query)
     {
-        var response = await mediator.Send(query);
-
+        var response = await mediator.Send(new GetTotalInvoicesQuery(query));
         return StatusCode((int)response.ApiState, response);
     }
-
     [HttpGet("revenue")]
-    public async Task<IActionResult> GetTotalRevenue([FromQuery] GetTotalRevenueQuery query)
+    public async Task<IActionResult> GetTotalRevenue([FromQuery] TotalRevenueDto query)
     {
-        var result = await mediator.Send(query);
+        var result = await mediator.Send(new GetTotalRevenueQuery(query));
         return StatusCode((int)result.ApiState, result);
     }
+    [HttpGet("overdue-payments/{clientId}")]
+    [HasPermission(Resource.Invoices, CrudAction.Read)]
+    public Task<BaseResponse<OverduePaymentsResponse>> GetOverduePayments([FromRoute] Guid  clientId,
+        CancellationToken cancellationToken) =>  mediator.Send(new GetOverduePaymentsQuery(clientId), cancellationToken);
 }

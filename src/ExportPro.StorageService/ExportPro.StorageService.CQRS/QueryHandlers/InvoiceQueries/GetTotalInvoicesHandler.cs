@@ -4,17 +4,12 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs;
 using MongoDB.Driver;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public sealed class GetTotalInvoicesQuery : IQuery<long>
-{
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-    public Guid ClientId { get; set; }
-}
-
+public sealed record GetTotalInvoicesQuery(TotalInvoicesDto InvoicesDto) : IQuery<long>;
 public sealed class GetTotalInvoicesHandler(IInvoiceRepository invoiceRepository)
     : IQueryHandler<GetTotalInvoicesQuery, long>
 {
@@ -23,9 +18,9 @@ public sealed class GetTotalInvoicesHandler(IInvoiceRepository invoiceRepository
     public async Task<BaseResponse<long>> Handle(GetTotalInvoicesQuery request, CancellationToken cancellationToken)
     {
         var filter =
-            Builders<Invoice>.Filter.Gte(x => x.IssueDate, request.StartDate)
-            & Builders<Invoice>.Filter.Lte(x => x.IssueDate, request.EndDate);
-        filter &= Builders<Invoice>.Filter.Eq(x => x.ClientId, request.ClientId.ToObjectId());
+            Builders<Invoice>.Filter.Gte(x => x.IssueDate, request.InvoicesDto.StartDate)
+            & Builders<Invoice>.Filter.Lte(x => x.IssueDate, request.InvoicesDto.EndDate);
+        filter &= Builders<Invoice>.Filter.Eq(x => x.ClientId, request.InvoicesDto.ClientId.ToObjectId());
         var count = await _invoiceRepository.CountAsync(filter, cancellationToken);
 
         if (count == 0)

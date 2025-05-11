@@ -3,16 +3,13 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Services;
 using FluentValidation;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public sealed class GetTotalRevenueQuery : IQuery<double>
-{
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-}
+public sealed record GetTotalRevenueQuery(TotalRevenueDto RevenueDto) : IQuery<double>;
 
 public sealed class GetTotalRevenueHandler(
     IInvoiceRepository invoiceRepository,
@@ -23,7 +20,7 @@ public sealed class GetTotalRevenueHandler(
 {
     public async Task<BaseResponse<double>> Handle(GetTotalRevenueQuery request, CancellationToken cancellationToken)
     {
-        var invoices = await invoiceRepository.GetInvoicesInDateRangeAsync(request.StartDate, request.EndDate);
+        var invoices = await invoiceRepository.GetInvoicesInDateRangeAsync(request.RevenueDto.StartDate, request.RevenueDto.EndDate);
 
         if (invoices == null || invoices.Count == 0)
         {

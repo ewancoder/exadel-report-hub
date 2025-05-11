@@ -7,12 +7,12 @@ public class GetInvoiceCountQueryValidator : AbstractValidator<GetTotalInvoicesQ
 {
     public GetInvoiceCountQueryValidator()
     {
-        RuleFor(x => x.StartDate).NotEmpty().WithMessage("Start date is required.");
+        RuleFor(x => x.InvoicesDto.StartDate).NotEmpty().WithMessage("Start date is required.");
 
-        RuleFor(x => x.EndDate).NotEmpty().WithMessage("End date is required.");
+        RuleFor(x => x.InvoicesDto.EndDate).NotEmpty().WithMessage("End date is required.");
 
         RuleFor(x => x)
-            .Must(x => x.EndDate >= x.StartDate)
+            .Must(x => x.InvoicesDto.EndDate >= x.InvoicesDto.StartDate)
             .WithMessage("End date must be greater than or equal to start date.");
 
         // RuleFor(x => x.ClientId)
