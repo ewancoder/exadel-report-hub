@@ -40,4 +40,10 @@ public interface IStorageServiceApi
     Task<BaseResponse<List<PlansResponse>>> GetPlansByClientAsync(
         Guid clientId,
         CancellationToken cancellationToken = default);
+    
+    [Post("/api/Customer/bulk")]
+    Task<BaseResponse<int>> CreateCustomersBulkAsync(
+        [Body] List<CreateUpdateCustomerDto> customers,
+        CancellationToken cancellationToken = default);
+
 }
