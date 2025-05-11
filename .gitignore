@@ -365,3 +365,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 src/.idea
+src/.idea/
+*/.idea/*
+src/ExportPro/ExportPro.IntegrationTests/ExportPro.Export.IntegrationTests/.idea
+src/ExportPro/ExportPro.IntegrationTests/ExportPro.StorageService.IntegrationTests/.idea

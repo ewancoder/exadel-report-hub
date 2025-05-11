@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.9" />
+      <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.3" />
+    </ItemGroup>
+
+
+</Project>

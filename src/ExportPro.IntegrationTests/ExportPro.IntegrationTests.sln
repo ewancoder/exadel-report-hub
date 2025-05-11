@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.IntegrationTests", "ExportPro.Export.IntegrationTests\ExportPro.Export.IntegrationTests.csproj", "{241AC2E0-28BE-43FD-AA8E-A59511AF08A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.IntegrationTests", "ExportPro.StorageService.IntegrationTests\ExportPro.StorageService.IntegrationTests.csproj", "{AD538052-7AA8-4BEF-ACA8-0722310D84C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{241AC2E0-28BE-43FD-AA8E-A59511AF08A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{241AC2E0-28BE-43FD-AA8E-A59511AF08A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{241AC2E0-28BE-43FD-AA8E-A59511AF08A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{241AC2E0-28BE-43FD-AA8E-A59511AF08A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD538052-7AA8-4BEF-ACA8-0722310D84C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD538052-7AA8-4BEF-ACA8-0722310D84C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD538052-7AA8-4BEF-ACA8-0722310D84C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD538052-7AA8-4BEF-ACA8-0722310D84C8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
