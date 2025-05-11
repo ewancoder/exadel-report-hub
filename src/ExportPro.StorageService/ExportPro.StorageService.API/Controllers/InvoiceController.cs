@@ -44,4 +44,19 @@ public class InvoiceController(IMediator mediator) : ControllerBase
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10
     ) => mediator.Send(new GetAllInvoicesQuery(pageNumber, pageSize), cancellationToken);
+
+    [HttpGet("count")]
+    public async Task<IActionResult> GetTotalInvoices([FromQuery] GetTotalInvoicesQuery query)
+    {
+        var response = await mediator.Send(query);
+
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpGet("revenue")]
+    public async Task<IActionResult> GetTotalRevenue([FromQuery] GetTotalRevenueQuery query)
+    {
+        var result = await mediator.Send(query);
+        return StatusCode((int)result.ApiState, result);
+    }
 }
