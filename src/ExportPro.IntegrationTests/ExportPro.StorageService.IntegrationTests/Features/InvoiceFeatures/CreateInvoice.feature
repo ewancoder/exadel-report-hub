@@ -13,8 +13,8 @@ Feature: Creating a invoice after creating a currency, country and customer
           | Name                      | Code                | CurrencyId |
           |TestUsa####TESTCUSTOMER### | TESTCOUNTRYCODECode |  temp      |
         And The user created following customer and stored the customer id
-          | CountryId | Name                     | Email                              |
-          |temp       | TESTUSER####TESTCUSTOMER | TESTUSER####TESTCUSTOMER@gmail.com |
+          | CountryId | Name                     | Email                              | Address|
+          |temp       | TESTUSER####TESTCUSTOMER | TESTUSER####TESTCUSTOMER@gmail.com | TBILISI|
         And The user wants to create following invoice
           | InvoiceNumber       | IssueDate  | DueDate    | CurrencyId | PaymentStatus | CustomerId | ClientId | ClientCurrencyId | 
           | 123456789#######000 | 2025-01-01 | 2025-01-31 | temp       | 0             | temp       | temp     | temp             | 
