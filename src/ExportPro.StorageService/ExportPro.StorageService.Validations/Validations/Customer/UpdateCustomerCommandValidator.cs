@@ -9,6 +9,36 @@ public sealed class UpdateCustomerCommandValidator : AbstractValidator<UpdateCus
 {
     public UpdateCustomerCommandValidator(ICountryRepository countryRepository, ICustomerRepository repository)
     {
+        RuleFor(x => x.Customer.Name)
+            .NotEmpty()
+            .WithMessage("Name is required.")
+            .MaximumLength(100)
+            .WithMessage("Name must not exceed 100 characters.")
+            .MustAsync(
+                async (name, cancellation) =>
+                {
+                    var customer = await repository.GetOneAsync(x => x.Name == name && !x.IsDeleted, cancellation);
+                    if (customer == null)
+                        return true;
+                    return false;
+                }
+            )
+            .WithMessage("Name already exists.");
+        RuleFor(x => x.Customer.Email)
+            .NotEmpty()
+            .WithMessage("Email is required.")
+            .EmailAddress()
+            .WithMessage("Invalid email format.")
+            .MustAsync(
+                async (email, cancellation) =>
+                {
+                    var customer = await repository.GetOneAsync(x => x.Email == email && !x.IsDeleted, cancellation);
+                    if (customer == null)
+                        return true;
+                    return false;
+                }
+            )
+            .WithMessage("Email already exists.");
         RuleFor(x => x.Id)
             .NotEmpty()
             .WithMessage("The id is required")
