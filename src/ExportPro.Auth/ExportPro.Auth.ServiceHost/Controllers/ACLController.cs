@@ -1,10 +1,14 @@
 ﻿using ExportPro.Auth.CQRS.Commands;
 using ExportPro.Auth.CQRS.Queries;
 using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Auth.SDK.Models;
 using ExportPro.AuthService.Services;
+using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace ExportPro.Auth.ServiceHost.Controllers
 {
@@ -21,18 +25,18 @@ namespace ExportPro.Auth.ServiceHost.Controllers
         public Task<BaseResponse<List<PermissionDTO>>> GetPermissions([FromRoute]string userId, [FromRoute] string clientId) =>
              mediator.Send(new GetUserClientPermissionsQuery(userId, clientId));
         
-        [HttpPost("grant")]
-        public Task<BaseResponse<bool>> GrantPermission([FromBody] GrantUserRoleCommand command) =>
-           mediator.Send(command);
+        [HttpPost("grant/{userId}/{clientId}/{role}")]
+        public Task<BaseResponse<bool>> GrantPermission([FromRoute] Guid clientId, [FromRoute] Guid userId, [FromRoute] UserRole role) =>
+        mediator.Send(new GrantUserRoleCommand(userId.ToObjectId(), clientId.ToObjectId(), role));
  
 
-        [HttpPost("revoke")]
-        public Task<BaseResponse<bool>> RevokePermission([FromBody] RemovePermissionCommand command) => 
-            mediator.Send(command);
+        [HttpPost("revoke/{userId}/{clientId}")]
+        public Task<BaseResponse<bool>> RevokePermission([FromRoute] Guid clientId, [FromRoute]Guid userId) => 
+            mediator.Send(new RemovePermissionCommand(userId.ToObjectId(),clientId.ToObjectId()));
 
-        [HttpPost("update-role")]
-        public  Task<BaseResponse<bool>> UpdateUserRole([FromBody] UpdateUserRoleCommand command) 
-            => mediator.Send(command);
+        [HttpPost("update-role/{userId}/{clientId}/{role}")]
+        public  Task<BaseResponse<bool>> UpdateUserRole([FromRoute] Guid clientId, [FromRoute] Guid userId, [FromRoute] UserRole role) 
+            => mediator.Send(new UpdateUserRoleCommand(userId.ToObjectId(), clientId.ToObjectId(), role));
 
         [HttpGet("user-clients")]
         public Task<BaseResponse<List<Guid>>> UserClients()

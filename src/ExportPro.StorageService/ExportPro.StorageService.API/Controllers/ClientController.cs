@@ -24,13 +24,12 @@ public class ClientController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     [SwaggerOperation(Summary = "Creating a client")]
-    [ProducesResponseType(typeof(ClientResponse), 200)]
+    [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     [ProducesResponseType(typeof(NotFoundResponse<ClientResponse>), 404)]
-    public async Task<IActionResult> CreateClient([FromBody] CreateClientCommand clientCommand)
-    {
-        var clientResponse = await mediator.Send(clientCommand);
-        return StatusCode((int)clientResponse.ApiState, clientResponse);
-    }
+    public Task<BaseResponse<ClientResponse>> CreateClient(
+        [FromBody] ClientDto client,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new CreateClientCommand(client), cancellationToken);
 
     [HttpGet]
     [SwaggerOperation(Summary = "Getting  clients")]
