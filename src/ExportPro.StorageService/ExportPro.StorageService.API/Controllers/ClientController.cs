@@ -33,24 +33,22 @@ public class ClientController(IMediator mediator) : ControllerBase
     [HttpGet]
     [SwaggerOperation(Summary = "Getting  clients")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
-    public async Task<BaseResponse<List<ClientResponse>>> GetClients([FromQuery] int top = 5, [FromQuery] int skip = 0) 
+    public Task<BaseResponse<List<ClientResponse>>> GetClients([FromQuery] int top = 5, [FromQuery] int skip = 0, CancellationToken cancellationToken = default) 
         => mediator.Send(new GetClientsQuery(top, skip), cancellationToken);
 
     [HttpGet("{clientId}")]
     [SwaggerOperation(Summary = "Getting  client by client id")]
     [ProducesResponseType(typeof(ClientResponse), 200)]
     [ProducesResponseType(typeof(NotFoundResponse<ClientResponse>), 404)]
-    public async Task<BaseResponse<ClientResponse>> GetClientById([Required] [FromRoute] string clientId)
+    public Task<BaseResponse<ClientResponse>> GetClientById([Required] [FromRoute] string clientId, CancellationToken cancellationToken = default)
     => mediator.Send(new GetClientByIdQuery(clientId), cancellationToken);
 
     [HttpPatch("{clientId}")]
     [SwaggerOperation(Summary = "Updating the client")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
-    public async Task<BaseResponse<ClientResponse>> UpdateClient([FromRoute] string clientId, [FromBody] ClientDto client)
-    {
-        var afterUpdate = await mediator.Send(new UpdateClientCommand(client, clientId));
-        return StatusCode((int)afterUpdate.ApiState, afterUpdate);
-    }
+    public Task<BaseResponse<ClientResponse>> UpdateClient([FromRoute] string clientId, [FromBody] ClientDto client)
+   => mediator.Send(new UpdateClientCommand(client, clientId));
+
 
     [HttpDelete("{clientId}")]
     [SwaggerOperation(Summary = "deleting the client by clientid")]
