@@ -29,86 +29,72 @@ public sealed class ExcelReportGenerator : IReportGenerator
 
     private static void GenerateReportInfoSheet(ReportContentDto data, XLWorkbook wb)
     {
-        var sht = wb.Worksheets.Add("ReportInfo");
-
-        sht.Cell("A1").Value = "GeneratedAt";
-        sht.Cell("B1").Value = DateTime.UtcNow.ToString("u");
-
-        sht.Cell("A2").Value = "ClientIds";
-        sht.Cell("B2").Value =
-            string.Join(", ", data.ClientNames.Select(kv => $"{kv.Value} ({kv.Key})"));
-
-        sht.Cell("A3").Value = "IssueDateFrom";
-        sht.Cell("B3").Value = data.Filters.IssueDateFrom?.ToString("u") ?? "—";
+        var info = wb.Worksheets.Add("ReportInfo");
+        info.Cell("A1").Value = "GeneratedAt";
+        info.Cell("B1").Value = DateTime.UtcNow.ToString("u");
+        info.Cell("A2").Value = "Client:";
+        info.Cell("B2").Value = data.ClientName;
     }
 
     private static void GeneratePlansSheet(ReportContentDto data, XLWorkbook wb)
     {
         var ws = wb.Worksheets.Add("Plans");
-        var row = 1;
-
-        foreach (var (clientId, plans) in data.PlansByClient)
-        {
-            data.ClientNames.TryGetValue(clientId, out var cName);
-            ws.Cell(row, 1).Value = $"Client: {cName ?? "—"} ({clientId})";
-            ws.Cell(row, 1).Style.Font.SetBold();
-            row++;
-
-            var tbl = ws.Cell(row, 1).InsertTable(plans, $"Pl_{clientId}", true);
-            row += tbl.RowCount() + 2;
-        }
+        ws.Cell(1, 1).Value = $"Client: {data.ClientName}";
+        ws.Cell(1, 1).Style.Font.SetBold();
+        ws.Cell(2, 1).InsertTable(
+            data.Plans.Select(p => new
+            {
+                p.StartDate,
+                p.EndDate,
+                p.Amount,
+                p.CreatedAt,
+                p.UpdatedAt
+            }),
+            "Plans",
+            true
+        );
     }
 
     private static void GenerateItemsSheet(ReportContentDto data, XLWorkbook wb)
     {
         var ws = wb.Worksheets.Add("Items");
-        var row = 1;
-
-        foreach (var (clientId, items) in data.ItemsByClient)
-        {
-            data.ClientNames.TryGetValue(clientId, out var cName);
-            ws.Cell(row, 1).Value = $"Client: {cName ?? "—"} ({clientId})";
-            ws.Cell(row, 1).Style.Font.SetBold();
-            row++;
-
-            var tbl = ws.Cell(row, 1).InsertTable(items, $"It_{clientId}", true);
-            row += tbl.RowCount() + 2;
-        }
+        ws.Cell(1, 1).Value = $"Client: {data.ClientName}";
+        ws.Cell(1, 1).Style.Font.SetBold();
+        ws.Cell(2, 1).InsertTable(
+            data.Items.Select(i => new
+            {
+                i.Name,
+                i.Description,
+                i.Price,
+                i.Status,
+                i.CurrencyId,
+                i.CreatedAt,
+                i.UpdatedAt
+            }),
+            "Items",
+            true
+        );
     }
 
     private static void GenerateInvoicesSheet(ReportContentDto data, XLWorkbook wb)
     {
         var ws = wb.Worksheets.Add("Invoices");
-        var row = 1;
-
-        foreach (var grp in data.Invoices
-                     .Where(i => i.ClientId.HasValue)
-                     .GroupBy(i => i.ClientId!.Value))
-        {
-            data.ClientNames.TryGetValue(grp.Key, out var cName);
-            ws.Cell(row, 1).Value = $"Client: {cName ?? "—"} ({grp.Key})";
-            ws.Cell(row, 1).Style.Font.SetBold();
-            row++;
-
-            var tbl = ws.Cell(row, 1)
-                .InsertTable(ProjectInvoices(grp), $"Inv_{grp.Key}", true);
-
-            row += tbl.RowCount() + 2;
-        }
+        ws.Cell(1, 1).Value = $"Client: {data.ClientName}";
+        ws.Cell(1, 1).Style.Font.SetBold();
+        ws.Cell(2, 1).InsertTable(ProjectInvoices(data.Invoices), "Invoices", true);
     }
 
     private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src)
-        => src.Select(i => new
+    {
+        return src.Select(i => new
         {
-            i.Id,
             i.InvoiceNumber,
             IssueDate = i.IssueDate.ToString("yyyy-MM-dd"),
             DueDate = i.DueDate.ToString("yyyy-MM-dd"),
             i.Amount,
             i.CurrencyId,
             i.PaymentStatus,
-            i.BankAccountNumber,
-            i.ClientId,
-            i.CustomerId
+            i.BankAccountNumber
         });
+    }
 }

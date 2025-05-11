@@ -8,7 +8,7 @@ using Refit;
 namespace ExportPro.Export.SDK.Interfaces;
 
 /// <summary>
-/// Refit client. Calls StorageService to fetch invoice data for export.
+///     Refit client. Calls StorageService to fetch invoice data for export.
 /// </summary>
 public interface IStorageServiceApi
 {

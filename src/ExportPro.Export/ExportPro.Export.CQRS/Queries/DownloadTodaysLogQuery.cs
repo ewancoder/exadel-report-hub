@@ -2,7 +2,7 @@
 
 namespace ExportPro.Export.CQRS.Queries;
 
-public record DownloadTodaysLogQuery() : IRequest<byte[]?>;
+public record DownloadTodaysLogQuery : IRequest<byte[]?>;
 
 public sealed class DownloadTodaysLogQueryHandler : IRequestHandler<DownloadTodaysLogQuery, byte[]?>
 {

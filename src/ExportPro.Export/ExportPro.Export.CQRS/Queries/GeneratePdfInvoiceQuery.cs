@@ -18,38 +18,69 @@ public sealed class GenerateInvoicePdfQueryHandler(
     IPdfGenerator pdfGenerator,
     IMapper mapper,
     IHttpContextAccessor httpContextAccessor,
-    ILogger<GenerateInvoicePdfQueryHandler> logger
-) : IRequestHandler<GenerateInvoicePdfQuery, PdfFileDto>
+    ILogger<GenerateInvoicePdfQueryHandler> logger)
+    : IRequestHandler<GenerateInvoicePdfQuery, PdfFileDto>
 {
     public async Task<PdfFileDto> Handle(GenerateInvoicePdfQuery request, CancellationToken cancellationToken)
     {
         if (request.InvoiceId == Guid.Empty)
             throw new ArgumentException("InvoiceId cannot be empty", nameof(request.InvoiceId));
 
-        var userId = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
+        var userId = httpContextAccessor.HttpContext?.User?
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
 
-        logger.LogInformation(
-            "GenerateInvoicePdf START: user {UserId}, invoice {InvoiceId}, ts {Ts}",
-            userId,
-            request.InvoiceId,
-            DateTime.UtcNow
-        );
+        logger.LogInformation("GenerateInvoicePdf START: user {UserId}, invoice {InvoiceId}, ts {Ts}",
+            userId, request.InvoiceId, DateTime.UtcNow);
 
-        var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
-        string currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
-        string client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
-        string customer = await GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
-        var invoice = MapToPdfInvoiceExportDto(invoiceDto, currency, client, customer);
-        var result = GeneratePdfFile(invoice);
+        var result = await CreateInvoicePdfAsync(request, cancellationToken);
 
-        logger.LogInformation(
-            "GenerateInvoicePdf DONE: user {UserId}, invoice {InvoiceId}, ts {Ts}",
-            userId,
-            request.InvoiceId,
-            DateTime.UtcNow
-        );
+        logger.LogInformation("GenerateInvoicePdf DONE: user {UserId}, invoice {InvoiceId}, ts {Ts}",
+            userId, request.InvoiceId, DateTime.UtcNow);
 
         return result;
+    }
+
+    private async Task<PdfFileDto> CreateInvoicePdfAsync(GenerateInvoicePdfQuery request,
+        CancellationToken cancellationToken)
+    {
+        var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
+        var currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
+        var client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
+        var customer = await GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
+        var invoice = MapToPdfInvoiceExportDto(invoiceDto, currency, client, customer);
+        await PopulateItemCurrencyCodesAsync(invoiceDto, invoice, cancellationToken);
+        var result = GeneratePdfFileDto(invoice);
+        return result;
+    }
+
+    private async Task PopulateItemCurrencyCodesAsync(
+        InvoiceDto srcInvoice,
+        PdfInvoiceExportDto destInvoice,
+        CancellationToken ct)
+    {
+        if (srcInvoice.Items is null)
+            return;
+
+        var cache = new Dictionary<Guid, string>();
+
+        for (var i = 0; i < srcInvoice.Items.Count; i++)
+        {
+            var curId = srcInvoice.Items[i].CurrencyId;
+
+            if (curId == Guid.Empty)
+            {
+                destInvoice.Items[i].CurrencyCode = "—";
+                continue;
+            }
+
+            if (!cache.TryGetValue(curId, out var code))
+            {
+                code = await GetCurrencyCodeAsync(curId, ct);
+                cache[curId] = code;
+            }
+
+            destInvoice.Items[i].CurrencyCode = code;
+        }
     }
 
     private async Task<InvoiceDto> GetInvoiceByIdAsync(Guid id, CancellationToken ct)
@@ -73,7 +104,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
             return "—";
 
         var resp = await storageApi.GetClientByIdAsync(id.Value, ct);
-        return resp.Data?.Name ?? "—"; // fixed for BaseResponse<ClientResponse>
+        return resp.Data?.Name ?? "—";
     }
 
     private async Task<string> GetCustomerNameAsync(Guid? id, CancellationToken ct)
@@ -86,11 +117,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
     }
 
     private PdfInvoiceExportDto MapToPdfInvoiceExportDto(
-        InvoiceDto src,
-        string currency,
-        string client,
-        string customer
-    )
+        InvoiceDto src, string currency, string client, string customer)
     {
         var dest = mapper.Map<PdfInvoiceExportDto>(src);
         dest.CurrencyCode = currency;
@@ -99,10 +126,10 @@ public sealed class GenerateInvoicePdfQueryHandler(
         return dest;
     }
 
-    private PdfFileDto GeneratePdfFile(PdfInvoiceExportDto invoice)
+    private PdfFileDto GeneratePdfFileDto(PdfInvoiceExportDto invoice)
     {
-        byte[] bytes = pdfGenerator.GeneratePdfDocument(invoice);
-        string name = FileNameTemplates.InvoicePdfFileName(invoice.InvoiceNumber);
+        var bytes = pdfGenerator.GeneratePdfDocument(invoice);
+        var name = FileNameTemplates.InvoicePdfFileName(invoice.InvoiceNumber);
         return new PdfFileDto(name, bytes);
     }
 }

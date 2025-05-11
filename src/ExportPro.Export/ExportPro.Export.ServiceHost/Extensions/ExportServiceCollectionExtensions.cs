@@ -4,7 +4,6 @@ using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
-using ExportPro.Export.CQRS.Behaviors;
 using ExportPro.Export.CQRS.Profile;
 using ExportPro.Export.CQRS.Queries;
 using ExportPro.Export.Csv.Services;
@@ -13,12 +12,11 @@ using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.ServiceHost.Infrastructure;
-using ExportPro.Export.Validations.Validations;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using QuestPDF;
 using QuestPDF.Infrastructure;
 using Refit;
 
@@ -35,8 +33,7 @@ public static class ExportServiceCollectionExtensions
 
         // —— auth ——
         var jwt = cfg.GetSection("JwtSettings").Get<JwtSettings>();
-        services
-            .AddAuthentication(o => o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+        services.AddAuthentication(o => o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(o =>
             {
                 o.Authority = "https://localhost:7067/";
@@ -49,51 +46,51 @@ public static class ExportServiceCollectionExtensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwt?.Issuer,
                     ValidAudience = jwt?.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt?.Secret)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt?.Secret))
                 };
             });
 
-        // —— Mongo ——
+        // —— Mongo —— 
         services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
         services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
-        services.AddValidatorsFromAssembly(typeof(DownloadLogByDateRangeQueryValidator).Assembly);
-        // —— MediatR ——
-        services.AddMediatR(o =>
-        {
-            o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly);
-            o.AddOpenBehavior(typeof(ValidationBehavior<,>));
-            o.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
-        });
-        // —— AutoMapper ——
+
+        // —— MediatR —— 
+        services.AddMediatR(o => o.RegisterServicesFromAssemblies(
+            typeof(GenerateInvoicePdfQuery).Assembly,
+            typeof(IPdfGenerator).Assembly));
+
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
+        // —— AutoMapper —— 
         services.AddAutoMapper(typeof(MappingProfile));
-        // —— PDF ——
+
+        // —— PDF —— 
         services.AddSingleton<IPdfGenerator, PdfGenerator>();
-        QuestPDF.Settings.License = LicenseType.Community;
+        Settings.License = LicenseType.Community;
 
         // —— CSV / XLSX generators ——
         services.AddSingleton<IReportGenerator, CsvReportGenerator>();
         services.AddSingleton<IReportGenerator, ExcelReportGenerator>();
 
-        // —— HttpContext / auth forwarding ——
+        // —— HttpContext / auth forwarding —— 
         services.AddHttpContextAccessor();
         services.AddTransient<ForwardAuthHeaderHandler>();
-        // —— Refit client to Storage-service ——
+
+        // —— Refit client to Storage-service —— 
         var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
-        services
-            .AddRefitClient<IStorageServiceApi>(
-                new RefitSettings
-                {
-                    ContentSerializer = new NewtonsoftJsonContentSerializer(
-                        new JsonSerializerSettings
-                        {
-                            NullValueHandling = NullValueHandling.Ignore,
-                            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                        }
-                    ),
-                }
-            )
+        services.AddRefitClient<IStorageServiceApi>(new RefitSettings
+            {
+                ContentSerializer = new NewtonsoftJsonContentSerializer(
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        DateTimeZoneHandling = DateTimeZoneHandling.Utc
+                    }
+                )
+            })
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
             .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
+
         return services;
     }
 }

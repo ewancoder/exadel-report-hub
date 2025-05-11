@@ -4,8 +4,10 @@ using ExportPro.Export.ServiceHost.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
 if (Environment.GetEnvironmentVariable("StorageUrl") is not null)
     builder.Host.UseSharedSerilogAndConfiguration();
+
 builder.Services.AddControllers();
 builder.Services.AddExportModule(builder.Configuration);
 
@@ -21,9 +23,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// if (Environment.GetEnvironmentVariable("StorageUrl") is not null)
-//
-//     app.UseSerilogRequestLogging();
+if (Environment.GetEnvironmentVariable("StorageUrl") is not null)
+    app.UseSerilogRequestLogging();
+
 app.UseAuthorization();
 app.MapControllers();
 

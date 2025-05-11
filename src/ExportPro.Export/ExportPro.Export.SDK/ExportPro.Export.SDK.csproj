@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="ExportPro.Common.Shared" Version="1.0.22" />
-		<PackageReference Include="ExportPro.StorageService.SDK" Version="1.0.4" />
-		<PackageReference Include="Refit" Version="8.0.0" />
-		<PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.20"/>
+        <PackageReference Include="ExportPro.StorageService.SDK" Version="1.0.4"/>
+        <PackageReference Include="Refit" Version="8.0.0"/>
+        <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
+    </ItemGroup>
 
 </Project>

@@ -4,5 +4,5 @@ public sealed class PdfItemExportDto
 {
     public string Name { get; set; } = default!;
     public double Price { get; set; }
-    public Guid CurrencyCode { get; set; } = default!;
+    public string CurrencyCode { get; set; } = default!;
 }
