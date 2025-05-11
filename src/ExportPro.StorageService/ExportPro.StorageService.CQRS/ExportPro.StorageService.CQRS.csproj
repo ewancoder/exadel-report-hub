@@ -6,6 +6,12 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Remove="Queries\**" />
+      <EmbeddedResource Remove="Queries\**" />
+      <None Remove="Queries\**" />
+    </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="MediatR" Version="12.5.0" />
@@ -15,10 +21,6 @@
     <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
     <ProjectReference Include="..\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj" />
     <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Queries\Items\" />
   </ItemGroup>
 
 </Project>
