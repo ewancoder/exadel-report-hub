@@ -4,9 +4,9 @@
     "MinimumLevel": {
       "Default": "Information",
       "Override": {
-        "Microsoft": "Fatal",
-        "System": "Fatal",
-        "Microsoft.AspNetCore.Hosting": "Fatal"
+        "Microsoft": "Warning",
+        "System": "Warning",
+        "Microsoft.AspNetCore.Hosting": "Information"
       }
     },
     "WriteTo": [

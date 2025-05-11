@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.Responses;
 
@@ -18,35 +18,35 @@ public class GetItemsQueryHandler(
 {
     public async Task<BaseResponse<List<ItemResponse>>> Handle(
         GetItemsQuery request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         // First check if client exists
         var client = await clientRepository.GetOneAsync(
             c => c.Id == request.ClientId.ToObjectId() && !c.IsDeleted,
-            cancellationToken);
+            cancellationToken
+        );
 
         if (client == null)
             return new BaseResponse<List<ItemResponse>>
             {
                 IsSuccess = false,
                 ApiState = HttpStatusCode.NotFound,
-                Messages = ["Client not found."]
+                Messages = ["Client not found."],
             };
 
         // Get all invoices for this client
         var parameters = new ExportPro.StorageService.SDK.PaginationParams.PaginationParameters
         {
             PageNumber = 1,
-            PageSize = 1000  // Large enough to get all invoices
+            PageSize = 1000, // Large enough to get all invoices
         };
 
-        var paginatedInvoices = await invoiceRepository.GetAllPaginatedAsync(
-            parameters,
-            false,
-            cancellationToken);
+        var paginatedInvoices = await invoiceRepository.GetAllPaginatedAsync(parameters, cancellationToken);
 
-        var invoices = paginatedInvoices.Items.Where(i =>
-            i.ClientId == request.ClientId.ToObjectId() && !i.IsDeleted).ToList();
+        var invoices = paginatedInvoices
+            .Items.Where(i => i.ClientId == request.ClientId.ToObjectId() && !i.IsDeleted)
+            .ToList();
 
         // Collect items from invoices
         var allItems = new List<Models.Models.Item>();
@@ -63,9 +63,7 @@ public class GetItemsQueryHandler(
             allItems.AddRange(client.Items);
 
         // Map to DTOs
-        var dtos = allItems
-            .Select(i => mapper.Map<ItemResponse>(i))
-            .ToList();
+        var dtos = allItems.Select(i => mapper.Map<ItemResponse>(i)).ToList();
 
         return new SuccessResponse<List<ItemResponse>>(dtos, "Items retrieved successfully");
     }
