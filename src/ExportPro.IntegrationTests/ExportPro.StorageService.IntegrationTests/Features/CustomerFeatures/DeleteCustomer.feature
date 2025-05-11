@@ -11,7 +11,7 @@ Feature: Delete a customer
             | Name       | Code            | CurrencyId |
             |TestUsa####TESTCUSTOMER###TESTCUSTOMER | TESTCOUNTRYCODECodePPPPPPP |  temp      |
         And The user has created following customer and stored the customer id
-            | CountryId | Name        | Email        |
-            |temp      | TESTUSER####TESTCUSTOMER | TESTUSER####TESTCUSTOMER@gmail.com |
+            | CountryId | Name                     | Email                              |Address|
+            |temp       | TESTUSER####TESTCUSTOMER | TESTUSER####TESTCUSTOMER@gmail.com | AMERICAA|
         When The user sends the customer delete request
         Then The customer should be deleted 

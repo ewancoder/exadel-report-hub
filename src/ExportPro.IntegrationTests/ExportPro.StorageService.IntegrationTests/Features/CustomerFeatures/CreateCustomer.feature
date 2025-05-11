@@ -9,8 +9,8 @@ Feature: Creating a Customer
             | Name       | Code            | CurrencyId |
             |TestUsa####TESTCUSTOMER### | TESTCOUNTRYCODECode |  temp      |
         And The user wants to create following customer
-            | CountryId | Name        | Email        |
-            |temp      | TESTUSER####TESTCUSTOMER | TESTUSER####TESTCUSTOMER@gmail.com |
+            | CountryId | Name        | Email        | Address|
+            |temp      | TESTUSER####TESTCUSTOMER | TESTUSER####TESTCUSTOMER@gmail.com | BERRLIN|
         When the user sends the customer creation request
         Then  the customer should be saved in the database
     Examples:

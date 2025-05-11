@@ -15,8 +15,8 @@ Feature: Delete an invoice
           | Name                       | Code                | CurrencyId |
           | TestUsa####TESTCUSTOMER### | TESTCOUNTRYCODECode | temp       |
         And The user created the following customer and stored the customer id
-          | CountryId | Name                     | Email                              |
-          | temp      | TESTUSER####TESTCUSTOMER | TESTUSER####TESTCUSTOMER@gmail.com |
+          | CountryId | Name                     | Email                              |Address| 
+          | temp      | TESTUSER####TESTCUSTOMER | TESTUSER####TESTCUSTOMER@gmail.com |dubai|
         And The user has the following invoice
           | InvoiceNumber       | IssueDate  | DueDate    | CurrencyId | PaymentStatus | CustomerId | ClientId | ClientCurrencyId |
           | 123456789#######000InvoiceDelete | 2025-01-01 | 2025-01-31 | temp       | 0             | temp       | temp     | temp             |

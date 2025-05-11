@@ -13,7 +13,7 @@
         <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.3" />
         <PackageReference Include="ExportPro.Common.Models.MongoDB" Version="1.0.3" />
         <PackageReference Include="ExportPro.Common.Shared" Version="1.0.27" />
-        <PackageReference Include="ExportPro.StorageService.SDK" Version="1.0.10" />
+        <PackageReference Include="ExportPro.StorageService.SDK" Version="1.0.13" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.4" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
         <PackageReference Include="NSubstitute" Version="5.3.0" />
