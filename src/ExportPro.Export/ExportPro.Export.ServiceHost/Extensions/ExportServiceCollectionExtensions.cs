@@ -71,6 +71,7 @@ public static class ExportServiceCollectionExtensions
         // —— CSV / XLSX generators ——
         services.AddSingleton<IReportGenerator, CsvReportGenerator>();
         services.AddSingleton<IReportGenerator, ExcelReportGenerator>();
+        services.AddSingleton<ICustomerExcelParser, CustomerExcelParser>();
 
         // —— HttpContext / auth forwarding —— 
         services.AddHttpContextAccessor();
