@@ -1,17 +1,17 @@
-﻿using ExportPro.Common.Shared.Library;
+﻿using AutoMapper;
+using ExportPro.Common.Shared.Library;
+using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using MediatR;
+using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
 
-public sealed record RemoveReportPreferenceCommand(Guid Id)
-    : IRequest<BaseResponse<string>>;
+public sealed record RemoveReportPreferenceCommand(Guid Id) : ICommand<ReportPreferenceResponse>;
 
-public sealed class RemoveReportPreferenceHandler(IReportPreference repository)
-    : IRequestHandler<RemoveReportPreferenceCommand, BaseResponse<string>>
+public sealed class RemoveReportPreferenceHandler(IReportPreference repository, IMapper mapper) : ICommandHandler<RemoveReportPreferenceCommand, ReportPreferenceResponse>
 {
-    public async Task<BaseResponse<string>> Handle(
+    public async Task<BaseResponse<ReportPreferenceResponse>> Handle(
         RemoveReportPreferenceCommand request,
         CancellationToken cancellationToken
     )
@@ -19,9 +19,11 @@ public sealed class RemoveReportPreferenceHandler(IReportPreference repository)
         var preference = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
 
         if (preference is null)
-            return new NotFoundResponse<string>("Report preference not found");
+            return new NotFoundResponse<ReportPreferenceResponse>("Report preference not found");
 
-        await repository.SoftDeleteAsync(preference.Id, cancellationToken);
-        return new BaseResponse<string> { Data = "Report preference successfully removed." };
+        var prefDeleted = await repository.SoftDeleteAsync(preference.Id, cancellationToken);
+        var prefResponse = mapper.Map<ReportPreferenceResponse>(prefDeleted);
+        
+        return new SuccessResponse<ReportPreferenceResponse>(prefResponse, "Report preference successfully removed.");
     }
 }
