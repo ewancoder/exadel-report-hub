@@ -7,6 +7,7 @@ using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 using ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 using ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
+using ExportPro.StorageService.CQRS.QueryHandlers.ItemQueries;
 using ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -71,6 +72,31 @@ public class ClientController(IMediator mediator) : ControllerBase
         [FromRoute] Guid clientId,
         CancellationToken cancellationToken = default
     ) => mediator.Send(new SoftDeleteClientCommand(clientId.ToObjectId()), cancellationToken);
+
+    [HttpGet("{clientId}/items")]
+    [SwaggerOperation(Summary = "Get all items for a client")]
+    [ProducesResponseType(typeof(List<ItemResponse>), 200)]
+    [HasPermission(Resource.Items, CrudAction.Read)]
+    public async Task<IActionResult> GetItems(
+            [FromRoute] Guid clientId,
+            CancellationToken cancellationToken)
+    {
+        var response = await mediator.Send(new GetItemsQuery(clientId), cancellationToken);
+        return StatusCode((int)response.ApiState, response);
+    }
+
+    [HttpGet("{clientId}/items/{itemId}")]
+    [SwaggerOperation(Summary = "Get a single item by ID for a client")]
+    [ProducesResponseType(typeof(ItemResponse), 200)]
+    [HasPermission(Resource.Items, CrudAction.Read)]
+    public async Task<IActionResult> GetItemById(
+            [FromRoute] Guid clientId,
+            [FromRoute] Guid itemId,
+            CancellationToken cancellationToken)
+    {
+        var response = await mediator.Send(new GetItemByIdQuery(clientId, itemId), cancellationToken);
+        return StatusCode((int)response.ApiState, response);
+    }
 
     [HttpPatch("{clientId}/item")]
     [SwaggerOperation(Summary = "add single item to client")]

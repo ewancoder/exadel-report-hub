@@ -23,6 +23,13 @@ public class CustomerController(IMediator mediator) : ControllerBase
         CancellationToken cancellationToken
     ) => mediator.Send(new CreateCustomerCommand(customerDto), cancellationToken);
 
+    [HttpPost("bulk")]
+    [HasPermission(Resource.Customers, CrudAction.Create)]
+    public Task<BaseResponse<int>> CreateBulk(
+        [FromBody] List<CreateUpdateCustomerDto> customers,
+        CancellationToken cancellationToken
+    ) => mediator.Send(new CreateCustomersCommand(customers), cancellationToken);
+    
     [HttpPut("{id}")]
     [HasPermission(Resource.Customers, CrudAction.Update)]
     public Task<BaseResponse<CustomerResponse>> Update(

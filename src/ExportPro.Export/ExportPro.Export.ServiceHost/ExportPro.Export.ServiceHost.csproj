@@ -1,23 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.DataAccess.MongoDB\ExportPro.Common.DataAccess.MongoDB.csproj" />
-    <ProjectReference Include="..\ExportPro.Export.CQRS\ExportPro.Export.CQRS.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2"/>
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="Refit.Newtonsoft.Json" Version="8.0.0"/>
+        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.1-dev-00953"/>
+        <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0-dev-02301"/>
+        <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ExportPro.Export.CQRS\ExportPro.Export.CQRS.csproj"/>
+        <ProjectReference Include="..\ExportPro.Export.Csv\ExportPro.Export.Csv.csproj"/>
+        <ProjectReference Include="..\ExportPro.Export.Excel\ExportPro.Export.Excel.csproj"/>
+    </ItemGroup>
 
 </Project>

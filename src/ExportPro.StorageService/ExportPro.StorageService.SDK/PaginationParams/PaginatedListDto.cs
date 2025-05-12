@@ -1,4 +1,6 @@
-﻿namespace ExportPro.StorageService.SDK.PaginationParams;
+﻿using System.Text.Json.Serialization;
+
+namespace ExportPro.StorageService.SDK.PaginationParams;
 
 public sealed class PaginatedListDto<T>
 {
