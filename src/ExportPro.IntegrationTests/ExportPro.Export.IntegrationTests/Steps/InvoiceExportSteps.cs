@@ -1,4 +1,4 @@
-﻿using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Shared.IntegrationTests.Auth;
 using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
@@ -14,28 +14,31 @@ using Refit;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
-namespace ExportPro.StorageService.IntegrationTests.Steps.InvoiceSteps;
+namespace ExportPro.Export.IntegrationTests.Steps;
 
 [Binding]
-[Scope(Tag = "CreateInvoice")]
-public class CreateInvoiceSteps
+[Scope(Tag = "InvoiceExport")]
+public class InvoiceExportSteps
 {
     private readonly IMongoDbContext<Invoice> _mongoDbContext = new MongoDbContext<Invoice>();
     private readonly IMongoDbContext<Country> _mongoDbContextCountry = new MongoDbContext<Country>();
     private readonly IMongoDbContext<Currency> _mongoDbContextCurrency = new MongoDbContext<Currency>();
     private readonly IMongoDbContext<Customer> _mongoDbContextCustomer = new MongoDbContext<Customer>();
     private readonly IMongoDbContext<Client> _mongoDbContextClient = new MongoDbContext<Client>();
+    private HttpResponseMessage _invoicepdf;
     private ICountryApi _countryApi;
     private ICurrencyApi _currencyApi;
     private ICustomerApi _customerApi;
     private IInvoiceApi _invoiceApi;
     private IClientApi _clientApi;
+    private IInvoiceExport _invoiceExport;
     private CreateInvoiceDto _invoiceDto;
     private Guid _countryId;
     private Guid _currencyId;
     private Guid _currencyIdForItem;
     private Guid _customerId;
     private Guid _clientId;
+    private Guid _invoiceId;
 
     [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
     public async Task GivenTheUserIsLoggedInWithEmailAndPasswordAndHasNecessaryPermissions(
@@ -45,10 +48,11 @@ public class CreateInvoiceSteps
     {
         string jwtToken = await UserLogin.Login(email, password);
         string jwtTokenForClient = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
-        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
+        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1200);
         var httpClientForClient = HttpClientForRefit.GetHttpClient(jwtTokenForClient, 1500);
         _countryApi = RestService.For<ICountryApi>(httpClient);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
+        _invoiceExport = RestService.For<IInvoiceExport>(httpClient);
         _invoiceApi = RestService.For<IInvoiceApi>(
             httpClient,
             new RefitSettings
@@ -72,10 +76,10 @@ public class CreateInvoiceSteps
         ClientDto clientDto = new() { Name = "ClientISInvoiceTest######", Description = "Description" };
         var clientResponse = await _clientApi.CreateClient(clientDto);
         var clientExists = await _mongoDbContextClient
-            .Collection.Find(x => x.Name == clientResponse.Data.Name)
+            .Collection.Find(x => x.Name == clientResponse.Data!.Name)
             .FirstOrDefaultAsync();
         Assert.That(clientExists, Is.Not.EqualTo(null));
-        Assert.That(clientExists.Name, Is.EqualTo(clientResponse.Data.Name));
+        Assert.That(clientExists.Name, Is.EqualTo(clientResponse.Data!.Name));
         _clientId = clientResponse.Data.Id;
     }
 
@@ -86,12 +90,12 @@ public class CreateInvoiceSteps
         var currency = await _currencyApi.Create(cur);
         var currencyExists = await _mongoDbContextCurrency
             .Collection.Find(x =>
-                x.CurrencyCode == currency.Data.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
+                x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
             )
             .FirstOrDefaultAsync();
         Assert.That(currencyExists, Is.Not.EqualTo(null));
         Assert.That(currencyExists.CurrencyCode, Is.EqualTo(cur.CurrencyCode));
-        _currencyId = currency.Data.Id;
+        _currencyId = currency.Data!.Id;
     }
 
     [Given("The user created following currency for item and stored the currency id")]
@@ -101,12 +105,12 @@ public class CreateInvoiceSteps
         var currency = await _currencyApi.Create(cur);
         var currencyExists = await _mongoDbContextCurrency
             .Collection.Find(x =>
-                x.CurrencyCode == currency.Data.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
+                x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
             )
             .FirstOrDefaultAsync();
         Assert.That(currencyExists, Is.Not.EqualTo(null));
         Assert.That(currencyExists.CurrencyCode, Is.EqualTo(cur.CurrencyCode));
-        _currencyIdForItem = currency.Data.Id;
+        _currencyIdForItem = currency.Data!.Id;
     }
 
     [Given("The user created following country and stored the country id")]
@@ -116,10 +120,10 @@ public class CreateInvoiceSteps
         countryDto.CurrencyId = _currencyId;
         var country = await _countryApi.Create(countryDto);
         var countryExists = await _mongoDbContextCountry
-            .Collection.Find(x => x.Name == country.Data.Name)
+            .Collection.Find(x => x.Name == country.Data!.Name)
             .FirstOrDefaultAsync();
         Assert.That(countryExists, Is.Not.EqualTo(null));
-        Assert.That(countryExists.Name, Is.EqualTo(country.Data.Name));
+        Assert.That(countryExists.Name, Is.EqualTo(country.Data!.Name));
         _countryId = country.Data.Id;
     }
 
@@ -130,25 +134,26 @@ public class CreateInvoiceSteps
         customerDto.CountryId = _countryId;
         var customer = await _customerApi.Create(customerDto);
         var customerExists = await _mongoDbContextCustomer
-            .Collection.Find(x => x.Name == customer.Data.Name)
+            .Collection.Find(x => x.Name == customer.Data!.Name)
             .FirstOrDefaultAsync();
         Assert.That(customerExists, Is.Not.EqualTo(null));
-        Assert.That(customerExists.Name, Is.EqualTo(customer.Data.Name));
+        Assert.That(customerExists.Name, Is.EqualTo(customer.Data!.Name));
         _customerId = customer.Data.Id;
     }
 
     [Given("The user wants to create following invoice")]
-    public async Task GivenTheUserCreatedFollowingInvoiceAndStoredTheInvoiceId(Table table)
+    public Task GivenTheUserCreatedFollowingInvoiceAndStoredTheInvoiceId(Table table)
     {
         _invoiceDto = table.CreateInstance<CreateInvoiceDto>();
         _invoiceDto.CustomerId = _customerId;
         _invoiceDto.ClientId = _clientId;
         _invoiceDto.CurrencyId = _currencyId;
         _invoiceDto.ClientCurrencyId = _currencyIdForItem;
+        return Task.CompletedTask;
     }
 
     [Given("the invoice contains the following items")]
-    public async Task GivenTheInvoiceContainsTheFollowingItems(Table table)
+    public Task GivenTheInvoiceContainsTheFollowingItems(Table table)
     {
         List<ItemDtoForClient> items = new List<ItemDtoForClient>();
         ItemDtoForClient item = new()
@@ -161,26 +166,35 @@ public class CreateInvoiceSteps
         };
         items.Add(item);
         _invoiceDto.Items = items;
+        return Task.CompletedTask;
     }
 
-    [When("the user sends the invoice creation request")]
-    public async Task WhenTheUserSendsTheInvoiceCreationRequest()
+    [Given("The user created invoice and  stored invoice id")]
+    public async Task GivenTheUserCreatedInvoiceAndStoredInvoiceId()
     {
-        await _invoiceApi.Create(_invoiceDto);
+        var invoice = await _invoiceApi.Create(_invoiceDto);
+        _invoiceId = invoice.Data!.Id;
     }
 
-    [Then("the invoice should be saved in the database")]
-    public async Task ThenTheInvoiceShouldBeSavedInTheDb()
+    [When("The user sends the invoice export request")]
+    public async Task WhenTheUserSendsTheInvoiceExportRequest()
     {
-        var invoice = await _mongoDbContext
-            .Collection.Find(x => x.InvoiceNumber == _invoiceDto.InvoiceNumber)
-            .FirstOrDefaultAsync();
-        Assert.That(invoice, Is.Not.EqualTo(null));
-        Assert.That(invoice.Items.Count, Is.EqualTo(1));
-        Assert.That(invoice.Items[0].Name, Is.EqualTo(_invoiceDto.Items[0].Name));
+        _invoicepdf = await _invoiceExport.GetInvoiceExportPdf(_invoiceId);
     }
 
-    [AfterScenario("@CreateInvoice")]
+    [Then("The invoice should be exported as pdf")]
+    public Task ThenTheInvoiceShouldBeExportedAsPdf()
+    {
+        var responselen = _invoicepdf.Content.Headers.ContentLength;
+        var contentType = _invoicepdf.Content.Headers.ContentType!.MediaType;
+        Assert.That(_invoicepdf, Is.Not.EqualTo(null));
+        Assert.That(responselen, Is.GreaterThan(500));
+        Assert.That(contentType, Is.EqualTo("application/pdf"));
+        _invoicepdf.Dispose();
+        return Task.CompletedTask;
+    }
+
+    [AfterScenario("@InvoiceExport")]
     public async Task CleanUp()
     {
         await _mongoDbContextCountry.Collection.DeleteOneAsync(x => x.Id == _countryId.ToObjectId());
@@ -188,9 +202,6 @@ public class CreateInvoiceSteps
         await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyIdForItem.ToObjectId());
         await _mongoDbContextCustomer.Collection.DeleteOneAsync(x => x.Id == _customerId.ToObjectId());
         await _mongoDbContextClient.Collection.DeleteOneAsync(x => x.Id == _clientId.ToObjectId());
-        await _mongoDbContext.Collection.DeleteOneAsync(x =>
-            x.InvoiceNumber == _invoiceDto.InvoiceNumber
-            && (x.CreatedBy == "OwnerUserTest" | x.CreatedBy == "ClientAdminTest" || x.CreatedBy == "OperatorTest")
-        );
+        await _mongoDbContext.Collection.DeleteOneAsync(x => x.Id == _invoiceId.ToObjectId());
     }
 }

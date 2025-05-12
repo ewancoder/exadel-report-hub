@@ -1,7 +1,7 @@
 ﻿@CreateInvoice
 Feature: Creating a invoice after creating a currency, country and customer
     Scenario Outline: The User wants to create a invoice
-        Given  The user is logged in with email '<email>' and password '<password>' and has necessary permissions
+        Given The user is logged in with email '<email>' and password '<password>' and has necessary permissions
         And The user has valid client id
         And The user created following currency for invoice and stored the currency id
           | CurrencyCode |

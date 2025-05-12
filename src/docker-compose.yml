@@ -46,3 +46,49 @@ services:
       - "1500:8080"
     depends_on:
       - authservice
+  exportservice:
+    container_name: exportservice
+    image: giorgaaa/exportpro.export
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.Export/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=mongodb://ExportProDb:27017
+      - StorageUrl=http://storageservice:8080
+    ports:
+      - "2000:8080"
+    depends_on:
+      - authservice
+      - storageservice
+      - mongodb
+      - exportproseq
+    # volumes:
+    #   - type: bind
+    #     # source: C:/Logs/
+    #     source: /home/randoma/logs_exadel
+    #     target: "/app/Logs"
+  exportproseq:
+    image: datalust/seq:latest
+    container_name: exportproseq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 8081:80
+  jobservice:
+    image: giorgaaa/exportpro.jobs
+    container_name: jobservice
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.Jobs/ExportPro.Export.Job.ServiceHost/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=mongodb://ExportProDb:27017
+      - DockerForReport=http://exportservice:8080
+      - DockerForAuth=http://authservice:8080
+    ports:
+      - "2500:8080"
+    depends_on:
+      - authservice
+      - exportservice
