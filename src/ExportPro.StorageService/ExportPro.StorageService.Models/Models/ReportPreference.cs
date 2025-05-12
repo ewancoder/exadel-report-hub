@@ -17,6 +17,7 @@ public sealed class ReportPreference : IModel
     public ReportFormat ReportFormat { get; set; } = ReportFormat.Csv;
 
     public required string CronExpression { get; set; }
+
     public required string HumanReadableCronExpression { get; set; }
 
     public bool IsDelivered { get; set; }

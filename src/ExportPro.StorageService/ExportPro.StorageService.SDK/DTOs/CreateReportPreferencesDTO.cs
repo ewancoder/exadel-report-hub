@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using ExportPro.StorageService.Models.Enums;
 
 namespace ExportPro.StorageService.SDK.DTOs;

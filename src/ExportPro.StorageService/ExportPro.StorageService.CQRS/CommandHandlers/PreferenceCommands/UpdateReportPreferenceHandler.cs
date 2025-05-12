@@ -1,32 +1,25 @@
 ﻿using AutoMapper;
-using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
+using ExportPro.Common.Shared.Mediator;
 using ExportPro.Export.Job.ServiceHost.Helpers;
+using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
-using MediatR;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
 
-public sealed record UpdateReportPreferenceCommand(
-    Guid Id,
-    ReportFormat ReportFormat,
-    string Email,
-    ReportScheduleDto Schedule,
-    bool IsEnabled
-) : IRequest<BaseResponse<ReportPreferenceResponse>>;
+public sealed record UpdateReportPreferenceCommand(UpdateReportPreferenceDTO dto) : ICommand<ReportPreferenceResponse>;
 
 public sealed class UpdateReportPreferenceHandler(IReportPreference repository, IMapper mapper)
-    : IRequestHandler<UpdateReportPreferenceCommand, BaseResponse<ReportPreferenceResponse>>
+    : ICommandHandler<UpdateReportPreferenceCommand, ReportPreferenceResponse>
 {
     public async Task<BaseResponse<ReportPreferenceResponse>> Handle(
         UpdateReportPreferenceCommand request,
         CancellationToken cancellationToken
     )
     {
-        var preference = await repository.GetByIdAsync(request.Id.ToObjectId(), cancellationToken);
+        var preference = await repository.GetByIdAsync(request.dto.Id.ToObjectId(), cancellationToken);
 
         if (preference is null)
         {
@@ -36,7 +29,7 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
         string cronExpression;
         try
         {
-            cronExpression = CronHelper.ToCron(request.Schedule);
+            cronExpression = CronHelper.ToCron(request.dto.Schedule);
         }
         catch (Exception ex)
         {
@@ -46,16 +39,17 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
             };
         }
 
-        preference.ReportFormat = request.ReportFormat;
-        preference.Email = request.Email;
+        preference.ReportFormat = request.dto.ReportFormat;
+        preference.Email = request.dto.Email;
         preference.CronExpression = cronExpression;
-        preference.IsEnabled = request.IsEnabled;
         preference.HumanReadableCronExpression = CronToTextHelper.ToReadableText(cronExpression);
+        preference.IsEnabled = request.dto.IsEnabled;
         preference.UpdatedAt = DateTime.UtcNow;
 
         await repository.UpdateOneAsync(preference, cancellationToken);
 
         var response = mapper.Map<ReportPreferenceResponse>(preference);
-        return new BaseResponse<ReportPreferenceResponse> { Data = response };
+
+        return new SuccessResponse<ReportPreferenceResponse>(response, "Report successfully updated!");
     }
 }
