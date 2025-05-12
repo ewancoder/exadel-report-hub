@@ -62,6 +62,7 @@ public sealed class CreateReportPreferenceHandler(
             ClientId = request.dto.ClientId.ToObjectId(),
             Email = request.dto.Email,
             ReportFormat = request.dto.ReportFormat,
+            HumanReadableCronExpression = CronToTextHelper.ToReadableText(cronExpression),
             CronExpression = cronExpression,
             IsDelivered = false,
             IsEnabled = true,

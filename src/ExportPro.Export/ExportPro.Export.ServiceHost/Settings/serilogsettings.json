@@ -24,7 +24,7 @@
               {
                 "Name": "ByIncludingOnly",
                 "Args": {
-                  "expression": "SourceContext = 'AuditLogs'"
+                  "expression": "SourceContext = 'AuditLogs' and @l = 'Information'"
                 }
               }
             ],

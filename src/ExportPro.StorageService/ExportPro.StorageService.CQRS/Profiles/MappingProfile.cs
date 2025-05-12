@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Export.Job.ServiceHost.Helpers;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
@@ -69,6 +70,18 @@ public sealed class MappingProfile : Profile
             .ReverseMap()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToObjectId()))
             .ForMember(dest => dest.CountryId, src => src.MapFrom(x => x.CountryId.ToObjectId()));
-            
+
+        CreateMap<ReportPreference, ReportPreferenceResponse>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToGuid()))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId.ToGuid()))
+            .ForMember(dest => dest.ClientId, opt => opt.MapFrom(src => src.ClientId.ToGuid()))
+            .ForMember(
+                dest => dest.HumanReadableSchedule,
+                opt => opt.MapFrom(src => CronToTextHelper.ToReadableText(src.CronExpression))
+            )
+            .ReverseMap()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToObjectId()))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId.ToObjectId()))
+            .ForMember(dest => dest.ClientId, opt => opt.MapFrom(src => src.ClientId.ToObjectId()));
     }
 }

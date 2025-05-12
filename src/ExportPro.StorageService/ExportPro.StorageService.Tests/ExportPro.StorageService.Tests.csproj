@@ -23,7 +23,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ExportPro.StorageService.API\ExportPro.StorageService.API.csproj"/>
-        <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

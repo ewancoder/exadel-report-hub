@@ -1,5 +1,6 @@
 ﻿using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.SDK.DTOs;
+
 namespace ExportPro.Export.Job.ServiceHost.Helpers;
 
 public static class CronHelper
@@ -11,16 +12,15 @@ public static class CronHelper
 
         return schedule.Frequency switch
         {
-            ReportFrequency.Daily =>
-                $"0 {minute} {hour} ? * *",
+            ReportFrequency.Daily => $"0 {minute} {hour} ? * *",
 
             ReportFrequency.Weekly when schedule.DayOfWeek.HasValue =>
-                $"0 {minute} {hour} ? * {schedule.DayOfWeek.Value.ToString().ToUpperInvariant()}", 
+                $"0 {minute} {hour} ? * {(int)schedule.DayOfWeek.Value + 1}",
 
             ReportFrequency.Monthly when schedule.DayOfMonth.HasValue =>
                 $"0 {minute} {hour} {schedule.DayOfMonth.Value} * ?",
 
-            _ => throw new InvalidOperationException("Invalid schedule configuration")
+            _ => throw new InvalidOperationException("Invalid schedule configuration"),
         };
     }
 }

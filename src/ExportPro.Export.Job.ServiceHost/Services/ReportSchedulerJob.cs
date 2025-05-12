@@ -14,16 +14,15 @@ namespace ExportPro.Export.Job.ServiceHost.Services;
 public sealed class ReportSchedulerJob(
     IReportPreference reportRepository,
     IEmailService emailService,
-    IHttpContextAccessor httpContext
+    IConfiguration configuration
 ) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        var authHeader = httpContext.HttpContext?.Request.Headers["Authorization"].ToString();
         var preferences = await reportRepository.GetAllPreferences(context.CancellationToken);
-        HttpClient client = new();
-        var baseUrlForAuth = Environment.GetEnvironmentVariable("DockerForAuth")?? "https://localhost:7067";
-        client.BaseAddress = new Uri(baseUrlForAuth);
+        var baseurl = Environment.GetEnvironmentVariable("DockerForAuth") ?? configuration["AuthURI"];
+        HttpClient client = new() { BaseAddress = new Uri(baseurl) };
+
         IAuth authAPi = RestService.For<IAuth>(client);
         UserRegisterDto user = new()
         {
@@ -34,14 +33,18 @@ public sealed class ReportSchedulerJob(
 
         UserLoginDto login = new() { Email = user.Email, Password = user.Password };
         var jwtTokenDto = await authAPi.LoginAsync(login);
-        string jwtToken = jwtTokenDto.AccessToken;
+        var jwtToken = jwtTokenDto.AccessToken;
         foreach (var pref in preferences)
         {
             if (!IsTimeToSend(pref))
                 continue;
-            HttpClient httpClient = new();
-            var baseurl = Environment.GetEnvironmentVariable("DockerForReport")?? "https://localhost:7195";
-            httpClient.BaseAddress = new Uri(baseurl);
+            var baseUrlForexport =
+                Environment.GetEnvironmentVariable("DockerForReport") ?? configuration["ExportReportURI"];
+            HttpClient httpClient = new()
+            {
+                BaseAddress = new Uri(baseUrlForexport), //localhost:5294"),
+            };
+
             httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
             IReportExportApi reportExportApi = RestService.For<IReportExportApi>(httpClient);
             var reportResponse = await reportExportApi.GetStatisticsAsync(

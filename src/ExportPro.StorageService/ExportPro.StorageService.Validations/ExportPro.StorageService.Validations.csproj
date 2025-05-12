@@ -12,7 +12,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ExportPro.StorageService.CQRS\ExportPro.StorageService.CQRS.csproj" />
-        <ProjectReference Include="..\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj" />
     </ItemGroup>
 
 </Project>

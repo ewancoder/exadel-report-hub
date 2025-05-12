@@ -30,10 +30,7 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
 
         if (preference is null)
         {
-            return new NotFoundResponse<ReportPreferenceResponse>
-            {
-                Messages = ["Report preference not found."]
-            };
+            return new NotFoundResponse<ReportPreferenceResponse> { Messages = ["Report preference not found."] };
         }
 
         string cronExpression;
@@ -45,7 +42,7 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
         {
             return new BaseResponse<ReportPreferenceResponse>
             {
-                Messages = [$"Failed to generate cron expression: {ex.Message}"]
+                Messages = [$"Failed to generate cron expression: {ex.Message}"],
             };
         }
 
@@ -53,6 +50,7 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
         preference.Email = request.Email;
         preference.CronExpression = cronExpression;
         preference.IsEnabled = request.IsEnabled;
+        preference.HumanReadableCronExpression = CronToTextHelper.ToReadableText(cronExpression);
         preference.UpdatedAt = DateTime.UtcNow;
 
         await repository.UpdateOneAsync(preference, cancellationToken);
