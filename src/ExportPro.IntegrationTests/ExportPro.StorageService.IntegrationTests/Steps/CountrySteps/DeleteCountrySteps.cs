@@ -19,10 +19,10 @@ public class DeleteCountrySteps
 {
     private readonly IMongoDbContext<Country> _mongoDbContext = new MongoDbContext<Country>();
     private readonly IMongoDbContext<Currency> _mongoDbContextCurrency = new MongoDbContext<Currency>();
-    private ICurrencyApi _currencyApi;
-    private ICountryApi _countryApi;
-    private Guid _currencyId;
+    private ICountryApi? _countryApi;
     private Guid _countryId;
+    private ICurrencyApi? _currencyApi;
+    private Guid _currencyId;
 
     [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
     public async Task GivenTheUserIsLoggedInWithEmailAndPasswordAndHasNecessaryPermissions(
@@ -30,8 +30,8 @@ public class DeleteCountrySteps
         string password
     )
     {
-        string jwtToken = await UserLogin.Login(email, password);
-        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
+        var jwtToken = await UserLogin.Login(email, password);
+        var httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _countryApi = RestService.For<ICountryApi>(httpClient);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
@@ -40,12 +40,12 @@ public class DeleteCountrySteps
     public async Task GivenTheFollowingCurrencyExists(Table table)
     {
         var currency = table.CreateInstance<CurrencyDto>();
-        var currencyResponse = await _currencyApi.Create(currency);
+        var currencyResponse = await _currencyApi!.Create(currency);
         var currencyResponseExists = await _mongoDbContextCurrency
-            .Collection.Find(x => x.Id == currencyResponse.Data.Id.ToObjectId())
+            .Collection.Find(x => x.Id == currencyResponse.Data!.Id.ToObjectId())
             .FirstOrDefaultAsync();
         Assert.That(currencyResponseExists, Is.Not.Null);
-        Assert.That(currencyResponseExists.Id, Is.EqualTo(currencyResponse.Data.Id.ToObjectId()));
+        Assert.That(currencyResponseExists.Id, Is.EqualTo(currencyResponse.Data!.Id.ToObjectId()));
         _currencyId = currencyResponse.Data.Id;
     }
 
@@ -54,11 +54,11 @@ public class DeleteCountrySteps
     {
         var country = table.CreateInstance<CreateCountryDto>();
         country.CurrencyId = _currencyId;
-        var countryResponse = await _countryApi.Create(country);
+        var countryResponse = await _countryApi!.Create(country);
         var countryResponseExists = await _mongoDbContext
-            .Collection.Find(x => x.Id == countryResponse.Data.Id.ToObjectId())
+            .Collection.Find(x => x.Id == countryResponse.Data!.Id.ToObjectId())
             .FirstOrDefaultAsync();
-        _countryId = countryResponse.Data.Id;
+        _countryId = countryResponse.Data!.Id;
         Assert.That(countryResponseExists, Is.Not.Null);
         Assert.That(countryResponseExists.Id, Is.EqualTo(countryResponse.Data.Id.ToObjectId()));
     }
@@ -66,7 +66,7 @@ public class DeleteCountrySteps
     [When("The user sends the country delete request")]
     public async Task WhenTheUserSendsTheCountryCreationRequest()
     {
-        await _countryApi.Delete(_countryId);
+        await _countryApi!.Delete(_countryId);
     }
 
     [Then("The country should be deleted")]
@@ -74,7 +74,7 @@ public class DeleteCountrySteps
     {
         var country = await _mongoDbContext.Collection.Find(x => x.Id == _countryId.ToObjectId()).FirstOrDefaultAsync();
         Assert.That(country, Is.Not.EqualTo(null));
-        Assert.That(country.IsDeleted, Is.EqualTo((true)));
+        Assert.That(country.IsDeleted, Is.EqualTo(true));
     }
 
     [AfterScenario("@DeleteCountry")]

@@ -7,7 +7,7 @@ namespace ExportPro.StorageService.IntegrationTests;
 public static class AddingTestUsers
 {
     [BeforeTestRun]
-    public static async Task AddingUsers()
+    public async static Task AddingUsers()
     {
         await UserActions.AddSuperAdmin();
         await UserActions.AddOperator();

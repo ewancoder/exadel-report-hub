@@ -19,10 +19,10 @@ public class CreateCountrySteps
 {
     private readonly IMongoDbContext<Country> _mongoDbContext = new MongoDbContext<Country>();
     private readonly IMongoDbContext<Currency> _mongoDbContextCurrency = new MongoDbContext<Currency>();
-    private ICountryApi _countryApi;
-    private ICurrencyApi _currencyApi;
+    private ICountryApi? _countryApi;
+    private CreateCountryDto? _createCountryDto;
+    private ICurrencyApi? _currencyApi;
     private Guid _currencyId;
-    private CreateCountryDto _createCountryDto;
 
     [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
     public async Task GivenTheUserIsLoggedInWithEmailAndPasswordAndHasNecessaryPermissions(
@@ -30,8 +30,8 @@ public class CreateCountrySteps
         string password
     )
     {
-        string jwtToken = await UserLogin.Login(email, password);
-        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
+        var jwtToken = await UserLogin.Login(email, password);
+        var httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _countryApi = RestService.For<ICountryApi>(httpClient);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
@@ -39,14 +39,14 @@ public class CreateCountrySteps
     [Given("The user created following currency and stored the currency id")]
     public async Task GivenTheFollowingCurrencyExists(Table table)
     {
-        CurrencyDto cur = table.CreateInstance<CurrencyDto>();
-        var currency = await _currencyApi.Create(cur);
+        var cur = table.CreateInstance<CurrencyDto>();
+        var currency = await _currencyApi!.Create(cur);
         var currencyExists = await _mongoDbContextCurrency
             .Collection.Find(x =>
-                x.CurrencyCode == currency.Data.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
+                x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
             )
             .FirstOrDefaultAsync();
-        _currencyId = currency.Data.Id;
+        _currencyId = currency.Data!.Id;
         Assert.That(currencyExists, Is.Not.EqualTo(null));
         Assert.That(currencyExists.CurrencyCode, Is.EqualTo(cur.CurrencyCode));
     }
@@ -61,7 +61,7 @@ public class CreateCountrySteps
     [When("The user sends the country creation request")]
     public async Task WhenTheUserSendsTheCountryCreationRequest()
     {
-        await _countryApi.Create(_createCountryDto);
+        await _countryApi!.Create(_createCountryDto!);
     }
 
     [Then("The country should be saved in the database")]
@@ -69,7 +69,7 @@ public class CreateCountrySteps
     {
         var country = await _mongoDbContext.Collection.Find(x => x.Name == "TestUsa####").FirstOrDefaultAsync();
         Assert.That(country, Is.Not.EqualTo(null));
-        Assert.That(country.Code, Is.EqualTo(("TESTCOUNTRYCODE")));
+        Assert.That(country.Code, Is.EqualTo("TESTCOUNTRYCODE"));
     }
 
     [AfterScenario("@CreateCountry")]
@@ -78,7 +78,7 @@ public class CreateCountrySteps
         await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyId.ToObjectId());
         await _mongoDbContext.Collection.DeleteOneAsync(x =>
             (x.CreatedBy == "OwnerUserTest" || x.CreatedBy == "ClientAdminTest" || x.CreatedBy == "OperatorTest")
-            && x.Name == _createCountryDto.Name
+            && x.Name == _createCountryDto!.Name
         );
     }
 }

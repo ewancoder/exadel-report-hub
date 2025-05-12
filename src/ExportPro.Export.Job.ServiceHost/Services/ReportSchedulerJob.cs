@@ -21,7 +21,7 @@ public sealed class ReportSchedulerJob(
     {
         var preferences = await reportRepository.GetAllPreferences(context.CancellationToken);
         var baseurl = Environment.GetEnvironmentVariable("DockerForAuth") ?? configuration["AuthURI"];
-        HttpClient client = new() { BaseAddress = new Uri(baseurl) };
+        HttpClient client = new() { BaseAddress = new Uri(baseurl!) };
 
         IAuth authAPi = RestService.For<IAuth>(client);
         UserRegisterDto user = new()
@@ -42,7 +42,7 @@ public sealed class ReportSchedulerJob(
                 Environment.GetEnvironmentVariable("DockerForReport") ?? configuration["ExportReportURI"];
             HttpClient httpClient = new()
             {
-                BaseAddress = new Uri(baseUrlForexport), //localhost:5294"),
+                BaseAddress = new Uri(baseUrlForexport!), //localhost:5294"),
             };
 
             httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
@@ -64,7 +64,7 @@ public sealed class ReportSchedulerJob(
             };
 
             var fileName = $"report_{DateTime.UtcNow:yyyyMMddHHmm}.{extension}";
-            var contentType = reportResponse.Content.Headers.ContentType?.MediaType ?? mimeType;
+            var contentType = reportResponse.Content!.Headers.ContentType?.MediaType ?? mimeType;
             var content = await reportResponse.Content.ReadAsByteArrayAsync(context.CancellationToken);
             var subject = $"Scheduled Report - {DateTime.UtcNow:MMMM dd, yyyy}";
             var body = $"Dear user,\n\nPlease find your scheduled report attached.";

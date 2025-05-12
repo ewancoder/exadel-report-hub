@@ -1,7 +1,6 @@
 ﻿using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.Export.ServiceHost.Extensions;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

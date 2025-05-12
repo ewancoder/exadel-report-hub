@@ -9,16 +9,16 @@ namespace ExportPro.Shared.IntegrationTests.Auth;
 
 public static class UserActions
 {
-    private static readonly IMongoDbContext<User> MongoDbContext = new MongoDbContext<User>("Users");
-    private static readonly IAuth iauth = RestService.For<IAuth>("http://localhost:5000");
+    private readonly static IMongoDbContext<User> MongoDbContext = new MongoDbContext<User>("Users");
+    private readonly static IAuth Iauth = RestService.For<IAuth>("http://localhost:5000");
 
-    public static async Task RemoveUser(string name)
+    public async static Task RemoveUser(string name)
     {
         var filter = Builders<User>.Filter.Eq(u => u.Username, name);
         await MongoDbContext.Collection.DeleteOneAsync(filter);
     }
 
-    public static async Task<string> AddSuperAdmin()
+    public async static Task<string> AddSuperAdmin()
     {
         UserRegisterDto userDto = new()
         {
@@ -27,15 +27,15 @@ public static class UserActions
             Password = "SuperAdminTest2@",
         };
         UserLoginDto userLoginDto = new() { Email = "SuperAdminTest@gmail.com", Password = "SuperAdminTest2@" };
-        await iauth.RegisterAsync(userDto);
+        await Iauth.RegisterAsync(userDto);
         var filter = Builders<User>.Filter.Eq(u => u.Username, userDto.Username);
         var update = Builders<User>.Update.Set(u => u.Role, UserRole.SuperAdmin);
         await MongoDbContext.Collection.UpdateOneAsync(filter, update);
-        var responseDto = await iauth.LoginAsync(userLoginDto);
+        var responseDto = await Iauth.LoginAsync(userLoginDto);
         return responseDto.AccessToken;
     }
 
-    public static async Task<string> AddOwner()
+    public async static Task<string> AddOwner()
     {
         UserRegisterDto userDto = new()
         {
@@ -44,15 +44,15 @@ public static class UserActions
             Password = "OwnerUserTest2@",
         };
         UserLoginDto userLoginDto = new() { Email = "OwnerUserTest@gmail.com", Password = "OwnerUserTest2@" };
-        await iauth.RegisterAsync(userDto);
+        await Iauth.RegisterAsync(userDto);
         var filter = Builders<User>.Filter.Eq(u => u.Username, userDto.Username);
         var update = Builders<User>.Update.Set(u => u.Role, UserRole.Owner);
         await MongoDbContext.Collection.UpdateOneAsync(filter, update);
-        var responseDto = await iauth.LoginAsync(userLoginDto);
+        var responseDto = await Iauth.LoginAsync(userLoginDto);
         return responseDto.AccessToken;
     }
 
-    public static async Task<string> AddClientAdmin()
+    public async static Task<string> AddClientAdmin()
     {
         UserRegisterDto userDto = new()
         {
@@ -61,15 +61,15 @@ public static class UserActions
             Password = "ClientAdminTest2@",
         };
         UserLoginDto userLoginDto = new() { Email = "ClientAdminTest@gmail.com", Password = "ClientAdminTest2@" };
-        await iauth.RegisterAsync(userDto);
+        await Iauth.RegisterAsync(userDto);
         var filter = Builders<User>.Filter.Eq(u => u.Username, userDto.Username);
         var update = Builders<User>.Update.Set(u => u.Role, UserRole.ClientAdmin);
         await MongoDbContext.Collection.UpdateOneAsync(filter, update);
-        var responseDto = await iauth.LoginAsync(userLoginDto);
+        var responseDto = await Iauth.LoginAsync(userLoginDto);
         return responseDto.AccessToken;
     }
 
-    public static async Task<string> AddOperator()
+    public async static Task<string> AddOperator()
     {
         UserRegisterDto userDto = new()
         {
@@ -78,11 +78,11 @@ public static class UserActions
             Password = "OperatorTest2@",
         };
         UserLoginDto userLoginDto = new() { Email = "OperatorTest@gmail.com", Password = "OperatorTest2@" };
-        await iauth.RegisterAsync(userDto);
+        await Iauth.RegisterAsync(userDto);
         var filter = Builders<User>.Filter.Eq(u => u.Username, userDto.Username);
         var update = Builders<User>.Update.Set(u => u.Role, UserRole.Operator);
         await MongoDbContext.Collection.UpdateOneAsync(filter, update);
-        var responseDto = await iauth.LoginAsync(userLoginDto);
+        var responseDto = await Iauth.LoginAsync(userLoginDto);
         return responseDto.AccessToken;
     }
 }

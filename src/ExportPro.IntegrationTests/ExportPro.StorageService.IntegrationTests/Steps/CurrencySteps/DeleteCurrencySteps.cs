@@ -17,7 +17,7 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.CurrencySteps;
 public class DeleteCurrencySteps
 {
     private readonly IMongoDbContext<Currency> _mongoDbContext = new MongoDbContext<Currency>();
-    private ICurrencyApi _currencyApi;
+    private ICurrencyApi? _currencyApi;
     private Guid _currencyId;
 
     [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
@@ -26,23 +26,23 @@ public class DeleteCurrencySteps
         string password
     )
     {
-        string jwtToken = await UserLogin.Login(email, password);
-        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
+        var jwtToken = await UserLogin.Login(email, password);
+        var httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
     }
 
     [Given("the user has created the following currency and stored the currency id")]
     public async Task GivenTheUserHasCreatedTheFollowingCurrencyAndStoredTheCurrencyId(Table table)
     {
-        CurrencyDto currencyDto = table.CreateInstance<CurrencyDto>();
-        var currency = await _currencyApi.Create(currencyDto);
-        _currencyId = currency.Data.Id;
+        var currencyDto = table.CreateInstance<CurrencyDto>();
+        var currency = await _currencyApi!.Create(currencyDto);
+        _currencyId = currency.Data!.Id;
     }
 
     [When("The user sends the currency delete request")]
     public async Task WhenTheUserSendsCurrencyDeleteRequest()
     {
-        await _currencyApi.Delete(_currencyId);
+        await _currencyApi!.Delete(_currencyId);
     }
 
     [Then("The currency should be deleted")]

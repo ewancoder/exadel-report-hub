@@ -9,8 +9,6 @@ namespace ExportPro.Shared.IntegrationTests.MongoDbContext;
 public class MongoDbContext<T> : IMongoDbContext<T>
     where T : IModel
 {
-    public IMongoCollection<T> Collection { get; }
-
     public MongoDbContext(string? name = null)
     {
         IConfiguration configuration = new ConfigurationBuilder()
@@ -26,4 +24,6 @@ public class MongoDbContext<T> : IMongoDbContext<T>
         ICollectionProvider collectionProvider = new DefaultCollectionProvider(connectionFactory);
         Collection = collectionProvider.GetCollection<T>(name);
     }
+
+    public IMongoCollection<T> Collection { get; }
 }

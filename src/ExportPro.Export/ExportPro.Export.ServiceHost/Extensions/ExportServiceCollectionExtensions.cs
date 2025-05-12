@@ -13,8 +13,6 @@ using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.ServiceHost.Infrastructure;
-using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -49,7 +47,7 @@ public static class ExportServiceCollectionExtensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwt?.Issuer,
                     ValidAudience = jwt?.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt?.Secret)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt!.Secret)),
                 };
             });
 

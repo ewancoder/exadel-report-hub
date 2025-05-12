@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using ExportPro.Common.Shared.Extensions;
+﻿using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.DataAccess.Repositories;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
 using ExportPro.StorageService.SDK.Services;
-using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
@@ -36,7 +33,7 @@ public sealed class GetOverduePaymentsQueryHandler(
         {
             if (invoice.CurrencyId == invoice.ClientCurrencyId)
             {
-                totalAmount += (double)invoice.Amount;
+                totalAmount += (double)invoice.Amount!;
                 continue;
             }
 
@@ -66,7 +63,7 @@ public sealed class GetOverduePaymentsQueryHandler(
                     new CurrencyExchangeModel { Date = invoice.IssueDate, From = clientCurrency.CurrencyCode },
                     cancellationToken
                 );
-                convertedAmount = (double)(invoice.Amount * clientCurrencyRate);
+                convertedAmount = (double)(invoice.Amount! * clientCurrencyRate);
             }
             totalAmount += convertedAmount;
         }

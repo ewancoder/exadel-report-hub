@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.Integratio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.IntegrationTests", "ExportPro.StorageService.IntegrationTests\ExportPro.StorageService.IntegrationTests.csproj", "{AD538052-7AA8-4BEF-ACA8-0722310D84C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Shared.IntegrationTests", "ExportPro.Shared.IntegrationTests\ExportPro.Shared.IntegrationTests.csproj", "{9FB872A6-CADE-480C-A916-28AD7FD585AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{AD538052-7AA8-4BEF-ACA8-0722310D84C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD538052-7AA8-4BEF-ACA8-0722310D84C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD538052-7AA8-4BEF-ACA8-0722310D84C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FB872A6-CADE-480C-A916-28AD7FD585AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FB872A6-CADE-480C-A916-28AD7FD585AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FB872A6-CADE-480C-A916-28AD7FD585AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FB872A6-CADE-480C-A916-28AD7FD585AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

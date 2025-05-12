@@ -7,7 +7,7 @@ namespace ExportPro.StorageService.IntegrationTests;
 public static class DeleteTestUsers
 {
     [AfterTestRun]
-    public static async Task DeletingTestUsers()
+    public async static Task DeletingTestUsers()
     {
         await UserActions.RemoveUser("SuperAdminTest");
         await UserActions.RemoveUser("OwnerUserTest");

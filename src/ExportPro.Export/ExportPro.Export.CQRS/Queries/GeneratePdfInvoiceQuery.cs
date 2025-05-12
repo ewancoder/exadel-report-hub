@@ -1,13 +1,10 @@
-﻿using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.SDK.Utilities;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace ExportPro.Export.CQRS.Queries;
 
@@ -16,18 +13,14 @@ public record GenerateInvoicePdfQuery(Guid InvoiceId) : IRequest<PdfFileDto>;
 public sealed class GenerateInvoicePdfQueryHandler(
     IStorageServiceApi storageApi,
     IPdfGenerator pdfGenerator,
-    IMapper mapper,
-    IHttpContextAccessor httpContextAccessor
+    IMapper mapper
 ) : IRequestHandler<GenerateInvoicePdfQuery, PdfFileDto>
 {
     public async Task<PdfFileDto> Handle(GenerateInvoicePdfQuery request, CancellationToken cancellationToken)
     {
         if (request.InvoiceId == Guid.Empty)
             throw new ArgumentException("InvoiceId cannot be empty", nameof(request.InvoiceId));
-
-        var userId = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
         var result = await CreateInvoicePdfAsync(request, cancellationToken);
-
         return result;
     }
 

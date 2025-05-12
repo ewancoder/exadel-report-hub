@@ -1,5 +1,4 @@
-﻿using ExportPro.Common.Models.MongoDB;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 
 namespace ExportPro.Shared.IntegrationTests.MongoDbContext;
 

@@ -14,9 +14,8 @@ public static class DependencyInjection
     {
         var smtpSettings = config.GetSection("SmtpSettings").Get<SmtpSettings>();
         services.AddSingleton(smtpSettings);
-        var baseurl = Environment.GetEnvironmentVariable("DockerForReport") ?? config["ReportExportApi:BaseUrl"]; 
-        services.AddRefitClient<IReportExportApi>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseurl));
+        var baseurl = Environment.GetEnvironmentVariable("DockerForReport") ?? config["ReportExportApi:BaseUrl"];
+        services.AddRefitClient<IReportExportApi>().ConfigureHttpClient(c => c.BaseAddress = new Uri(baseurl!));
 
         services.AddTransient<IEmailService, EmailService>();
         services.AddScoped<IReportPreference, ReportPreferenceRepository>();

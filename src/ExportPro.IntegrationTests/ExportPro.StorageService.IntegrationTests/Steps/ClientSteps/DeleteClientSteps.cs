@@ -5,7 +5,6 @@ using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Refit;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Refit;
 using TechTalk.SpecFlow;
@@ -17,23 +16,23 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.ClientSteps;
 public class DeleteClientSteps
 {
     private readonly IMongoDbContext<Client> _mongoDbContext = new MongoDbContext<Client>();
-    private Guid _clientId;
     private IClientApi? _clientApi;
+    private Guid _clientId;
 
     [Given("The user is logged in with email  and password  and has necessary permissions")]
     public async Task GivenUserHasValidToken(Table table)
     {
-        string jwtToken = await UserLogin.Login(table.Rows[0]["Email"], table.Rows[0]["Password"]);
-        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
+        var jwtToken = await UserLogin.Login(table.Rows[0]["Email"], table.Rows[0]["Password"]);
+        var httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _clientApi = RestService.For<IClientApi>(httpClient);
     }
 
     [Given("The user creates a client and The stores the client id")]
     public async Task GivenTheClientExists(Table table)
     {
-        ClientDto clientDto = table.CreateInstance<ClientDto>();
+        var clientDto = table.CreateInstance<ClientDto>();
         await _clientApi!.CreateClient(clientDto);
-        var client = await _mongoDbContext!.Collection.Find(x => x.Name == clientDto.Name).FirstOrDefaultAsync();
+        var client = await _mongoDbContext.Collection.Find(x => x.Name == clientDto.Name).FirstOrDefaultAsync();
         Assert.That(client, Is.Not.Null);
         Assert.That(client.Name, Is.EqualTo(clientDto.Name));
         _clientId = client.Id.ToGuid();

@@ -10,7 +10,7 @@ public static class MongoServiceCollectionExtensions
     {
         var mongoSettings = config.GetSection("MongoDbSettings").Get<MongoDbSettings>();
         services.AddSingleton(mongoSettings);
-        var mongoConstring = Environment.GetEnvironmentVariable("MongoDbDocker") ?? mongoSettings.ConnectionString;
+        var mongoConstring = Environment.GetEnvironmentVariable("MongoDbDocker") ?? mongoSettings!.ConnectionString;
         services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConstring));
         services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
 
