@@ -52,6 +52,7 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
         preference.ReportFormat = request.ReportFormat;
         preference.Email = request.Email;
         preference.CronExpression = cronExpression;
+        preference.HumanReadableCronExpression = CronToTextHelper.ToReadableText(cronExpression);
         preference.IsEnabled = request.IsEnabled;
         preference.UpdatedAt = DateTime.UtcNow;
 

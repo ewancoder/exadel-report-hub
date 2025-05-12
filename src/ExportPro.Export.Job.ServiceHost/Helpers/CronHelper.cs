@@ -15,7 +15,7 @@ public static class CronHelper
                 $"0 {minute} {hour} ? * *",
 
             ReportFrequency.Weekly when schedule.DayOfWeek.HasValue =>
-                $"0 {minute} {hour} ? * {schedule.DayOfWeek.Value.ToString().ToUpperInvariant()}", 
+                $"0 {minute} {hour} ? * {(int)schedule.DayOfWeek.Value + 1}",
 
             ReportFrequency.Monthly when schedule.DayOfMonth.HasValue =>
                 $"0 {minute} {hour} {schedule.DayOfMonth.Value} * ?",
