@@ -6,56 +6,88 @@ namespace ExportPro.Export.Excel.Services;
 
 public sealed class CustomerExcelParser : ICustomerExcelParser
 {
-    private static readonly string[] Required =
+    private static readonly string[] RequiredColumns =
         ["Name", "Email", "Address", "CountryId"];
 
     public List<CreateUpdateCustomerDto> Parse(Stream excelStream)
     {
         using var wb = new XLWorkbook(excelStream);
-        var ws = wb.Worksheets.First();
-        var header = ws.FirstRowUsed();
+        var worksheet = GetWorksheet(wb);
+        var headerRow = worksheet.FirstRowUsed();
+        var columnMap = MapHeaderColumns(headerRow);
+        ValidateRequiredColumns(columnMap);
+        return ExtractCustomersFromWorksheet(worksheet, columnMap);
+    }
 
-        // map column names → index
-        var col = header.Cells()
-                        .Where(c => Required.Contains(c.GetString().Trim(),
-                                                      StringComparer.OrdinalIgnoreCase))
-                        .ToDictionary(c => c.GetString().Trim(),
-                                      c => c.Address.ColumnNumber,
-                                      StringComparer.OrdinalIgnoreCase);
+    private List<CreateUpdateCustomerDto> ExtractCustomersFromWorksheet(IXLWorksheet ws,
+        Dictionary<string, int> columnMap)
+    {
+        var customers = ProcessRows(ws, columnMap);
 
-        var missing = Required.Where(r => !col.ContainsKey(r)).ToArray();
-        if (missing.Length > 0)
-            throw new Exception($"Missing columns: {string.Join(", ", missing)}");
-
-        List<CreateUpdateCustomerDto> list = [];
-        foreach (var row in ws.RowsUsed().Skip(1)) // skip header
-        {
-            var name = row.Cell(col["Name"]).GetString().Trim();
-            var email = row.Cell(col["Email"]).GetString().Trim();
-            var addr  = row.Cell(col["Address"]).GetString().Trim();
-            var cid   = row.Cell(col["CountryId"]).GetString().Trim();
-
-            if (string.IsNullOrWhiteSpace(name) &&
-                string.IsNullOrWhiteSpace(email) &&
-                string.IsNullOrWhiteSpace(addr) &&
-                string.IsNullOrWhiteSpace(cid))
-                continue; // blank row
-
-            if (!Guid.TryParse(cid, out var countryId))
-                throw new Exception($"Invalid CountryId '{cid}' (row {row.RowNumber()}).");
-
-            list.Add(new CreateUpdateCustomerDto
-            {
-                Name      = name,
-                Email     = email,
-                Address   = addr,
-                CountryId = countryId
-            });
-        }
-
-        if (list.Count == 0)
+        if (customers.Count == 0)
             throw new Exception("No valid rows found.");
 
-        return list;
+        return customers;
+    }
+
+    private IXLWorksheet GetWorksheet(XLWorkbook workbook)
+    {
+        return workbook.Worksheets.First();
+    }
+
+    private Dictionary<string, int> MapHeaderColumns(IXLRow headerRow)
+    {
+        return headerRow.Cells()
+            .Where(c => RequiredColumns.Contains(c.GetString().Trim(), StringComparer.OrdinalIgnoreCase))
+            .ToDictionary(
+                c => c.GetString().Trim(),
+                c => c.Address.ColumnNumber,
+                StringComparer.OrdinalIgnoreCase);
+    }
+
+    private void ValidateRequiredColumns(IReadOnlyDictionary<string, int> columnMap)
+    {
+        var missingColumns = RequiredColumns.Where(r => !columnMap.ContainsKey(r)).ToArray();
+        if (missingColumns.Length > 0)
+            throw new Exception($"Missing columns: {string.Join(", ", missingColumns)}");
+    }
+
+    private List<CreateUpdateCustomerDto> ProcessRows(IXLWorksheet worksheet,
+        IReadOnlyDictionary<string, int> columnMap)
+    {
+        List<CreateUpdateCustomerDto> customers = [];
+        
+        foreach (var row in worksheet.RowsUsed().Skip(1)) // skip header
+        {
+            var customerDto = ParseRow(row, columnMap);
+            if (customerDto != null) customers.Add(customerDto);
+        }
+
+        return customers;
+    }
+
+    private CreateUpdateCustomerDto? ParseRow(IXLRow row, IReadOnlyDictionary<string, int> columnMap)
+    {
+        var name = row.Cell(columnMap["Name"]).GetString().Trim();
+        var email = row.Cell(columnMap["Email"]).GetString().Trim();
+        var addr = row.Cell(columnMap["Address"]).GetString().Trim();
+        var cidStr = row.Cell(columnMap["CountryId"]).GetString().Trim();
+
+        if (string.IsNullOrWhiteSpace(name) &&
+            string.IsNullOrWhiteSpace(email) &&
+            string.IsNullOrWhiteSpace(addr) &&
+            string.IsNullOrWhiteSpace(cidStr))
+            return null; // blank row
+
+        if (!Guid.TryParse(cidStr, out var countryId))
+            throw new Exception($"Invalid CountryId '{cidStr}' (row {row.RowNumber()}).");
+
+        return new CreateUpdateCustomerDto
+        {
+            Name = name,
+            Email = email,
+            Address = addr,
+            CountryId = countryId
+        };
     }
 }

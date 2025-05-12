@@ -1,7 +1,4 @@
-﻿// namespace ExportPro.Export.CQRS.Commands;
-// namespace ExportPro.Export.CQRS.CommandHandlers;
-
-
+﻿using System.Net;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.Export.SDK.Interfaces;
@@ -23,30 +20,46 @@ public sealed class ImportCustomersCommandHandler(
         ImportCustomersCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.ExcelFile.Length == 0)
-            return new BadRequestResponse<int>("Empty file.");
+        var parseResult = await ParseExcelAsync(request.ExcelFile);
 
-        // ── 1. parse Excel ───────────────────────────────
-        List<CreateUpdateCustomerDto> customers;
+        if (!parseResult.IsSuccess)
+            return new BadRequestResponse<int>(parseResult.ErrorMessage!);
+
+        return await SaveCustomersAsync(parseResult.Customers!, cancellationToken);
+    }
+
+    private async Task<(bool IsSuccess, List<CreateUpdateCustomerDto>? Customers, string? ErrorMessage)>
+        ParseExcelAsync(IFormFile excelFile)
+    {
+        if (excelFile.Length == 0)
+            return (false, null, "Empty file.");
+
         try
         {
-            using var stream = request.ExcelFile.OpenReadStream();
-            customers = parser.Parse(stream);
+            await using var stream = excelFile.OpenReadStream();
+            var customers = await Task.Run(() => parser.Parse(stream));
+            return (true, customers, null);
         }
         catch (Exception ex)
         {
-            return new BadRequestResponse<int>($"Excel parsing failed: {ex.Message}");
+            return (false, null, $"Excel parsing failed: {ex.Message}");
         }
+    }
 
-        // ── 2. forward to Storage‑service ────────────────
+    private async Task<BaseResponse<int>> SaveCustomersAsync(
+        List<CreateUpdateCustomerDto> customers,
+        CancellationToken cancellationToken)
+    {
+        if (customers.Count == 0)
+            return new BadRequestResponse<int>("No customers to import.");
+
         try
         {
             return await storageApi.CreateCustomersBulkAsync(customers, cancellationToken);
         }
-        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest &&
+        catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.BadRequest &&
                                       !string.IsNullOrWhiteSpace(ex.Content))
         {
-            // Bubble the validation errors exactly as Storage‑service sent them
             var resp = JsonConvert.DeserializeObject<BaseResponse<int>>(ex.Content);
             return resp ?? new BadRequestResponse<int>("Import failed.");
         }
