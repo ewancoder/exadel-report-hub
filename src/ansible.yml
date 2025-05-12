@@ -27,12 +27,14 @@
       git:
         repo: https://github.com/ewancoder/exadel-report-hub.git
         dest: /exadel/
-    - name: Git Checkout
+    - name: Ensure repo is on latest ForHosting branch
       git:
-        repo: /exadel/
+        repo: https://github.com/ewancoder/exadel-report-hub.git
         dest: /exadel/
-        version: ForHosting 
-    
+        version: ForHosting
+        force: true
+        update: yes
+
 - name: Installing Docker
   hosts: all
   gather_facts: true
