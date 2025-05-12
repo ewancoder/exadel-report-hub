@@ -52,14 +52,18 @@ public class InvoiceController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(new GetTotalInvoicesQuery(query));
         return StatusCode((int)response.ApiState, response);
     }
+
     [HttpGet("revenue")]
     public async Task<IActionResult> GetTotalRevenue([FromQuery] TotalRevenueDto query)
     {
         var result = await mediator.Send(new GetTotalRevenueQuery(query));
         return StatusCode((int)result.ApiState, result);
     }
+
     [HttpGet("overdue-payments/{clientId}")]
     [HasPermission(Resource.Invoices, CrudAction.Read)]
-    public Task<BaseResponse<OverduePaymentsResponse>> GetOverduePayments([FromRoute] Guid  clientId,
-        CancellationToken cancellationToken) =>  mediator.Send(new GetOverduePaymentsQuery(clientId), cancellationToken);
+    public Task<BaseResponse<OverduePaymentsResponse>> GetOverduePayments(
+        [FromRoute] Guid clientId,
+        CancellationToken cancellationToken
+    ) => mediator.Send(new GetOverduePaymentsQuery(clientId), cancellationToken);
 }
