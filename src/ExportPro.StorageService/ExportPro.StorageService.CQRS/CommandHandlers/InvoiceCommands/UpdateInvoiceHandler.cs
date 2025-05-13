@@ -1,17 +1,22 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.Responses;
+using Microsoft.AspNetCore.Http;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
 public sealed record UpdateInvoiceCommand(Guid Id, CreateInvoiceDto InvoiceDto) : ICommand<InvoiceResponse>;
 
-public sealed class UpdateInvoiceHandler(IInvoiceRepository repository, IMapper mapper)
-    : ICommandHandler<UpdateInvoiceCommand, InvoiceResponse>
+public sealed class UpdateInvoiceHandler(
+    IHttpContextAccessor httpContext,
+    IInvoiceRepository repository,
+    IMapper mapper
+) : ICommandHandler<UpdateInvoiceCommand, InvoiceResponse>
 {
     public async Task<BaseResponse<InvoiceResponse>> Handle(
         UpdateInvoiceCommand request,
@@ -31,6 +36,8 @@ public sealed class UpdateInvoiceHandler(IInvoiceRepository repository, IMapper 
         existing.PaymentStatus = request.InvoiceDto.PaymentStatus;
         existing.BankAccountNumber = request.InvoiceDto.BankAccountNumber;
         existing.ClientId = request.InvoiceDto.ClientId.ToObjectId();
+        existing.UpdatedAt = DateTime.Now;
+        existing.UpdatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;
         await repository.UpdateOneAsync(existing, cancellationToken);
         var invoiceResponse = mapper.Map<InvoiceResponse>(request.InvoiceDto);
         invoiceResponse.Id = existing.Id.ToGuid();

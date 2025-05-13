@@ -1,8 +1,9 @@
+using ExportPro.Common.Models.MongoDB;
 using ExportPro.StorageService.Models.Enums;
 
 namespace ExportPro.StorageService.SDK.Responses;
 
-public sealed class InvoiceResponse
+public sealed class InvoiceResponse : AuditModel
 {
     public required Guid Id { get; set; }
     public string InvoiceNumber { get; set; } = string.Empty;

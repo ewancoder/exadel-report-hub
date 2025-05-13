@@ -1,6 +1,7 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.CurrencyCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -13,16 +14,16 @@ public class CurrencyController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     public Task<BaseResponse<CurrencyResponse>> Create(
-        [FromBody] string currencyCode,
+        [FromBody] CurrencyDto currency,
         CancellationToken cancellationToken
-    ) => mediator.Send(new CreateCurrencyCommand(currencyCode), cancellationToken);
+    ) => mediator.Send(new CreateCurrencyCommand(currency), cancellationToken);
 
     [HttpPut("{id}")]
     public Task<BaseResponse<CurrencyResponse>> Update(
         [FromRoute] Guid id,
-        [FromBody] string currencyCode,
+        [FromBody] CurrencyDto currency,
         CancellationToken cancellationToken
-    ) => mediator.Send(new UpdateCurrencyCommand(id, currencyCode));
+    ) => mediator.Send(new UpdateCurrencyCommand(id, currency), cancellationToken);
 
     [HttpDelete("{id}")]
     public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken) =>

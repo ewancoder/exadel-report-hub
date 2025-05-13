@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 using ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 using ExportPro.StorageService.CQRS.CommandHandlers.PlanCommands;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
 using ExportPro.StorageService.CQRS.QueryHandlers.ItemQueries;
 using ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
@@ -26,6 +26,7 @@ public class ClientController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     [SwaggerOperation(Summary = "Creating a client")]
+    [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     [ProducesResponseType(typeof(NotFoundResponse<ClientResponse>), 404)]
     [HasPermission(Resource.Clients, CrudAction.Create)]
     public Task<BaseResponse<ClientResponse>> CreateClient(

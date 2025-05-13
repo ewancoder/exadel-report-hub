@@ -1,6 +1,6 @@
 using MongoDB.Bson;
 
-namespace ExportPro.StorageService.CQRS.Extensions;
+namespace ExportPro.Common.Shared.Extensions;
 
 public static class ObjectIdConvertExtension
 {
