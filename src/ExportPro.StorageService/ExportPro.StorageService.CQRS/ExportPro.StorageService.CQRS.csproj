@@ -15,5 +15,9 @@
         <PackageReference Include="MediatR" Version="12.5.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
+    </ItemGroup>
+
 
 </Project>
