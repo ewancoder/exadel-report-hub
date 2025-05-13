@@ -11,7 +11,6 @@ namespace ExportPro.Export.ServiceHost.Controllers;
 public sealed class CustomerImportController(IMediator mediator) : ControllerBase
 {
     [HttpPost("bulk")]
-    // [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SuccessResponse<int>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse<int>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Bulk(
@@ -21,12 +20,4 @@ public sealed class CustomerImportController(IMediator mediator) : ControllerBas
         var resp = await mediator.Send(new ImportCustomersCommand(file), ct);
         return StatusCode((int)resp.ApiState, resp);
     }
-    
-    // [HttpPost("bulk")]
-    // [Consumes("multipart/form-data")]
-    // [ProducesResponseType(typeof(BaseResponse<int>), StatusCodes.Status200OK)]
-    // public Task<BaseResponse<int>> Bulk(
-    //     IFormFile file,
-    //     CancellationToken ct) =>
-    //     mediator.Send(new ImportCustomersCommand(file), ct);
 }

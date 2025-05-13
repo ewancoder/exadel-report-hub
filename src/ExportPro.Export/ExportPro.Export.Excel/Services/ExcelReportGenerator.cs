@@ -1,7 +1,6 @@
 ﻿using ClosedXML.Excel;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Interfaces;
-using ExportPro.Export.SDK.Utilities;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.Export.Excel.Services;
@@ -9,7 +8,7 @@ namespace ExportPro.Export.Excel.Services;
 public sealed class ExcelReportGenerator : IReportGenerator
 {
     public string ContentType => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    public string Extension => ReportFileTypes.Excel;
+    public string Extension => "xlsx";
 
     public byte[] Generate(ReportContentDto data)
     {
