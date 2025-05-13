@@ -25,95 +25,68 @@ public sealed class CreateCustomersCommandHandler(
         CancellationToken cancellationToken
     )
     {
-        if (request.Customers.Count == 0) return new BadRequestResponse<int>("No customers provided for creation.");
+        var validationResult = await ValidateCustomersAsync(request, cancellationToken);
 
-        // Dictionary to collect validation errors by customer index
+        if (validationResult is not null)
+            return validationResult;
+
+        return await CreateCustomersAsync(request, cancellationToken);
+    }
+
+    private async Task<BaseResponse<int>?> ValidateCustomersAsync(
+        CreateCustomersCommand request,
+        CancellationToken cancellationToken
+    )
+    {
+        if (request.Customers.Count == 0)
+            return new BadRequestResponse<int>("No customers provided for creation.");
+
         var validationErrors = new Dictionary<int, List<string>>();
 
-        // Validate each customer before processing any
         for (var i = 0; i < request.Customers.Count; i++)
         {
             var customerDto = request.Customers[i];
-            List<string> errors = [];
+            var errors = await ValidateSingleCustomerAsync(customerDto, cancellationToken);
 
-            // Validate required fields
-            if (string.IsNullOrEmpty(customerDto.Name))
-                errors.Add("Name is required.");
-
-            if (string.IsNullOrEmpty(customerDto.Email))
-                errors.Add("Email is required.");
-
-            if (string.IsNullOrEmpty(customerDto.Address))
-                errors.Add("Address is required.");
-
-            if (customerDto.CountryId == Guid.Empty)
-                errors.Add("CountryId is required.");
-
-            // Skip further validation if basic fields are missing
             if (errors.Count > 0)
-            {
                 validationErrors[i] = errors;
-                continue;
-            }
-
-            // Validate country exists
-            var country = await countryRepository.GetOneAsync(
-                x => x.Id == customerDto.CountryId.ToObjectId() && !x.IsDeleted,
-                cancellationToken
-            );
-
-            if (country == null) errors.Add("CountryId does not exist.");
-
-            // Validate email format
-            if (!IsValidEmail(customerDto.Email)) errors.Add("Invalid email format.");
-
-            // Validate no duplicates in database
-            var existingEmail = await customerRepository.GetOneAsync(
-                x => x.Email == customerDto.Email && !x.IsDeleted,
-                cancellationToken
-            );
-
-            if (existingEmail != null) errors.Add("Email already exists.");
-
-            var existingName = await customerRepository.GetOneAsync(
-                x => x.Name == customerDto.Name && !x.IsDeleted,
-                cancellationToken
-            );
-
-            if (existingName != null) errors.Add("Name already exists.");
-
-            // If there are validation errors, add them to the dictionary
-            if (errors.Count > 0) validationErrors[i] = errors;
-
-            // Validate Address exists
-            var existingAddress = await customerRepository.GetOneAsync(
-                x => x.Address == customerDto.Address && !x.IsDeleted,
-                cancellationToken
-            );
-
-            if (existingAddress != null) errors.Add("Address already exists.");
         }
 
-        // Return validation errors if any
         if (validationErrors.Count > 0)
-        {
-            // Convert validation errors to a flat list of messages
-            var errorMessages = validationErrors
-                .SelectMany(kvp => kvp.Value.Select(error => $"Customer {kvp.Key + 1}: {error}"))
-                .ToList();
+            return CreateValidationErrorResponse(validationErrors);
 
-            return new BadRequestResponse<int>
-            {
-                Messages = errorMessages
-            };
-        }
+        return null;
+    }
 
-        // All customers passed validation, proceed with creation
+    private async Task<List<string>> ValidateSingleCustomerAsync(
+        CreateUpdateCustomerDto customerDto,
+        CancellationToken cancellationToken
+    )
+    {
+        var errors = new List<string>();
+
+        ValidateRequiredFields(customerDto, errors);
+
+        if (errors.Count > 0) return errors;
+
+        await ValidateCountryExistsAsync(customerDto.CountryId, errors, cancellationToken);
+        ValidateEmailFormat(customerDto.Email, errors);
+        await ValidateNoDuplicatesAsync(customerDto, errors, cancellationToken);
+
+        return errors;
+    }
+
+    private async Task<BaseResponse<int>> CreateCustomersAsync(
+        CreateCustomersCommand request,
+        CancellationToken cancellationToken
+    )
+    {
         var successCount = 0;
+
         foreach (var customerDto in request.Customers)
         {
             var customer = mapper.Map<Customer>(customerDto);
-            customer.CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;
+            customer.CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
             await customerRepository.AddOneAsync(customer, cancellationToken);
             successCount++;
         }
@@ -121,16 +94,87 @@ public sealed class CreateCustomersCommandHandler(
         return new SuccessResponse<int>(successCount, $"{successCount} customers created successfully.");
     }
 
-    private bool IsValidEmail(string email)
+    private void ValidateRequiredFields(CreateUpdateCustomerDto customerDto, List<string> errors)
+    {
+        if (string.IsNullOrEmpty(customerDto.Name))
+            errors.Add("Name is required.");
+
+        if (string.IsNullOrEmpty(customerDto.Email))
+            errors.Add("Email is required.");
+
+        if (string.IsNullOrEmpty(customerDto.Address))
+            errors.Add("Address is required.");
+
+        if (customerDto.CountryId == Guid.Empty)
+            errors.Add("CountryId is required.");
+    }
+
+    private async Task ValidateCountryExistsAsync(
+        Guid countryId,
+        List<string> errors,
+        CancellationToken cancellationToken
+    )
+    {
+        var country = await countryRepository.GetOneAsync(
+            x => x.Id == countryId.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
+
+        if (country == null)
+            errors.Add("CountryId does not exist.");
+    }
+
+    private void ValidateEmailFormat(string email, List<string> errors)
     {
         try
         {
             var addr = new MailAddress(email);
-            return addr.Address == email;
+            if (addr.Address != email)
+                errors.Add("Invalid email format.");
         }
         catch
         {
-            return false;
+            errors.Add("Invalid email format.");
         }
+    }
+
+    private async Task ValidateNoDuplicatesAsync(
+        CreateUpdateCustomerDto customerDto,
+        List<string> errors,
+        CancellationToken cancellationToken
+    )
+    {
+        var existingEmail = await customerRepository.GetOneAsync(
+            x => x.Email == customerDto.Email && !x.IsDeleted,
+            cancellationToken
+        );
+
+        if (existingEmail != null)
+            errors.Add("Email already exists.");
+
+        var existingName = await customerRepository.GetOneAsync(
+            x => x.Name == customerDto.Name && !x.IsDeleted,
+            cancellationToken
+        );
+
+        if (existingName != null)
+            errors.Add("Name already exists.");
+
+        var existingAddress = await customerRepository.GetOneAsync(
+            x => x.Address == customerDto.Address && !x.IsDeleted,
+            cancellationToken
+        );
+
+        if (existingAddress != null)
+            errors.Add("Address already exists.");
+    }
+
+    private BaseResponse<int> CreateValidationErrorResponse(Dictionary<int, List<string>> validationErrors)
+    {
+        var errorMessages = validationErrors
+            .SelectMany(kvp => kvp.Value.Select(error => $"Customer {kvp.Key + 1}: {error}"))
+            .ToList();
+
+        return new BadRequestResponse<int> { Messages = errorMessages };
     }
 }

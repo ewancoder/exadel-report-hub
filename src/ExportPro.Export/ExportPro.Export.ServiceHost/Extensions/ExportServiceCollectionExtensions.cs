@@ -13,6 +13,7 @@ using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.ServiceHost.Infrastructure;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -55,13 +56,21 @@ public static class ExportServiceCollectionExtensions
         services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
         services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 
-        // —— MediatR ——
-        services.AddMediatR(o =>
-        {
-            o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly);
-            o.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
-            o.AddOpenBehavior(typeof(ValidationBehavior<,>));
-        });
+        // // —— MediatR ——
+        // services.AddMediatR(o =>
+        // {
+        //     o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly);
+        //     o.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
+        //     o.AddOpenBehavior(typeof(ValidationBehavior<,>));
+        // });
+        
+        // —— MediatR —— 
+        services.AddMediatR(o => o.RegisterServicesFromAssemblies(
+            typeof(GenerateInvoicePdfQuery).Assembly,
+            typeof(IPdfGenerator).Assembly));
+
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        
         // —— AutoMapper ——
         services.AddAutoMapper(typeof(MappingProfile));
 
@@ -72,6 +81,7 @@ public static class ExportServiceCollectionExtensions
         // —— CSV / XLSX generators ——
         services.AddSingleton<IReportGenerator, CsvReportGenerator>();
         services.AddSingleton<IReportGenerator, ExcelReportGenerator>();
+        services.AddSingleton<ICustomerExcelParser, CustomerExcelParser>();
 
         // —— HttpContext / auth forwarding ——
         services.AddHttpContextAccessor();
