@@ -1,10 +1,10 @@
 services:
   api-gateway:
     container_name: ocelot
-    image: giorgaaa/exportproocelot:latest
-    # build:
-    #   context: .
-    #   dockerfile: ExportPro.Gateway/ExportPro.Gateway.ServiceHost/Dockerfile
+    # image: giorgaaa/exportproocelot:latest
+    build:
+      context: .
+      dockerfile: ExportPro.Gateway/ExportPro.Gateway.ServiceHost/Dockerfile
     depends_on:
       - authservice
       - storageservice
@@ -21,10 +21,10 @@ services:
       - /data/db    
   authservice:
     container_name: authservice
-    image: giorgaaa/exportpro.authservice:latest
-    # build:
-    #   context: .
-    #   dockerfile: ExportPro.Auth/Dockerfile
+    # image: giorgaaa/exportpro.authservice:latest
+    build:
+      context: .
+      dockerfile: ExportPro.Auth/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDbDocker=mongodb://ExportProDb:27017
@@ -35,10 +35,10 @@ services:
      
   storageservice:
     container_name: storageservice
-    image: giorgaaa/exportpro.storageservice:latest
-    # build:
-    #   context: .
-    #   dockerfile: ExportPro.StorageService/Dockerfile
+    # image: giorgaaa/exportpro.storageservice:latest
+    build:
+      context: .
+      dockerfile: ExportPro.StorageService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development  
       - MongoDbDocker=mongodb://ExportProDb:27017
@@ -48,10 +48,10 @@ services:
       - authservice
   exportservice:
     container_name: exportservice
-    image: giorgaaa/exportpro.export
-    # build:
-    #   context: .
-    #   dockerfile: ExportPro.Export/Dockerfile
+    # image: giorgaaa/exportpro.export
+    build:
+      context: .
+      dockerfile: ExportPro.Export/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDbDocker=mongodb://ExportProDb:27017
@@ -77,11 +77,11 @@ services:
       - 5341:5341
       - 8081:80
   jobservice:
-    image: giorgaaa/exportpro.jobs
+    # image: giorgaaa/exportpro.jobs
     container_name: jobservice
-    # build:
-    #   context: .
-    #   dockerfile: ExportPro.Jobs/ExportPro.Export.Job.ServiceHost/Dockerfile
+    build:
+      context: .
+      dockerfile: ExportPro.Jobs/ExportPro.Export.Job.ServiceHost/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDbDocker=mongodb://ExportProDb:27017
