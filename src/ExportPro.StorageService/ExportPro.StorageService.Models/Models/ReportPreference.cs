@@ -4,7 +4,7 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.Models.Models;
 
-public sealed class ReportPreference : IModel
+public sealed class ReportPreference : AuditModel, IModel
 {
     public ObjectId Id { get; set; }
 
@@ -23,10 +23,6 @@ public sealed class ReportPreference : IModel
     public bool IsDelivered { get; set; }
 
     public bool IsEnabled { get; set; } = true;
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    public DateTime? UpdatedAt { get; set; }
 
     public bool IsDeleted { get; set; } = false;
 }

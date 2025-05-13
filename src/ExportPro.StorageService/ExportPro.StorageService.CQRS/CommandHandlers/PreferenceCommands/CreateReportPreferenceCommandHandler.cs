@@ -67,6 +67,8 @@ public sealed class CreateReportPreferenceHandler(
             IsDelivered = false,
             IsEnabled = true,
             CreatedAt = DateTime.UtcNow,
+            UpdatedAt = null,
+            CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value
         };
 
         await repository.AddOneAsync(preference, cancellationToken);

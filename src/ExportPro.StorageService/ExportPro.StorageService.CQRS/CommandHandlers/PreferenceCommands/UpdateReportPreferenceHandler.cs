@@ -6,13 +6,18 @@ using ExportPro.Export.Job.ServiceHost.Helpers;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
 
 public sealed record UpdateReportPreferenceCommand(UpdateReportPreferenceDTO dto) : ICommand<ReportPreferenceResponse>;
 
-public sealed class UpdateReportPreferenceHandler(IReportPreference repository, IMapper mapper)
-    : ICommandHandler<UpdateReportPreferenceCommand, ReportPreferenceResponse>
+public sealed class UpdateReportPreferenceHandler(
+      IReportPreference repository,
+      IHttpContextAccessor httpContext,
+      IMapper mapper
+    ) : ICommandHandler<UpdateReportPreferenceCommand, ReportPreferenceResponse>
 {
     public async Task<BaseResponse<ReportPreferenceResponse>> Handle(
         UpdateReportPreferenceCommand request,
@@ -23,7 +28,10 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
 
         if (preference is null)
         {
-            return new NotFoundResponse<ReportPreferenceResponse> { Messages = ["Report preference not found."] };
+            return new NotFoundResponse<ReportPreferenceResponse>
+            {
+                Messages = ["Report preference not found."]
+            };
         }
 
         string cronExpression;
@@ -35,7 +43,7 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
         {
             return new BaseResponse<ReportPreferenceResponse>
             {
-                Messages = [$"Failed to generate cron expression: {ex.Message}"],
+                Messages = [$"Failed to generate cron expression: {ex.Message}"]
             };
         }
 
@@ -45,11 +53,12 @@ public sealed class UpdateReportPreferenceHandler(IReportPreference repository, 
         preference.HumanReadableCronExpression = CronToTextHelper.ToReadableText(cronExpression);
         preference.IsEnabled = request.dto.IsEnabled;
         preference.UpdatedAt = DateTime.UtcNow;
+        preference.UpdatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
 
         await repository.UpdateOneAsync(preference, cancellationToken);
 
         var response = mapper.Map<ReportPreferenceResponse>(preference);
-
+            
         return new SuccessResponse<ReportPreferenceResponse>(response, "Report successfully updated!");
     }
 }

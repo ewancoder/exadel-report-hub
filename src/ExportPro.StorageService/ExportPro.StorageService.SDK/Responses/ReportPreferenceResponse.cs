@@ -11,5 +11,9 @@ public sealed class ReportPreferenceResponse
     public ReportFormat ReportFormat { get; set; }
     public required string CronExpression { get; set; }
     public string? HumanReadableSchedule { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string? UpdatedBy { get; set; }
+    public required string CreatedBy { get; set; }
     public bool IsEnabled { get; set; }
 }
