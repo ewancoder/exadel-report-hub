@@ -7,7 +7,7 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Development
 WORKDIR /src
-COPY ExportPro.Common/ExportPro.Common.Shared/Settings/serilogsettings.json ./ExportPro.Common/
+COPY ExportPro.Common/ExportPro.Common.Shared/Settings ./ExportPro.Common/
 COPY ExportPro.StorageService/ ./ExportPro.StorageService/
 RUN dotnet restore ExportPro.StorageService/ExportPro.StorageService.sln
 WORKDIR /src/ExportPro.StorageService/ExportPro.StorageService.API

@@ -22,9 +22,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// if (Environment.GetEnvironmentVariable("StorageUrl") is not null)
-//     app.UseSerilogRequestLogging();
-
 app.UseAuthorization();
 app.MapControllers();
 

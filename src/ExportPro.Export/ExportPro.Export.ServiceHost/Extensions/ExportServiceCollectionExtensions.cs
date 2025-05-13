@@ -57,20 +57,20 @@ public static class ExportServiceCollectionExtensions
         services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 
         // // —— MediatR ——
-        // services.AddMediatR(o =>
-        // {
-        //     o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly);
-        //     o.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
-        //     o.AddOpenBehavior(typeof(ValidationBehavior<,>));
-        // });
-        
-        // —— MediatR —— 
-        services.AddMediatR(o => o.RegisterServicesFromAssemblies(
-            typeof(GenerateInvoicePdfQuery).Assembly,
-            typeof(IPdfGenerator).Assembly));
+        services.AddMediatR(o =>
+        {
+            o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly);
+            o.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
+            o.AddOpenBehavior(typeof(ValidationBehavior<,>));
+        });
+
+        // —— MediatR ——
+        // services.AddMediatR(o => o.RegisterServicesFromAssemblies(
+        //     typeof(GenerateInvoicePdfQuery).Assembly,
+        //     typeof(IPdfGenerator).Assembly));
 
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-        
+
         // —— AutoMapper ——
         services.AddAutoMapper(typeof(MappingProfile));
 
