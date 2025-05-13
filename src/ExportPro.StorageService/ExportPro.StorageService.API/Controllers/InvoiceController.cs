@@ -47,18 +47,12 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     ) => mediator.Send(new GetAllInvoicesQuery(pageNumber, pageSize), cancellationToken);
 
     [HttpGet("count")]
-    public async Task<IActionResult> GetTotalInvoices([FromQuery] TotalInvoicesDto query)
-    {
-        var response = await mediator.Send(new GetTotalInvoicesQuery(query));
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<long>> GetTotalInvoices([FromQuery] TotalInvoicesDto query) =>
+        mediator.Send(new GetTotalInvoicesQuery(query));
 
     [HttpGet("revenue")]
-    public async Task<IActionResult> GetTotalRevenue([FromQuery] TotalRevenueDto query)
-    {
-        var result = await mediator.Send(new GetTotalRevenueQuery(query));
-        return StatusCode((int)result.ApiState, result);
-    }
+    public Task<BaseResponse<double>> GetTotalRevenue([FromQuery] TotalRevenueDto query) =>
+        mediator.Send(new GetTotalRevenueQuery(query));
 
     [HttpGet("overdue-payments/{clientId}")]
     [HasPermission(Resource.Invoices, CrudAction.Read)]

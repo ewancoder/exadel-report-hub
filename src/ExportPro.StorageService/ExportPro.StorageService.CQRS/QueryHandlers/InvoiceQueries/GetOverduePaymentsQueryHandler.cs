@@ -100,7 +100,7 @@ public sealed class GetOverduePaymentsQueryHandler(
                 );
             }
 
-            double convertedAmount = (double)invoice.Amount;
+            double convertedAmount = (double)invoice.Amount!;
 
             if (clientCurrency.CurrencyCode != "EUR")
             {
@@ -109,7 +109,7 @@ public sealed class GetOverduePaymentsQueryHandler(
                     cancellationToken
                 );
 
-                convertedAmount = (double)(invoice.Amount! * clientCurrencyRate);
+                convertedAmount = (double)(invoice.Amount! * clientCurrencyRate)!;
                 logger.Debug(
                     "Converted amount for invoice {InvoiceId} to client currency {ClientCurrency}: {ConvertedAmount}",
                     invoice.Id,
