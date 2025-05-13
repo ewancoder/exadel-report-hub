@@ -1,18 +1,21 @@
 ﻿using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.Export.Job.ServiceHost.Helpers;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
 
 public sealed record UpdateReportPreferenceCommand(UpdateReportPreferenceDTO dto) : ICommand<ReportPreferenceResponse>;
 
 public sealed class UpdateReportPreferenceHandler(
-      IReportPreference repository, 
+      IReportPreference repository,
+      IHttpContextAccessor httpContext,
       IMapper mapper
     ) : ICommandHandler<UpdateReportPreferenceCommand, ReportPreferenceResponse>
 {
@@ -50,6 +53,7 @@ public sealed class UpdateReportPreferenceHandler(
         preference.HumanReadableCronExpression = CronToTextHelper.ToReadableText(cronExpression);
         preference.IsEnabled = request.dto.IsEnabled;
         preference.UpdatedAt = DateTime.UtcNow;
+        preference.UpdatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
 
         await repository.UpdateOneAsync(preference, cancellationToken);
 

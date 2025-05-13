@@ -22,7 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<ExportPro.StorageService.API.Filters.ApiResponseStatusCodeFilter>();
+    options.Filters.Add<ApiResponseStatusCodeFilter>();
     options.Filters.Add<PermissionFilter>();
 });
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));

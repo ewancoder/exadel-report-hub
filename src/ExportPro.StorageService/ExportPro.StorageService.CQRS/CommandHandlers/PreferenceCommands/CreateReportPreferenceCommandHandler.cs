@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
+using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.Export.Job.ServiceHost.Helpers;
-using ExportPro.StorageService.CQRS.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
@@ -67,6 +67,8 @@ public sealed class CreateReportPreferenceHandler(
             IsDelivered = false,
             IsEnabled = true,
             CreatedAt = DateTime.UtcNow,
+            UpdatedAt = null,
+            CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value
         };
 
         await repository.AddOneAsync(preference, cancellationToken);
