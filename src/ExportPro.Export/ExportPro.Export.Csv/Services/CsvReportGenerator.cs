@@ -57,8 +57,8 @@ public sealed class CsvReportGenerator : IReportGenerator
 
         // >>> overdue summary
         writer.WriteLine("Overdue Invoices");
-        writer.WriteLine("Count,Amount");
-        writer.WriteLine($"{data.OverdueInvoicesCount},{data.TotalOverdueAmount?.ToString("N2") ?? "—"}");
+        writer.WriteLine("Count,Amount,Client Currency");
+        writer.WriteLine($"{data.OverdueInvoicesCount},{data.TotalOverdueAmount?.ToString("N2") ?? "—"},{data.ClientCurrencyCode}");
         writer.WriteLine();
     }
 

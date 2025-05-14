@@ -49,5 +49,6 @@ public interface IStorageServiceApi
     [Get("/api/Invoice/overdue-payments/{clientId}")]
     Task<BaseResponse<OverduePaymentsResponse>> GetOverduePaymentsAsync(
         Guid clientId,
+        Guid clientCurrencyId,
         CancellationToken cancellationToken = default);
 }

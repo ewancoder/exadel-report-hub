@@ -17,9 +17,10 @@ public sealed class ReportExportController(IMediator mediator) : ControllerBase
     public async Task<FileResult> Statistics(
         [Required] [FromQuery] ReportFormat format,
         [Required] [FromQuery] Guid clientId,
+        [Required][FromQuery] Guid clientCurrencyId,
         CancellationToken cancellationToken = default)
     {
-        var filters = new ReportFilterDto { ClientId = clientId };
+        var filters = new ReportFilterDto { ClientId = clientId, ClientCurrencyId = clientCurrencyId };
         var file = await mediator.Send(new GenerateReportQuery(format, filters), cancellationToken);
         return File(file.Content, file.ContentType, file.FileName);
     }

@@ -90,11 +90,12 @@ public sealed class ExcelReportGenerator : IReportGenerator
 
         ws.Cell(startRow + 1, 1).Value = "Count";
         ws.Cell(startRow + 1, 2).Value = "Amount";
-
+        ws.Cell(startRow+1,3).Value = "Client Currency";
         ws.Cell(startRow + 2, 1).Value = data.OverdueInvoicesCount;
-        ws.Cell(startRow + 2, 2).Value = data.TotalOverdueAmount.HasValue
+        ws.Cell(startRow + 2, 2).Value = (data.TotalOverdueAmount.HasValue
             ? data.TotalOverdueAmount.Value.ToString("N2")
-            : "—";
+            : "—") ;
+        ws.Cell(startRow+2,3).Value = data.ClientCurrencyCode;
     }
 
     private static IEnumerable<object> ProjectInvoices(ReportContentDto data)

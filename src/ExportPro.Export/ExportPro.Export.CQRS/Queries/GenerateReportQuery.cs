@@ -38,6 +38,7 @@ public sealed class GenerateReportQueryHandler(
     {
         var allInvoices = await FetchInvoicesAsync(cancellationToken);
         var clientId = request.Filters.ClientId;
+        var clientCurrencyId = request.Filters.ClientCurrencyId;
         var invoices = FilterInvoicesByClientId(clientId, allInvoices);
         var (items, plans) = await FetchItemsAndPlansAsync(clientId, cancellationToken);
 
@@ -46,7 +47,7 @@ public sealed class GenerateReportQueryHandler(
         double? overdueAmt = null;
         if (clientId != Guid.Empty)
         {
-            var overdueResp = await storageApi.GetOverduePaymentsAsync(clientId, cancellationToken);
+            var overdueResp = await storageApi.GetOverduePaymentsAsync(clientId, clientCurrencyId,cancellationToken);
             if (overdueResp.IsSuccess && overdueResp.Data is not null)
             {
                 overdueCnt = overdueResp.Data.OverdueInvoicesCount;
@@ -70,13 +71,15 @@ public sealed class GenerateReportQueryHandler(
             var curResp = await storageApi.GetCurrencyByIdAsync(id, cancellationToken);
             currencyCodes[id] = curResp.Data?.CurrencyCode ?? "—";
         }
-        
+
+        var clientCurrecyCode = await storageApi.GetCurrencyByIdAsync(clientCurrencyId, cancellationToken);
         // >>> attach the numbers
         reportContent = reportContent with
         {
             OverdueInvoicesCount = overdueCnt,
             TotalOverdueAmount = overdueAmt,
-            CurrencyCodes = currencyCodes
+            CurrencyCodes = currencyCodes,
+            ClientCurrencyCode = clientCurrecyCode.Data?.CurrencyCode ?? "—",
         };
 
         return CreateReportFileDto(reportContent, request.Format, generators);

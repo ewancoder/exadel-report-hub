@@ -10,7 +10,8 @@ public sealed record ReportContentDto
     public List<PlansResponse> Plans { get; init; } = [];
     public string ClientName { get; init; } = "—";
     public ReportFilterDto Filters { get; init; } = new();
-    public int     OverdueInvoicesCount { get; init; }
+    public int OverdueInvoicesCount { get; init; }
+    public string ClientCurrencyCode { get; init; } = "—";
     public double? TotalOverdueAmount   { get; init; }
     public Dictionary<Guid, string> CurrencyCodes { get; init; } = [];
 }
