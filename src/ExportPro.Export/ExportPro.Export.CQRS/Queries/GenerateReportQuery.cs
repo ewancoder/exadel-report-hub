@@ -47,12 +47,22 @@ public sealed class GenerateReportQueryHandler(
         double? overdueAmt = null;
         if (clientId != Guid.Empty)
         {
-            var overdueResp = await storageApi.GetOverduePaymentsAsync(clientId, clientCurrencyId,cancellationToken);
-            if (overdueResp.IsSuccess && overdueResp.Data is not null)
+            try
             {
-                overdueCnt = overdueResp.Data.OverdueInvoicesCount;
-                overdueAmt = overdueResp.Data.TotalOverdueAmount;
+                var overdueResp =
+                    await storageApi.GetOverduePaymentsAsync(clientId, clientCurrencyId, cancellationToken);
+                if (overdueResp.IsSuccess && overdueResp.Data is not null)
+                {
+                    overdueCnt = overdueResp.Data.OverdueInvoicesCount;
+                    overdueAmt = overdueResp.Data.TotalOverdueAmount;
+                }
             }
+            catch
+            {
+                overdueCnt = 0;
+                overdueAmt = 0;
+            }
+           
         }
 
         var reportContent = await RetrieveClientNameAsync(
