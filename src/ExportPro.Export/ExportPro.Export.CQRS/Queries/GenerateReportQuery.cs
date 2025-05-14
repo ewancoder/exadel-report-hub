@@ -32,17 +32,54 @@ public sealed class GenerateReportQueryHandler(
         return reportFile;
     }
 
-    private async Task<ReportFileDto> GenerateReportFileAsync(GenerateReportQuery request,
+    private async Task<ReportFileDto> GenerateReportFileAsync(
+        GenerateReportQuery request,
         CancellationToken cancellationToken)
     {
         var allInvoices = await FetchInvoicesAsync(cancellationToken);
         var clientId = request.Filters.ClientId;
         var invoices = FilterInvoicesByClientId(clientId, allInvoices);
         var (items, plans) = await FetchItemsAndPlansAsync(clientId, cancellationToken);
-        var reportContentDto =
-            await RetrieveClientNameAsync(request, clientId, invoices, items, plans, cancellationToken);
-        var reportFileDto = CreateReportFileDto(reportContentDto, request.Format, generators);
-        return reportFileDto;
+
+        // >>> grab overdue summary when clientId present
+        int overdueCnt = 0;
+        double? overdueAmt = null;
+        if (clientId != Guid.Empty)
+        {
+            var overdueResp = await storageApi.GetOverduePaymentsAsync(clientId, cancellationToken);
+            if (overdueResp.IsSuccess && overdueResp.Data is not null)
+            {
+                overdueCnt = overdueResp.Data.OverdueInvoicesCount;
+                overdueAmt = overdueResp.Data.TotalOverdueAmount;
+            }
+        }
+
+        var reportContent = await RetrieveClientNameAsync(
+            request, clientId, invoices, items, plans, cancellationToken);
+
+        var currencyCodes = new Dictionary<Guid, string>();
+
+        var ids = invoices
+            .Where(i => i.CurrencyId.HasValue && i.CurrencyId != Guid.Empty)
+            .Select(i => i.CurrencyId!.Value)
+            .Concat(items.Select(it => it.CurrencyId))
+            .Distinct();
+
+        foreach (var id in ids)
+        {
+            var curResp = await storageApi.GetCurrencyByIdAsync(id, cancellationToken);
+            currencyCodes[id] = curResp.Data?.CurrencyCode ?? "—";
+        }
+        
+        // >>> attach the numbers
+        reportContent = reportContent with
+        {
+            OverdueInvoicesCount = overdueCnt,
+            TotalOverdueAmount = overdueAmt,
+            CurrencyCodes = currencyCodes
+        };
+
+        return CreateReportFileDto(reportContent, request.Format, generators);
     }
 
     private async Task<ReportContentDto> RetrieveClientNameAsync(

@@ -45,12 +45,20 @@ public sealed class CsvReportGenerator : IReportGenerator
             IssueDate = i.IssueDate.ToString("yyyy-MM-dd"),
             DueDate = i.DueDate.ToString("yyyy-MM-dd"),
             i.Amount,
-            i.CurrencyId,
+            Currency = i.CurrencyId.HasValue
+                ? data.CurrencyCodes.GetValueOrDefault(i.CurrencyId.Value, "—")
+                : "—",
             i.PaymentStatus,
             i.BankAccountNumber
         });
 
         csv.WriteRecords(rows);
+        writer.WriteLine();
+
+        // >>> overdue summary
+        writer.WriteLine("Overdue Invoices");
+        writer.WriteLine("Count,Amount");
+        writer.WriteLine($"{data.OverdueInvoicesCount},{data.TotalOverdueAmount?.ToString("N2") ?? "—"}");
         writer.WriteLine();
     }
 
@@ -74,7 +82,7 @@ public sealed class CsvReportGenerator : IReportGenerator
             i.Description,
             i.Price,
             i.Status,
-            i.CurrencyId,
+            Currency = data.CurrencyCodes.GetValueOrDefault(i.CurrencyId, "—"),
             i.CreatedAt,
             i.UpdatedAt
         }));
