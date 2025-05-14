@@ -42,7 +42,6 @@ public sealed class GenerateReportQueryHandler(
         var invoices = FilterInvoicesByClientId(clientId, allInvoices);
         var (items, plans) = await FetchItemsAndPlansAsync(clientId, cancellationToken);
 
-        // >>> grab overdue summary when clientId present
         int overdueCnt = 0;
         double? overdueAmt = null;
         if (clientId != Guid.Empty)
@@ -73,7 +72,7 @@ public sealed class GenerateReportQueryHandler(
         }
 
         var clientCurrecyCode = await storageApi.GetCurrencyByIdAsync(clientCurrencyId, cancellationToken);
-        // >>> attach the numbers
+
         reportContent = reportContent with
         {
             OverdueInvoicesCount = overdueCnt,
@@ -136,6 +135,7 @@ public sealed class GenerateReportQueryHandler(
         ReportFormat fmt,
         IEnumerable<IReportGenerator> generators)
     {
+        // do not use "csv" and "xlsx" strings. maybe use nameof operator
         var key = fmt == ReportFormat.Csv ? "csv" : "xlsx";
         var generator = generators.First(g => g.Extension.Equals(key, StringComparison.OrdinalIgnoreCase));
         var bytes = generator.Generate(dto);

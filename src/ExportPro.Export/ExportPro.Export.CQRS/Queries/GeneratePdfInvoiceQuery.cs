@@ -43,6 +43,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
     private async Task<PdfFileDto> CreateInvoicePdfAsync(GenerateInvoicePdfQuery request,
         CancellationToken cancellationToken)
     {
+        // use Task.WhenAll() for currency, client, customer
         var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
         var currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
         var client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);

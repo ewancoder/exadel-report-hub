@@ -7,6 +7,7 @@ namespace ExportPro.Export.Excel.Services;
 
 public sealed class ExcelReportGenerator : IReportGenerator
 {
+    // make it constant
     public string ContentType => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public string Extension => "xlsx";
 

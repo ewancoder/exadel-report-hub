@@ -54,8 +54,6 @@ public sealed class CsvReportGenerator : IReportGenerator
 
         csv.WriteRecords(rows);
         writer.WriteLine();
-
-        // >>> overdue summary
         writer.WriteLine("Overdue Invoices");
         writer.WriteLine("Count,Amount,Client Currency");
         writer.WriteLine($"{data.OverdueInvoicesCount},{data.TotalOverdueAmount?.ToString("N2") ?? "—"},{data.ClientCurrencyCode}");
@@ -119,6 +117,7 @@ public sealed class CsvReportGenerator : IReportGenerator
         out StreamWriter writer,
         out CsvWriter csv)
     {
+        // use IDispose or "using"
         ms = new MemoryStream();
         writer = new StreamWriter(ms, Encoding.UTF8, leaveOpen: true);
         csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
