@@ -12,16 +12,26 @@ public sealed class CsvReportGenerator : IReportGenerator
     private static readonly string Separator = new('#', 75);
     public string ContentType => "text/csv";
     public string Extension => "csv";
-
+    
     public byte[] Generate(ReportContentDto data)
     {
         SetupCsvStream(out var ms, out var writer, out var csv);
-        GenerateReportMetaData(data, writer);
-        GenerateInvoiceSection(data, writer, csv);
-        GenerateItemSection(data, writer, csv);
-        GeneratePlanSection(data, writer, csv);
-        writer.Flush();
-        return ms.ToArray();
+
+        try
+        {
+            GenerateReportMetaData(data, writer);
+            GenerateInvoiceSection(data, writer, csv);
+            GenerateItemSection(data, writer, csv);
+            GeneratePlanSection(data, writer, csv);
+            writer.Flush();
+            return ms.ToArray();
+        }
+        finally
+        {
+            csv.Dispose();
+            writer.Dispose();
+            ms.Dispose();
+        }
     }
 
     private static void GenerateReportMetaData(ReportContentDto data, StreamWriter writer)
@@ -56,7 +66,8 @@ public sealed class CsvReportGenerator : IReportGenerator
         writer.WriteLine();
         writer.WriteLine("Overdue Invoices");
         writer.WriteLine("Count,Amount,Client Currency");
-        writer.WriteLine($"{data.OverdueInvoicesCount},{data.TotalOverdueAmount?.ToString("N2") ?? "—"},{data.ClientCurrencyCode}");
+        writer.WriteLine(
+            $"{data.OverdueInvoicesCount},{data.TotalOverdueAmount?.ToString("N2") ?? "—"},{data.ClientCurrencyCode}");
         writer.WriteLine();
     }
 
@@ -117,7 +128,6 @@ public sealed class CsvReportGenerator : IReportGenerator
         out StreamWriter writer,
         out CsvWriter csv)
     {
-        // use IDispose or "using"
         ms = new MemoryStream();
         writer = new StreamWriter(ms, Encoding.UTF8, leaveOpen: true);
         csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
