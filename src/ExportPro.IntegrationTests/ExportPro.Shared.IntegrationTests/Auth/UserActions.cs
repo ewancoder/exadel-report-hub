@@ -1,7 +1,9 @@
 ﻿using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Auth.SDK.Models;
+using ExportPro.Shared.IntegrationTests.Configs;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Refit;
 
@@ -9,24 +11,25 @@ namespace ExportPro.Shared.IntegrationTests.Auth;
 
 public static class UserActions
 {
-    private readonly static IMongoDbContext<User> MongoDbContext = new MongoDbContext<User>("Users");
-    private readonly static IAuth Iauth = RestService.For<IAuth>("http://localhost:5000");
+    private static readonly IMongoDbContext<User> MongoDbContext = new MongoDbContext<User>("Users");
+    private static readonly IConfiguration _config = LoadingConfig.LoadConfig();
+    private static readonly IAuth Iauth = RestService.For<IAuth>(_config.GetSection("AuthUrl").Value!);
 
-    public async static Task RemoveUser(string name)
+    public static async Task RemoveUser(string name)
     {
         var filter = Builders<User>.Filter.Eq(u => u.Username, name);
         await MongoDbContext.Collection.DeleteOneAsync(filter);
     }
 
-    public async static Task<string> AddSuperAdmin()
+    public static async Task<string> AddSuperAdmin()
     {
         UserRegisterDto userDto = new()
         {
-            Username = "SuperAdminTest",
-            Email = "SuperAdminTest@gmail.com",
-            Password = "SuperAdminTest2@",
+            Username = _config.GetSection("Users:SuperAdmin:Username").Value!,
+            Email = _config.GetSection("Users:SuperAdmin:Email").Value!,
+            Password = _config.GetSection("Users:SuperAdmin:Password").Value!,
         };
-        UserLoginDto userLoginDto = new() { Email = "SuperAdminTest@gmail.com", Password = "SuperAdminTest2@" };
+        UserLoginDto userLoginDto = new() { Email = userDto.Email, Password = userDto.Password };
         await Iauth.RegisterAsync(userDto);
         var filter = Builders<User>.Filter.Eq(u => u.Username, userDto.Username);
         var update = Builders<User>.Update.Set(u => u.Role, UserRole.SuperAdmin);
@@ -35,15 +38,15 @@ public static class UserActions
         return responseDto.AccessToken;
     }
 
-    public async static Task<string> AddOwner()
+    public static async Task<string> AddOwner()
     {
         UserRegisterDto userDto = new()
         {
-            Username = "OwnerUserTest",
-            Email = "OwnerUserTest@gmail.com",
-            Password = "OwnerUserTest2@",
+            Username = _config.GetSection("Users:Owner:Username").Value!,
+            Email = _config.GetSection("Users:Owner:Email").Value!,
+            Password = _config.GetSection("Users:Owner:Password").Value!,
         };
-        UserLoginDto userLoginDto = new() { Email = "OwnerUserTest@gmail.com", Password = "OwnerUserTest2@" };
+        UserLoginDto userLoginDto = new() { Email = userDto.Email, Password = userDto.Password };
         await Iauth.RegisterAsync(userDto);
         var filter = Builders<User>.Filter.Eq(u => u.Username, userDto.Username);
         var update = Builders<User>.Update.Set(u => u.Role, UserRole.Owner);
@@ -52,15 +55,15 @@ public static class UserActions
         return responseDto.AccessToken;
     }
 
-    public async static Task<string> AddClientAdmin()
+    public static async Task<string> AddClientAdmin()
     {
         UserRegisterDto userDto = new()
         {
-            Username = "ClientAdminTest",
-            Email = "ClientAdminTest@gmail.com",
-            Password = "ClientAdminTest2@",
+            Username = _config.GetSection("Users:ClientAdmin:Username").Value!,
+            Email = _config.GetSection("Users:ClientAdmin:Email").Value!,
+            Password = _config.GetSection("Users:ClientAdmin:Password").Value!,
         };
-        UserLoginDto userLoginDto = new() { Email = "ClientAdminTest@gmail.com", Password = "ClientAdminTest2@" };
+        UserLoginDto userLoginDto = new() { Email = userDto.Email, Password = userDto.Password };
         await Iauth.RegisterAsync(userDto);
         var filter = Builders<User>.Filter.Eq(u => u.Username, userDto.Username);
         var update = Builders<User>.Update.Set(u => u.Role, UserRole.ClientAdmin);
@@ -69,15 +72,15 @@ public static class UserActions
         return responseDto.AccessToken;
     }
 
-    public async static Task<string> AddOperator()
+    public static async Task<string> AddOperator()
     {
         UserRegisterDto userDto = new()
         {
-            Username = "OperatorTest",
-            Email = "OperatorTest@gmail.com",
-            Password = "OperatorTest2@",
+            Username = _config.GetSection("Users:Operator:Username").Value!,
+            Email = _config.GetSection("Users:Operator:Email").Value!,
+            Password = _config.GetSection("Users:Operator:Password").Value!,
         };
-        UserLoginDto userLoginDto = new() { Email = "OperatorTest@gmail.com", Password = "OperatorTest2@" };
+        UserLoginDto userLoginDto = new() { Email = userDto.Email, Password = userDto.Password };
         await Iauth.RegisterAsync(userDto);
         var filter = Builders<User>.Filter.Eq(u => u.Username, userDto.Username);
         var update = Builders<User>.Update.Set(u => u.Role, UserRole.Operator);

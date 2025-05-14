@@ -10,6 +10,11 @@
         <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.9"/>
         <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.3"/>
     </ItemGroup>
+    <ItemGroup>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 
 </Project>

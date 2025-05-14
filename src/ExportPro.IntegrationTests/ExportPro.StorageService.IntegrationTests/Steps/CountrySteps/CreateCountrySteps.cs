@@ -1,11 +1,13 @@
 ﻿using ExportPro.Common.Shared.Extensions;
 using ExportPro.Shared.IntegrationTests.Auth;
+using ExportPro.Shared.IntegrationTests.Configs;
 using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 using ExportPro.StorageService.SDK.Refit;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Refit;
 using TechTalk.SpecFlow;
@@ -15,7 +17,7 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.CountrySteps;
 
 [Binding]
 [Scope(Tag = "CreateCountry")]
-public class CreateCountrySteps
+public class CreateCountrySteps()
 {
     private readonly IMongoDbContext<Country> _mongoDbContext = new MongoDbContext<Country>();
     private readonly IMongoDbContext<Currency> _mongoDbContextCurrency = new MongoDbContext<Currency>();
@@ -23,14 +25,15 @@ public class CreateCountrySteps
     private CreateCountryDto? _createCountryDto;
     private ICurrencyApi? _currencyApi;
     private Guid _currencyId;
+    private readonly IConfiguration _config = LoadingConfig.LoadConfig();
 
-    [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
-    public async Task GivenTheUserIsLoggedInWithEmailAndPasswordAndHasNecessaryPermissions(
-        string email,
-        string password
-    )
+    [Given(@"The '(.*)' user is logged in with email and password and has necessary permissions")]
+    public async Task GivenTheUserIsLoggedInWithEmailAndPasswordAndHasNecessaryPermissions(string role)
     {
-        var jwtToken = await UserLogin.Login(email, password);
+        var jwtToken = await UserLogin.Login(
+            _config.GetSection($"Users:{role}:Email").Value!,
+            _config.GetSection($"Users:{role}:Password").Value!
+        );
         var httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
         _countryApi = RestService.For<ICountryApi>(httpClient);
         _currencyApi = RestService.For<ICurrencyApi>(httpClient);
