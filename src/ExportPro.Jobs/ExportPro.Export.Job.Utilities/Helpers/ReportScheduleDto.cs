@@ -1,4 +1,4 @@
-﻿using ExportPro.StorageService.Models.Enums;
+﻿using ExportPro.Export.Job.Utilities.Helpers;
 
 namespace ExportPro.StorageService.SDK.DTOs;
 

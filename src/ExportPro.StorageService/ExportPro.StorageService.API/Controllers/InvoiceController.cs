@@ -1,4 +1,5 @@
-﻿using ExportPro.Common.Shared.Attributes;
+﻿using System.ComponentModel.DataAnnotations;
+using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
@@ -58,6 +59,7 @@ public class InvoiceController(IMediator mediator) : ControllerBase
     [HasPermission(Resource.Invoices, CrudAction.Read)]
     public Task<BaseResponse<OverduePaymentsResponse>> GetOverduePayments(
         [FromRoute] Guid clientId,
+        [Required] [FromQuery] Guid clientCurrencyId,
         CancellationToken cancellationToken
-    ) => mediator.Send(new GetOverduePaymentsQuery(clientId), cancellationToken);
+    ) => mediator.Send(new GetOverduePaymentsQuery(clientId, clientCurrencyId), cancellationToken);
 }

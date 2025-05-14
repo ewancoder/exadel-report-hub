@@ -12,6 +12,5 @@ public class CreateInvoiceDto
     public Guid CustomerId { get; set; }
     public string? BankAccountNumber { get; set; }
     public Guid ClientId { get; set; }
-    public Guid ClientCurrencyId { get; set; }
     public List<ItemDtoForClient>? Items { get; set; }
 }

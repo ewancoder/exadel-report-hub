@@ -9,7 +9,7 @@ using Serilog;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public record GetOverduePaymentsQuery(Guid ClientId) : IQuery<OverduePaymentsResponse>;
+public record GetOverduePaymentsQuery(Guid ClientId, Guid ClientCurrencyId) : IQuery<OverduePaymentsResponse>;
 
 public sealed class GetOverduePaymentsQueryHandler(
     IInvoiceRepository invoiceRepository,
@@ -51,10 +51,10 @@ public sealed class GetOverduePaymentsQueryHandler(
                 invoice.Id,
                 invoice.Amount,
                 invoice.CurrencyId,
-                invoice.ClientCurrencyId
+                request.ClientCurrencyId
             );
 
-            if (invoice.CurrencyId == invoice.ClientCurrencyId)
+            if (invoice.CurrencyId == request.ClientCurrencyId.ToObjectId())
             {
                 totalAmount += (double)invoice.Amount!;
                 logger.Debug(
@@ -66,7 +66,7 @@ public sealed class GetOverduePaymentsQueryHandler(
             }
 
             var invoiceCurrency = await currencyRepository.GetCurrencyCodeById(invoice.CurrencyId);
-            var clientCurrency = await currencyRepository.GetCurrencyCodeById(invoice.ClientCurrencyId);
+            var clientCurrency = await currencyRepository.GetCurrencyCodeById(request.ClientCurrencyId.ToObjectId());
 
             if (invoiceCurrency == null || clientCurrency == null)
             {
@@ -74,7 +74,7 @@ public sealed class GetOverduePaymentsQueryHandler(
                     "Currency not found for invoice {InvoiceId}. InvoiceCurrencyId: {InvoiceCurrencyId}, ClientCurrencyId: {ClientCurrencyId}",
                     invoice.Id,
                     invoice.CurrencyId,
-                    invoice.ClientCurrencyId
+                    request.ClientCurrencyId.ToObjectId()
                 );
                 return new BadRequestResponse<OverduePaymentsResponse>("One or more currencies not found.");
             }
@@ -100,23 +100,21 @@ public sealed class GetOverduePaymentsQueryHandler(
                 );
             }
 
-            double convertedAmount = (double)invoice.Amount!;
-
+            double clientCurrencyRate = 1.0;
             if (clientCurrency.CurrencyCode != "EUR")
             {
-                var clientCurrencyRate = await currencyExchangeService.ExchangeRate(
+                clientCurrencyRate = await currencyExchangeService.ExchangeRate(
                     new CurrencyExchangeModel { Date = invoice.IssueDate, From = clientCurrency.CurrencyCode },
                     cancellationToken
                 );
-
-                convertedAmount = (double)(invoice.Amount! * clientCurrencyRate)!;
-                logger.Debug(
-                    "Converted amount for invoice {InvoiceId} to client currency {ClientCurrency}: {ConvertedAmount}",
-                    invoice.Id,
-                    clientCurrency.CurrencyCode,
-                    convertedAmount
-                );
             }
+            var convertedAmount = (double)(invoice.Amount! * clientCurrencyRate / invoiceCurrencyExchangeRateToEuro)!;
+            logger.Debug(
+                "Converted amount for invoice {InvoiceId} to client currency {ClientCurrency}: {ConvertedAmount}",
+                invoice.Id,
+                clientCurrency.CurrencyCode,
+                convertedAmount
+            );
 
             totalAmount += convertedAmount;
         }

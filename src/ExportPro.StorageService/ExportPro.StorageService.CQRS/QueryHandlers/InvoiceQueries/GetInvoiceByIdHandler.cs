@@ -32,8 +32,6 @@ public sealed class GetInvoiceByIdHandler(IInvoiceRepository repository, IMapper
             BankAccountNumber = invoice.BankAccountNumber,
             ClientId = invoice.ClientId.ToGuid(),
             CustomerId = invoice.CustomerId.ToGuid(),
-
-            ClientCurrencyId = invoice.ClientCurrencyId.ToGuid(),
             Amount = invoice.Amount,
             Items = invoice.Items?.Select(x => mapper.Map<ItemDtoForClient>(x)).ToList(),
         };
