@@ -57,13 +57,13 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
         IReadOnlyDictionary<string, int> columnMap)
     {
         List<CreateUpdateCustomerDto> customers = [];
-        
+
         foreach (var row in worksheet.RowsUsed().Skip(1)) // skip header
         {
             var customerDto = ParseRow(row, columnMap);
             customers.Add(customerDto!);
         }
-        
+
         return customers;
     }
 
@@ -73,12 +73,8 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
         var email = row.Cell(columnMap["Email"]).GetString().Trim();
         var addr = row.Cell(columnMap["Address"]).GetString().Trim();
         var cidStr = row.Cell(columnMap["CountryId"]).GetString().Trim();
-
-        // write extension method: string.OneOfThis(name, email, addr, etc);
-        if (string.IsNullOrWhiteSpace(name) &&
-            string.IsNullOrWhiteSpace(email) &&
-            string.IsNullOrWhiteSpace(addr) &&
-            string.IsNullOrWhiteSpace(cidStr))
+        
+        if (AllBlank(name, email, addr, cidStr))
             return null; // blank row
 
         if (!Guid.TryParse(cidStr, out var countryId))
@@ -92,4 +88,7 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
             CountryId = countryId
         };
     }
+
+    private static bool AllBlank(params string?[] values) =>
+        values.All(string.IsNullOrWhiteSpace);
 }

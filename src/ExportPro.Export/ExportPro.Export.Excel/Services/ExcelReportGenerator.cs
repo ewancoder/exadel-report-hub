@@ -7,7 +7,6 @@ namespace ExportPro.Export.Excel.Services;
 
 public sealed class ExcelReportGenerator : IReportGenerator
 {
-    // make it constant
     public string ContentType => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public string Extension => "xlsx";
 
@@ -83,12 +82,9 @@ public sealed class ExcelReportGenerator : IReportGenerator
         ws.Cell(1, 1).Value = $"Client: {data.ClientName}";
         ws.Cell(1, 1).Style.Font.SetBold();
         ws.Cell(2, 1).InsertTable(ProjectInvoices(data), "Invoices", true);
-
-        // >>> append overdue summary after two blank rows
         var startRow = ws.LastRowUsed()!.RowNumber() + 3;
         ws.Cell(startRow, 1).Value = "Overdue Invoices";
         ws.Cell(startRow, 1).Style.Font.SetBold();
-
         ws.Cell(startRow + 1, 1).Value = "Count";
         ws.Cell(startRow + 1, 2).Value = "Amount";
         ws.Cell(startRow+1,3).Value = "Client Currency";

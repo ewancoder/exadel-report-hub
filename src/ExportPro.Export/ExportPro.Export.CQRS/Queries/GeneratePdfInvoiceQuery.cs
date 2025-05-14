@@ -40,18 +40,21 @@ public sealed class GenerateInvoicePdfQueryHandler(
         return result;
     }
 
-    private async Task<PdfFileDto> CreateInvoicePdfAsync(GenerateInvoicePdfQuery request,
+    private async Task<PdfFileDto> CreateInvoicePdfAsync(
+        GenerateInvoicePdfQuery request,
         CancellationToken cancellationToken)
     {
-        // use Task.WhenAll() for currency, client, customer
         var invoiceDto = await GetInvoiceByIdAsync(request.InvoiceId, cancellationToken);
-        var currency = await GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
-        var client = await GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
-        var customer = await GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
+        var currencyTask = GetCurrencyCodeAsync(invoiceDto.CurrencyId, cancellationToken);
+        var clientTask = GetClientNameAsync(invoiceDto.ClientId, cancellationToken);
+        var customerTask = GetCustomerNameAsync(invoiceDto.CustomerId, cancellationToken);
+        await Task.WhenAll(currencyTask, clientTask, customerTask);
+        var currency = await currencyTask;
+        var client = await clientTask;
+        var customer = await customerTask;
         var invoice = MapToPdfInvoiceExportDto(invoiceDto, currency, client, customer);
         await PopulateItemCurrencyCodesAsync(invoiceDto, invoice, cancellationToken);
-        var result = GeneratePdfFileDto(invoice);
-        return result;
+        return GeneratePdfFileDto(invoice);
     }
 
     private async Task PopulateItemCurrencyCodesAsync(
@@ -130,7 +133,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
     private PdfFileDto GeneratePdfFileDto(PdfInvoiceExportDto invoice)
     {
         var bytes = pdfGenerator.GeneratePdfDocument(invoice);
-        var name = FileNameTemplates.InvoicePdfFileName(invoice.InvoiceNumber);
+        var name = FileNameTemplates.InvoicePdfFileName(invoice.InvoiceNumber!);
         return new PdfFileDto(name, bytes);
     }
 }

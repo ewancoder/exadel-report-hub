@@ -61,7 +61,6 @@ public sealed class GenerateReportQueryHandler(
                 overdueCnt = 0;
                 overdueAmt = 0;
             }
-           
         }
 
         var reportContent = await RetrieveClientNameAsync(
@@ -145,8 +144,7 @@ public sealed class GenerateReportQueryHandler(
         ReportFormat fmt,
         IEnumerable<IReportGenerator> generators)
     {
-        // do not use "csv" and "xlsx" strings. maybe use nameof operator
-        var key = fmt == ReportFormat.Csv ? "csv" : "xlsx";
+        var key = fmt.ToString();
         var generator = generators.First(g => g.Extension.Equals(key, StringComparison.OrdinalIgnoreCase));
         var bytes = generator.Generate(dto);
         var name = FileNameTemplates.CsvExcelFileName(generator.Extension);
