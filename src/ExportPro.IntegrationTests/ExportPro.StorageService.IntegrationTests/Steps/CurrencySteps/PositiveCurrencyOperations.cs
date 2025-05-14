@@ -15,7 +15,7 @@ namespace ExportPro.StorageService.IntegrationTests.Steps.CurrencySteps;
 
 [Binding]
 [Scope(Tag = "CurrencyManagement")]
-public class CreateCurrencySteps(FeatureContext featureContext)
+public class PositiveCurrencyOperations(FeatureContext featureContext)
 {
     private static readonly IMongoDbContext<Currency> _mongoDbContext = new MongoDbContext<Currency>();
     private static Guid _currencyId;
@@ -61,12 +61,20 @@ public class CreateCurrencySteps(FeatureContext featureContext)
         Assert.That(currency.CurrencyCode, Is.EqualTo(_currency!.CurrencyCode));
     }
 
+    [Given(@"The user has following currency '(.*)' created")]
+    public void GivenTheUserHasCurrencyCreated(string currencyCode)
+    {
+        _currency = new CurrencyDto { CurrencyCode = currencyCode };
+        var currency = _mongoDbContext.Collection.Find(x => x.CurrencyCode == _currency!.CurrencyCode).FirstOrDefault();
+        _currencyId = currency.Id.ToGuid();
+        Assert.That(currency, Is.Not.EqualTo(null));
+        Assert.That(currency.CurrencyCode, Is.EqualTo(_currency!.CurrencyCode));
+    }
+
     [When(@"The user sends a delete request with currency id")]
     public async Task WhenTheUserSendsCurrencyDeleteRequest()
     {
-        Console.WriteLine($"should be deleted in delete {featureContext["CurrencyId"]}");
-        var currencyid = (Guid)featureContext["CurrencyId"];
-        await _currencyApi!.Delete(currencyid);
+        await _currencyApi!.Delete(_currencyId);
     }
 
     [Then("The currency should be deleted")]
