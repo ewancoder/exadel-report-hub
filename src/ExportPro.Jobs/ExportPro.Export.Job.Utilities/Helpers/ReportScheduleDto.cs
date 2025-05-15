@@ -1,6 +1,6 @@
 ﻿using ExportPro.Export.Job.Utilities.Helpers;
 
-namespace ExportPro.StorageService.SDK.DTOs;
+namespace ExportPro.Export.Job.Utilities.Helpers;
 
 public sealed class ReportScheduleDto
 {

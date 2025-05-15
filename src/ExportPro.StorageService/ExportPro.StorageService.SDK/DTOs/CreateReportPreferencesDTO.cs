@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExportPro.Export.Job.Utilities.Helpers;
 using ExportPro.StorageService.Models.Enums;
 
 namespace ExportPro.StorageService.SDK.DTOs;

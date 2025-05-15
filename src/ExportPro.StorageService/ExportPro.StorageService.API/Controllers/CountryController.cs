@@ -11,6 +11,12 @@ namespace ExportPro.StorageService.API.Controllers;
 [Route("api/[controller]")]
 public class CountryController(IMediator mediator) : ControllerBase
 {
+    [HttpGet("name/{countryCode}")]
+    public Task<BaseResponse<CountryDto>> GetById(
+        [FromRoute] string countryCode,
+        CancellationToken cancellationToken
+    ) => mediator.Send(new GetCountryByCodeQuery(countryCode), cancellationToken);
+
     [HttpGet("{id}")]
     public Task<BaseResponse<CountryDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken) =>
         mediator.Send(new GetCountryByIdQuery(id), cancellationToken);
