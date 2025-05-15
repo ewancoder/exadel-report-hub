@@ -14,7 +14,7 @@ namespace ExportPro.StorageService.API.Controllers;
 public class CurrencyController(IMediator mediator) : ControllerBase, ICurrencyController
 {
     [HttpGet("name/{currencyCode}")]
-    public Task<BaseResponse<CurrencyResponse>> GetById(
+    public Task<BaseResponse<CurrencyResponse>> GetByCode(
         [FromRoute] string currencyCode,
         CancellationToken cancellationToken
     ) => mediator.Send(new GetCurrencyByCodeQuery(currencyCode), cancellationToken);

@@ -20,7 +20,7 @@ public class PositiveClientOperationsSteps(FeatureContext featureContext)
 {
     private static readonly IMongoDbContext<Client> _mongoDbContext = new MongoDbContext<Client>();
     private static Guid _clientId;
-    private IClientApi? _clientApi;
+    private IClientController? _clientApi;
     private ClientDto? _clientDto;
     private readonly IConfiguration _config = LoadingConfig.LoadConfig();
 
@@ -32,7 +32,7 @@ public class PositiveClientOperationsSteps(FeatureContext featureContext)
             _config.GetSection($"Users:{user}:Password").Value!
         );
         var httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
-        _clientApi = RestService.For<IClientApi>(httpClient);
+        _clientApi = RestService.For<IClientController>(httpClient);
     }
 
     [Given(@"The user has a client with name and description")]

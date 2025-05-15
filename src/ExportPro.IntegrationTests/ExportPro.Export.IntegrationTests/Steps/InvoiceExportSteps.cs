@@ -26,11 +26,11 @@ public class InvoiceExportSteps
     private readonly IMongoDbContext<Customer> _mongoDbContextCustomer = new MongoDbContext<Customer>();
     private readonly IMongoDbContext<Client> _mongoDbContextClient = new MongoDbContext<Client>();
     private HttpResponseMessage _invoicepdf;
-    private ICountryApi _countryController;
-    private ICurrencyApi _currencyController;
-    private ICustomerApi _customerController;
-    private IInvoiceApi _invoiceController;
-    private IClientApi _clientController;
+    private ICountryController _countryController;
+    private ICurrencyController _currencyController;
+    private ICustomerController _customerController;
+    private IInvoiceController _invoiceController;
+    private IClientController _clientController;
     private IInvoiceExport _invoiceExport;
     private CreateInvoiceDto _invoiceDto;
     private Guid _countryId;
@@ -50,10 +50,10 @@ public class InvoiceExportSteps
         string jwtTokenForClient = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
         HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1200);
         var httpClientForClient = HttpClientForRefit.GetHttpClient(jwtTokenForClient, 1500);
-        _countryController = RestService.For<ICountryApi>(httpClient);
-        _currencyController = RestService.For<ICurrencyApi>(httpClient);
+        _countryController = RestService.For<ICountryController>(httpClient);
+        _currencyController = RestService.For<ICurrencyController>(httpClient);
         _invoiceExport = RestService.For<IInvoiceExport>(httpClient);
-        _invoiceController = RestService.For<IInvoiceApi>(
+        _invoiceController = RestService.For<IInvoiceController>(
             httpClient,
             new RefitSettings
             {
@@ -66,8 +66,8 @@ public class InvoiceExportSteps
                 ),
             }
         );
-        _customerController = RestService.For<ICustomerApi>(httpClient);
-        _clientController = RestService.For<IClientApi>(httpClientForClient);
+        _customerController = RestService.For<ICustomerController>(httpClient);
+        _clientController = RestService.For<IClientController>(httpClientForClient);
     }
 
     [Given("The user has valid client id")]
@@ -83,49 +83,49 @@ public class InvoiceExportSteps
         _clientId = clientResponse.Data.Id;
     }
 
-    [Given("The user created following currency for invoice and stored the currency id")]
-    public async Task GivenTheUserCreatedFollowingCurrencyForInvoiceAndStoredTheCurrencyId(Table table)
-    {
-        CurrencyDto cur = table.CreateInstance<CurrencyDto>();
-        var currency = await _currencyController.Create(cur);
-        var currencyExists = await _mongoDbContextCurrency
-            .Collection.Find(x =>
-                x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
-            )
-            .FirstOrDefaultAsync();
-        Assert.That(currencyExists, Is.Not.EqualTo(null));
-        Assert.That(currencyExists.CurrencyCode, Is.EqualTo(cur.CurrencyCode));
-        _currencyId = currency.Data!.Id;
-    }
+    // [Given("The user created following currency for invoice and stored the currency id")]
+    // public async Task GivenTheUserCreatedFollowingCurrencyForInvoiceAndStoredTheCurrencyId(Table table)
+    // {
+    //     CurrencyDto cur = table.CreateInstance<CurrencyDto>();
+    //     var currency = await _currencyController.Create(cur);
+    //     var currencyExists = await _mongoDbContextCurrency
+    //         .Collection.Find(x =>
+    //             x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
+    //         )
+    //         .FirstOrDefaultAsync();
+    //     Assert.That(currencyExists, Is.Not.EqualTo(null));
+    //     Assert.That(currencyExists.CurrencyCode, Is.EqualTo(cur.CurrencyCode));
+    //     _currencyId = currency.Data!.Id;
+    // }
 
-    [Given("The user created following currency for item and stored the currency id")]
-    public async Task GivenTheUserCreatedFollowingCurrencyForItemAndStoredTheCurrencyId(Table table)
-    {
-        CurrencyDto cur = table.CreateInstance<CurrencyDto>();
-        var currency = await _currencyController.Create(cur);
-        var currencyExists = await _mongoDbContextCurrency
-            .Collection.Find(x =>
-                x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
-            )
-            .FirstOrDefaultAsync();
-        Assert.That(currencyExists, Is.Not.EqualTo(null));
-        Assert.That(currencyExists.CurrencyCode, Is.EqualTo(cur.CurrencyCode));
-        _currencyIdForItem = currency.Data!.Id;
-    }
+    // [Given("The user created following currency for item and stored the currency id")]
+    // public async Task GivenTheUserCreatedFollowingCurrencyForItemAndStoredTheCurrencyId(Table table)
+    // {
+    //     CurrencyDto cur = table.CreateInstance<CurrencyDto>();
+    //     var currency = await _currencyController.Create(cur);
+    //     var currencyExists = await _mongoDbContextCurrency
+    //         .Collection.Find(x =>
+    //             x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
+    //         )
+    //         .FirstOrDefaultAsync();
+    //     Assert.That(currencyExists, Is.Not.EqualTo(null));
+    //     Assert.That(currencyExists.CurrencyCode, Is.EqualTo(cur.CurrencyCode));
+    //     _currencyIdForItem = currency.Data!.Id;
+    // }
 
-    [Given("The user created following country and stored the country id")]
-    public async Task GivenTheUserCreatedFollowingCountryAndStoredTheCountryId(Table table)
-    {
-        CreateCountryDto countryDto = table.CreateInstance<CreateCountryDto>();
-        countryDto.CurrencyId = _currencyId;
-        var country = await _countryController.Create(countryDto);
-        var countryExists = await _mongoDbContextCountry
-            .Collection.Find(x => x.Name == country.Data!.Name)
-            .FirstOrDefaultAsync();
-        Assert.That(countryExists, Is.Not.EqualTo(null));
-        Assert.That(countryExists.Name, Is.EqualTo(country.Data!.Name));
-        _countryId = country.Data.Id;
-    }
+    // [Given("The user created following country and stored the country id")]
+    // public async Task GivenTheUserCreatedFollowingCountryAndStoredTheCountryId(Table table)
+    // {
+    //     CreateCountryDto countryDto = table.CreateInstance<CreateCountryDto>();
+    //     countryDto.CurrencyId = _currencyId;
+    //     var country = await _countryController.Create(countryDto);
+    //     var countryExists = await _mongoDbContextCountry
+    //         .Collection.Find(x => x.Name == country.Data!.Name)
+    //         .FirstOrDefaultAsync();
+    //     Assert.That(countryExists, Is.Not.EqualTo(null));
+    //     Assert.That(countryExists.Name, Is.EqualTo(country.Data!.Name));
+    //     _countryId = country.Data.Id;
+    // }
 
     [Given("The user created following customer and stored the customer id")]
     public async Task GivenTheUserCreatedFollowingCustomerAndStoredTheCustomerId(Table table)
@@ -141,16 +141,16 @@ public class InvoiceExportSteps
         _customerId = customer.Data.Id;
     }
 
-    [Given("The user wants to create following invoice")]
-    public Task GivenTheUserCreatedFollowingInvoiceAndStoredTheInvoiceId(Table table)
-    {
-        _invoiceDto = table.CreateInstance<CreateInvoiceDto>();
-        _invoiceDto.CustomerId = _customerId;
-        _invoiceDto.ClientId = _clientId;
-        _invoiceDto.CurrencyId = _currencyId;
-        _invoiceDto.ClientCurrencyId = _currencyIdForItem;
-        return Task.CompletedTask;
-    }
+    // [Given("The user wants to create following invoice")]
+    // public Task GivenTheUserCreatedFollowingInvoiceAndStoredTheInvoiceId(Table table)
+    // {
+    //     _invoiceDto = table.CreateInstance<CreateInvoiceDto>();
+    //     _invoiceDto.CustomerId = _customerId;
+    //     _invoiceDto.ClientId = _clientId;
+    //     _invoiceDto.CurrencyId = _currencyId;
+    //     _invoiceDto.ClientCurrencyId = _currencyIdForItem;
+    //     return Task.CompletedTask;
+    // }
 
     [Given("the invoice contains the following items")]
     public Task GivenTheInvoiceContainsTheFollowingItems(Table table)

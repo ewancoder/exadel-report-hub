@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <PackageId>ExportPro.StorageService.SDK</PackageId>
         <Authors>Exadel-Group-3</Authors>
-        <Version>1.0.20</Version>
+        <Version>1.0.22</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
     <ItemGroup>
