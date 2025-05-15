@@ -1,7 +1,7 @@
 ﻿using ExportPro.Shared.IntegrationTests.Auth;
 using TechTalk.SpecFlow;
 
-namespace ExportPro.StorageService.IntegrationTests;
+namespace ExportPro.Shared.IntegrationTests;
 
 [Binding]
 public static class DeleteTestUsers

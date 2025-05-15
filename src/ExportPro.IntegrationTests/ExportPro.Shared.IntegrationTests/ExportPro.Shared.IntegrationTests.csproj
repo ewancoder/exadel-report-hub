@@ -16,5 +16,11 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="TechTalk.SpecFlow">
+        <HintPath>..\..\..\..\..\.nuget\packages\specflow\3.9.74\lib\netstandard2.0\TechTalk.SpecFlow.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 
 </Project>
