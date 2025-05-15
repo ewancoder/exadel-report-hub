@@ -101,23 +101,23 @@ namespace ExportPro.StorageService.IntegrationTests.Features.CountryFeatures
         testRunner.Given(string.Format("The user is logged in with email \'{0}\' and password \'{1}\' and has necessary permi" +
                             "ssions", email, password), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
                             "CurrencyCode"});
-                table7.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "GBP"});
 #line 6
-        testRunner.And("The user created following currency and stored the currency id", ((string)(null)), table7, "And ");
+        testRunner.And("The user created following currency and stored the currency id", ((string)(null)), table4, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
                             "Name",
                             "Code",
                             "CurrencyId"});
-                table8.AddRow(new string[] {
+                table5.AddRow(new string[] {
                             "TestUsa####",
                             "TESTCOUNTRYCODE",
                             "temp"});
 #line 9
-        testRunner.And("The user created country and the stored the country id", ((string)(null)), table8, "And ");
+        testRunner.And("The user created country and the stored the country id", ((string)(null)), table5, "And ");
 #line hidden
 #line 12
         testRunner.When("The user sends the country delete request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

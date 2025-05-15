@@ -104,45 +104,45 @@ namespace ExportPro.StorageService.IntegrationTests.Features.InvoiceFeatures
 #line 6
         testRunner.And("The user has valid client id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                             "CurrencyCode"});
-                table18.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "USD"});
 #line 7
-        testRunner.And("The user created following currency for invoice and stored the currency id", ((string)(null)), table18, "And ");
+        testRunner.And("The user created following currency for invoice and stored the currency id", ((string)(null)), table13, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
                             "CurrencyCode"});
-                table19.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "GBP"});
 #line 10
-        testRunner.And("The user created following currency for item and stored the currency id", ((string)(null)), table19, "And ");
+        testRunner.And("The user created following currency for item and stored the currency id", ((string)(null)), table14, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
                             "Name",
                             "Code",
                             "CurrencyId"});
-                table20.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "TestUsa####TESTCUSTOMER###",
                             "TESTCOUNTRYCODECode",
                             "temp"});
 #line 13
-        testRunner.And("The user created following country and stored the country id", ((string)(null)), table20, "And ");
+        testRunner.And("The user created following country and stored the country id", ((string)(null)), table15, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
                             "CountryId",
                             "Name",
                             "Email",
                             "Address"});
-                table21.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "temp",
                             "TESTUSER####TESTCUSTOMER",
                             "TESTUSER####TESTCUSTOMER@gmail.com",
                             "TBILISI"});
 #line 16
-        testRunner.And("The user created following customer and stored the customer id", ((string)(null)), table21, "And ");
+        testRunner.And("The user created following customer and stored the customer id", ((string)(null)), table16, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
                             "InvoiceNumber",
                             "IssueDate",
                             "DueDate",
@@ -151,7 +151,7 @@ namespace ExportPro.StorageService.IntegrationTests.Features.InvoiceFeatures
                             "CustomerId",
                             "ClientId",
                             "ClientCurrencyId"});
-                table22.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "123456789#######000",
                             "2025-01-01",
                             "2025-01-31",
@@ -161,22 +161,22 @@ namespace ExportPro.StorageService.IntegrationTests.Features.InvoiceFeatures
                             "temp",
                             "temp"});
 #line 19
-        testRunner.And("The user wants to create following invoice", ((string)(null)), table22, "And ");
+        testRunner.And("The user wants to create following invoice", ((string)(null)), table17, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
                             "Name",
                             "Description",
                             "Price",
                             "Status",
                             "CurrencyId"});
-                table23.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "ItemTESTInvoice",
                             "NAGARI",
                             "10.50",
                             "0",
                             "temp"});
 #line 22
-        testRunner.And("the invoice contains the following items", ((string)(null)), table23, "And ");
+        testRunner.And("the invoice contains the following items", ((string)(null)), table18, "And ");
 #line hidden
 #line 25
         testRunner.When("the user sends the invoice creation request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

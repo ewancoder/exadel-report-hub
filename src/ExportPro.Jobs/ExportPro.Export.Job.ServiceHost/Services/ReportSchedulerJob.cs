@@ -53,7 +53,7 @@ public sealed class ReportSchedulerJob(
             var reportResponse = await reportExportApi.GetStatisticsAsync(
                                 pref.ReportFormat,
                                 pref.ClientId.ToGuid(),
-                                pref.ClientCurrencyId, // <- Add this line
+                                pref.ClientCurrencyId.ToGuid(),
                                 context.CancellationToken
                             );
 
@@ -66,10 +66,10 @@ public sealed class ReportSchedulerJob(
                 ReportFormat.Csv => ("csv", "text/csv"),
                 _ => ("dat", "application/octet-stream"),
             };
-
+            var httpResponse = reportResponse.Content;
             var fileName = $"report_{DateTime.UtcNow:yyyyMMddHHmm}.{extension}";
-            var contentType = reportResponse.Content!.Headers.ContentType?.MediaType ?? mimeType;
-            var content = await reportResponse.Content.ReadAsByteArrayAsync(context.CancellationToken);
+            var content = await httpResponse.Content.ReadAsByteArrayAsync(context.CancellationToken);
+            var contentType = httpResponse.Content.Headers.ContentType?.MediaType ?? mimeType;
             var subject = $"Scheduled Report - {DateTime.UtcNow:MMMM dd, yyyy}";
             var body = $"Dear user,\n\nPlease find your scheduled report attached.";
             var userEmail = pref.Email;

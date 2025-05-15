@@ -94,45 +94,45 @@ namespace ExportPro.StorageService.IntegrationTests.Features.CustomerFeatures
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
                             "Email",
                             "Password"});
-                table14.AddRow(new string[] {
+                table9.AddRow(new string[] {
                             "OwnerUserTest@gmail.com",
                             "OwnerUserTest2@"});
 #line 5
-        testRunner.Given("The user is logged in with email and password and has necessary permissions", ((string)(null)), table14, "Given ");
+        testRunner.Given("The user is logged in with email and password and has necessary permissions", ((string)(null)), table9, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
                             "CurrencyCode"});
-                table15.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "EUR"});
 #line 8
-        testRunner.And("The user has created following currency and stored the currency id", ((string)(null)), table15, "And ");
+        testRunner.And("The user has created following currency and stored the currency id", ((string)(null)), table10, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                             "Name",
                             "Code",
                             "CurrencyId"});
-                table16.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "TestUsa####TESTCUSTOMER###TESTCUSTOMER",
                             "TESTCOUNTRYCODECodePPPPPPP",
                             "temp"});
 #line 11
-        testRunner.And("The user has created following country and stored the country id", ((string)(null)), table16, "And ");
+        testRunner.And("The user has created following country and stored the country id", ((string)(null)), table11, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
                             "CountryId",
                             "Name",
                             "Email",
                             "Address"});
-                table17.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "temp",
                             "TESTUSER####TESTCUSTOMER",
                             "TESTUSER####TESTCUSTOMER@gmail.com",
                             "AMERICAA"});
 #line 14
-        testRunner.And("The user has created following customer and stored the customer id", ((string)(null)), table17, "And ");
+        testRunner.And("The user has created following customer and stored the customer id", ((string)(null)), table12, "And ");
 #line hidden
 #line 17
         testRunner.When("The user sends the customer delete request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

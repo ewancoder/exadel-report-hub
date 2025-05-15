@@ -77,15 +77,14 @@ namespace ExportPro.StorageService.IntegrationTests.Features.CountryFeatures
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("The user creates a country after creating a currency")]
-        [NUnit.Framework.TestCaseAttribute("OwnerUserTest@gmail.com", "OwnerUserTest2@", null)]
-        [NUnit.Framework.TestCaseAttribute("ClientAdminTest@gmail.com", "ClientAdminTest2@", null)]
-        [NUnit.Framework.TestCaseAttribute("OperatorTest@gmail.com", "OperatorTest2@", null)]
-        public void TheUserCreatesACountryAfterCreatingACurrency(string email, string password, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("Owner", null)]
+        [NUnit.Framework.TestCaseAttribute("ClientAdmin", null)]
+        [NUnit.Framework.TestCaseAttribute("Operator", null)]
+        public void TheUserCreatesACountryAfterCreatingACurrency(string role, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            argumentsOfScenario.Add("email", email);
-            argumentsOfScenario.Add("password", password);
+            argumentsOfScenario.Add("Role", role);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("The user creates a country after creating a currency", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
     this.ScenarioInitialize(scenarioInfo);
@@ -98,26 +97,26 @@ namespace ExportPro.StorageService.IntegrationTests.Features.CountryFeatures
             {
                 this.ScenarioStart();
 #line 5
-        testRunner.Given(string.Format("The user is logged in with email \'{0}\' and password \'{1}\' and has necessary permi" +
-                            "ssions", email, password), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+        testRunner.Given(string.Format("The \'{0}\' user is logged in with email and password and has necessary permissions" +
+                            "", role), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
                             "CurrencyCode"});
-                table5.AddRow(new string[] {
+                table2.AddRow(new string[] {
                             "GBP"});
 #line 6
-        testRunner.And("The user created following currency and stored the currency id", ((string)(null)), table5, "And ");
+        testRunner.And("The user created following currency and stored the currency id", ((string)(null)), table2, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
                             "Name",
                             "Code",
                             "CurrencyId"});
-                table6.AddRow(new string[] {
+                table3.AddRow(new string[] {
                             "TestUsa####",
                             "TESTCOUNTRYCODE",
                             "temp"});
 #line 9
-        testRunner.And("The user wants to create following country", ((string)(null)), table6, "And ");
+        testRunner.And("The user wants to create following country", ((string)(null)), table3, "And ");
 #line hidden
 #line 12
         testRunner.When("The user sends the country creation request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

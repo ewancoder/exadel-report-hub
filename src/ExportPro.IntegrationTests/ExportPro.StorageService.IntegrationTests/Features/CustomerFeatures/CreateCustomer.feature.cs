@@ -101,36 +101,36 @@ namespace ExportPro.StorageService.IntegrationTests.Features.CustomerFeatures
         testRunner.Given(string.Format("The user is logged in with email \'{0}\' and password \'{1}\' and has necessary permi" +
                             "ssions", email, password), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
                             "CurrencyCode"});
-                table11.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "EUR"});
 #line 6
-        testRunner.And("The user created following currency and stored the currency id", ((string)(null)), table11, "And ");
+        testRunner.And("The user created following currency and stored the currency id", ((string)(null)), table6, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
                             "Name",
                             "Code",
                             "CurrencyId"});
-                table12.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "TestUsa####TESTCUSTOMER###",
                             "TESTCOUNTRYCODECode",
                             "temp"});
 #line 9
-        testRunner.And("The user created following country and stored the country id", ((string)(null)), table12, "And ");
+        testRunner.And("The user created following country and stored the country id", ((string)(null)), table7, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
                             "CountryId",
                             "Name",
                             "Email",
                             "Address"});
-                table13.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "temp",
                             "TESTUSER####TESTCUSTOMER",
                             "TESTUSER####TESTCUSTOMER@gmail.com",
                             "BERRLIN"});
 #line 12
-        testRunner.And("The user wants to create following customer", ((string)(null)), table13, "And ");
+        testRunner.And("The user wants to create following customer", ((string)(null)), table8, "And ");
 #line hidden
 #line 15
         testRunner.When("the user sends the customer creation request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
