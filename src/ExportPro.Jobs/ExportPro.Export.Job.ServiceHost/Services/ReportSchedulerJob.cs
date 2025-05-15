@@ -7,6 +7,7 @@ using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
+using Microsoft.Extensions.Options;
 using Quartz;
 using Refit;
 
@@ -15,9 +16,11 @@ namespace ExportPro.Export.Job.ServiceHost.Services;
 public sealed class ReportSchedulerJob(
     IReportPreference reportRepository,
     IEmailService emailService,
-    IConfiguration configuration
+    IConfiguration configuration,
+    IOptions<ServiceAccountSettings> serviceAccountOptions
 ) : IJob
 {
+    private readonly ServiceAccountSettings _serviceAccount = serviceAccountOptions.Value;
     public async Task Execute(IJobExecutionContext context)
     {
         var preferences = await reportRepository.GetAllPreferences(context.CancellationToken);
@@ -25,16 +28,15 @@ public sealed class ReportSchedulerJob(
         HttpClient client = new() { BaseAddress = new Uri(baseurl!) };
 
         IAuth authAPi = RestService.For<IAuth>(client);
-        UserRegisterDto user = new()
+        var login = new UserLoginDto
         {
-            Email = "G10@gmail.com",
-            Username = "GPPP",
-            Password = "G10@gmail.com",
+            Email = _serviceAccount.Email,
+            Password = _serviceAccount.Password
         };
 
-        UserLoginDto login = new() { Email = user.Email, Password = user.Password };
         var jwtTokenDto = await authAPi.LoginAsync(login);
         var jwtToken = jwtTokenDto.AccessToken;
+
         foreach (var pref in preferences)
         {
             if (!IsTimeToSend(pref))
@@ -43,16 +45,17 @@ public sealed class ReportSchedulerJob(
                 Environment.GetEnvironmentVariable("DockerForReport") ?? configuration["ExportReportURI"];
             HttpClient httpClient = new()
             {
-                BaseAddress = new Uri(baseUrlForexport!), //localhost:5294"),
+                BaseAddress = new Uri(baseUrlForexport!),
             };
 
             httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
             IReportExportApi reportExportApi = RestService.For<IReportExportApi>(httpClient);
             var reportResponse = await reportExportApi.GetStatisticsAsync(
-                pref.ReportFormat,
-                pref.ClientId.ToGuid(),
-                context.CancellationToken
-            );
+                                pref.ReportFormat,
+                                pref.ClientId.ToGuid(),
+                                pref.ClientCurrencyId, // <- Add this line
+                                context.CancellationToken
+                            );
 
             if (!reportResponse.IsSuccessStatusCode)
                 continue;

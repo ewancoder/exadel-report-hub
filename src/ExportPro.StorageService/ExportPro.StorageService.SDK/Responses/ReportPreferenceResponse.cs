@@ -12,5 +12,6 @@ public sealed class ReportPreferenceResponse : AuditModel
     public ReportFormat ReportFormat { get; set; }
     public required string CronExpression { get; set; }
     public string? HumanReadableSchedule { get; set; }
+    public Guid ClientCurrencyId { get; set; }
     public bool IsEnabled { get; set; }
 }

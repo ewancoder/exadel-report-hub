@@ -73,6 +73,7 @@ public sealed class MappingProfile : Profile
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToGuid()))
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId.ToGuid()))
             .ForMember(dest => dest.ClientId, opt => opt.MapFrom(src => src.ClientId.ToGuid()))
+            .ForMember(dest => dest.ClientCurrencyId, opt => opt.MapFrom(src => src.ClientCurrencyId.ToGuid()))
             .ForMember(
                 dest => dest.HumanReadableSchedule,
                 opt => opt.MapFrom(src => CronToTextHelper.ToReadableText(src.CronExpression))
@@ -80,6 +81,7 @@ public sealed class MappingProfile : Profile
             .ReverseMap()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToObjectId()))
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId.ToObjectId()))
-            .ForMember(dest => dest.ClientId, opt => opt.MapFrom(src => src.ClientId.ToObjectId()));
+            .ForMember(dest => dest.ClientId, opt => opt.MapFrom(src => src.ClientId.ToObjectId()))
+            .ForMember(dest => dest.ClientCurrencyId, opt => opt.MapFrom(src => src.ClientCurrencyId.ToObjectId()));
     }
 }

@@ -3,7 +3,6 @@ using AutoMapper;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.Export.Job.Utilities.Helpers;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
@@ -47,6 +46,7 @@ public sealed class UpdateReportPreferenceHandler(
         }
 
         preference.ReportFormat = request.dto.ReportFormat;
+        preference.ClientCurrencyId = request.dto.ClientCurrencyId.ToObjectId();
         preference.Email = request.dto.Email;
         preference.CronExpression = cronExpression;
         preference.HumanReadableCronExpression = CronToTextHelper.ToReadableText(cronExpression);

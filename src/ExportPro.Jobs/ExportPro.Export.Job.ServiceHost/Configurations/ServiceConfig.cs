@@ -20,6 +20,6 @@ public static class ServiceConfig
         services.AddTransient<IEmailService, EmailService>();
         services.AddScoped<IReportPreference, ReportPreferenceRepository>();
         services.AddTransient<ReportSchedulerJob>();
-        Console.WriteLine("Quartz job registration completed");
+        services.Configure<ServiceAccountSettings>(config.GetSection("ServiceAccount"));
     }
 }

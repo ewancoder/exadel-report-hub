@@ -6,8 +6,9 @@ namespace ExportPro.StorageService.SDK.Refit;
 public interface IReportExportApi
 {
     [Get("/api/ReportExport")]
-    Task<ApiResponse<HttpContent>> GetStatisticsAsync(
+    Task<ApiResponse<HttpResponseMessage>> GetStatisticsAsync(
         [Query] ReportFormat format,
-        [Query] Guid? clientId = null,
+        [Query] Guid clientId,
+        [Query] Guid clientCurrencyId,
         CancellationToken cancellationToken = default);
 }

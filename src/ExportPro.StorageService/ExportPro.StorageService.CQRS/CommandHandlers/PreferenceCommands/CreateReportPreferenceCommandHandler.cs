@@ -60,6 +60,7 @@ public sealed class CreateReportPreferenceHandler(
         {
             UserId = userObjectId,
             ClientId = request.dto.ClientId.ToObjectId(),
+            ClientCurrencyId = request.dto.ClientCurrencyId.ToObjectId(),
             Email = request.dto.Email,
             ReportFormat = request.dto.ReportFormat,
             CronExpression = cronExpression,
