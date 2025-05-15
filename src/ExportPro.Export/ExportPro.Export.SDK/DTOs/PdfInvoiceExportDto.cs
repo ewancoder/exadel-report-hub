@@ -2,7 +2,7 @@
 
 public sealed class PdfInvoiceExportDto
 {
-    public string InvoiceNumber { get; set; } = default!;
+    public string? InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
     public decimal Amount { get; set; }

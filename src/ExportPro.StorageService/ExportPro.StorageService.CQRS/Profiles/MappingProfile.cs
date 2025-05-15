@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ExportPro.Common.Shared.Extensions;
-using ExportPro.Export.Job.ServiceHost.Helpers;
+using ExportPro.Export.Job.Utilities.Helpers;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
@@ -35,13 +35,11 @@ public sealed class MappingProfile : Profile
             .ForMember(dest => dest.CurrencyId, src => src.MapFrom(x => x.CurrencyId.ToGuid()))
             .ForMember(dest => dest.CustomerId, src => src.MapFrom(x => x.CustomerId.ToGuid()))
             .ForMember(dest => dest.ClientId, src => src.MapFrom(x => x.ClientId.ToGuid()))
-            .ForMember(dest => dest.ClientCurrencyId, src => src.MapFrom(x => x.ClientCurrencyId.ToGuid()))
             .ReverseMap()
             .ForMember(dest => dest.Id, src => src.MapFrom(y => y.Id.ToObjectId()))
             .ForMember(dest => dest.CurrencyId, src => src.MapFrom(y => y.CurrencyId.ToObjectId()))
             .ForMember(dest => dest.CustomerId, src => src.MapFrom(y => y.CustomerId.ToObjectId()))
-            .ForMember(dest => dest.ClientId, src => src.MapFrom(y => y.ClientId.ToObjectId()))
-            .ForMember(dest => dest.ClientCurrencyId, src => src.MapFrom(y => y.ClientCurrencyId.ToObjectId()));
+            .ForMember(dest => dest.ClientId, src => src.MapFrom(y => y.ClientId.ToObjectId()));
         CreateMap<CreateInvoiceDto, InvoiceResponse>().ReverseMap();
         // Customer -> CustomerDto
         CreateMap<Customer, CustomerDto>()

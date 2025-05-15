@@ -1,7 +1,6 @@
-﻿using ExportPro.StorageService.Models.Enums;
-using ExportPro.StorageService.SDK.DTOs;
+﻿using ExportPro.StorageService.SDK.DTOs;
 
-namespace ExportPro.Export.Job.ServiceHost.Helpers;
+namespace ExportPro.Export.Job.Utilities.Helpers;
 
 public static class CronHelper
 {

@@ -1,14 +1,17 @@
 ﻿using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Interfaces;
+using ExportPro.Shared.IntegrationTests.Configs;
+using Microsoft.Extensions.Configuration;
 using Refit;
 
 namespace ExportPro.Shared.IntegrationTests.Auth;
 
 public static class UserLogin
 {
-    private readonly static IAuth iauth = RestService.For<IAuth>("http://localhost:5000");
+    private static readonly IConfiguration _config = LoadingConfig.LoadConfig();
+    private static readonly IAuth iauth = RestService.For<IAuth>(_config.GetSection("AuthUrl").Value!);
 
-    public async static Task<string> Login(string email, string password)
+    public static async Task<string> Login(string email, string password)
     {
         UserLoginDto userLoginDto = new() { Email = email, Password = password };
         var user = await iauth.LoginAsync(userLoginDto);

@@ -5,9 +5,11 @@ using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
+using ExportPro.StorageService.API;
 using ExportPro.StorageService.API.Configurations;
 using ExportPro.StorageService.CQRS;
 using ExportPro.StorageService.CQRS.Profiles;
+using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Services;
@@ -69,7 +71,14 @@ builder.Services.AddCommonRegistrations();
 builder.Services.AddRepositoryConfig();
 builder.Services.AddScoped<ICurrencyExchangeService, CurrencyExchangeService>();
 builder.Services.AddCQRS();
+// builder.Services.AddScoped<SeedingData>();
 var app = builder.Build();
+// using (var scope = app.Services.CreateScope())
+// {
+//     var repo = scope.ServiceProvider.GetRequiredService<ICountryRepository>();
+//     var seedingData = scope.ServiceProvider.GetRequiredService<SeedingData>();
+//     // await seedingData.SeedCountries(); 
+// }
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseMiddleware<ErrorHandlingMiddleware>();

@@ -78,23 +78,5 @@ public class UpdateInvoiceValidator : AbstractValidator<UpdateInvoiceCommand>
                         )
                         .WithMessage("The Currency Id does not exist")
             );
-        RuleFor(x => x.InvoiceDto.ClientCurrencyId)
-            .NotEmpty()
-            .WithMessage("Client Currency Id  cannot be empty.")
-            .DependentRules(
-                () =>
-                    RuleFor(x => x.InvoiceDto.ClientCurrencyId)
-                        .MustAsync(
-                            async (currency, cancellationToken) =>
-                            {
-                                var client = await currencyRepository.GetOneAsync(
-                                    x => x.Id == currency.ToObjectId() && !x.IsDeleted,
-                                    cancellationToken
-                                );
-                                return client != null;
-                            }
-                        )
-                        .WithMessage("The Client Currency Id does not exist")
-            );
     }
 }

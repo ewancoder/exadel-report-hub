@@ -67,7 +67,7 @@ public sealed class ExcelReportGenerator : IReportGenerator
                 i.Description,
                 i.Price,
                 i.Status,
-                i.CurrencyId,
+                Currency = data.CurrencyCodes.GetValueOrDefault(i.CurrencyId, "—"),
                 i.CreatedAt,
                 i.UpdatedAt
             }),
@@ -81,18 +81,32 @@ public sealed class ExcelReportGenerator : IReportGenerator
         var ws = wb.Worksheets.Add("Invoices");
         ws.Cell(1, 1).Value = $"Client: {data.ClientName}";
         ws.Cell(1, 1).Style.Font.SetBold();
-        ws.Cell(2, 1).InsertTable(ProjectInvoices(data.Invoices), "Invoices", true);
+        ws.Cell(2, 1).InsertTable(ProjectInvoices(data), "Invoices", true);
+        var startRow = ws.LastRowUsed()!.RowNumber() + 3;
+        ws.Cell(startRow, 1).Value = "Overdue Invoices";
+        ws.Cell(startRow, 1).Style.Font.SetBold();
+        ws.Cell(startRow + 1, 1).Value = "Count";
+        ws.Cell(startRow + 1, 2).Value = "Amount";
+        ws.Cell(startRow+1,3).Value = "Client Currency";
+        ws.Cell(startRow + 2, 1).Value = data.OverdueInvoicesCount;
+        ws.Cell(startRow + 2, 2).Value = (data.TotalOverdueAmount.HasValue
+            ? data.TotalOverdueAmount.Value.ToString("N2")
+            : "—") ;
+        ws.Cell(startRow+2,3).Value = data.ClientCurrencyCode;
     }
 
-    private static IEnumerable<object> ProjectInvoices(IEnumerable<InvoiceDto> src)
+    private static IEnumerable<object> ProjectInvoices(ReportContentDto data)
     {
-        return src.Select(i => new
+        var dict = data.CurrencyCodes;
+        return data.Invoices.Select(i => new
         {
             i.InvoiceNumber,
             IssueDate = i.IssueDate.ToString("yyyy-MM-dd"),
             DueDate = i.DueDate.ToString("yyyy-MM-dd"),
             i.Amount,
-            i.CurrencyId,
+            Currency = i.CurrencyId.HasValue
+                ? dict.GetValueOrDefault(i.CurrencyId.Value, "—")
+                : "—",
             i.PaymentStatus,
             i.BankAccountNumber
         });

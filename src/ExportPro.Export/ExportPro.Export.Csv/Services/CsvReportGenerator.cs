@@ -12,16 +12,26 @@ public sealed class CsvReportGenerator : IReportGenerator
     private static readonly string Separator = new('#', 75);
     public string ContentType => "text/csv";
     public string Extension => "csv";
-
+    
     public byte[] Generate(ReportContentDto data)
     {
         SetupCsvStream(out var ms, out var writer, out var csv);
-        GenerateReportMetaData(data, writer);
-        GenerateInvoiceSection(data, writer, csv);
-        GenerateItemSection(data, writer, csv);
-        GeneratePlanSection(data, writer, csv);
-        writer.Flush();
-        return ms.ToArray();
+
+        try
+        {
+            GenerateReportMetaData(data, writer);
+            GenerateInvoiceSection(data, writer, csv);
+            GenerateItemSection(data, writer, csv);
+            GeneratePlanSection(data, writer, csv);
+            writer.Flush();
+            return ms.ToArray();
+        }
+        finally
+        {
+            csv.Dispose();
+            writer.Dispose();
+            ms.Dispose();
+        }
     }
 
     private static void GenerateReportMetaData(ReportContentDto data, StreamWriter writer)
@@ -45,12 +55,19 @@ public sealed class CsvReportGenerator : IReportGenerator
             IssueDate = i.IssueDate.ToString("yyyy-MM-dd"),
             DueDate = i.DueDate.ToString("yyyy-MM-dd"),
             i.Amount,
-            i.CurrencyId,
+            Currency = i.CurrencyId.HasValue
+                ? data.CurrencyCodes.GetValueOrDefault(i.CurrencyId.Value, "—")
+                : "—",
             i.PaymentStatus,
             i.BankAccountNumber
         });
 
         csv.WriteRecords(rows);
+        writer.WriteLine();
+        writer.WriteLine("Overdue Invoices");
+        writer.WriteLine("Count,Amount,Client Currency");
+        writer.WriteLine(
+            $"{data.OverdueInvoicesCount},{data.TotalOverdueAmount?.ToString("N2") ?? "—"},{data.ClientCurrencyCode}");
         writer.WriteLine();
     }
 
@@ -74,7 +91,7 @@ public sealed class CsvReportGenerator : IReportGenerator
             i.Description,
             i.Price,
             i.Status,
-            i.CurrencyId,
+            Currency = data.CurrencyCodes.GetValueOrDefault(i.CurrencyId, "—"),
             i.CreatedAt,
             i.UpdatedAt
         }));

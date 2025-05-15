@@ -32,17 +32,65 @@ public sealed class GenerateReportQueryHandler(
         return reportFile;
     }
 
-    private async Task<ReportFileDto> GenerateReportFileAsync(GenerateReportQuery request,
+    private async Task<ReportFileDto> GenerateReportFileAsync(
+        GenerateReportQuery request,
         CancellationToken cancellationToken)
     {
         var allInvoices = await FetchInvoicesAsync(cancellationToken);
         var clientId = request.Filters.ClientId;
+        var clientCurrencyId = request.Filters.ClientCurrencyId;
         var invoices = FilterInvoicesByClientId(clientId, allInvoices);
         var (items, plans) = await FetchItemsAndPlansAsync(clientId, cancellationToken);
-        var reportContentDto =
-            await RetrieveClientNameAsync(request, clientId, invoices, items, plans, cancellationToken);
-        var reportFileDto = CreateReportFileDto(reportContentDto, request.Format, generators);
-        return reportFileDto;
+
+        int overdueCnt = 0;
+        double? overdueAmt = null;
+        if (clientId != Guid.Empty)
+        {
+            try
+            {
+                var overdueResp =
+                    await storageApi.GetOverduePaymentsAsync(clientId, clientCurrencyId, cancellationToken);
+                if (overdueResp.IsSuccess && overdueResp.Data is not null)
+                {
+                    overdueCnt = overdueResp.Data.OverdueInvoicesCount;
+                    overdueAmt = overdueResp.Data.TotalOverdueAmount;
+                }
+            }
+            catch
+            {
+                overdueCnt = 0;
+                overdueAmt = 0;
+            }
+        }
+
+        var reportContent = await RetrieveClientNameAsync(
+            request, clientId, invoices, items, plans, cancellationToken);
+
+        var currencyCodes = new Dictionary<Guid, string>();
+
+        var ids = invoices
+            .Where(i => i.CurrencyId.HasValue && i.CurrencyId != Guid.Empty)
+            .Select(i => i.CurrencyId!.Value)
+            .Concat(items.Select(it => it.CurrencyId))
+            .Distinct();
+
+        foreach (var id in ids)
+        {
+            var curResp = await storageApi.GetCurrencyByIdAsync(id, cancellationToken);
+            currencyCodes[id] = curResp.Data?.CurrencyCode ?? "—";
+        }
+
+        var clientCurrecyCode = await storageApi.GetCurrencyByIdAsync(clientCurrencyId, cancellationToken);
+
+        reportContent = reportContent with
+        {
+            OverdueInvoicesCount = overdueCnt,
+            TotalOverdueAmount = overdueAmt,
+            CurrencyCodes = currencyCodes,
+            ClientCurrencyCode = clientCurrecyCode.Data?.CurrencyCode ?? "—",
+        };
+
+        return CreateReportFileDto(reportContent, request.Format, generators);
     }
 
     private async Task<ReportContentDto> RetrieveClientNameAsync(
@@ -96,7 +144,7 @@ public sealed class GenerateReportQueryHandler(
         ReportFormat fmt,
         IEnumerable<IReportGenerator> generators)
     {
-        var key = fmt == ReportFormat.Csv ? "csv" : "xlsx";
+        var key = fmt.ToString();
         var generator = generators.First(g => g.Extension.Equals(key, StringComparison.OrdinalIgnoreCase));
         var bytes = generator.Generate(dto);
         var name = FileNameTemplates.CsvExcelFileName(generator.Extension);

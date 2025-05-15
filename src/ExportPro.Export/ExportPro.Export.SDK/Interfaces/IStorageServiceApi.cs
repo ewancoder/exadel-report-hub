@@ -45,5 +45,10 @@ public interface IStorageServiceApi
     Task<BaseResponse<int>> CreateCustomersBulkAsync(
         [Body] List<CreateUpdateCustomerDto> customers,
         CancellationToken cancellationToken = default);
-
+    
+    [Get("/api/Invoice/overdue-payments/{clientId}")]
+    Task<BaseResponse<OverduePaymentsResponse>> GetOverduePaymentsAsync(
+        Guid clientId,
+        Guid clientCurrencyId,
+        CancellationToken cancellationToken = default);
 }

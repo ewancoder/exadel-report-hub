@@ -11,6 +11,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="ExportPro.Common.Shared" Version="1.0.25"/>
+        <PackageReference Include="ExportPro.Export.Job.Utilities" Version="1.0.2" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0-preview1"/>
         <PackageReference Include="Refit" Version="8.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1"/>

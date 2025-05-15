@@ -1,4 +1,4 @@
-﻿namespace ExportPro.Export.Job.ServiceHost.Helpers;
+﻿namespace ExportPro.Export.Job.Utilities.Helpers;
 
 public static class CronToTextHelper
 {

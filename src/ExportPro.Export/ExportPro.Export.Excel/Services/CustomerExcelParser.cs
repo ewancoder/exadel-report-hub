@@ -14,7 +14,7 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
         using var wb = new XLWorkbook(excelStream);
         var worksheet = GetWorksheet(wb);
         var headerRow = worksheet.FirstRowUsed();
-        var columnMap = MapHeaderColumns(headerRow);
+        var columnMap = MapHeaderColumns(headerRow!);
         ValidateRequiredColumns(columnMap);
         return ExtractCustomersFromWorksheet(worksheet, columnMap);
     }
@@ -24,6 +24,7 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
     {
         var customers = ProcessRows(ws, columnMap);
 
+        // do not use Exception, use concrete exception
         if (customers.Count == 0)
             throw new Exception("No valid rows found.");
 
@@ -56,11 +57,11 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
         IReadOnlyDictionary<string, int> columnMap)
     {
         List<CreateUpdateCustomerDto> customers = [];
-        
+
         foreach (var row in worksheet.RowsUsed().Skip(1)) // skip header
         {
             var customerDto = ParseRow(row, columnMap);
-            if (customerDto != null) customers.Add(customerDto);
+            customers.Add(customerDto!);
         }
 
         return customers;
@@ -72,11 +73,8 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
         var email = row.Cell(columnMap["Email"]).GetString().Trim();
         var addr = row.Cell(columnMap["Address"]).GetString().Trim();
         var cidStr = row.Cell(columnMap["CountryId"]).GetString().Trim();
-
-        if (string.IsNullOrWhiteSpace(name) &&
-            string.IsNullOrWhiteSpace(email) &&
-            string.IsNullOrWhiteSpace(addr) &&
-            string.IsNullOrWhiteSpace(cidStr))
+        
+        if (AllBlank(name, email, addr, cidStr))
             return null; // blank row
 
         if (!Guid.TryParse(cidStr, out var countryId))
@@ -90,4 +88,7 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
             CountryId = countryId
         };
     }
+
+    private static bool AllBlank(params string?[] values) =>
+        values.All(string.IsNullOrWhiteSpace);
 }

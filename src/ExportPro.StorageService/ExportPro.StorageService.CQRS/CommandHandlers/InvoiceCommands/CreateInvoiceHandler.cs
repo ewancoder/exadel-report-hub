@@ -42,7 +42,6 @@ public sealed class CreateInvoiceHandler(
             BankAccountNumber = request.CreateInvoiceDto.BankAccountNumber,
             ClientId = request.CreateInvoiceDto.ClientId.ToObjectId(),
             CustomerId = request.CreateInvoiceDto.CustomerId.ToObjectId(),
-            ClientCurrencyId = request.CreateInvoiceDto.ClientCurrencyId.ToObjectId(),
             CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value,
             Items = request.CreateInvoiceDto.Items!.Select(c => mapper.Map<Item>(c)).ToList(),
         };
