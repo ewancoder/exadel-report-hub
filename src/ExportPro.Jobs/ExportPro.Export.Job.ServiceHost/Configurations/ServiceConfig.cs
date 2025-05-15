@@ -8,9 +8,9 @@ using Refit;
 
 namespace ExportPro.Export.Job.ServiceHost.Configurations;
 
-public static class DependencyInjection
+public static class ServiceConfig
 {
-    public static void AddInfrastructure(this IServiceCollection services, IConfiguration config)
+    public static void AddServices(this IServiceCollection services, IConfiguration config)
     {
         var smtpSettings = config.GetSection("SmtpSettings").Get<SmtpSettings>();
         services.AddSingleton(smtpSettings);

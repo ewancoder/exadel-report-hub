@@ -1,6 +1,7 @@
 ﻿using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Export.Job.ServiceHost.DTOs;
 using ExportPro.Export.Job.ServiceHost.Interfaces;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
@@ -60,7 +61,7 @@ public sealed class ReportSchedulerJob(
             {
                 ReportFormat.Xlsx => ("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
                 ReportFormat.Csv => ("csv", "text/csv"),
-                _ => ("dat", "application/octet-stream"), // fallback
+                _ => ("dat", "application/octet-stream"),
             };
 
             var fileName = $"report_{DateTime.UtcNow:yyyyMMddHHmm}.{extension}";
@@ -72,7 +73,15 @@ public sealed class ReportSchedulerJob(
 
             if (!string.IsNullOrWhiteSpace(userEmail))
             {
-                await emailService.SendAsync(userEmail, subject, body, content, fileName, contentType);
+                await emailService.SendAsync(new EmailSendDto
+                {
+                    To = userEmail,
+                    Subject = subject,
+                    Body = body,
+                    Attachment = content,
+                    FileName = fileName,
+                    ContentType = contentType
+                });
             }
         }
     }
