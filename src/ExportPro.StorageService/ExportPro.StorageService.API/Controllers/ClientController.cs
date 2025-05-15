@@ -11,6 +11,7 @@ using ExportPro.StorageService.CQRS.QueryHandlers.ItemQueries;
 using ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,7 @@ namespace ExportPro.StorageService.API.Controllers;
 [Route("api/client/")]
 [Authorize]
 [ApiController]
-public class ClientController(IMediator mediator) : ControllerBase
+public class ClientController(IMediator mediator) : ControllerBase, IClientController
 {
     [HttpPost]
     [SwaggerOperation(Summary = "Creating a client")]
@@ -39,10 +40,9 @@ public class ClientController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     [HasPermission(Resource.Clients, CrudAction.Read)]
     public Task<BaseResponse<List<ClientResponse>>> GetClients(
-        [FromQuery] int top = 5,
-        [FromQuery] int skip = 0,
+        [FromQuery] Filters filters,
         CancellationToken cancellationToken = default
-    ) => mediator.Send(new GetClientsQuery(top, skip), cancellationToken);
+    ) => mediator.Send(new GetClientsQuery(filters), cancellationToken);
 
     [HttpGet("{clientId}")]
     [SwaggerOperation(Summary = "Getting  client by client id")]
@@ -77,26 +77,20 @@ public class ClientController(IMediator mediator) : ControllerBase
     [SwaggerOperation(Summary = "Get all items for a client")]
     [ProducesResponseType(typeof(List<ItemResponse>), 200)]
     [HasPermission(Resource.Items, CrudAction.Read)]
-    public async Task<IActionResult> GetItems(
-            [FromRoute] Guid clientId,
-            CancellationToken cancellationToken)
-    {
-        var response = await mediator.Send(new GetItemsQuery(clientId), cancellationToken);
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<List<ItemResponse>>> GetItems(
+        [FromRoute] Guid clientId,
+        CancellationToken cancellationToken
+    ) => mediator.Send(new GetItemsQuery(clientId), cancellationToken);
 
     [HttpGet("{clientId}/items/{itemId}")]
     [SwaggerOperation(Summary = "Get a single item by ID for a client")]
     [ProducesResponseType(typeof(ItemResponse), 200)]
     [HasPermission(Resource.Items, CrudAction.Read)]
-    public async Task<IActionResult> GetItemById(
-            [FromRoute] Guid clientId,
-            [FromRoute] Guid itemId,
-            CancellationToken cancellationToken)
-    {
-        var response = await mediator.Send(new GetItemByIdQuery(clientId, itemId), cancellationToken);
-        return StatusCode((int)response.ApiState, response);
-    }
+    public Task<BaseResponse<ItemResponse>> GetItemById(
+        [FromRoute] Guid clientId,
+        [FromRoute] Guid itemId,
+        CancellationToken cancellationToken
+    ) => mediator.Send(new GetItemByIdQuery(clientId, itemId), cancellationToken);
 
     [HttpPatch("{clientId}/item")]
     [SwaggerOperation(Summary = "add single item to client")]
@@ -158,10 +152,9 @@ public class ClientController(IMediator mediator) : ControllerBase
     [HasPermission(Resource.Plans, CrudAction.Read)]
     public Task<BaseResponse<List<PlansResponse>>> GetClientPlans(
         [FromRoute] Guid clientId,
-        [FromQuery] int top = 5,
-        [FromQuery] int skip = 0,
+        [FromQuery] Filters filters,
         CancellationToken cancellationToken = default
-    ) => mediator.Send(new GetClientPlansQuery(clientId, top, skip), cancellationToken);
+    ) => mediator.Send(new GetClientPlansQuery(clientId, filters), cancellationToken);
 
     [HttpPatch("{clientId}/plan")]
     [SwaggerOperation(Summary = "add single plan to client")]

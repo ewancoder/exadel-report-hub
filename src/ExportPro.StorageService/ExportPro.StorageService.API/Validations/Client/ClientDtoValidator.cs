@@ -1,14 +1,14 @@
-﻿using ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
-using ExportPro.StorageService.DataAccess.Interfaces;
+﻿using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.SDK.DTOs;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations.Client;
+namespace ExportPro.StorageService.Api.Validations.Client;
 
-public sealed class CreateClientCommandValidator : AbstractValidator<CreateClientCommand>
+public sealed class ClientDtoValidator : AbstractValidator<ClientDto>
 {
-    public CreateClientCommandValidator(IClientRepository clientRepository)
+    public ClientDtoValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.ClientDto.Name)
+        RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Name must not be empty")
             .MinimumLength(3)
@@ -17,13 +17,13 @@ public sealed class CreateClientCommandValidator : AbstractValidator<CreateClien
             .WithMessage("Name must not exceed 50 characters")
             .DependentRules(() =>
             {
-                RuleFor(x => x.ClientDto.Name)
+                RuleFor(x => x.Name)
                     .MustAsync(
-                        async (name, cancellationtoken) =>
+                        async (name, cancellationToken) =>
                         {
                             var client = await clientRepository.GetOneAsync(
                                 x => x.Name == name && !x.IsDeleted,
-                                cancellationtoken
+                                cancellationToken
                             );
                             return client == null;
                         }

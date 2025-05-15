@@ -6,7 +6,7 @@ using Refit;
 
 namespace ExportPro.StorageService.SDK.Refit;
 
-public interface ICustomerApi
+public interface ICustomerController
 {
     [Post("/api/Customer")]
     Task<BaseResponse<CustomerResponse>> Create(

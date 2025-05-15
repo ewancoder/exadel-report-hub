@@ -2,7 +2,7 @@
 using ExportPro.StorageService.SDK.DTOs;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations.Report;
+namespace ExportPro.StorageService.Api.Validations.Report;
 
 public class ReportScheduleDtoValidator : AbstractValidator<ReportScheduleDto>
 {

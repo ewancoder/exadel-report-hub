@@ -2,7 +2,7 @@
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations.Client;
+namespace ExportPro.StorageService.Api.Validations.Client;
 
 public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClientCommand>
 {

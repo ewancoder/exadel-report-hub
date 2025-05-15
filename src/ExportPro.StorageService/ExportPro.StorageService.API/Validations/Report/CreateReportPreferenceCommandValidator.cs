@@ -1,7 +1,7 @@
 ﻿using ExportPro.StorageService.CQRS.CommandHandlers.PreferenceCommands;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations.Report;
+namespace ExportPro.StorageService.Api.Validations.Report;
 
 public class CreateReportPreferenceCommandValidator : AbstractValidator<CreateReportPreferenceCommand>
 {
@@ -14,7 +14,9 @@ public class CreateReportPreferenceCommandValidator : AbstractValidator<CreateRe
         //    .NotNull().WithMessage("Schedule is required.")
         //    .SetValidator(new ReportScheduleDtoValidator());
         RuleFor(x => x.dto.Email)
-            .NotEmpty().WithMessage("Email is required.")
-            .EmailAddress().WithMessage("Email format is invalid.");
+            .NotEmpty()
+            .WithMessage("Email is required.")
+            .EmailAddress()
+            .WithMessage("Email format is invalid.");
     }
 }

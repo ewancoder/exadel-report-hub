@@ -6,7 +6,7 @@ using Refit;
 
 namespace ExportPro.StorageService.SDK.Refit;
 
-public interface IInvoiceApi
+public interface IInvoiceController
 {
     [Post("/api/Invoice")]
     Task<BaseResponse<InvoiceResponse>> Create(

@@ -7,11 +7,6 @@ namespace ExportPro.StorageService.DataAccess.Interfaces;
 
 public interface ICurrencyRepository : IRepository<Currency>
 {
-    Task<List<Currency>> GetPaginated(
-        int top,
-        int skip,
-        OrderBy orderBy,
-        CancellationToken cancellationToken = default
-    );
+    Task<List<Currency>> GetPaginated(Filters filters, CancellationToken cancellationToken = default);
     Task<Currency?> GetCurrencyCodeById(ObjectId id);
 }

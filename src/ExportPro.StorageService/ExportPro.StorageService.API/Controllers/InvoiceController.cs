@@ -7,6 +7,7 @@ using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
+using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ namespace ExportPro.StorageService.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class InvoiceController(IMediator mediator) : ControllerBase
+public class InvoiceController(IMediator mediator) : ControllerBase, IInvoiceController
 {
     [HttpPost]
     [HasPermission(Resource.Invoices, CrudAction.Create)]

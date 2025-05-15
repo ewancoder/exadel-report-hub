@@ -3,7 +3,7 @@ using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations.Customer;
+namespace ExportPro.StorageService.Api.Validations.Customer;
 
 public sealed class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>
 {

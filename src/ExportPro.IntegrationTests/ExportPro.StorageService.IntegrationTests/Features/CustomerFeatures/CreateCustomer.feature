@@ -3,12 +3,7 @@ Feature: Creating a Customer
 
     Scenario Outline: The user creates a customer after creating a currency and country
         Given The user is logged in with email '<email>' and password '<password>' and has necessary permissions
-        And The user created following currency and stored the currency id
-          | CurrencyCode |
-          | EUR          |
-        And The user created following country and stored the country id
-          | Name                       | Code                | CurrencyId |
-          | TestUsa####TESTCUSTOMER### | TESTCOUNTRYCODECode | temp       |
+        And The user  has following currency "USD" and has following country "USA"
         And The user wants to create following customer
           | CountryId | Name                     | Email                              | Address |
           | temp      | TESTUSER####TESTCUSTOMER | TESTUSER####TESTCUSTOMER@gmail.com | BERRLIN |

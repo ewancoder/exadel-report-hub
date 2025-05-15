@@ -8,7 +8,7 @@ namespace ExportPro.StorageService.DataAccess.Interfaces;
 
 public interface IClientRepository : IRepository<Client>
 {
-    Task<List<Client>> GetClients(int top, int skip, CancellationToken cancellationToken = default);
+    Task<List<Client>> GetClients(Filters filters, CancellationToken cancellationToken = default);
     Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default);
     Task AddItem(ObjectId id, Client updatedClient, CancellationToken cancellationToken = default);
     Task<bool> AddItems(ObjectId clientId, List<Item> items, CancellationToken cancellationToken = default);
@@ -34,8 +34,7 @@ public interface IClientRepository : IRepository<Client>
 
     Task<List<PlansResponse>> GetClientPlans(
         ObjectId clientId,
-        int top,
-        int skip,
+        Filters filters,
         CancellationToken cancellationToken = default
     );
 }

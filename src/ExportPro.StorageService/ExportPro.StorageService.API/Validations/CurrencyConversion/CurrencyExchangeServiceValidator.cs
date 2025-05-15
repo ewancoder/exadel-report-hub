@@ -2,7 +2,7 @@
 using ExportPro.StorageService.SDK.Services;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations.CurrencyConversion;
+namespace ExportPro.StorageService.Api.Validations.CurrencyConversion;
 
 public sealed class CurrencyExchangeServiceValidator : AbstractValidator<CurrencyExchangeModel>
 {

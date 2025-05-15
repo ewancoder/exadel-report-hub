@@ -2,11 +2,12 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
+using Microsoft.AspNetCore.Mvc;
 using Refit;
 
 namespace ExportPro.StorageService.SDK.Refit;
 
-public interface IClientApi
+public interface IClientController
 {
     [Post("/api/client")]
     Task<BaseResponse<ClientResponse>> CreateClient(
@@ -15,11 +16,7 @@ public interface IClientApi
     );
 
     [Get("/api/client")]
-    Task<BaseResponse<List<ClientResponse>>> GetClients(
-        [Query] int top = 5,
-        [Query] int skip = 0,
-        CancellationToken cancellationToken = default
-    );
+    Task<BaseResponse<List<ClientResponse>>> GetClients(Filters filters, CancellationToken cancellationToken = default);
 
     [Get("/api/client/{clientId}")]
     Task<BaseResponse<ClientResponse>> GetClientById(Guid clientId, CancellationToken cancellationToken = default);
@@ -75,8 +72,7 @@ public interface IClientApi
     [Get("/api/client/{clientId}/plans")]
     Task<BaseResponse<List<PlansResponse>>> GetClientPlans(
         Guid clientId,
-        [Query] int top = 5,
-        [Query] int skip = 0,
+        [Query] Filters filters,
         CancellationToken cancellationToken = default
     );
 

@@ -3,7 +3,7 @@ using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations.Invoice;
+namespace ExportPro.StorageService.Api.Validations.Invoice;
 
 public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
 {

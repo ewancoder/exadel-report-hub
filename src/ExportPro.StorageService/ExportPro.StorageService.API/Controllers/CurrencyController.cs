@@ -1,6 +1,8 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 using ExportPro.StorageService.Models.Enums;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +11,7 @@ namespace ExportPro.StorageService.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CurrencyController(IMediator mediator) : ControllerBase
+public class CurrencyController(IMediator mediator) : ControllerBase, ICurrencyController
 {
     [HttpGet("name/{currencyCode}")]
     public Task<BaseResponse<CurrencyResponse>> GetById(
@@ -23,9 +25,7 @@ public class CurrencyController(IMediator mediator) : ControllerBase
 
     [HttpGet]
     public Task<BaseResponse<List<CurrencyResponse>>> GetAll(
-        int top = 10,
-        int skip = 0,
-        OrderBy orderBy = OrderBy.Ascending,
+        [FromQuery] Filters filters,
         CancellationToken cancellationToken = default
-    ) => mediator.Send(new GetAllCurrenciesQuery(top, skip, orderBy), cancellationToken);
+    ) => mediator.Send(new GetAllCurrenciesQuery(filters), cancellationToken);
 }

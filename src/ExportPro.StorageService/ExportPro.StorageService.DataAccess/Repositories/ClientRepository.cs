@@ -3,6 +3,7 @@ using AutoMapper;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
@@ -12,17 +13,20 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public sealed class ClientRepository(
-    IHttpContextAccessor httpContextAccessor,
-    ICollectionProvider collectionProvider,
-    IMapper mapper
-) : BaseRepository<Client>(collectionProvider), IClientRepository
+public sealed class ClientRepository(ICollectionProvider collectionProvider, IMapper mapper)
+    : BaseRepository<Client>(collectionProvider),
+        IClientRepository
 {
-    public Task<List<Client>> GetClients(int top, int skip, CancellationToken cancellationToken = default)
+    public Task<List<Client>> GetClients(Filters filters, CancellationToken cancellationToken = default)
     {
-        var clients = Collection.Find(c => !c.IsDeleted);
-        var paginated = clients.Skip(skip).Limit(top).ToListAsync(cancellationToken);
-        return paginated;
+        var filter = Builders<Client>.Filter.Eq(x => x.IsDeleted, false);
+        var sort = filters.OrderBy switch
+        {
+            OrderBy.Ascending => Builders<Client>.Sort.Ascending(x => x.Name),
+            OrderBy.Descending => Builders<Client>.Sort.Descending(x => x.Name),
+            _ => throw new ArgumentOutOfRangeException(nameof(filters.OrderBy)),
+        };
+        return Collection.Find(filter).Sort(sort).Skip(filters.Skip).Limit(filters.Top).ToListAsync(cancellationToken);
     }
 
     public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)
@@ -51,7 +55,6 @@ public sealed class ClientRepository(
         {
             item.Id = ObjectId.GenerateNewId();
             item.CreatedAt = DateTime.UtcNow;
-            item.CreatedBy = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;
         }
 
         var update = Builders<Client>.Update.PushEach(x => x.Items, items);
@@ -154,7 +157,6 @@ public sealed class ClientRepository(
         client!.Plans?.Add(plans);
         plans.Amount = ind;
         client.UpdatedAt = DateTime.UtcNow;
-        client.UpdatedBy = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
         await UpdateOneAsync(client, cancellationToken);
         return plans;
     }
@@ -197,7 +199,6 @@ public sealed class ClientRepository(
             item.Id = ObjectId.GenerateNewId();
         plan.items = items;
 
-        plan.UpdatedBy = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
         plan.UpdatedAt = DateTime.UtcNow;
         var filter = Builders<Client>.Filter.And(
             Builders<Client>.Filter.Eq(c => c.Id, client.Id),
@@ -223,13 +224,24 @@ public sealed class ClientRepository(
 
     public async Task<List<PlansResponse>> GetClientPlans(
         ObjectId clientId,
-        int top,
-        int skip,
+        Filters filters,
         CancellationToken cancellationToken = default
     )
     {
         var client = await GetOneAsync(x => x.Id == clientId && !x.IsDeleted, cancellationToken);
-        var plans = client!.Plans!.Skip(skip).Take(top).Select(x => mapper.Map<PlansResponse>(x)).ToList();
+        var plans = client!
+            .Plans!.Skip(filters.Skip)
+            .Take(filters.Top)
+            .Select(x => mapper.Map<PlansResponse>(x))
+            .OrderBy(x =>
+                filters.OrderBy switch
+                {
+                    OrderBy.Ascending => x.StartDate,
+                    OrderBy.Descending => x.StartDate,
+                    _ => throw new ArgumentOutOfRangeException(nameof(filters.OrderBy)),
+                }
+            )
+            .ToList();
         return plans;
     }
 }

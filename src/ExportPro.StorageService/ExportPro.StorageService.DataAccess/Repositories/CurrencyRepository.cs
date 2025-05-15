@@ -12,21 +12,21 @@ public sealed class CurrencyRepository(ICollectionProvider collectionProvider)
     : BaseRepository<Currency>(collectionProvider),
         ICurrencyRepository
 {
-    public async Task<List<Currency>> GetPaginated(
-        int top,
-        int skip,
-        OrderBy orderBy,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<List<Currency>> GetPaginated(Filters filters, CancellationToken cancellationToken = default)
     {
         var filter = Builders<Currency>.Filter.Eq(x => x.IsDeleted, false);
-        var sort = orderBy switch
+        var sort = filters.OrderBy switch
         {
             OrderBy.Ascending => Builders<Currency>.Sort.Ascending(x => x.CurrencyCode),
             OrderBy.Descending => Builders<Currency>.Sort.Descending(x => x.CurrencyCode),
-            _ => throw new ArgumentOutOfRangeException(nameof(orderBy)),
+            _ => throw new ArgumentOutOfRangeException(nameof(filters.OrderBy)),
         };
-        return await Collection.Find(filter).Sort(sort).Skip(skip).Limit(top).ToListAsync(cancellationToken);
+        return await Collection
+            .Find(filter)
+            .Sort(sort)
+            .Skip(filters.Skip)
+            .Limit(filters.Top)
+            .ToListAsync(cancellationToken);
     }
 
     public Task<Currency?> GetCurrencyCodeById(ObjectId id)

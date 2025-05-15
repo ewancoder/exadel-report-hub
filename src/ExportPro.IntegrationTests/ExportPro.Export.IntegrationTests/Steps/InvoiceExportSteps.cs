@@ -26,11 +26,11 @@ public class InvoiceExportSteps
     private readonly IMongoDbContext<Customer> _mongoDbContextCustomer = new MongoDbContext<Customer>();
     private readonly IMongoDbContext<Client> _mongoDbContextClient = new MongoDbContext<Client>();
     private HttpResponseMessage _invoicepdf;
-    private ICountryApi _countryApi;
-    private ICurrencyApi _currencyApi;
-    private ICustomerApi _customerApi;
-    private IInvoiceApi _invoiceApi;
-    private IClientApi _clientApi;
+    private ICountryApi _countryController;
+    private ICurrencyApi _currencyController;
+    private ICustomerApi _customerController;
+    private IInvoiceApi _invoiceController;
+    private IClientApi _clientController;
     private IInvoiceExport _invoiceExport;
     private CreateInvoiceDto _invoiceDto;
     private Guid _countryId;
@@ -50,10 +50,10 @@ public class InvoiceExportSteps
         string jwtTokenForClient = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
         HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1200);
         var httpClientForClient = HttpClientForRefit.GetHttpClient(jwtTokenForClient, 1500);
-        _countryApi = RestService.For<ICountryApi>(httpClient);
-        _currencyApi = RestService.For<ICurrencyApi>(httpClient);
+        _countryController = RestService.For<ICountryApi>(httpClient);
+        _currencyController = RestService.For<ICurrencyApi>(httpClient);
         _invoiceExport = RestService.For<IInvoiceExport>(httpClient);
-        _invoiceApi = RestService.For<IInvoiceApi>(
+        _invoiceController = RestService.For<IInvoiceApi>(
             httpClient,
             new RefitSettings
             {
@@ -66,15 +66,15 @@ public class InvoiceExportSteps
                 ),
             }
         );
-        _customerApi = RestService.For<ICustomerApi>(httpClient);
-        _clientApi = RestService.For<IClientApi>(httpClientForClient);
+        _customerController = RestService.For<ICustomerApi>(httpClient);
+        _clientController = RestService.For<IClientApi>(httpClientForClient);
     }
 
     [Given("The user has valid client id")]
     public async Task GivenTheUserHasValidClientId()
     {
         ClientDto clientDto = new() { Name = "ClientISInvoiceTest######", Description = "Description" };
-        var clientResponse = await _clientApi.CreateClient(clientDto);
+        var clientResponse = await _clientController.CreateClient(clientDto);
         var clientExists = await _mongoDbContextClient
             .Collection.Find(x => x.Name == clientResponse.Data!.Name)
             .FirstOrDefaultAsync();
@@ -87,7 +87,7 @@ public class InvoiceExportSteps
     public async Task GivenTheUserCreatedFollowingCurrencyForInvoiceAndStoredTheCurrencyId(Table table)
     {
         CurrencyDto cur = table.CreateInstance<CurrencyDto>();
-        var currency = await _currencyApi.Create(cur);
+        var currency = await _currencyController.Create(cur);
         var currencyExists = await _mongoDbContextCurrency
             .Collection.Find(x =>
                 x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
@@ -102,7 +102,7 @@ public class InvoiceExportSteps
     public async Task GivenTheUserCreatedFollowingCurrencyForItemAndStoredTheCurrencyId(Table table)
     {
         CurrencyDto cur = table.CreateInstance<CurrencyDto>();
-        var currency = await _currencyApi.Create(cur);
+        var currency = await _currencyController.Create(cur);
         var currencyExists = await _mongoDbContextCurrency
             .Collection.Find(x =>
                 x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
@@ -118,7 +118,7 @@ public class InvoiceExportSteps
     {
         CreateCountryDto countryDto = table.CreateInstance<CreateCountryDto>();
         countryDto.CurrencyId = _currencyId;
-        var country = await _countryApi.Create(countryDto);
+        var country = await _countryController.Create(countryDto);
         var countryExists = await _mongoDbContextCountry
             .Collection.Find(x => x.Name == country.Data!.Name)
             .FirstOrDefaultAsync();
@@ -132,7 +132,7 @@ public class InvoiceExportSteps
     {
         CreateUpdateCustomerDto customerDto = table.CreateInstance<CreateUpdateCustomerDto>();
         customerDto.CountryId = _countryId;
-        var customer = await _customerApi.Create(customerDto);
+        var customer = await _customerController.Create(customerDto);
         var customerExists = await _mongoDbContextCustomer
             .Collection.Find(x => x.Name == customer.Data!.Name)
             .FirstOrDefaultAsync();
@@ -172,7 +172,7 @@ public class InvoiceExportSteps
     [Given("The user created invoice and  stored invoice id")]
     public async Task GivenTheUserCreatedInvoiceAndStoredInvoiceId()
     {
-        var invoice = await _invoiceApi.Create(_invoiceDto);
+        var invoice = await _invoiceController.Create(_invoiceDto);
         _invoiceId = invoice.Data!.Id;
     }
 

@@ -7,10 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.9"/>
-        <PackageReference Include="ExportPro.Auth.Service" Version="1.0.1"/>
-        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.29" />
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0-preview1"/>
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2"/>
         <PackageReference Include="Refit" Version="8.0.0"/>
         <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
@@ -23,8 +20,10 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0"/>
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\ExportPro.Auth\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj" />
+        <ProjectReference Include="..\..\ExportPro.Auth\ExportPro.AuthService\ExportPro.AuthService.csproj" />
+        <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
         <ProjectReference Include="..\ExportPro.StorageService.CQRS\ExportPro.StorageService.CQRS.csproj"/>
-        <ProjectReference Include="..\ExportPro.StorageService.Validations\ExportPro.StorageService.Validations.csproj"/>
     </ItemGroup>
     <ItemGroup>
       <None Include="Settings\serilogsettings.json" />

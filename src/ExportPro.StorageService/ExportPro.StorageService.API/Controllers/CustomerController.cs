@@ -6,6 +6,7 @@ using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
+using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ namespace ExportPro.StorageService.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CustomerController(IMediator mediator) : ControllerBase
+public class CustomerController(IMediator mediator) : ControllerBase, ICustomerController
 {
     [HttpPost]
     [HasPermission(Resource.Customers, CrudAction.Create)]
@@ -29,7 +30,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
         [FromBody] List<CreateUpdateCustomerDto> customers,
         CancellationToken cancellationToken
     ) => mediator.Send(new CreateCustomersCommand(customers), cancellationToken);
-    
+
     [HttpPut("{id}")]
     [HasPermission(Resource.Customers, CrudAction.Update)]
     public Task<BaseResponse<CustomerResponse>> Update(
@@ -51,8 +52,8 @@ public class CustomerController(IMediator mediator) : ControllerBase
     [HasPermission(Resource.Customers, CrudAction.Read)]
     [HttpGet]
     public Task<BaseResponse<PaginatedListDto<CustomerDto>>> GetAll(
-        CancellationToken cancellationToken,
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10
+        [FromQuery] int pageSize = 10,
+        CancellationToken cancellationToken = default
     ) => mediator.Send(new GetPaginatedCustomersQuery(pageNumber, pageSize), cancellationToken);
 }

@@ -40,4 +40,11 @@
         <UpToDateCheckBuild Remove="Features\CurrencyFeatures\CreateCurrency.feature.cs"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Features\CountryFeatures\" />
+      <Folder Include="Features\CurrencyFeatures\" />
+      <Folder Include="Steps\CountrySteps\" />
+      <Folder Include="Steps\CurrencySteps\" />
+    </ItemGroup>
+
 </Project>

@@ -1,7 +1,7 @@
 ﻿using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 using FluentValidation;
 
-namespace ExportPro.StorageService.Validations.Validations.Invoice;
+namespace ExportPro.StorageService.Api.Validations.Invoice;
 
 public class GetInvoiceCountQueryValidator : AbstractValidator<GetTotalInvoicesQuery>
 {

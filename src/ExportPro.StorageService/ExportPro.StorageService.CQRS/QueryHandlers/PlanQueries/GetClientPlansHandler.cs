@@ -2,11 +2,12 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 
-public sealed record GetClientPlansQuery(Guid ClientId, int Top, int Skip) : IQuery<List<PlansResponse>>;
+public sealed record GetClientPlansQuery(Guid ClientId, Filters Filters) : IQuery<List<PlansResponse>>;
 
 public sealed class GetClientsPlansQueryHandler(IClientRepository clientRepository)
     : IQueryHandler<GetClientPlansQuery, List<PlansResponse>>
@@ -24,8 +25,7 @@ public sealed class GetClientsPlansQueryHandler(IClientRepository clientReposito
             return new NotFoundResponse<List<PlansResponse>>("Client Not Found");
         var plans = await clientRepository.GetClientPlans(
             request.ClientId.ToObjectId(),
-            request.Top,
-            request.Skip,
+            request.Filters,
             cancellationToken
         );
         return new SuccessResponse<List<PlansResponse>>(plans, "Client plans retrieved successfully");
