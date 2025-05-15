@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 
-public sealed class GetAllCurrenciesQuery : IRequest<BaseResponse<List<CurrencyResponse>>> { }
+public sealed record GetAllCurrenciesQuery(int Top = 10, int Skip = 0, OrderBy OrderBy = OrderBy.Ascending)
+    : IRequest<BaseResponse<List<CurrencyResponse>>>;
 
 public sealed class GetAllCurrenciesHandler(ICurrencyRepository repository, IMapper mapper)
     : IRequestHandler<GetAllCurrenciesQuery, BaseResponse<List<CurrencyResponse>>>

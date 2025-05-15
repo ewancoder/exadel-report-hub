@@ -1,9 +1,10 @@
 namespace ExportPro.StorageService.SDK.Responses;
+
 public class RestCountries
 {
     public NameDto? Name { get; set; }
     public string? Cioc { get; set; }
-    public Dictionary<string, CurrencyDtoFromApi> Currencies { get; set; } = null!;
+    public Dictionary<string, CurrencyDtoFromApi>? Currencies { get; set; }
 }
 
 public class NameDto

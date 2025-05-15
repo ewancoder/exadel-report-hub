@@ -1,4 +1,5 @@
 using System.Text;
+using AutoMapper;
 using ExportPro.Common.DataAccess.MongoDB.Configurations;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Config;
@@ -71,14 +72,16 @@ builder.Services.AddCommonRegistrations();
 builder.Services.AddRepositoryConfig();
 builder.Services.AddScoped<ICurrencyExchangeService, CurrencyExchangeService>();
 builder.Services.AddCQRS();
-// builder.Services.AddScoped<SeedingData>();
+
+builder.Services.AddScoped<SeedingData>();
 var app = builder.Build();
-// using (var scope = app.Services.CreateScope())
-// {
-//     var repo = scope.ServiceProvider.GetRequiredService<ICountryRepository>();
-//     var seedingData = scope.ServiceProvider.GetRequiredService<SeedingData>();
-//     // await seedingData.SeedCountries(); 
-// }
+using (var scope = app.Services.CreateScope())
+{
+    var repo = scope.ServiceProvider.GetRequiredService<ICountryRepository>();
+    var seedingData = scope.ServiceProvider.GetRequiredService<SeedingData>();
+    var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+    await seedingData.SeedCountries();
+}
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseMiddleware<ErrorHandlingMiddleware>();
