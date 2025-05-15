@@ -45,7 +45,9 @@ public sealed class MappingProfile : Profile
         CreateMap<Customer, CustomerDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToGuid()))
             .ForMember(dest => dest.CountryId, src => src.MapFrom(x => x.CountryId.ToGuid()));
-        CreateMap<Country, CountryDto>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToGuid()));
+        CreateMap<Country, CountryDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToGuid()))
+            .ForMember(dest => dest.CurrencyId, src => src.MapFrom(x => x.CurrencyId.ToGuid()));
         CreateMap<Customer, CreateUpdateCustomerDto>()
             .ForMember(dest => dest.CountryId, opt => opt.MapFrom(src => src.CountryId.ToGuid()))
             .ReverseMap()

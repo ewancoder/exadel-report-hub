@@ -1,22 +1,24 @@
 ﻿using AutoMapper;
 using ExportPro.Common.Shared.Library;
+using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 
-public sealed class GetAllCurrenciesQuery : IRequest<BaseResponse<List<CurrencyResponse>>> { }
+public sealed record GetAllCurrenciesQuery(int Top, int Skip, OrderBy OrderBy) : IQuery<List<CurrencyResponse>>;
 
 public sealed class GetAllCurrenciesHandler(ICurrencyRepository repository, IMapper mapper)
-    : IRequestHandler<GetAllCurrenciesQuery, BaseResponse<List<CurrencyResponse>>>
+    : IQueryHandler<GetAllCurrenciesQuery, List<CurrencyResponse>>
 {
     public async Task<BaseResponse<List<CurrencyResponse>>> Handle(
         GetAllCurrenciesQuery request,
         CancellationToken cancellationToken
     )
     {
-        var currencies = await repository.GetAllAsync(cancellationToken);
+        var currencies = await repository.GetPaginated(request.Top, request.Skip, request.OrderBy, cancellationToken);
         var currency = currencies.Select(x => mapper.Map<CurrencyResponse>(x)).ToList();
         return new SuccessResponse<List<CurrencyResponse>>(currency, "Currencies retrieved successfully");
     }
