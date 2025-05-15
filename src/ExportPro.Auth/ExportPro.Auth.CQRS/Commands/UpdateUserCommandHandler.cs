@@ -1,9 +1,9 @@
 ﻿using ExportPro.AuthService.Repositories;
+using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.Common.Shared.Refit;
 using MongoDB.Bson;
 
 
@@ -11,7 +11,7 @@ namespace ExportPro.Auth.CQRS.Commands;
 
 public record UpdateUserCommand(ObjectId Id, ObjectId? ClientId, string Username, string Email, UserRole? Role, string Password) : ICommand<Guid>;
 
-public class UpdateUserCommandHandler(IUserRepository userRepository, IACLSharedApi aCLSharedApi)
+public class UpdateUserCommandHandler(IUserRepository userRepository, IACLService aCLService)
     : ICommandHandler<UpdateUserCommand, Guid>
 {
     public async Task<BaseResponse<Guid>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
@@ -30,7 +30,7 @@ public class UpdateUserCommandHandler(IUserRepository userRepository, IACLShared
 
         if(request.ClientId != null || request.Role != null)
         {
-            await aCLSharedApi.UpdateUserRoleAsync(request.Id.ToGuid(), request.ClientId.Value.ToGuid(), (UserRole)request.Role);
+            await aCLService.UpdateUserRole(request.Id, request.ClientId.Value, (UserRole)request.Role, cancellationToken);
         }
 
 

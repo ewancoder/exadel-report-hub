@@ -1,5 +1,6 @@
 ﻿using ExportPro.Auth.SDK.Models;
 using ExportPro.AuthService.Repositories;
+using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Helpers;
@@ -18,7 +19,7 @@ public record CreateUserCommand(string Username, string Email, string Password, 
     public CrudAction Action => CrudAction.Create;
 }
 
-public class CreateUserCommandHandler(IUserRepository userRepository, IACLSharedApi aclApi)
+public class CreateUserCommandHandler(IUserRepository userRepository, IACLService aclService)
     : ICommandHandler<CreateUserCommand, Guid>
 {
     public async Task<BaseResponse<Guid>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -34,7 +35,7 @@ public class CreateUserCommandHandler(IUserRepository userRepository, IACLShared
         var createdUser = await userRepository.AddOneAsync(user, cancellationToken);
         if (request.ClientId != null && request.UserRole != null)
         {
-            await aclApi.GrantPermissionAsync(createdUser.Id.ToGuid(), (Guid)request.ClientId, (UserRole)request.UserRole);
+            await aclService.GrantPermission(createdUser.Id, ((Guid)request.ClientId).ToObjectId(), (UserRole)request.UserRole, cancellationToken);
         }
 
         return new SuccessResponse<Guid>
