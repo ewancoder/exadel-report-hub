@@ -1,13 +1,19 @@
 ﻿using ClosedXML.Excel;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
+using ExportPro.Export.Excel.Constants;
 
 namespace ExportPro.Export.Excel.Services;
 
 public sealed class CustomerExcelParser : ICustomerExcelParser
 {
     private static readonly string[] RequiredColumns =
-        ["Name", "Email", "Address", "CountryId"];
+    [
+        CustomerColumns.Name,
+        CustomerColumns.Email,
+        CustomerColumns.Address,
+        CustomerColumns.CountryId
+    ];
 
     public List<CreateUpdateCustomerDto> Parse(Stream excelStream)
     {
@@ -26,7 +32,7 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
 
         // do not use Exception, use concrete exception
         if (customers.Count == 0)
-            throw new Exception("No valid rows found.");
+            throw new InvalidDataException("No valid rows found.");
 
         return customers;
     }
@@ -50,7 +56,7 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
     {
         var missingColumns = RequiredColumns.Where(r => !columnMap.ContainsKey(r)).ToArray();
         if (missingColumns.Length > 0)
-            throw new Exception($"Missing columns: {string.Join(", ", missingColumns)}");
+            throw new InvalidDataException($"Missing columns: {string.Join(", ", missingColumns)}");
     }
 
     private List<CreateUpdateCustomerDto> ProcessRows(IXLWorksheet worksheet,
@@ -69,11 +75,11 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
 
     private CreateUpdateCustomerDto? ParseRow(IXLRow row, IReadOnlyDictionary<string, int> columnMap)
     {
-        var name = row.Cell(columnMap["Name"]).GetString().Trim();
-        var email = row.Cell(columnMap["Email"]).GetString().Trim();
-        var addr = row.Cell(columnMap["Address"]).GetString().Trim();
-        var cidStr = row.Cell(columnMap["CountryId"]).GetString().Trim();
-        
+        var name = row.Cell(columnMap[CustomerColumns.Name]).GetString().Trim();
+        var email = row.Cell(columnMap[CustomerColumns.Email]).GetString().Trim();
+        var addr = row.Cell(columnMap[CustomerColumns.Address]).GetString().Trim();
+        var cidStr = row.Cell(columnMap[CustomerColumns.CountryId]).GetString().Trim();
+
         if (AllBlank(name, email, addr, cidStr))
             return null; // blank row
 
