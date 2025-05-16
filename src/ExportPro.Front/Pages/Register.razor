@@ -1,0 +1,46 @@
+﻿@page "/register"
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Nav
+
+<div class="login-wrapper">
+    <div class="login-page">
+        <EditForm Model="@registerModel" OnValidSubmit="HandleRegister">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <img src="Exadel_logo_new.png" alt="Exadel Logo" class="login-logo" />
+
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <InputText @bind-Value="registerModel.Username" id="username" class="form-control" />
+                <ValidationMessage For="@(() => registerModel.Username)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <InputText @bind-Value="registerModel.Email" id="email" class="form-control" />
+                <ValidationMessage For="@(() => registerModel.Email)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <InputText @bind-Value="registerModel.Password" id="password" type="password" class="form-control" />
+                <ValidationMessage For="@(() => registerModel.Password)" />
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100 mt-2">Register</button>
+            <button type="button" class="btn btn-dark w-100" @onclick="NavigateToLogin">Back to Login</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private ExportPro.Front.Models.RegisterModel registerModel = new();
+
+    private Task HandleRegister()
+    {
+        return Task.CompletedTask;
+    }
+
+    private void NavigateToLogin() => Nav.NavigateTo("/login");
+}

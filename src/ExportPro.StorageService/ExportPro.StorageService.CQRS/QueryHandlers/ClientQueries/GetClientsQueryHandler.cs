@@ -34,9 +34,11 @@ public class GetClientsQueryHandler(IClientRepository clientRepository, IMapper 
             return new SuccessResponse<List<ClientResponse>>([.. allClients.Select(x => mapper.Map<ClientResponse>(x))]);
         }
         var availableClients = await aclApi.GetUserClientsAsync(cancellationToken);
-        var clientIds = availableClients.Data
+        var clientIds = availableClients?.Data?
                             .Select(id => id.ToObjectId())
                             .ToList();
+        if(clientIds == null)
+            return new BadRequestResponse<List<ClientResponse>>("Clients not found");
         var clients = await clientRepository.GetClientsByIdsAsync(clientIds, request.Top, request.Skip, cancellationToken);
         if (clients.Count == 0)
             return new BadRequestResponse<List<ClientResponse>>("There is no such document");

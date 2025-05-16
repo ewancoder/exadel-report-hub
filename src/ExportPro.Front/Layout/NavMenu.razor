@@ -1,43 +1,47 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">
-            <img src="Exadel_logo_new.png" alt="Logo" class="logo" />
-        </a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿<AuthorizeView>
+    <Authorized>
+        <div class="top-row ps-3 navbar navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="">
+                    <img src="Exadel_logo_new.png" alt="Logo" class="logo" />
+                </a>
+                <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center" href="">
-                <i class="bi bi-speedometer2 me-2 icon-align"></i>
-                <span class="nav-label">Dashboard</span>
-            </NavLink>
+        <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+            <nav class="nav flex-column">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link d-flex align-items-center" href="">
+                        <i class="bi bi-speedometer2 me-2 icon-align"></i>
+                        <span class="nav-label">Dashboard</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link d-flex align-items-center" href="clients">
+                        <i class="bi bi-people me-2 icon-align"></i>
+                        <span class="nav-label">Clients</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link d-flex align-items-center" href="items">
+                        <i class="bi bi-box me-2 icon-align"></i>
+                        <span class="nav-label">Items</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link d-flex align-items-center" href="invoices">
+                        <i class="bi bi-receipt me-2 icon-align"></i>
+                        <span class="nav-label">Invoices</span>
+                    </NavLink>
+                </div>
+            </nav>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center" href="clients">
-                <i class="bi bi-people me-2 icon-align"></i>
-                <span class="nav-label">Clients</span>
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center" href="items">
-                <i class="bi bi-box me-2 icon-align"></i>
-                <span class="nav-label">Items</span>
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center" href="invoices">
-                <i class="bi bi-receipt me-2 icon-align"></i>
-                <span class="nav-label">Invoices</span>
-            </NavLink>
-        </div>
-    </nav>
-</div>
 
+    </Authorized>
+</AuthorizeView>
 
 
 
