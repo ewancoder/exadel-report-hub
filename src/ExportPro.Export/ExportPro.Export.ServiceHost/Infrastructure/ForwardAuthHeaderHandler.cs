@@ -13,9 +13,11 @@ public class ForwardAuthHeaderHandler(IHttpContextAccessor accessor) : Delegatin
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        var incoming = accessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+        var incoming = accessor.HttpContext?.Request.Headers.Authorization.FirstOrDefault();
+        
         if (!string.IsNullOrWhiteSpace(incoming))
             request.Headers.Authorization = AuthenticationHeaderValue.Parse(incoming);
+        
         return base.SendAsync(request, cancellationToken);
     }
 }

@@ -27,12 +27,73 @@ public static class ExportServiceCollectionExtensions
 {
     public static IServiceCollection AddExportModule(this IServiceCollection services, IConfiguration cfg)
     {
-        // —— common / swagger ——
         services.AddCommonRegistrations();
-        services.AddOpenApi();
-        services.AddSwaggerServices("ExportPro Export Service");
+        ConfigureSwaggerServices(services);
+        ConfigureJwtAuthentication(services, cfg);
+        ConfigureMongoServices(services);
+        RegisterExportServices(services);
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        services.AddAutoMapper(typeof(MappingProfile));
+        ConfigurePdfGeneration(services);
+        ConfigureReportServices(services);
+        services.AddHttpContextAccessor();
+        services.AddTransient<ForwardAuthHeaderHandler>();
+        ConfigureStorageServiceClient(services);
+        return services;
+    }
 
-        // —— auth ——
+    private static void ConfigureStorageServiceClient(IServiceCollection services)
+    {
+        var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
+        Console.WriteLine(baseUrl);
+        services
+            .AddRefitClient<IStorageServiceApi>(
+                new RefitSettings
+                {
+                    ContentSerializer = new NewtonsoftJsonContentSerializer(
+                        new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                        }
+                    ),
+                }
+            )
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+            .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
+    }
+
+    private static void ConfigureReportServices(IServiceCollection services)
+    {
+        services.AddSingleton<IReportGenerator, CsvReportGenerator>();
+        services.AddSingleton<IReportGenerator, ExcelReportGenerator>();
+        services.AddSingleton<ICustomerExcelParser, CustomerExcelParser>();
+    }
+
+    private static void ConfigurePdfGeneration(IServiceCollection services)
+    {
+        services.AddSingleton<IPdfGenerator, PdfGenerator>();
+        Settings.License = LicenseType.Community;
+    }
+
+    private static void RegisterExportServices(IServiceCollection services)
+    {
+        services.AddMediatR(o =>
+        {
+            o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly);
+            o.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
+            o.AddOpenBehavior(typeof(ValidationBehavior<,>));
+        });
+    }
+
+    private static void ConfigureMongoServices(IServiceCollection services)
+    {
+        services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
+        services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
+    }
+
+    private static void ConfigureJwtAuthentication(IServiceCollection services, IConfiguration cfg)
+    {
         var jwt = cfg.GetSection("JwtSettings").Get<JwtSettings>();
         services
             .AddAuthentication(o => o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
@@ -51,61 +112,11 @@ public static class ExportServiceCollectionExtensions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt!.Secret)),
                 };
             });
+    }
 
-        // —— Mongo ——
-        services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
-        services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
-
-        // // —— MediatR ——
-        services.AddMediatR(o =>
-        {
-            o.RegisterServicesFromAssemblies(typeof(GenerateInvoicePdfQuery).Assembly, typeof(IPdfGenerator).Assembly);
-            o.AddOpenBehavior(typeof(ExportLoggingBehavior<,>));
-            o.AddOpenBehavior(typeof(ValidationBehavior<,>));
-        });
-
-        // —— MediatR ——
-        // services.AddMediatR(o => o.RegisterServicesFromAssemblies(
-        //     typeof(GenerateInvoicePdfQuery).Assembly,
-        //     typeof(IPdfGenerator).Assembly));
-
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-
-        // —— AutoMapper ——
-        services.AddAutoMapper(typeof(MappingProfile));
-
-        // —— PDF ——
-        services.AddSingleton<IPdfGenerator, PdfGenerator>();
-        Settings.License = LicenseType.Community;
-
-        // —— CSV / XLSX generators ——
-        services.AddSingleton<IReportGenerator, CsvReportGenerator>();
-        services.AddSingleton<IReportGenerator, ExcelReportGenerator>();
-        services.AddSingleton<ICustomerExcelParser, CustomerExcelParser>();
-
-        // —— HttpContext / auth forwarding ——
-        services.AddHttpContextAccessor();
-        services.AddTransient<ForwardAuthHeaderHandler>();
-
-        // —— Refit client to Storage-service ——
-        var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
-        Console.WriteLine(baseUrl);
-        services
-            .AddRefitClient<IStorageServiceApi>(
-                new RefitSettings
-                {
-                    ContentSerializer = new NewtonsoftJsonContentSerializer(
-                        new JsonSerializerSettings
-                        {
-                            NullValueHandling = NullValueHandling.Ignore,
-                            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                        }
-                    ),
-                }
-            )
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
-            .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
-
-        return services;
+    private static void ConfigureSwaggerServices(IServiceCollection services)
+    {
+        services.AddOpenApi();
+        services.AddSwaggerServices("ExportPro Export Service");
     }
 }
