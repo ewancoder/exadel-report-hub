@@ -41,6 +41,7 @@ public sealed class ReportSchedulerJob(
         {
             if (!IsTimeToSend(pref))
                 continue;
+
             var baseUrlForexport =
                 Environment.GetEnvironmentVariable("DockerForReport") ?? configuration["ExportReportURI"];
             HttpClient httpClient = new()
