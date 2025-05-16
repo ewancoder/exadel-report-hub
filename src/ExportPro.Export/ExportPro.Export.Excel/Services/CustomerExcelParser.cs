@@ -30,7 +30,6 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
     {
         var customers = ProcessRows(ws, columnMap);
 
-        // do not use Exception, use concrete exception
         if (customers.Count == 0)
             throw new InvalidDataException("No valid rows found.");
 
