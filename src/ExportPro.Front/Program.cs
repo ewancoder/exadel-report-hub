@@ -15,7 +15,7 @@ builder.Services.AddScoped(sp =>
 {
     var httpClient = new HttpClient
     {
-        BaseAddress = new Uri("http://localhost:1200/") 
+        BaseAddress = new Uri("https://localhost:7067/") 
     };
     return new ApiHelper(httpClient);
 });

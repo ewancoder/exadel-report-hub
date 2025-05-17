@@ -1,37 +1,39 @@
-﻿using System.Net.Http.Json;
+﻿using ExportPro.Front.Models;
+using System.Net.Http.Json;
 
 namespace ExportPro.Front.Helper
 {
     public class ApiHelper(HttpClient httpClient)
     {
+        private readonly HttpClient _httpClient = httpClient;
 
-        public async Task<T> GetAsync<T>(string url)
+        public async Task<Result<T>> GetAsync<T>(string url)
         {
-            var response = await httpClient.GetAsync(url);
+            var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<T>()
+            return await response.Content.ReadFromJsonAsync<Result<T>>()
                    ?? throw new InvalidOperationException("Response was null");
         }
 
-        public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest data)
+        public async Task<Result<TResponse>> PostAsync<TRequest, TResponse>(string url, TRequest data)
         {
-            var response = await httpClient.PostAsJsonAsync(url, data);
+            var response = await _httpClient.PostAsJsonAsync(url, data);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<TResponse>()
+            return await response.Content.ReadFromJsonAsync<Result<TResponse>>()
                    ?? throw new InvalidOperationException("Response was null");
         }
 
-        public async Task<TResponse> PutAsync<TRequest, TResponse>(string url, TRequest data)
+        public async Task<Result<TResponse>> PutAsync<TRequest, TResponse>(string url, TRequest data)
         {
-            var response = await httpClient.PutAsJsonAsync(url, data);
+            var response = await _httpClient.PutAsJsonAsync(url, data);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<TResponse>()
+            return await response.Content.ReadFromJsonAsync<Result<TResponse>>()
                    ?? throw new InvalidOperationException("Response was null");
         }
 
         public async Task DeleteAsync(string url)
         {
-            var response = await httpClient.DeleteAsync(url);
+            var response = await _httpClient.DeleteAsync(url);
             response.EnsureSuccessStatusCode();
         }
     }
