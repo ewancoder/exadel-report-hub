@@ -1,5 +1,7 @@
 using ExportPro.Auth.CQRS.Commands;
+using ExportPro.Auth.SDK.Behaviors;
 using ExportPro.Auth.ServiceHost.Extensions;
+using ExportPro.AuthService.Behaviors;
 using ExportPro.AuthService.Repositories;
 using ExportPro.AuthService.Services;
 using ExportPro.Common.DataAccess.MongoDB.Contexts;
@@ -22,7 +24,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddScoped<ExportProMongoContext>();
 builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LocalAuthorizationBehavior<,>));
 builder.Services.AddScoped<IACLRepository, ACLRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
