@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
 	  <PackageId>ExportPro.Auth.SDK</PackageId>
-	  <Version>1.0.4</Version>
+	  <Version>1.0.9</Version>
 	  <Authors>Exadel-Group-3</Authors>
 	  <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -11,10 +11,13 @@
 
   <ItemGroup>
     <PackageReference Include="ExportPro.Common.Models.MongoDB" Version="1.0.0" />
-    <PackageReference Include="ExportPro.Common.Shared" Version="1.0.5" />
     <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
     <PackageReference Include="Refit" Version="8.0.0" />
     <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
   </ItemGroup>
 </Project>

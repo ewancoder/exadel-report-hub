@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Export.CQRS", "ExportPro.Export.CQRS", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.CQRS", "ExportPro.Export.CQRS\ExportPro.Export.CQRS.csproj", "{79120522-9984-1285-D7EB-4932AC627811}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Export.Csv", "ExportPro.Export.Csv", "{BF11203A-62EF-4CED-AD5D-19E9B5071149}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.Csv", "ExportPro.Export.Csv\ExportPro.Export.Csv.csproj", "{B9930716-93AF-BA79-9C94-6484993B1A80}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Export.Excel", "ExportPro.Export.Excel", "{21994348-249C-4B1F-821E-E1068038E551}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.Excel", "ExportPro.Export.Excel\ExportPro.Export.Excel.csproj", "{CE995EE5-E614-DFF2-721B-4F9A78A0D59F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Export.Pdf", "ExportPro.Export.Pdf", "{D3A12234-8EC8-4E8A-88A5-1F119372FA9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.Pdf", "ExportPro.Export.Pdf\ExportPro.Export.Pdf.csproj", "{C68FB21D-4194-3F9C-CFA5-14ADC716F138}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Export.SDK", "ExportPro.Export.SDK", "{3BDD2E6B-D927-4C9B-9FE4-EF4A64203032}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.SDK", "ExportPro.Export.SDK\ExportPro.Export.SDK.csproj", "{7DA28C7D-EC2E-7D1C-230F-BF9FAC7AA004}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExportPro.Export.ServiceHost", "ExportPro.Export.ServiceHost", "{27E25451-3319-48BA-8D60-16724C38903B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.Export.ServiceHost", "ExportPro.Export.ServiceHost\ExportPro.Export.ServiceHost.csproj", "{4476E3C4-00DE-70A4-CA12-A83F1475508E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{79120522-9984-1285-D7EB-4932AC627811}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79120522-9984-1285-D7EB-4932AC627811}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79120522-9984-1285-D7EB-4932AC627811}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79120522-9984-1285-D7EB-4932AC627811}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9930716-93AF-BA79-9C94-6484993B1A80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9930716-93AF-BA79-9C94-6484993B1A80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9930716-93AF-BA79-9C94-6484993B1A80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9930716-93AF-BA79-9C94-6484993B1A80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE995EE5-E614-DFF2-721B-4F9A78A0D59F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE995EE5-E614-DFF2-721B-4F9A78A0D59F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE995EE5-E614-DFF2-721B-4F9A78A0D59F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE995EE5-E614-DFF2-721B-4F9A78A0D59F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C68FB21D-4194-3F9C-CFA5-14ADC716F138}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C68FB21D-4194-3F9C-CFA5-14ADC716F138}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C68FB21D-4194-3F9C-CFA5-14ADC716F138}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C68FB21D-4194-3F9C-CFA5-14ADC716F138}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DA28C7D-EC2E-7D1C-230F-BF9FAC7AA004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DA28C7D-EC2E-7D1C-230F-BF9FAC7AA004}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DA28C7D-EC2E-7D1C-230F-BF9FAC7AA004}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DA28C7D-EC2E-7D1C-230F-BF9FAC7AA004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4476E3C4-00DE-70A4-CA12-A83F1475508E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4476E3C4-00DE-70A4-CA12-A83F1475508E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4476E3C4-00DE-70A4-CA12-A83F1475508E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4476E3C4-00DE-70A4-CA12-A83F1475508E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{79120522-9984-1285-D7EB-4932AC627811} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{B9930716-93AF-BA79-9C94-6484993B1A80} = {BF11203A-62EF-4CED-AD5D-19E9B5071149}
+		{CE995EE5-E614-DFF2-721B-4F9A78A0D59F} = {21994348-249C-4B1F-821E-E1068038E551}
+		{C68FB21D-4194-3F9C-CFA5-14ADC716F138} = {D3A12234-8EC8-4E8A-88A5-1F119372FA9A}
+		{7DA28C7D-EC2E-7D1C-230F-BF9FAC7AA004} = {3BDD2E6B-D927-4C9B-9FE4-EF4A64203032}
+		{4476E3C4-00DE-70A4-CA12-A83F1475508E} = {27E25451-3319-48BA-8D60-16724C38903B}
+	EndGlobalSection
+EndGlobal

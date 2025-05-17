@@ -1,6 +1,5 @@
 ﻿using System.Net;
 
-
 namespace ExportPro.Common.Shared.Library;
 
 public class NotFoundResponse : BaseResponse
@@ -26,4 +25,3 @@ public class NotFoundResponse<T> : BaseResponse<T>
         Messages?.Add(message);
     }
 }
-

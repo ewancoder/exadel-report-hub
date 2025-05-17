@@ -1,17 +1,17 @@
-﻿
-
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 
 namespace ExportPro.Common.Shared.Exceptions
 {
-    public class ValidationException: Exception
+    public class ValidationException : Exception
     {
-        public ValidationException() : base("One or more validation errors.")
+        public ValidationException()
+            : base("One or more validation errors.")
         {
             Failures = new Dictionary<string, string[]>();
         }
 
-        public ValidationException(List<ValidationFailure> failures) : this()
+        public ValidationException(List<ValidationFailure> failures)
+            : this()
         {
             var propNames = failures.Select(e => e.PropertyName).Distinct();
 
@@ -23,7 +23,6 @@ namespace ExportPro.Common.Shared.Exceptions
                     .ToArray();
 
                 Failures.Add(propName, propFailures);
-
             }
         }
 
