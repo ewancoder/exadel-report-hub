@@ -4,11 +4,11 @@ using FluentValidation;
 
 namespace ExportPro.StorageService.Api.Validations.Client;
 
-public sealed class UpdateClientCommandValidator : AbstractValidator<UpdateClientCommand>
+public class CreateClientCommandValidator : AbstractValidator<CreateClientCommand>
 {
-    public UpdateClientCommandValidator(IClientRepository clientRepository)
+    public CreateClientCommandValidator(IClientRepository clientRepository)
     {
-        RuleFor(x => x.Client.Name)
+        RuleFor(x => x.ClientDto.Name)
             .MustAsync(
                 async (name, cancellationToken) =>
                 {

@@ -15,20 +15,5 @@ public sealed class ClientDtoValidator : AbstractValidator<ClientDto>
             .WithMessage("Name must be at least 3 characters long")
             .MaximumLength(50)
             .WithMessage("Name must not exceed 50 characters");
-        // .DependentRules(() =>
-        // {
-        //     RuleFor(x => x.Name)
-        //         .MustAsync(
-        //             async (name, cancellationToken) =>
-        //             {
-        //                 var client = await clientRepository.GetOneAsync(
-        //                     x => x.Name == name && !x.IsDeleted,
-        //                     cancellationToken
-        //                 );
-        //                 return client == null;
-        //             }
-        //         )
-        //         .WithMessage("Client with this name already exists");
-        // });
     }
 }

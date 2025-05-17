@@ -18,16 +18,19 @@ public sealed class ClientRepository(ICollectionProvider collectionProvider, IMa
     : BaseRepository<Client>(collectionProvider),
         IClientRepository
 {
-    public Task<List<Client>> GetClients(Filters filters, CancellationToken cancellationToken = default)
+    public Task<PaginatedList<ClientResponse>> GetClients(
+        PaginationParameters paginationParameters,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<Client>.Filter.Eq(x => x.IsDeleted, false);
-        var sort = filters.OrderBy switch
-        {
-            OrderBy.Ascending => Builders<Client>.Sort.Ascending(x => x.Name),
-            OrderBy.Descending => Builders<Client>.Sort.Descending(x => x.Name),
-            _ => throw new ArgumentOutOfRangeException(nameof(filters.OrderBy)),
-        };
-        return Collection.Find(filter).Sort(sort).Skip(filters.Skip).Limit(filters.Top).ToListAsync(cancellationToken);
+        var clients = Collection.Find(filter).ToList();
+        var clientsResponse = clients.Select(x => mapper.Map<ClientResponse>(x)).ToList();
+        var paginatedList = clientsResponse.ToPaginatedList(
+            paginationParameters.PageNumber,
+            paginationParameters.PageSize
+        );
+        return Task.FromResult(paginatedList);
     }
 
     public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)

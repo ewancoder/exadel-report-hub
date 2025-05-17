@@ -65,6 +65,7 @@ public sealed class GetAllInvoicesHandler(
                         IssueDate = invoice.IssueDate,
                         DueDate = invoice.DueDate,
                         Currency = currency,
+                        CreatedBy = invoice.CreatedBy,
                         PaymentStatus = invoice.PaymentStatus,
                         BankAccountNumber = invoice.BankAccountNumber,
                         ClientId = invoice.ClientId.ToGuid(),

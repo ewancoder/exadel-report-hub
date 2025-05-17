@@ -15,21 +15,16 @@ public class CountryController(IMediator mediator) : ControllerBase, ICountryCon
     [HttpGet("name/{countryCode}")]
     public Task<BaseResponse<CountryDto>> GetByCode(
         [FromRoute] string countryCode,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     ) => mediator.Send(new GetCountryByCodeQuery(countryCode), cancellationToken);
 
     [HttpGet("{id}")]
-    public Task<BaseResponse<CountryDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken) =>
+    public Task<BaseResponse<CountryDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken = default) =>
         mediator.Send(new GetCountryByIdQuery(id), cancellationToken);
 
     [HttpGet]
     public Task<BaseResponse<PaginatedListDto<CountryDto>>> GetAll(
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10,
+        [FromQuery] PaginationParameters paginationParameters,
         CancellationToken cancellationToken = default
-    ) =>
-        mediator.Send(
-            new GetPaginatedCountriesQuery { PageNumber = pageNumber, PageSize = pageSize },
-            cancellationToken
-        );
+    ) => mediator.Send(new GetPaginatedCountriesQuery(paginationParameters), cancellationToken);
 }

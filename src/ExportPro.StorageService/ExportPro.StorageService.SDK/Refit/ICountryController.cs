@@ -15,8 +15,7 @@ public interface ICountryController
 
     [Get("/api/Country")]
     Task<BaseResponse<PaginatedListDto<CountryDto>>> GetAll(
-        int pageNumber = 1,
-        int pageSize = 10,
+        [Query] PaginationParameters paginationParameters,
         CancellationToken cancellationToken = default
     );
 }

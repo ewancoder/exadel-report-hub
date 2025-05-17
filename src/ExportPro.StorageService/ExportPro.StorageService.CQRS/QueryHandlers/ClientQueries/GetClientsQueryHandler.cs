@@ -3,22 +3,22 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.ClientQueries;
 
-public sealed record GetClientsQuery(Filters Filters) : IQuery<List<ClientResponse>>;
+public sealed record GetClientsQuery(PaginationParameters PaginationParameters) : IQuery<PaginatedList<ClientResponse>>;
 
 public sealed class GetClientsQueryHandler(IClientRepository clientRepository, IMapper mapper)
-    : IQueryHandler<GetClientsQuery, List<ClientResponse>>
+    : IQueryHandler<GetClientsQuery, PaginatedList<ClientResponse>>
 {
-    public async Task<BaseResponse<List<ClientResponse>>> Handle(
+    public async Task<BaseResponse<PaginatedList<ClientResponse>>> Handle(
         GetClientsQuery request,
         CancellationToken cancellationToken
     )
     {
-        var clients = await clientRepository.GetClients(request.Filters, cancellationToken);
-        var clientsResponse = clients.Select(x => mapper.Map<ClientResponse>(x)).ToList();
-        return new SuccessResponse<List<ClientResponse>>(clientsResponse, "Clients Retrieved");
+        var clients = await clientRepository.GetClients(request.PaginationParameters, cancellationToken);
+        return new SuccessResponse<PaginatedList<ClientResponse>>(clients, "Clients Retrieved");
     }
 }

@@ -41,10 +41,10 @@ public class ClientController(IMediator mediator) : ControllerBase, IClientContr
     [SwaggerOperation(Summary = "Getting  clients")]
     [ProducesResponseType(typeof(List<ClientResponse>), 200)]
     [HasPermission(Resource.Clients, CrudAction.Read)]
-    public Task<BaseResponse<List<ClientResponse>>> GetClients(
-        [FromQuery] Filters filters,
+    public Task<BaseResponse<PaginatedList<ClientResponse>>> GetClients(
+        [FromQuery] PaginationParameters paginationParameters,
         CancellationToken cancellationToken = default
-    ) => mediator.Send(new GetClientsQuery(filters), cancellationToken);
+    ) => mediator.Send(new GetClientsQuery(paginationParameters), cancellationToken);
 
     [HttpGet("{clientId}")]
     [SwaggerOperation(Summary = "Getting  client by client id")]

@@ -26,18 +26,18 @@ public sealed class ReportExportController(IMediator mediator) : ControllerBase
         return File(file.Content, file.ContentType, file.FileName);
     }
 
-    [HttpGet("invoice")]
-    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<FileResult> Invoice(
-        [Required] [FromQuery] ReportFormat format,
-        [Required] [FromQuery] Guid clientId,
-        [Required] [FromQuery] Guid clientCurrencyId,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var filters = new ReportFilterDto { ClientId = clientId, ClientCurrencyId = clientCurrencyId };
-        var file = await mediator.Send(new GenerateReportQuery(format, filters), cancellationToken);
-        return File(file.Content, file.ContentType, file.FileName);
-    }
+    // [HttpGet("invoice")]
+    // [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status404NotFound)]
+    // public async Task<FileResult> Invoice(
+    //     [Required] [FromQuery] ReportFormat format,
+    //     [Required] [FromQuery] Guid clientId,
+    //     [Required] [FromQuery] Guid clientCurrencyId,
+    //     CancellationToken cancellationToken = default
+    // )
+    // {
+    //     var filters = new ReportFilterDto { ClientId = clientId, ClientCurrencyId = clientCurrencyId };
+    //     var file = await mediator.Send(new GenerateReportQuery(format, filters), cancellationToken);
+    //     return File(file.Content, file.ContentType, file.FileName);
+    // }
 }

@@ -2,6 +2,7 @@
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 using Refit;
 
@@ -16,5 +17,8 @@ public interface ICurrencyController
     Task<BaseResponse<CurrencyResponse>> GetById(Guid id, CancellationToken cancellationToken = default);
 
     [Get("/api/Currency")]
-    Task<BaseResponse<List<CurrencyResponse>>> GetAll(Filters filters, CancellationToken cancellationToken = default);
+    Task<BaseResponse<PaginatedList<CurrencyResponse>>> GetAll(
+        [Query] PaginationParameters paginationParameters,
+        CancellationToken cancellationToken = default
+    );
 }

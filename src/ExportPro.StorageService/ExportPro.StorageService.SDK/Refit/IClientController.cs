@@ -18,7 +18,10 @@ public interface IClientController
     );
 
     [Get("/api/client")]
-    Task<BaseResponse<List<ClientResponse>>> GetClients(Filters filters, CancellationToken cancellationToken = default);
+    Task<BaseResponse<PaginatedList<ClientResponse>>> GetClients(
+        PaginationParameters paginationParameters,
+        CancellationToken cancellationToken = default
+    );
 
     [Get("/api/client/{clientId}")]
     Task<BaseResponse<ClientResponse>> GetClientById(Guid clientId, CancellationToken cancellationToken = default);
