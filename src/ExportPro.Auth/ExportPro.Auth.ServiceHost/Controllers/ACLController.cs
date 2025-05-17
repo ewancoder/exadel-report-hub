@@ -23,7 +23,7 @@ namespace ExportPro.Auth.ServiceHost.Controllers
              mediator.Send(new HasPermissionQuery((Guid)request.UserId, request.ClientId, request.Resource, request.Action));
 
         [HttpGet("{userId}/{clientId}")]
-        public Task<BaseResponse<List<PermissionDTO>>> GetPermissions([FromRoute]string userId, [FromRoute] string clientId) =>
+        public Task<BaseResponse<List<PermissionDTO>>> GetPermissions([FromRoute]Guid userId, [FromRoute] Guid clientId) =>
              mediator.Send(new GetUserClientPermissionsQuery(userId, clientId));
         
         [HttpPost("grant/{userId}/{clientId}/{role}")]
