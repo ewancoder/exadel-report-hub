@@ -1,5 +1,4 @@
 using ExportPro.Auth.CQRS.Commands;
-using ExportPro.Auth.SDK.Behaviors;
 using ExportPro.Auth.ServiceHost.Extensions;
 using ExportPro.AuthService.Behaviors;
 using ExportPro.AuthService.Repositories;
