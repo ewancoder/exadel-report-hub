@@ -128,7 +128,7 @@ public sealed class GetOverduePaymentsQueryHandler(
         var result = new OverduePaymentsResponse
         {
             OverdueInvoicesCount = overdueInvoices.Count,
-            TotalOverdueAmount = (double?)totalAmount,
+            TotalOverdueAmount = totalAmount,
         };
 
         logger.Information("Successfully handled GetOverduePaymentsQuery for ClientId: {ClientId}", request.ClientId);
