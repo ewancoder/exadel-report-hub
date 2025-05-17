@@ -24,7 +24,7 @@ namespace ExportPro.Auth.ServiceHost.Controllers
 
         [HttpGet("{userId}/{clientId}")]
         public Task<BaseResponse<List<PermissionDTO>>> GetPermissions([FromRoute]Guid userId, [FromRoute] Guid clientId) =>
-             mediator.Send(new GetUserClientPermissionsQuery(userId, clientId));
+             mediator.Send(new GetUserClientPermissionsQuery(userId.ToObjectId(), clientId.ToObjectId());
         
         [HttpPost("grant/{userId}/{clientId}/{role}")]
         public Task<BaseResponse<bool>> GrantPermission([FromRoute] Guid clientId, [FromRoute] Guid userId, [FromRoute] UserRole role) =>
