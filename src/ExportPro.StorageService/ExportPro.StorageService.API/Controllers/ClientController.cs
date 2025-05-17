@@ -11,6 +11,8 @@ using ExportPro.StorageService.CQRS.QueryHandlers.ItemQueries;
 using ExportPro.StorageService.CQRS.QueryHandlers.PlanQueries;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
@@ -74,7 +76,17 @@ public class ClientController(IMediator mediator) : ControllerBase, IClientContr
     ) => mediator.Send(new SoftDeleteClientCommand(clientId.ToObjectId()), cancellationToken);
 
     [HttpGet("{clientId}/items")]
-    [SwaggerOperation(Summary = "Get all items for a client")]
+    [SwaggerOperation(Summary = "Get all items of a client")]
+    [ProducesResponseType(typeof(List<ItemResponse>), 200)]
+    [HasPermission(Resource.Items, CrudAction.Read)]
+    public Task<BaseResponse<PaginatedList<ItemResponse>>> GetClientItems(
+        [FromRoute] Guid clientId,
+        [FromQuery] PaginationParameters parameters,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new GetClientItemsQuery(clientId, parameters), cancellationToken);
+
+    [HttpGet("{clientId}/items/invoice")]
+    [SwaggerOperation(Summary = "Get all items of a invoice a client")]
     [ProducesResponseType(typeof(List<ItemResponse>), 200)]
     [HasPermission(Resource.Items, CrudAction.Read)]
     public Task<BaseResponse<List<ItemResponse>>> GetItems(
@@ -95,7 +107,7 @@ public class ClientController(IMediator mediator) : ControllerBase, IClientContr
     [HttpPatch("{clientId}/item")]
     [SwaggerOperation(Summary = "add single item to client")]
     [HasPermission(Resource.Items, CrudAction.Create)]
-    public Task<BaseResponse<string>> AddItemToClient(
+    public Task<BaseResponse<Guid>> AddItemToClient(
         Guid clientId,
         [FromBody] ItemDtoForClient item,
         CancellationToken cancellationToken = default
@@ -150,11 +162,11 @@ public class ClientController(IMediator mediator) : ControllerBase, IClientContr
     [HttpGet("{clientId}/plans")]
     [SwaggerOperation(Summary = "Get Client Plans")]
     [HasPermission(Resource.Plans, CrudAction.Read)]
-    public Task<BaseResponse<List<PlansResponse>>> GetClientPlans(
+    public Task<BaseResponse<PaginatedList<PlansResponse>>> GetClientPlans(
         [FromRoute] Guid clientId,
-        [FromQuery] Filters filters,
+        [FromQuery] PaginationParameters paginationParameters,
         CancellationToken cancellationToken = default
-    ) => mediator.Send(new GetClientPlansQuery(clientId, filters), cancellationToken);
+    ) => mediator.Send(new GetClientPlansQuery(clientId, paginationParameters), cancellationToken);
 
     [HttpPatch("{clientId}/plan")]
     [SwaggerOperation(Summary = "add single plan to client")]

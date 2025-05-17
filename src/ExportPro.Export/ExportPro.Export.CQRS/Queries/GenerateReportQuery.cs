@@ -4,42 +4,43 @@ using ExportPro.Export.SDK.Enums;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.SDK.Utilities;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.StorageService.SDK.PaginationParams;
+using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using ILogger = Serilog.ILogger;
 
 namespace ExportPro.Export.CQRS.Queries;
 
-public sealed record GenerateReportQuery(
-    ReportFormat Format,
-    ReportFilterDto Filters)
-    : IRequest<ReportFileDto>;
+public sealed record GenerateReportQuery(ReportFormat Format, ReportFilterDto Filters) : IRequest<ReportFileDto>;
 
 public sealed class GenerateReportQueryHandler(
     IStorageServiceApi storageApi,
     IEnumerable<IReportGenerator> generators,
     IMapper mapper,
-    ILogger<GenerateReportQueryHandler> log)
-    : IRequestHandler<GenerateReportQuery, ReportFileDto>
+    ILogger logger
+) : IRequestHandler<GenerateReportQuery, ReportFileDto>
 {
-    public async Task<ReportFileDto> Handle(
-        GenerateReportQuery request,
-        CancellationToken cancellationToken)
+    public async Task<ReportFileDto> Handle(GenerateReportQuery request, CancellationToken cancellationToken)
     {
-        log.LogInformation("Statistics export start (format={Format})", request.Format);
         var reportFile = await GenerateReportFileAsync(request, cancellationToken);
-        log.LogInformation("Statistics export done (bytes={Len})", reportFile.Content.Length);
         return reportFile;
     }
 
     private async Task<ReportFileDto> GenerateReportFileAsync(
         GenerateReportQuery request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
+        logger.Information("GenerateReportFile START");
         var allInvoices = await FetchInvoicesAsync(cancellationToken);
         var clientId = request.Filters.ClientId;
+        logger.Debug("ClientId: {@clientId}", clientId);
         var clientCurrencyId = request.Filters.ClientCurrencyId;
+        logger.Debug("ClientCurrencyId: {@clientCurrencyId}", clientCurrencyId);
         var invoices = FilterInvoicesByClientId(clientId, allInvoices);
+        logger.Debug("Invoices: {@invoices}", invoices);
         var (items, plans) = await FetchItemsAndPlansAsync(clientId, cancellationToken);
 
         int overdueCnt = 0;
@@ -48,8 +49,12 @@ public sealed class GenerateReportQueryHandler(
         {
             try
             {
-                var overdueResp =
-                    await storageApi.GetOverduePaymentsAsync(clientId, clientCurrencyId, cancellationToken);
+                var overdueResp = await storageApi.Invoice.GetOverduePayments(
+                    clientId,
+                    clientCurrencyId,
+                    cancellationToken
+                );
+                logger.Debug("OverdueResp: {@overdueResp}", overdueResp);
                 if (overdueResp.IsSuccess && overdueResp.Data is not null)
                 {
                     overdueCnt = overdueResp.Data.OverdueInvoicesCount;
@@ -63,30 +68,14 @@ public sealed class GenerateReportQueryHandler(
             }
         }
 
-        var reportContent = await RetrieveClientNameAsync(
-            request, clientId, invoices, items, plans, cancellationToken);
+        var reportContent = await RetrieveClientNameAsync(request, clientId, invoices, items, plans, cancellationToken);
 
-        var currencyCodes = new Dictionary<Guid, string>();
-
-        var ids = invoices
-            .Where(i => i.CurrencyId.HasValue && i.CurrencyId != Guid.Empty)
-            .Select(i => i.CurrencyId!.Value)
-            .Concat(items.Select(it => it.CurrencyId))
-            .Distinct();
-
-        foreach (var id in ids)
-        {
-            var curResp = await storageApi.GetCurrencyByIdAsync(id, cancellationToken);
-            currencyCodes[id] = curResp.Data?.CurrencyCode ?? "—";
-        }
-
-        var clientCurrecyCode = await storageApi.GetCurrencyByIdAsync(clientCurrencyId, cancellationToken);
-
+        var clientCurrecyCode = await storageApi.Currency.GetById(clientCurrencyId, cancellationToken);
+        logger.Debug("ClientCurrecyCode: {@clientCurrecyCode}", clientCurrecyCode);
         reportContent = reportContent with
         {
             OverdueInvoicesCount = overdueCnt,
             TotalOverdueAmount = overdueAmt,
-            CurrencyCodes = currencyCodes,
             ClientCurrencyCode = clientCurrecyCode.Data?.CurrencyCode ?? "—",
         };
 
@@ -96,53 +85,69 @@ public sealed class GenerateReportQueryHandler(
     private async Task<ReportContentDto> RetrieveClientNameAsync(
         GenerateReportQuery request,
         Guid clientId,
-        List<InvoiceDto> invoices,
+        List<InvoiceForReport> invoices,
         List<ItemResponse> items,
         List<PlansResponse> plans,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var clientName = "—";
 
         if (clientId != Guid.Empty)
         {
-            var clientResp = await storageApi.GetClientByIdAsync(clientId, cancellationToken);
+            var clientResp = await storageApi.Client.GetClientById(clientId, cancellationToken);
+            logger.Debug("ClientResp: {@clientResp}", clientResp);
             clientName = clientResp.Data?.Name ?? "—";
         }
 
         return mapper.Map<ReportContentDto>((invoices, items, plans, request.Filters, clientName));
     }
 
-    private static List<InvoiceDto> FilterInvoicesByClientId(Guid clientId, List<InvoiceDto> allInvoices)
+    private static List<InvoiceForReport> FilterInvoicesByClientId(Guid clientId, List<InvoiceDto> allInvoices)
     {
-        var invoices = clientId != Guid.Empty
-            ? allInvoices.Where(i => i.ClientId == clientId).ToList()
-            : allInvoices;
-        return invoices;
+        var invoices =
+            clientId != Guid.Empty ? allInvoices.Where(i => i.ClientId == clientId).ToList() : allInvoices.ToList();
+        var invoicesForReport = invoices
+            .Select(i => new InvoiceForReport
+            {
+                InvoiceNumber = i.InvoiceNumber,
+                IssueDate = i.IssueDate,
+                DueDate = i.DueDate,
+                Amount = i.Amount,
+                CurrencyCode = i.Currency,
+                PaymentStatus = i.PaymentStatus,
+                BankAccountNumber = i.BankAccountNumber,
+            })
+            .ToList();
+        return invoicesForReport;
     }
 
     private async Task<List<InvoiceDto>> FetchInvoicesAsync(CancellationToken cancellationToken)
     {
-        return (await storageApi.GetInvoicesAsync(1, int.MaxValue, false, cancellationToken))
-            .Data?.Items ?? [];
+        return (await storageApi.Invoice.GetInvoices(1, int.MaxValue, cancellationToken)).Data?.Items ?? [];
     }
 
-    private async Task<(List<ItemResponse>, List<PlansResponse>)>
-        FetchItemsAndPlansAsync(Guid clientId, CancellationToken cancellationToken)
+    private async Task<(List<ItemResponse>, List<PlansResponse>)> FetchItemsAndPlansAsync(
+        Guid clientId,
+        CancellationToken cancellationToken
+    )
     {
         if (clientId == Guid.Empty)
-            return (new List<ItemResponse>(), new List<PlansResponse>());
-
-        var itemsTask = storageApi.GetItemsByClientAsync(clientId, cancellationToken);
-        var plansTask = storageApi.GetPlansByClientAsync(clientId, cancellationToken);
+            return ([], []);
+        var parameters = new PaginationParameters { PageNumber = 1, PageSize = 1000 };
+        var itemsTask = storageApi.Client.GetClientItems(clientId, parameters, cancellationToken);
+        var plansTask = storageApi.Client.GetClientPlans(clientId, parameters, cancellationToken);
         await Task.WhenAll(itemsTask, plansTask);
-
-        return (itemsTask.Result.Data ?? new List<ItemResponse>(), plansTask.Result.Data ?? new List<PlansResponse>());
+        var itemsResult = await itemsTask;
+        var plansResult = await plansTask;
+        return (itemsResult.Data?.Items?.Cast<ItemResponse>().ToList() ?? [], plansResult.Data?.Items ?? []);
     }
 
     private static ReportFileDto CreateReportFileDto(
         ReportContentDto dto,
         ReportFormat fmt,
-        IEnumerable<IReportGenerator> generators)
+        IEnumerable<IReportGenerator> generators
+    )
     {
         var key = fmt.ToString();
         var generator = generators.First(g => g.Extension.Equals(key, StringComparison.OrdinalIgnoreCase));

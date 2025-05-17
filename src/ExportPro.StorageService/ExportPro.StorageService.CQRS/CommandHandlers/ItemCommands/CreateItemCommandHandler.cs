@@ -17,19 +17,19 @@ public sealed record CreateItemCommand(
     Status Status,
     Guid CurrencyId,
     Guid ClientId
-) : ICommand<string>;
+) : ICommand<Guid>;
 
 public sealed class CreateItemCommandHandler(IHttpContextAccessor httpContext, IClientRepository clientRepository)
-    : ICommandHandler<CreateItemCommand, string>
+    : ICommandHandler<CreateItemCommand, Guid>
 {
-    public async Task<BaseResponse<string>> Handle(CreateItemCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<Guid>> Handle(CreateItemCommand request, CancellationToken cancellationToken)
     {
         var client = await clientRepository.GetOneAsync(
             x => x.Id == request.ClientId.ToObjectId() && !x.IsDeleted,
             cancellationToken
         );
         if (client == null || client.IsDeleted)
-            return new NotFoundResponse<string>("Client not found");
+            return new NotFoundResponse<Guid>("Client not found");
         var item = new Item
         {
             Id = ObjectId.GenerateNewId(),
@@ -38,13 +38,12 @@ public sealed class CreateItemCommandHandler(IHttpContextAccessor httpContext, I
             Price = request.Price,
             Status = request.Status,
             CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value,
-
             CurrencyId = request.CurrencyId.ToObjectId(),
         };
         client.Items ??= new List<Item>();
         client.Items.Add(item);
         client.UpdatedAt = DateTime.UtcNow;
         await clientRepository.AddItem(client.Id, client, cancellationToken);
-        return new SuccessResponse<string>(item.Id.ToString());
+        return new SuccessResponse<Guid>(item.Id.ToGuid());
     }
 }

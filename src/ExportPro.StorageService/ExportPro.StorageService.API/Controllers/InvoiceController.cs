@@ -6,6 +6,7 @@ using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.StorageService.SDK.ModelFilters;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
@@ -20,16 +21,16 @@ public class InvoiceController(IMediator mediator) : ControllerBase, IInvoiceCon
 {
     [HttpPost]
     [HasPermission(Resource.Invoices, CrudAction.Create)]
-    public Task<BaseResponse<InvoiceResponse>> Create(
+    public Task<BaseResponse<InvoiceDto>> Create(
         [FromBody] CreateInvoiceDto invoice,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     ) => mediator.Send(new CreateInvoiceCommand(invoice), cancellationToken);
 
     [HttpPut("{id}")]
     public Task<BaseResponse<InvoiceResponse>> Update(
         [FromRoute] Guid id,
         [FromBody] CreateInvoiceDto invoice,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     ) => mediator.Send(new UpdateInvoiceCommand(id, invoice), cancellationToken);
 
     [HttpDelete("{id}")]
@@ -43,18 +44,30 @@ public class InvoiceController(IMediator mediator) : ControllerBase, IInvoiceCon
     [HttpGet]
     [HasPermission(Resource.Invoices, CrudAction.Read)]
     public Task<BaseResponse<PaginatedListDto<InvoiceDto>>> GetInvoices(
-        CancellationToken cancellationToken,
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10
+        [FromQuery] int pageSize = 10,
+        CancellationToken cancellationToken = default
     ) => mediator.Send(new GetAllInvoicesQuery(pageNumber, pageSize), cancellationToken);
 
+    [HttpGet("getByFilter")]
+    [HasPermission(Resource.Invoices, CrudAction.Read)]
+    public Task<BaseResponse<PaginatedList<InvoiceDto>>> GetInvoicesByFilter(
+        [FromQuery] InvoiceFilter filters,
+        [FromQuery] Guid clientId,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new GetInvoicesByFilter(filters, clientId), cancellationToken);
+
     [HttpGet("count")]
-    public Task<BaseResponse<long>> GetTotalInvoices([FromQuery] TotalInvoicesDto query) =>
-        mediator.Send(new GetTotalInvoicesQuery(query));
+    public Task<BaseResponse<long>> GetTotalInvoices(
+        [FromQuery] TotalInvoicesDto query,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new GetTotalInvoicesQuery(query), cancellationToken);
 
     [HttpGet("revenue")]
-    public Task<BaseResponse<double>> GetTotalRevenue([FromQuery] TotalRevenueDto query) =>
-        mediator.Send(new GetTotalRevenueQuery(query));
+    public Task<BaseResponse<double>> GetTotalRevenue(
+        [FromQuery] TotalRevenueDto query,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new GetTotalRevenueQuery(query), cancellationToken);
 
     [HttpGet("overdue-payments/{clientId}")]
     [HasPermission(Resource.Invoices, CrudAction.Read)]

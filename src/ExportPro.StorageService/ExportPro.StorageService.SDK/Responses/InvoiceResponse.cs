@@ -10,7 +10,7 @@ public sealed class InvoiceResponse : AuditModel
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
     public double Amount { get; set; }
-    public Guid CurrencyId { get; set; }
+    public required string Currency { get; set; }
     public Status? PaymentStatus { get; set; }
     public Guid CustomerId { get; set; }
     public string BankAccountNumber { get; set; } = string.Empty;

@@ -13,6 +13,7 @@ using ExportPro.Export.Pdf.Interfaces;
 using ExportPro.Export.Pdf.Services;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.Export.ServiceHost.Infrastructure;
+using ExportPro.StorageService.SDK.Refit;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -44,23 +45,27 @@ public static class ExportServiceCollectionExtensions
 
     private static void ConfigureStorageServiceClient(IServiceCollection services)
     {
-        var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
-        Console.WriteLine(baseUrl);
-        services
-            .AddRefitClient<IStorageServiceApi>(
-                new RefitSettings
-                {
-                    ContentSerializer = new NewtonsoftJsonContentSerializer(
-                        new JsonSerializerSettings
-                        {
-                            NullValueHandling = NullValueHandling.Ignore,
-                            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                        }
-                    ),
-                }
-            )
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
-            .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
+        services.AddSingleton<IStorageServiceApi>(sp =>
+        {
+            var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+            var baseUrl = Environment.GetEnvironmentVariable("StorageUrl") ?? "http://localhost:5011";
+            var authHandler = new ForwardAuthHeaderHandler(httpContextAccessor)
+            {
+                InnerHandler = new HttpClientHandler(),
+            };
+            var http = new HttpClient(authHandler) { BaseAddress = new Uri(baseUrl) };
+            var refitSettings = new RefitSettings
+            {
+                ContentSerializer = new NewtonsoftJsonContentSerializer(
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                    }
+                ),
+            };
+            return new StorageServiceApi(http, refitSettings);
+        });
     }
 
     private static void ConfigureReportServices(IServiceCollection services)

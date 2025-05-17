@@ -1,4 +1,5 @@
 ﻿using ExportPro.Common.Shared.Library;
+using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
@@ -9,7 +10,7 @@ namespace ExportPro.StorageService.SDK.Refit;
 public interface IInvoiceController
 {
     [Post("/api/Invoice")]
-    Task<BaseResponse<InvoiceResponse>> Create(
+    Task<BaseResponse<InvoiceDto>> Create(
         [Body] CreateInvoiceDto invoice,
         CancellationToken cancellationToken = default
     );
@@ -29,8 +30,25 @@ public interface IInvoiceController
 
     [Get("/api/Invoice")]
     Task<BaseResponse<PaginatedListDto<InvoiceDto>>> GetInvoices(
-        CancellationToken cancellationToken = default,
         [Query] int pageNumber = 1,
-        [Query] int pageSize = 10
+        [Query] int pageSize = 10,
+        CancellationToken cancellationToken = default
+    );
+    Task<BaseResponse<long>> GetTotalInvoices(
+        [Query] TotalInvoicesDto query,
+        CancellationToken cancellationToken = default
+    );
+
+    [Get("/api/invoice/revenue")]
+    Task<BaseResponse<double>> GetTotalRevenue(
+        [Query] TotalRevenueDto query,
+        CancellationToken cancellationToken = default
+    );
+
+    [Get("/api/invoice/overdue-payments/{clientId}")]
+    Task<BaseResponse<OverduePaymentsResponse>> GetOverduePayments(
+        Guid clientId,
+        Guid clientCurrencyId,
+        CancellationToken cancellationToken = default
     );
 }

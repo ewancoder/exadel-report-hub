@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Refit;
+using ExportPro.StorageService.Api.Validations.CurrencyConversion;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,7 +81,6 @@ builder.Services.AddCommonRegistrations();
 builder.Services.AddRepositoryConfig();
 builder.Services.AddScoped<ICurrencyExchangeService, CurrencyExchangeService>();
 builder.Services.AddCQRS();
-
 builder.Services.AddScoped<SeedingData>();
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())

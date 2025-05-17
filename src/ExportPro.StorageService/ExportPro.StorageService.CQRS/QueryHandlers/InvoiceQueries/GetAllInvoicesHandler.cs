@@ -1,18 +1,27 @@
-﻿using AutoMapper;
+﻿using System.Runtime.CompilerServices;
+using AutoMapper;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
+using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
 public sealed record GetAllInvoicesQuery(int PageNumber = 1, int PageSize = 10) : IQuery<PaginatedListDto<InvoiceDto>>;
 
-public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper mapper)
-    : IQueryHandler<GetAllInvoicesQuery, PaginatedListDto<InvoiceDto>>
+public sealed class GetAllInvoicesHandler(
+    IInvoiceRepository repository,
+    ICustomerRepository customerRepository,
+    ICountryRepository countryRepository,
+    IClientRepository clientRepository,
+    ICurrencyRepository currencyRepository,
+    IMapper mapper
+) : IQueryHandler<GetAllInvoicesQuery, PaginatedListDto<InvoiceDto>>
 {
     public async Task<BaseResponse<PaginatedListDto<InvoiceDto>>> Handle(
         GetAllInvoicesQuery request,
@@ -25,22 +34,47 @@ public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper
             return new BadRequestResponse<PaginatedListDto<InvoiceDto>>("Page size must be greater than zero.");
         var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
         var paginatedInvoices = await repository.GetAllPaginatedAsync(parameters, cancellationToken);
-        var invoiceDtos = paginatedInvoices
-            .Items.Select(invoice => new InvoiceDto
-            {
-                Id = invoice.Id.ToGuid(),
-                InvoiceNumber = invoice.InvoiceNumber,
-                IssueDate = invoice.IssueDate,
-                DueDate = invoice.DueDate,
-                CurrencyId = invoice.CurrencyId.ToGuid(),
-                PaymentStatus = invoice.PaymentStatus,
-                BankAccountNumber = invoice.BankAccountNumber,
-                ClientId = invoice.ClientId.ToGuid(),
-                CustomerId = invoice.CustomerId.ToGuid(),
-                Amount = invoice.Amount,
-                Items = invoice.Items?.Select(i => mapper.Map<ItemDtoForClient>(i)).ToList(),
-            })
-            .ToList();
+        var invoiceDtos = (
+            await Task.WhenAll(
+                paginatedInvoices.Items.Select(async invoice =>
+                {
+                    var currency = await GetCustomerCurrency(invoice.CustomerId, cancellationToken);
+                    var items = new List<ItemDtoForInvoice>();
+                    foreach (var i in invoice.ItemsId!)
+                    {
+                        var client = await clientRepository.GetOneAsync(
+                            x => x.Items.Any(y => y.Id == i) && !x.IsDeleted,
+                            cancellationToken
+                        );
+                        var item = client?.Items?.FirstOrDefault(y => y.Id == i);
+                        if (item is not null)
+                        {
+                            var itemCurrency = await currencyRepository.GetOneAsync(
+                                x => x.Id == item.CurrencyId && !x.IsDeleted,
+                                cancellationToken
+                            );
+                            var itemDto = mapper.Map<ItemDtoForInvoice>(item);
+                            itemDto.Currency = itemCurrency!.CurrencyCode;
+                            items.Add(itemDto);
+                        }
+                    }
+                    return new InvoiceDto
+                    {
+                        Id = invoice.Id.ToGuid(),
+                        InvoiceNumber = invoice.InvoiceNumber,
+                        IssueDate = invoice.IssueDate,
+                        DueDate = invoice.DueDate,
+                        Currency = currency,
+                        PaymentStatus = invoice.PaymentStatus,
+                        BankAccountNumber = invoice.BankAccountNumber,
+                        ClientId = invoice.ClientId.ToGuid(),
+                        Items = items,
+                        CustomerId = invoice.CustomerId.ToGuid(),
+                        Amount = invoice.Amount,
+                    };
+                })
+            )
+        ).ToList();
         var paginatedDto = new PaginatedListDto<InvoiceDto>(
             invoiceDtos,
             paginatedInvoices.TotalCount,
@@ -51,5 +85,21 @@ public sealed class GetAllInvoicesHandler(IInvoiceRepository repository, IMapper
             paginatedDto,
             "The invoices were retrieved successfully."
         );
+    }
+
+    private async Task<string> GetCustomerCurrency(ObjectId customerId, CancellationToken cancellationToken)
+    {
+        var customer = await customerRepository.GetOneAsync(x => x.Id == customerId && !x.IsDeleted, cancellationToken);
+
+        var country = await countryRepository.GetOneAsync(
+            x => x.Id == customer!.CountryId && !x.IsDeleted,
+            cancellationToken
+        );
+
+        var currency = await currencyRepository.GetOneAsync(
+            x => x.Id == country!.CurrencyId && !x.IsDeleted,
+            cancellationToken
+        );
+        return currency!.CurrencyCode;
     }
 }

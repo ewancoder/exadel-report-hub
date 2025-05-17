@@ -6,6 +6,7 @@ using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
@@ -222,26 +223,19 @@ public sealed class ClientRepository(ICollectionProvider collectionProvider, IMa
         return planResponse;
     }
 
-    public async Task<List<PlansResponse>> GetClientPlans(
+    public async Task<PaginatedList<PlansResponse>> GetClientPlans(
         ObjectId clientId,
-        Filters filters,
+        PaginationParameters filters,
         CancellationToken cancellationToken = default
     )
     {
         var client = await GetOneAsync(x => x.Id == clientId && !x.IsDeleted, cancellationToken);
-        var plans = client!
-            .Plans!.Skip(filters.Skip)
-            .Take(filters.Top)
-            .Select(x => mapper.Map<PlansResponse>(x))
-            .OrderBy(x =>
-                filters.OrderBy switch
-                {
-                    OrderBy.Ascending => x.StartDate,
-                    OrderBy.Descending => x.StartDate,
-                    _ => throw new ArgumentOutOfRangeException(nameof(filters.OrderBy)),
-                }
-            )
-            .ToList();
-        return plans;
+        List<PlansResponse> plans = new();
+        foreach (var plan in client.Plans)
+        {
+            plans.Add(mapper.Map<PlansResponse>(plan));
+        }
+        var clientPlans = plans.ToPaginatedList(filters.PageNumber, filters.PageSize);
+        return clientPlans;
     }
 }

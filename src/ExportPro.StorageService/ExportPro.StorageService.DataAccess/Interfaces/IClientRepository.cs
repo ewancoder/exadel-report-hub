@@ -1,6 +1,7 @@
 ﻿using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 using MongoDB.Bson;
 
@@ -32,9 +33,9 @@ public interface IClientRepository : IRepository<Client>
 
     Task<PlansResponse?> GetPlan(ObjectId planId, CancellationToken cancellationToken = default);
 
-    Task<List<PlansResponse>> GetClientPlans(
+    Task<PaginatedList<PlansResponse>> GetClientPlans(
         ObjectId clientId,
-        Filters filters,
+        PaginationParameters paginationParameters,
         CancellationToken cancellationToken = default
     );
 }

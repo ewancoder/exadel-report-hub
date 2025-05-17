@@ -60,23 +60,5 @@ public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceComm
                     )
                     .WithMessage("The Client Id does not exist");
             });
-        RuleFor(x => x.CreateInvoiceDto.CurrencyId)
-            .NotEmpty()
-            .WithMessage("Currency Id  cannot be empty.")
-            .DependentRules(
-                () =>
-                    RuleFor(x => x.CreateInvoiceDto.CurrencyId)
-                        .MustAsync(
-                            async (currency, cancellationToken) =>
-                            {
-                                var client = await currencyRepository.GetOneAsync(
-                                    x => x.Id == currency.ToObjectId() && !x.IsDeleted,
-                                    cancellationToken
-                                );
-                                return client != null;
-                            }
-                        )
-                        .WithMessage("The Currency Id does not exist")
-            );
     }
 }

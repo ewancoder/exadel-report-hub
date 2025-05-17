@@ -1,6 +1,8 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Refit;
@@ -31,8 +33,15 @@ public interface IClientController
     [Delete("/api/client/{clientId}")]
     Task<BaseResponse<ClientResponse>> SoftDeleteClient(Guid clientId, CancellationToken cancellationToken = default);
 
+    [Get("/api/client/{clientId}/items")]
+    Task<BaseResponse<PaginatedList<ItemResponse>>> GetClientItems(
+        Guid clientId,
+        [Query] PaginationParameters parameters,
+        CancellationToken cancellationToken = default
+    );
+
     [Patch("/api/client/{clientId}/item")]
-    Task<BaseResponse<string>> AddItemToClient(
+    Task<BaseResponse<Guid>> AddItemToClient(
         Guid clientId,
         [Body] ItemDtoForClient item,
         CancellationToken cancellationToken = default
@@ -70,9 +79,9 @@ public interface IClientController
     Task<BaseResponse<PlansResponse>> GetPlan(Guid planId, CancellationToken cancellationToken = default);
 
     [Get("/api/client/{clientId}/plans")]
-    Task<BaseResponse<List<PlansResponse>>> GetClientPlans(
+    Task<BaseResponse<PaginatedList<PlansResponse>>> GetClientPlans(
         Guid clientId,
-        [Query] Filters filters,
+        [Query] PaginationParameters paginationParameters,
         CancellationToken cancellationToken = default
     );
 

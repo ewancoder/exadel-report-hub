@@ -11,8 +11,8 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="ExportPro.Export.Job.Utilities" Version="1.0.3" />
-        <PackageReference Include="Refit" Version="8.0.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1"/>
+        <PackageReference Include="Refit" Version="8.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />

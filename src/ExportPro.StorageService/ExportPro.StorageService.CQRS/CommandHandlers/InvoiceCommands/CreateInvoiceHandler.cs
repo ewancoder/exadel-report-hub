@@ -14,88 +14,95 @@ using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public sealed record CreateInvoiceCommand(CreateInvoiceDto CreateInvoiceDto) : ICommand<InvoiceResponse>;
+public sealed record CreateInvoiceCommand(CreateInvoiceDto CreateInvoiceDto) : ICommand<InvoiceDto>;
 
 public sealed class CreateInvoiceHandler(
     IInvoiceRepository repository,
     IMapper mapper,
+    IClientRepository clientRepository,
     ICurrencyExchangeService currencyExchangeService,
     ICurrencyRepository currencyRepository,
     IHttpContextAccessor httpContext,
+    ICountryRepository countryRepository,
+    ICustomerRepository customerRepository,
     //i need to use this manually because it is not validating automatically
     IValidator<CurrencyExchangeModel> validator
-) : ICommandHandler<CreateInvoiceCommand, InvoiceResponse>
+) : ICommandHandler<CreateInvoiceCommand, InvoiceDto>
 {
-    public async Task<BaseResponse<InvoiceResponse>> Handle(
+    public async Task<BaseResponse<InvoiceDto>> Handle(
         CreateInvoiceCommand request,
         CancellationToken cancellationToken
     )
     {
-        var invoice = new Invoice
-        {
-            Id = ObjectId.GenerateNewId(),
-            InvoiceNumber = request.CreateInvoiceDto.InvoiceNumber,
-            IssueDate = request.CreateInvoiceDto.IssueDate,
-            DueDate = request.CreateInvoiceDto.DueDate,
-            CurrencyId = request.CreateInvoiceDto.CurrencyId.ToObjectId(),
-            PaymentStatus = request.CreateInvoiceDto.PaymentStatus,
-            BankAccountNumber = request.CreateInvoiceDto.BankAccountNumber,
-            ClientId = request.CreateInvoiceDto.ClientId.ToObjectId(),
-            CustomerId = request.CreateInvoiceDto.CustomerId.ToObjectId(),
-            CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value,
-            Items = request.CreateInvoiceDto.Items!.Select(c => mapper.Map<Item>(c)).ToList(),
-        };
-        foreach (var i in invoice.Items)
-            i.Id = ObjectId.GenerateNewId();
-        //getting the invoice currency
-        var invoiceCurrency = await currencyRepository.GetCurrencyCodeById(
-            request.CreateInvoiceDto.CurrencyId.ToObjectId()
-        );
-        CurrencyExchangeModel currencyExchangeModel = new()
-        {
-            Date = invoice.IssueDate,
-            From = invoiceCurrency!.CurrencyCode,
-        };
-        //converting the invoice's currency to euro becuase the api converts the currency to EUR only
-        //if it is already EUR than there is no need to convert it
-        var invoiceCurrencyExchangeRateToEuro = 1.0;
-        if (invoiceCurrency.CurrencyCode != "EUR")
-        {
-            //manually validating because it is not validating automatically and catching it in the middlewere.
-            await validator.ValidateAndThrowAsync(currencyExchangeModel, cancellationToken);
-            invoiceCurrencyExchangeRateToEuro = await currencyExchangeService.ExchangeRate(currencyExchangeModel);
-        }
-
+        Currency currencyResp = await GetCustomerCurrency(request, cancellationToken);
+        var invoice = mapper.Map<Invoice>(request.CreateInvoiceDto);
         invoice.Amount = 0;
-        //going to convert items currency to invoice's currency
-        //first converting to euro
-        foreach (var i in invoice.Items)
+        var client = await clientRepository.GetOneAsync(
+            x => x.Id == invoice.ClientId && !x.IsDeleted,
+            cancellationToken
+        );
+        List<ItemDtoForInvoice> items = new();
+        foreach (var i in invoice.ItemsId!)
         {
-            var currency = await currencyRepository.GetCurrencyCodeById(i.CurrencyId);
-            if (currency == null)
-                return new BadRequestResponse<InvoiceResponse> { Messages = ["Currency not found."] };
+            var item = client!.Items!.FirstOrDefault(x => x.Id == i)!;
+            var currency = await currencyRepository.GetOneAsync(
+                x => x.Id == item.CurrencyId && !x.IsDeleted,
+                cancellationToken
+            );
+            ItemDtoForInvoice dto = mapper.Map<ItemDtoForInvoice>(item);
+            dto.Currency = currency?.CurrencyCode;
+            items.Add(dto);
+        }
+        var invoiceDto = mapper.Map<InvoiceDto>(invoice);
+        invoiceDto.Items = items;
+        invoiceDto.Currency = currencyResp.CurrencyCode;
+        foreach (var i in invoiceDto.Items)
+        {
             //item's currencycode
-            var currencyCode = currency.CurrencyCode;
+            var currencyCode = i.Currency;
+            await validator.ValidateAndThrowAsync(
+                new CurrencyExchangeModel
+                {
+                    Date = invoice.IssueDate,
+                    From = currencyCode,
+                    To = currencyResp.CurrencyCode,
+                    AmountFrom = i.Price,
+                }
+            );
             //converting item currency to EUR
-            var itemExchangeRateToEuro = 1.0;
-            if (currencyCode != "EUR" && invoiceCurrency.CurrencyCode != currencyCode)
+            CurrencyExchangeModel model = new()
             {
-                currencyExchangeModel.From = currencyCode;
-                await validator.ValidateAndThrowAsync(currencyExchangeModel, cancellationToken);
-                //getting the exchange rate of item's currency code and EUR
-                itemExchangeRateToEuro = await currencyExchangeService.ExchangeRate(
-                    currencyExchangeModel,
-                    cancellationToken
-                );
-            }
-
-            //converting and getting the amount
-            var amount = i.Price * invoiceCurrencyExchangeRateToEuro / itemExchangeRateToEuro;
+                Date = invoice.IssueDate,
+                From = currencyCode,
+                To = currencyResp.CurrencyCode,
+                AmountFrom = i.Price,
+            };
+            var amount = await currencyExchangeService.ConvertTwoCurrencies(model, cancellationToken);
             invoice.Amount += amount;
         }
-
+        invoice.CreatedBy = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;
+        invoice.CurrencyId = currencyResp.Id;
         await repository.AddOneAsync(invoice, cancellationToken);
-        var invoiceResponse = mapper.Map<InvoiceResponse>(invoice);
-        return new SuccessResponse<InvoiceResponse>(invoiceResponse, "Invoice created successfully.");
+        var invoiceResponse = mapper.Map<InvoiceDto>(invoice);
+        invoiceResponse.Items = items;
+        invoiceResponse.Currency = currencyResp.CurrencyCode;
+        return new SuccessResponse<InvoiceDto>(invoiceResponse, "Invoice created successfully.");
+    }
+
+    private async Task<Currency> GetCustomerCurrency(CreateInvoiceCommand request, CancellationToken cancellationToken)
+    {
+        var customerResp = await customerRepository.GetOneAsync(
+            x => x.Id == request.CreateInvoiceDto.CustomerId.ToObjectId() && !x.IsDeleted,
+            cancellationToken
+        );
+        var countryResp = await countryRepository.GetOneAsync(
+            x => x.Id == customerResp!.CountryId && !x.IsDeleted,
+            cancellationToken
+        );
+        var currencyResp = await currencyRepository.GetOneAsync(
+            x => x.Id == countryResp!.CurrencyId && !x.IsDeleted,
+            cancellationToken
+        );
+        return currencyResp!;
     }
 }

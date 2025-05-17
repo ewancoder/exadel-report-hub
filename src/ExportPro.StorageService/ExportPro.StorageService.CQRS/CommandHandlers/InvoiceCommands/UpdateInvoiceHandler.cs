@@ -32,7 +32,7 @@ public sealed class UpdateInvoiceHandler(
         existing.InvoiceNumber = request.InvoiceDto.InvoiceNumber;
         existing.IssueDate = request.InvoiceDto.IssueDate;
         existing.DueDate = request.InvoiceDto.DueDate;
-        existing.CurrencyId = request.InvoiceDto.CurrencyId.ToObjectId();
+
         existing.PaymentStatus = request.InvoiceDto.PaymentStatus;
         existing.BankAccountNumber = request.InvoiceDto.BankAccountNumber;
         existing.ClientId = request.InvoiceDto.ClientId.ToObjectId();
