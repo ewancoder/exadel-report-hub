@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using ExportPro.Front.Helper;
 using ExportPro.Front.Models;
+using ExportPro.Front.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
@@ -13,6 +14,7 @@ public partial class NavMenu : IDisposable
     [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
     [Inject] private HttpClient httpClient { get; set; }
     [Inject] private ILocalStorageService localStorageService { get; set; } = default!;
+    [Inject] private NavigationManager NavMan { get; set; } = default!;
 
     private UserDto? CurrentUser;
     private bool collapseNavMenu = true;
@@ -55,5 +57,20 @@ public partial class NavMenu : IDisposable
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task Logout()
+    {
+        await localStorageService.RemoveItemAsync("accessToken");
+        await localStorageService.RemoveItemAsync("refreshToken");
+        await localStorageService.RemoveItemAsync("expiresAt");
+
+
+        if (AuthProvider is AuthStateProvider auth)
+        {
+            auth.NotifyUserLogout();
+        }
+
+        NavMan.NavigateTo("/login", forceLoad: true);
     }
 }

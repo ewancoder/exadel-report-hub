@@ -15,10 +15,10 @@ public class ApiHelper
         _httpClient = httpClient;
         _localStorage = localStorage;
     }
-
     private async Task AttachAuthHeaderAsync()
     {
         var token = await _localStorage.GetItemAsync<string>("accessToken");
+
         if (!string.IsNullOrWhiteSpace(token))
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

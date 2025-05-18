@@ -1,0 +1,104 @@
+﻿<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">   
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">@ModalTitle</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="ClientModel" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mb-3">
+                        <label for="clientName" class="form-label">Name</label>
+                        <InputText id="clientName" class="form-control" @bind-Value="ClientModel.Name" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="clientDescription" class="form-label">Description</label>
+                        <InputTextArea id="clientDescription" class="form-control" @bind-Value="ClientModel.Description" />
+                    </div>
+                </EditForm>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-dark">@ButtonName</button>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter] public string ModalTitle { get; set; } = string.Empty;
+    [Parameter] public string ButtonName { get; set; } = string.Empty;
+
+    private ClientUpsertRequest ClientModel { get; set; }
+
+    [Parameter] public EventCallback OnSaved { get; set; }
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadClient();
+            IsProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadClient()
+    {
+        if (IsEditMode)
+        {
+            var clientId = new Guid(Nav.ToAbsoluteUri(Nav.Uri).Segments.Last());
+            var response = await apiHelper.GetAsync<ClientResponse>($"api/client/{clientId}");
+            ClientModel = new ClientUpsertRequest { Id = response.Data.Id, Description = response.Data.Description, Name = response.Data.Name };
+        }
+    }
+    private async Task HandleSubmit()
+    {
+        if (IsEditMode)
+        {
+            var resp = await apiHelper.PutAsync<ClientUpsertRequest, ClientResponse>($"api/client/{ClientModel.Id}", ClientModel);
+            if (resp.IsSuccess)
+            {
+                await JS.ToastrSucess($"Client {ClientModel.Name} updated successfully");
+            }
+        }
+        else
+        {
+            var resp = await apiHelper.PostAsync<ClientUpsertRequest, ClientResponse>("api/client", ClientModel);
+            if (resp.IsSuccess)
+            {
+                await JS.ToastrSucess($"Client {ClientModel.Name} created successfully");
+            }
+        }
+
+        await OnSaved.InvokeAsync(); 
+        await CloseModal();
+    }
+
+    [Parameter] public bool IsEditMode { get; set; } = false;
+    
+    private async Task CloseModal()
+    {
+        await JS.InvokeVoidAsync("eval", @"
+        (function() {
+            const modalEl = document.getElementById('staticBackdrop');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            }
+        })();
+    ");
+    }
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Inject] private ApiHelper apiHelper { get; set; } = default!;
+    [Inject] private ILocalStorageService LocalStorage { get; set; } = default!;
+    [Inject] private HttpClient httpClient { get; set; } = default!;
+    [Inject] private NavigationManager Nav { get; set; } = default!;
+    private bool IsProcessing { get; set; } = true;
+}

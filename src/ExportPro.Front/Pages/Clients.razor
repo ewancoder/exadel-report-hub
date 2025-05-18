@@ -22,9 +22,12 @@ else
         </div>
         <div class="card-body p-4">
             <div class="row pb3">
-                <div class="col-12 text-end">
-                    <button class="btn btn-large btn-dark">Create New Client</button>
-                </div>
+                @if (CurrentUser?.Role == Role.SuperAdmin)
+                {
+                    <div class="col-12 text-start">
+                        <a href="client/create" class="btn btn-large btn-dark">Create New Client</a>
+                    </div>
+                }
             </div>
             @if(ClientsList.IsSuccess && ClientsList.Data != null && ClientsList.Data.Any())
             {
@@ -43,9 +46,23 @@ else
                                 <td>@client.Name</td>
                                 <td>@client.Description</td>
                                 <td>
-                                    <button class="btn btn-primary">Edit</button>
+
                                     <button class="btn btn-dark">View Users</button>
-                                    <button class="btn btn-danger">Delete</button>
+                                    @if (CurrentUser?.Role == Role.SuperAdmin)
+                                    {
+                                        <a href="@($"client/update/{client.Id}") class="btn btn-primary">Edit</a>
+                                        <button class="btn btn-danger">Delete</button>
+                                    }
+                                    else
+                                    {
+                                        foreach (var role in CurrentUser?.ClientRoles)
+                                        {
+                                            if (role.ClientId == client.Id && role.Role == UserRole.Owner)
+                                            {
+                                                <a href="@($"client/update/{client.Id}") class="btn btn-primary">Edit</a>
+                                            }
+                                        }
+                                    }
                                 </td>
                             </tr>
                         }
@@ -65,10 +82,11 @@ else
 
 
 @code {
-    public bool IsProcessing { get; set; } = false;
+    public bool IsProcessing { get; set; } = true;
     [Inject] private HttpClient httpClient { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
     [Inject] private ILocalStorageService LocalStorage { get; set; } = default!;
+    private UserDto? CurrentUser;
     private ApiHelper? apiHelper;
     private Result<IEnumerable<ClientResponse>> ClientsList { get; set; } = new Result<IEnumerable<ClientResponse>>
         {
@@ -78,11 +96,18 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        apiHelper = new ApiHelper(httpClient, LocalStorage);
-        IsProcessing = true;
-        await LoadClients();
-        IsProcessing = false;
+    }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            apiHelper = new ApiHelper(httpClient, LocalStorage);
+            var result = await apiHelper.GetAsync<UserDto>("api/user/current");
+            await LoadClients();
+            IsProcessing = false;
+            StateHasChanged();
+        }
     }
 
     private async Task LoadClients()

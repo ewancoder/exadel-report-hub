@@ -31,7 +31,6 @@ public partial class Login
             if (result.IsSuccess && result.Data is not null)
             {
                 await LocalStorage.SetItemAsync("accessToken", result.Data.AccessToken);
-                await LocalStorage.SetItemAsync("refreshToken", result.Data.RefreshToken);
                 await LocalStorage.SetItemAsync("expiresAt", result.Data.ExpiresAt);
                 if (AuthProvider is AuthStateProvider authStateProvider)
                 {
