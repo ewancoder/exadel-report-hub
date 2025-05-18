@@ -1,5 +1,4 @@
 using ExportPro.Auth.CQRS.Commands;
-using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.ServiceHost.Extensions;
 using ExportPro.AuthService.Repositories;
 using ExportPro.AuthService.Services;
@@ -20,7 +19,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddScoped<ExportProMongoContext>();
-
+builder.Services.AddDataSeeders();
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly);
@@ -41,25 +40,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
-using (var scope = app.Services.CreateScope())
-{
-    var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
-    var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-
-    UserRegisterDto user = new()
-    {
-        Email = "G10@gmail.com",
-        Username = "GPPP",
-        Password = "G10@gmail.com",
-    };
-
-    var userExistence = await userRepository.GetByEmailAsync(user.Email);
-    
-    if (userExistence == null)
-    {
-        var register = await authService.RegisterAsync(user);
-    }
-}
 
 app.Run();
