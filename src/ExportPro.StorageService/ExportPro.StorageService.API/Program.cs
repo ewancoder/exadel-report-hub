@@ -18,6 +18,9 @@ using Refit;
 using ExportPro.Common.Shared.Refit;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using ExportPro.Export.ServiceHost.Infrastructure;
+using System.Buffers.Text;
+using ExportPro.StorageService.API;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
@@ -65,8 +68,18 @@ builder
     {
         c.BaseAddress = new Uri(builder.Configuration["Refit:currencyUrl"]);
     });
-builder.Services.AddRefitClient<IACLSharedApi>(refitSettings)
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.Configuration["Refit:authUrl"]));
+builder.Services.AddTransient<ForwardAuthHeaderHandler>();
+builder.Services
+    .AddRefitClient<IACLSharedApi>(new RefitSettings
+    {
+        ContentSerializer = new SystemTextJsonContentSerializer()
+    })
+    .ConfigureHttpClient((sp, client) =>
+    {
+        var config = sp.GetRequiredService<IConfiguration>();
+        client.BaseAddress = new Uri(config["Refit:authUrl"]);
+    })
+    .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
 builder.Services.AddLogging();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Storage Service");
