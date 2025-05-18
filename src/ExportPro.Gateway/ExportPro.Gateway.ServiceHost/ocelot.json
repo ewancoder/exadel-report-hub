@@ -382,7 +382,7 @@
             "SwaggerKey": "StorageService"
         },
         {
-            "UpstreamPathTemplate": "/api/Auth/register",
+            "UpstreamPathTemplate": "/api/auth/register",
             "UpstreamHttpMethod": [ "Post" ],
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
@@ -391,7 +391,7 @@
                     "Port": 8080
                 }
             ],
-            "DownstreamPathTemplate": "/api/Auth/register",
+            "DownstreamPathTemplate": "/api/auth/register",
             "SwaggerKey": "AuthService"
         },
         {
@@ -451,11 +451,11 @@
         {
             "Key": "AuthService",
             "Config": [
-                {
-                    "Name": "Auth Service",
-                    "Version": "v1",
-                    "Url": "http://authservice:8080/swagger/v1/swagger.json"
-                }
+              {
+                "Name": "Auth Service",
+                "Version": "v1",
+                "Url": "https://localhost:7067/swagger/v1/swagger.json"
+              }
             ]
         },
         {

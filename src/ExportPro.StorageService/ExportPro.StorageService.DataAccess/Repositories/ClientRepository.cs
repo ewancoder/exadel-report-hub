@@ -33,6 +33,21 @@ public sealed class ClientRepository(ICollectionProvider collectionProvider, IMa
         return Task.FromResult(paginatedList);
     }
 
+    public Task<List<Client>> GetClientsByIdsAsync(
+        List<ObjectId> clientIds,
+        int top,
+        int skip,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var filter = Builders<Client>.Filter.And(
+            Builders<Client>.Filter.In(c => c.Id, clientIds),
+            Builders<Client>.Filter.Eq(c => c.IsDeleted, false)
+        );
+
+        return Collection.Find(filter).Skip(skip).Limit(top).ToListAsync(cancellationToken);
+    }
+
     public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)
     {
         var maxSize = Collection.Find(c => !c.IsDeleted).CountDocuments(cancellationToken);

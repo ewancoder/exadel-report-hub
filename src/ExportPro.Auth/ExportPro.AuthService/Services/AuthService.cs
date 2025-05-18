@@ -1,18 +1,23 @@
 ﻿using System.Security.Claims;
+using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Models;
 using ExportPro.AuthService.Configuration;
 using ExportPro.AuthService.Repositories;
 using ExportPro.Common.Shared.Exceptions;
+using ExportPro.Common.Shared.Helpers;
+using ExportPro.Common.Shared.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using ExportPro.Auth.SDK.DTOs;
+
 namespace ExportPro.AuthService.Services;
 
 public class AuthService(
-    IUserRepository userRepository,
+    UserRepository userRepository,
     IJwtTokenService jwtTokenService,
-    IOptions<JwtSettings> jwtOptions) : IAuthService
+    IOptions<JwtSettings> jwtOptions
+) : IAuthService
 {
-    private readonly IUserRepository _userRepository = userRepository;
+    private readonly UserRepository _userRepository = userRepository;
     private readonly IJwtTokenService _jwtTokenService = jwtTokenService;
     private readonly JwtSettings _jwtSettings = jwtOptions.Value;
 
@@ -30,16 +35,15 @@ public class AuthService(
         {
             throw new EmailAlreadyExistsException();
         }
-
         var user = new User
         {
             Username = dto.Username,
             Email = dto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = UserRole.Owner,
+            Role = Common.Shared.Enums.Role.None,
         };
 
-        user = await _userRepository.CreateAsync(user);
+        user = await _userRepository.AddOneAsync(user);
         return await GenerateTokenAndSetRefreshToken(user);
     }
 
@@ -92,7 +96,7 @@ public class AuthService(
         if (user != null)
         {
             user.RefreshTokens.RemoveAll(rt => rt.Token == refreshToken);
-            await _userRepository.UpdateAsync(user);
+            await _userRepository.UpdateOneAsync(user);
         }
     }
 
@@ -102,7 +106,7 @@ public class AuthService(
     /// <param name="user">The user for whom the tokens are generated.</param>
     /// <returns>An authentication response containing the generated JWT token, the user's username, the token's expiration date, and the new refresh token.</returns>
     /// <remarks>
-    /// This method removes expired refresh tokens, generates a new refresh token, updates the user's refresh token list, and stores the new token in the database. 
+    /// This method removes expired refresh tokens, generates a new refresh token, updates the user's refresh token list, and stores the new token in the database.
     /// The JWT token is generated with claims including the user's ID, username, role, and token version.
     /// </remarks>
     private async Task<AuthResponseDto> GenerateTokenAndSetRefreshToken(User user)
@@ -118,15 +122,14 @@ public class AuthService(
         };
 
         user.RefreshTokens.Add(newRefreshToken);
-        await _userRepository.UpdateAsync(user);
+        await _userRepository.UpdateOneAsync(user);
 
         List<Claim> claims =
         [
-            new (ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new (ClaimTypes.Name, user.Username),
-            new (ClaimTypes.Role,user.Role.ToString() )
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.Username),
+            new(ClaimTypes.Role, user.Role.ToString()),
         ];
-
 
         var accessToken = _jwtTokenService.GenerateAccessToken(user, claims);
 

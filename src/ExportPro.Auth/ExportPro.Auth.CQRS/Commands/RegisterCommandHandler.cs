@@ -9,11 +9,10 @@ public record RegisterCommand(UserRegisterDto RegisterDto) : ICommand<AuthRespon
 public class RegisterCommandHandler(IAuthService authService)
     : ICommandHandler<RegisterCommand, AuthResponseDto>
 {
-    private readonly IAuthService _authService = authService;
 
     public async Task<BaseResponse<AuthResponseDto>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        var result = await _authService.RegisterAsync(request.RegisterDto);
+        var result = await authService.RegisterAsync(request.RegisterDto);
         return new SuccessResponse<AuthResponseDto>(result);
     }
 }

@@ -38,19 +38,17 @@ public static class AuthenticationExtensions
             {
                 OnTokenValidated = async context =>
                 {
-                    var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                    var userRepository = context.HttpContext.RequestServices.GetRequiredService<UserRepository>();
 
                     var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier);
-                    var tokenVersionClaim = context.Principal?.FindFirst("tokenVersion");
 
-                    if (userIdClaim == null || tokenVersionClaim == null)
+                    if (userIdClaim == null)
                     {
                         context.Fail("Missing claims");
                         return;
                     }
 
                     var userId = new ObjectId(userIdClaim.Value);
-                    var tokenVersion = int.Parse(tokenVersionClaim.Value);
                     var user = await userRepository.GetByIdAsync(userId);
 
                     if (user == null)
@@ -59,17 +57,13 @@ public static class AuthenticationExtensions
                         return;
                     }
 
-                    if (!context.HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
-                    {
-                        context.Fail("Refresh token missing");
-                        return;
-                    }
+                    //if (!context.HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+                    //{
+                    //    context.Fail("Refresh token missing");
+                    //    return;
+                    //}
 
-                    var token = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
-                    if (token == null || token.TokenVersion != tokenVersion)
-                    {
-                        context.Fail("Token version mismatch");
-                    }
+                    //var token = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
                 }
             };
 

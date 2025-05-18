@@ -1,23 +1,35 @@
 ﻿using System.Runtime.CompilerServices;
 using AutoMapper;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.Common.Shared.Refit;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public sealed record GetAllInvoicesQuery(int PageNumber = 1, int PageSize = 10) : IQuery<PaginatedListDto<InvoiceDto>>;
+public sealed record GetAllInvoicesQuery(int PageNumber = 1, int PageSize = 10)
+    : IQuery<PaginatedListDto<InvoiceDto>>,
+        IPermissionedRequest
+{
+    public List<Guid>? ClientIds => [];
+    public Resource Resource => Resource.Invoices;
+    public CrudAction Action => CrudAction.Read;
+}
 
 public sealed class GetAllInvoicesHandler(
     IInvoiceRepository repository,
     ICustomerRepository customerRepository,
     ICountryRepository countryRepository,
+    IACLSharedApi aCLSharedApi,
     IClientRepository clientRepository,
     ICurrencyRepository currencyRepository,
     IMapper mapper
@@ -32,11 +44,19 @@ public sealed class GetAllInvoicesHandler(
             return new BadRequestResponse<PaginatedListDto<InvoiceDto>>("Page number must be greater than zero.");
         if (request.PageSize < 1)
             return new BadRequestResponse<PaginatedListDto<InvoiceDto>>("Page size must be greater than zero.");
+
+        var availableClientGuids = await aCLSharedApi.GetUserClientsAsync(cancellationToken);
+        var availableClientObjectIds = availableClientGuids.Data?.Select(g => g.ToObjectId()).ToHashSet();
+
         var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
+
         var paginatedInvoices = await repository.GetAllPaginatedAsync(parameters, cancellationToken);
+        var filteredInvoices = paginatedInvoices
+            .Items.Where(i => availableClientObjectIds.Contains(i.ClientId))
+            .ToList();
         var invoiceDtos = (
             await Task.WhenAll(
-                paginatedInvoices.Items.Select(async invoice =>
+                filteredInvoices.Select(async invoice =>
                 {
                     var currency = await GetCustomerCurrency(invoice.CustomerId, cancellationToken);
                     var items = new List<ItemDtoForInvoice>();
@@ -82,6 +102,7 @@ public sealed class GetAllInvoicesHandler(
             paginatedInvoices.PageNumber,
             paginatedInvoices.TotalPages
         );
+
         return new SuccessResponse<PaginatedListDto<InvoiceDto>>(
             paginatedDto,
             "The invoices were retrieved successfully."

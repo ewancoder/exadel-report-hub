@@ -1,0 +1,24 @@
+﻿<div class="grid">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+        @foreach (var client in ClientsList)
+        {
+            <tr @onclick="() => OnSelect.InvokeAsync(client.Id)">
+                <td>@client.Name</td>
+                <td>@client.Description</td>
+            </tr>
+        }
+    </table>
+</div>
+
+
+@code {
+    [Parameter] public IEnumerable<Client> ClientsList { get; set; }
+    [Parameter] public EventCallback<int> ServiceParamsMethod { get; set; }
+    [Parameter] public EventCallback<int> ServiceResultParamsMethod { get; set; }
+    [Parameter] public EventCallback<Guid> OnSelect { get; set; }
+}
+

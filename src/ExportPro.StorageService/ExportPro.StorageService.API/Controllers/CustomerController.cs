@@ -1,6 +1,4 @@
-﻿using ExportPro.Common.Shared.Attributes;
-using ExportPro.Common.Shared.Enums;
-using ExportPro.Common.Shared.Extensions;
+﻿using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 using ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
@@ -9,16 +7,17 @@ using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExportPro.StorageService.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class CustomerController(IMediator mediator) : ControllerBase, ICustomerController
 {
     [HttpPost]
-    [HasPermission(Resource.Customers, CrudAction.Create)]
     public Task<BaseResponse<CustomerResponse>> Create(
         [FromBody] CreateUpdateCustomerDto customerDto,
         CancellationToken cancellationToken
@@ -32,7 +31,6 @@ public class CustomerController(IMediator mediator) : ControllerBase, ICustomerC
     ) => mediator.Send(new CreateCustomersCommand(customers), cancellationToken);
 
     [HttpPut("{id}")]
-    [HasPermission(Resource.Customers, CrudAction.Update)]
     public Task<BaseResponse<CustomerResponse>> Update(
         [FromRoute] Guid id,
         [FromBody] CreateUpdateCustomerDto customerDto,
@@ -40,16 +38,12 @@ public class CustomerController(IMediator mediator) : ControllerBase, ICustomerC
     ) => mediator.Send(new UpdateCustomerCommand(id, customerDto), cancellationToken);
 
     [HttpDelete("{id}")]
-    [HasPermission(Resource.Customers, CrudAction.Delete)]
     public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken) =>
         mediator.Send(new DeleteCustomerCommand(id), cancellationToken);
 
     [HttpGet("{id}")]
-    [HasPermission(Resource.Customers, CrudAction.Read)]
     public Task<BaseResponse<CustomerDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken) =>
         mediator.Send(new GetCustomerByIdQuery(id.ToObjectId()), cancellationToken);
-
-    [HasPermission(Resource.Customers, CrudAction.Read)]
     [HttpGet]
     public Task<BaseResponse<PaginatedListDto<CustomerDto>>> GetAll(
         [FromQuery] int pageNumber = 1,

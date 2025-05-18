@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Library;
@@ -11,16 +11,17 @@ using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExportPro.StorageService.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class InvoiceController(IMediator mediator) : ControllerBase, IInvoiceController
 {
     [HttpPost]
-    [HasPermission(Resource.Invoices, CrudAction.Create)]
     public Task<BaseResponse<InvoiceDto>> Create(
         [FromBody] CreateInvoiceDto invoice,
         CancellationToken cancellationToken = default
@@ -42,7 +43,6 @@ public class InvoiceController(IMediator mediator) : ControllerBase, IInvoiceCon
         mediator.Send(new GetInvoiceByIdQuery(id), cancellationToken);
 
     [HttpGet]
-    [HasPermission(Resource.Invoices, CrudAction.Read)]
     public Task<BaseResponse<PaginatedListDto<InvoiceDto>>> GetInvoices(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
@@ -50,7 +50,6 @@ public class InvoiceController(IMediator mediator) : ControllerBase, IInvoiceCon
     ) => mediator.Send(new GetAllInvoicesQuery(pageNumber, pageSize), cancellationToken);
 
     [HttpGet("getByFilter")]
-    [HasPermission(Resource.Invoices, CrudAction.Read)]
     public Task<BaseResponse<PaginatedList<InvoiceDto>>> GetInvoicesByFilter(
         [FromQuery] InvoiceFilter filters,
         [FromQuery] Guid clientId,
@@ -70,7 +69,6 @@ public class InvoiceController(IMediator mediator) : ControllerBase, IInvoiceCon
     ) => mediator.Send(new GetTotalRevenueQuery(query), cancellationToken);
 
     [HttpGet("overdue-payments/{clientId}")]
-    [HasPermission(Resource.Invoices, CrudAction.Read)]
     public Task<BaseResponse<OverduePaymentsResponse>> GetOverduePayments(
         [FromRoute] Guid clientId,
         [Required] [FromQuery] Guid clientCurrencyId,

@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -15,7 +17,14 @@ using Serilog;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public sealed record CreateInvoiceCommand(CreateInvoiceDto CreateInvoiceDto) : ICommand<InvoiceDto>;
+public sealed record CreateInvoiceCommand(CreateInvoiceDto CreateInvoiceDto)
+    : ICommand<InvoiceDto>,
+        IPermissionedRequest
+{
+    public List<Guid>? ClientIds { get; init; } = [CreateInvoiceDto.ClientId];
+    public Resource Resource { get; init; } = Resource.Invoices;
+    public CrudAction Action { get; init; } = CrudAction.Create;
+};
 
 public sealed class CreateInvoiceHandler(
     IInvoiceRepository repository,
@@ -57,7 +66,7 @@ public sealed class CreateInvoiceHandler(
                 cancellationToken
             );
             logger.Debug("currency retrieved of item @{currency}", currency);
-            logger.Debug("currency of item @{currency.CurrencyCode}",currency.CurrencyCode);
+            logger.Debug("currency of item @{currency.CurrencyCode}", currency.CurrencyCode);
             ItemDtoForInvoice dto = mapper.Map<ItemDtoForInvoice>(item);
             dto.Currency = currency?.CurrencyCode;
 
@@ -73,13 +82,12 @@ public sealed class CreateInvoiceHandler(
             var currencyCode = i.Currency;
             if (currencyCode == "EUR")
             {
-              
                 await validator.ValidateAndThrowAsync(
                     new CurrencyExchangeModel
                     {
                         Date = invoice.IssueDate,
                         From = i.Currency,
-                        To=currencyResp.CurrencyCode
+                        To = currencyResp.CurrencyCode,
                     }
                 );
                 CurrencyExchangeModel modela = new()

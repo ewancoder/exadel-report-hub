@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
@@ -8,7 +10,12 @@ using ExportPro.StorageService.SDK.DTOs;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 
-public sealed record CreateItemsCommand(Guid ClientId, List<ItemDtoForClient> Items) : ICommand<bool>;
+public sealed record CreateItemsCommand(Guid ClientId, List<ItemDtoForClient> Items) : ICommand<bool>, IPermissionedRequest
+{
+    public List<Guid>? ClientIds { get; init; } = [ClientId];
+    public Resource Resource { get; init; } = Resource.Items;
+    public CrudAction Action { get; init; } = CrudAction.Create;
+};
 
 public sealed class CreateItemsCommandHandler(IClientRepository repository, IMapper mapper)
     : ICommandHandler<CreateItemsCommand, bool>

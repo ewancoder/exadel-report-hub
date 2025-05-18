@@ -1,16 +1,26 @@
 ﻿using AutoMapper;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.Common.Shared.Refit;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
+using ExportPro.StorageService.SDK.Refit;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using Serilog;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
-public sealed record GetInvoiceByIdQuery(Guid Id) : IQuery<InvoiceDto>;
+public sealed record GetInvoiceByIdQuery(Guid Id) : IQuery<InvoiceDto>, IPermissionedRequest
+{
+    public List<Guid>? ClientIds => null;
+    public Resource Resource => Resource.Invoices;
+    public CrudAction Action => CrudAction.Read;
+}
 
 public sealed class GetInvoiceByIdHandler(
     IInvoiceRepository repository,
@@ -18,6 +28,8 @@ public sealed class GetInvoiceByIdHandler(
     ICurrencyRepository currencyRepository,
     IClientRepository clientRepository,
     ICustomerRepository customerRepository,
+    IACLSharedApi aclApi,
+    IHttpContextAccessor httpContextAccessor,
     IMapper mapper,
     ILogger logger
 ) : IQueryHandler<GetInvoiceByIdQuery, InvoiceDto>
@@ -31,6 +43,22 @@ public sealed class GetInvoiceByIdHandler(
         logger.Information("Invoice found: {@Invoice}", invoice);
         if (invoice == null)
             return new NotFoundResponse<InvoiceDto>("Invoice not found.");
+        var client = await clientRepository.GetOneAsync(
+            x => x.Id == invoice.ClientId && !x.IsDeleted,
+            cancellationToken
+        );
+        var permission = await aclApi.CheckPermissionAsync(
+            new Common.Shared.Models.CheckPermissionRequest
+            {
+                ClientId = client?.Id.ToGuid(),
+                UserId = TokenHelper.GetUserId(httpContextAccessor.HttpContext?.User).ToGuid(),
+                Resource = request.Resource,
+                Action = request.Action,
+            }
+        );
+
+        if (!permission.Data)
+            return new NotFoundResponse<InvoiceDto>("You do not have permission to view this invoice.");
         var customerCurrency = await GetCustomerCurrency(invoice.CustomerId, cancellationToken);
         logger.Debug("Customer Currency: {@customerCurrency}", customerCurrency);
         List<ItemDtoForInvoice> items = new();

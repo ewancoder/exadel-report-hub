@@ -5,7 +5,6 @@ using ExportPro.Common.Shared.Attributes;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Extensions;
-using ExportPro.Common.Shared.Filters;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.StorageService.API;
 using ExportPro.StorageService.API.Configurations;
@@ -26,6 +25,12 @@ using Microsoft.IdentityModel.Tokens;
 using Refit;
 using ExportPro.StorageService.Api.Validations.CurrencyConversion;
 
+using ExportPro.Common.Shared.Refit;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using ExportPro.Export.ServiceHost.Infrastructure;
+using System.Buffers.Text;
+using ExportPro.StorageService.API;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
@@ -35,16 +40,27 @@ builder
         options.Filters.Add<ApiResponseStatusCodeFilter>();
         options.Filters.Add<PermissionFilter>();
         options.Filters.Add<ValidateModelStateAttribute>();
+    }).AddJsonOptions(opts =>
+    {
+        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     })
     .AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Program>());
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
-});
+
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Host.UseSharedSerilogAndConfiguration();
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-
+var refitSettings = new RefitSettings
+{
+    ContentSerializer = new SystemTextJsonContentSerializer(
+        new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = false
+        })
+};
 builder
     .Services.AddAuthentication(options =>
     {
@@ -72,10 +88,23 @@ builder
     {
         c.BaseAddress = new Uri(builder.Configuration["Refit:appurl"] ?? string.Empty);
     });
+builder.Services.AddTransient<ForwardAuthHeaderHandler>();
+builder.Services
+    .AddRefitClient<IACLSharedApi>(new RefitSettings
+    {
+        ContentSerializer = new SystemTextJsonContentSerializer()
+    })
+    .ConfigureHttpClient((sp, client) =>
+    {
+        var config = sp.GetRequiredService<IConfiguration>();
+        client.BaseAddress = new Uri(config["Refit:authUrl"]);
+    })
+    .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
 builder.Services.AddLogging();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Storage Service");
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddCommonRegistrations();
 builder.Services.AddRepositoryConfig();
