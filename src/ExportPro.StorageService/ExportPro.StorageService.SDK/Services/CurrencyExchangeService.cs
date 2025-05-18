@@ -11,6 +11,10 @@ public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeS
         CancellationToken cancellationToken = default
     )
     {
+        if (currenyExchangeModel.From is not null && currenyExchangeModel.To is not null)
+            currenyExchangeModel.From = currenyExchangeModel.To;
+        if (currenyExchangeModel.From == "EUR")
+            return 1.0;
         var validDate = await GetLastValidDateAsync(currenyExchangeModel.From, currenyExchangeModel.Date);
         var dateString = validDate.ToString("yyyy-MM-dd");
 
@@ -72,7 +76,7 @@ public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeS
         double exchangeRateToEuroFromDestCurrency = 1.0;
         if (currenyExchangeModel.From != "EUR")
             exchangeRateToEuroFromSrcCurrency = await ExchangeRate(currenyExchangeModel, cancellationToken);
-        if (currenyExchangeModel.To == "EUR")
+        if (currenyExchangeModel.To != "EUR")
             exchangeRateToEuroFromDestCurrency = await ExchangeRate(currenyExchangeModel, cancellationToken);
         var amount =
             currenyExchangeModel.AmountFrom * exchangeRateToEuroFromDestCurrency / exchangeRateToEuroFromSrcCurrency;

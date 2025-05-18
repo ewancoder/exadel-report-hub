@@ -57,6 +57,7 @@ public sealed class CreateInvoiceHandler(
                 cancellationToken
             );
             logger.Debug("currency retrieved of item @{currency}", currency);
+            logger.Debug("currency of item @{currency.CurrencyCode}",currency.CurrencyCode);
             ItemDtoForInvoice dto = mapper.Map<ItemDtoForInvoice>(item);
             dto.Currency = currency?.CurrencyCode;
 
@@ -70,6 +71,28 @@ public sealed class CreateInvoiceHandler(
         {
             //item's currencycode
             var currencyCode = i.Currency;
+            if (currencyCode == "EUR")
+            {
+              
+                await validator.ValidateAndThrowAsync(
+                    new CurrencyExchangeModel
+                    {
+                        Date = invoice.IssueDate,
+                        From = i.Currency,
+                        To=currencyResp.CurrencyCode
+                    }
+                );
+                CurrencyExchangeModel modela = new()
+                {
+                    Date = invoice.IssueDate,
+                    From = currencyCode,
+                    To = currencyResp.CurrencyCode,
+                    AmountFrom = i.Price,
+                };
+                var amounta = await currencyExchangeService.ConvertTwoCurrencies(modela, cancellationToken);
+                invoice.Amount += amounta;
+                continue;
+            }
             await validator.ValidateAndThrowAsync(
                 new CurrencyExchangeModel
                 {
