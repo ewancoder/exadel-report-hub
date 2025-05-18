@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Common.Shared.Library;
 namespace ExportPro.Auth.ServiceHost.Controllers;
 
 [Produces("application/json")]
@@ -15,27 +16,29 @@ public class AuthController(IMediator mediator) : ControllerBase
     [HttpPost("register")]
     [SwaggerOperation(Summary = "Register a new user")]
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
-    public async Task<IActionResult> Register([FromBody] UserRegisterDto dto)
+    public async Task<BaseResponse<AuthResponseDto>> Register([FromBody] UserRegisterDto dto)
     {
         var response = await _mediator.Send(new RegisterCommand(dto));
-        if (!response.IsSuccess || response.Data == null)
-            return BadRequest(response.Messages);
-
         SetRefreshTokenCookie(response.Data);
-        return Ok("Registered successfully");
+        return response;
     }
 
     [HttpPost("login")]
     [SwaggerOperation(Summary = "Login a user")]
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
-    public async Task<IActionResult> Login([FromBody] UserLoginDto dto)
+    public async Task<BaseResponse<AuthResponseDto>> Login([FromBody] UserLoginDto dto)
     {
         var response = await _mediator.Send(new LoginCommand(dto));
         if (!response.IsSuccess || response.Data == null)
-            return Unauthorized(response.Messages);
+            return new BadRequestResponse<AuthResponseDto>
+            {
+                Messages = response.Messages,
+                ApiState = response.ApiState,
+                Data = null
+            };
 
         SetRefreshTokenCookie(response.Data);
-        return Ok(response.Data);
+        return response;
     }
 
     [HttpPost("refresh-token")]

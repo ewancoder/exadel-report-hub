@@ -6,14 +6,11 @@ using ExportPro.AuthService.Services;
 using ExportPro.Common.DataAccess.MongoDB.Contexts;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Services;
-using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
 using MediatR;
-using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerServices("ExportPro Auth Service");
@@ -28,6 +25,17 @@ builder.Services.AddScoped<IACLRepository, ACLRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IACLService, ACLService>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWasm", policy =>
+    {
+        policy
+            .WithOrigins("https://localhost:7107") 
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 
 builder.Services.AddMediatR(cfg =>
@@ -46,7 +54,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowWasm");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

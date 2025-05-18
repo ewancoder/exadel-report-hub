@@ -1,6 +1,14 @@
 ﻿@page "/home"
 
 
+<AuthorizeView>
+    <Authorized>
+        <h3>Welcome dashboard</h3>
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
 

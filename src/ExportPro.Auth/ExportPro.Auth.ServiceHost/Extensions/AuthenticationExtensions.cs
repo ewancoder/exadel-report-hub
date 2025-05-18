@@ -57,13 +57,13 @@ public static class AuthenticationExtensions
                         return;
                     }
 
-                    if (!context.HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
-                    {
-                        context.Fail("Refresh token missing");
-                        return;
-                    }
+                    //if (!context.HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+                    //{
+                    //    context.Fail("Refresh token missing");
+                    //    return;
+                    //}
 
-                    var token = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
+                    //var token = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
                 }
             };
 

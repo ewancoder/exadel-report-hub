@@ -55,7 +55,8 @@ public class GetAllUsersQueryHandler(IHttpContextAccessor httpContextAccessor, I
                 .Select(cr => new UserClientRolesDTO
                 {
                     ClientId = cr.ClientId.ToGuid(),
-                    Role = cr.Role
+                    Role = cr.Role,
+                    UserId = cr.UserId.ToGuid()
                 }).ToList() ?? [];
 
             userDtos.Add(new UserDto

@@ -1,4 +1,5 @@
-﻿using ExportPro.Front.Helper;
+﻿using Blazored.LocalStorage;
+using ExportPro.Front.Helper;
 using ExportPro.Front.Models;
 using Microsoft.AspNetCore.Components;
 
@@ -8,6 +9,7 @@ public partial class Register : ComponentBase
 {
     [Inject] private NavigationManager Nav { get; set; } = default!;
     [Inject] private HttpClient httpClient { get; set; } = default!;
+    [Inject] private ILocalStorageService localStorage { get; set; } = default!;
 
     private ApiHelper? apiHelper;
 
@@ -15,7 +17,7 @@ public partial class Register : ComponentBase
 
     protected override void OnInitialized()
     {
-        apiHelper = new ApiHelper(httpClient);
+        apiHelper = new ApiHelper(httpClient, localStorage);
     }
 
     private async Task HandleRegister()
@@ -26,12 +28,9 @@ public partial class Register : ComponentBase
         try
         {
             var result = await apiHelper.PostAsync<RegisterModel, object>("api/Auth/register", registerModel);
-            Console.Write(httpClient.BaseAddress);
-
             if (result.IsSuccess)
-            {
-                Nav.NavigateTo("/login");
-            }
+                NavigateToLogin();
+
         }
         catch (Exception ex)
         {

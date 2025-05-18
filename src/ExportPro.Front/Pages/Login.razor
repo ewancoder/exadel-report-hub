@@ -4,7 +4,7 @@
 
 <div class="login-wrapper">
     <div class="login-page">
-        <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+        <EditForm Model="@login" OnValidSubmit="HandleLogin">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
@@ -12,14 +12,14 @@
 
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <InputText @bind-Value="loginModel.Email" id="email" class="form-control" />
-                <ValidationMessage For="@(() => loginModel.Email)" />
+                <InputText @bind-Value="login.Email" id="email" class="form-control" />
+                <ValidationMessage For="@(() => login.Email)" />
             </div>
 
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <InputText @bind-Value="loginModel.Password" id="password" type="password" class="form-control" />
-                <ValidationMessage For="@(() => loginModel.Password)" />
+                <InputText @bind-Value="login.Password" id="password" type="password" class="form-control" />
+                <ValidationMessage For="@(() => login.Password)" />
             </div>
 
             <button type="submit" class="btn btn-dark w-100">Log In</button>
@@ -27,14 +27,3 @@
         </EditForm>
     </div>
 </div>
-
-@code {
-    private ExportPro.Front.Models.LoginModel loginModel = new();
-
-    private async Task HandleLogin()
-    {
-        // TODO: Call API
-    }
-
-    private void NavigateToRegister() => Nav.NavigateTo("/register");
-}

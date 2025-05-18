@@ -47,9 +47,9 @@ public sealed class ACLService(IACLRepository aclRepository) : IACLService
         await aclRepository.AddOneAsync(roleEntry, cancellationToken);
     }
 
-    public async Task<bool> HasPermission(ObjectId userId, ObjectId clientId, Resource resource, CrudAction action, CancellationToken cancellationToken = default)
+    public async Task<bool> HasPermission(ObjectId userId, ObjectId? clientId, Resource resource, CrudAction action, CancellationToken cancellationToken = default)
     {
-        var userRoles = await Roles(userId, clientId, cancellationToken);
+        var userRoles = await Roles(userId, clientId.GetValueOrDefault(), cancellationToken);
         foreach (var roleEntry in userRoles)
         {
             if (PermissionChecker.HasPermission(roleEntry.Role, resource, action))

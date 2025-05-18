@@ -29,7 +29,8 @@ public sealed class GetCurrentUserQueryHandler(IHttpContextAccessor httpContextA
             .Select(cr => new UserClientRolesDTO
             {
                 ClientId = cr.ClientId.ToGuid(),
-                Role = cr.Role
+                Role = cr.Role,
+                UserId = cr.UserId.ToGuid()
             }).ToList() ?? [];
 
         var userDto = new UserDto
