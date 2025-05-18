@@ -9,11 +9,18 @@
     <ItemGroup>
         <PackageReference Include="ExportPro.Auth.SDK" Version="1.0.9"/>
         <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="1.0.3"/>
+        <PackageReference Include="SpecFlow" Version="3.9.74" />
     </ItemGroup>
     <ItemGroup>
         <None Update="appsettings.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="TechTalk.SpecFlow">
+        <HintPath>..\..\..\..\..\.nuget\packages\specflow\3.9.74\lib\netstandard2.0\TechTalk.SpecFlow.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 

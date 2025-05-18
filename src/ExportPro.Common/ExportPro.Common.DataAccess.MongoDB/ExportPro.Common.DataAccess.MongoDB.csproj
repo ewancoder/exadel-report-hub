@@ -12,10 +12,13 @@
 
   <ItemGroup>
     <PackageReference Include="ExportPro.Common.Models.MongoDB" Version="1.0.0" />
-    <PackageReference Include="ExportPro.Common.Shared" Version="1.0.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3" />
     <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
   </ItemGroup>
 
  

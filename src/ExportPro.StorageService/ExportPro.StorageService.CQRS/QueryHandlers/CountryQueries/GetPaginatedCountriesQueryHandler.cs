@@ -7,7 +7,7 @@ using ExportPro.StorageService.SDK.PaginationParams;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CountryQueries;
 
-public sealed record GetPaginatedCountriesQuery(int PageNumber = 1, int PageSize = 10)
+public sealed record GetPaginatedCountriesQuery(PaginationParameters PaginationParameters)
     : IQuery<PaginatedListDto<CountryDto>>;
 
 public sealed class GetPaginatedCountriesQueryHandler(ICountryRepository repository, IMapper mapper)
@@ -18,8 +18,7 @@ public sealed class GetPaginatedCountriesQueryHandler(ICountryRepository reposit
         CancellationToken cancellationToken
     )
     {
-        var parameters = new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize };
-        var result = await repository.GetAllPaginatedAsync(parameters, cancellationToken);
+        var result = await repository.GetAllPaginatedAsync(request.PaginationParameters, cancellationToken);
 
         return new SuccessResponse<PaginatedListDto<CountryDto>>(
             new PaginatedListDto<CountryDto>(

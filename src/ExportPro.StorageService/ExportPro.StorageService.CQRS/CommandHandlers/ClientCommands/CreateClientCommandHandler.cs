@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Claims;
 using AutoMapper;
 using ExportPro.Common.Shared.Library;
@@ -25,6 +26,7 @@ public sealed class CreateClientCommandHandler(
     {
         var userName = httpContext.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
         var client = mapper.Map<Client>(request.ClientDto);
+        client.Name = char.ToUpper(client.Name![0]) + client.Name.Substring(1);
         client.CreatedBy = userName;
         await clientRepository.AddOneAsync(client, cancellationToken);
         var clientResponse = mapper.Map<ClientResponse>(client);

@@ -2,6 +2,7 @@
 using ExportPro.StorageService.CQRS.QueryHandlers.CountryQueries;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
+using ExportPro.StorageService.SDK.Refit;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,26 +10,21 @@ namespace ExportPro.StorageService.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CountryController(IMediator mediator) : ControllerBase
+public class CountryController(IMediator mediator) : ControllerBase, ICountryController
 {
     [HttpGet("name/{countryCode}")]
-    public Task<BaseResponse<CountryDto>> GetById(
+    public Task<BaseResponse<CountryDto>> GetByCode(
         [FromRoute] string countryCode,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     ) => mediator.Send(new GetCountryByCodeQuery(countryCode), cancellationToken);
 
     [HttpGet("{id}")]
-    public Task<BaseResponse<CountryDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken) =>
+    public Task<BaseResponse<CountryDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken = default) =>
         mediator.Send(new GetCountryByIdQuery(id), cancellationToken);
 
     [HttpGet]
     public Task<BaseResponse<PaginatedListDto<CountryDto>>> GetAll(
-        CancellationToken cancellationToken,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10
-    ) =>
-        mediator.Send(
-            new GetPaginatedCountriesQuery { PageNumber = pageNumber, PageSize = pageSize },
-            cancellationToken
-        );
+        [FromQuery] PaginationParameters paginationParameters,
+        CancellationToken cancellationToken = default
+    ) => mediator.Send(new GetPaginatedCountriesQuery(paginationParameters), cancellationToken);
 }

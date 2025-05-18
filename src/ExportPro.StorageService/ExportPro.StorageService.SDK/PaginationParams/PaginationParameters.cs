@@ -1,6 +1,6 @@
 ﻿namespace ExportPro.StorageService.SDK.PaginationParams;
 
-public sealed class PaginationParameters
+public class PaginationParameters
 {
     private const int MaxPageSize = 50;
     private int _pageNumber = 1;

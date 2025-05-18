@@ -22,8 +22,7 @@ public sealed class Invoice : AuditModel, IModel
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId CustomerId { get; set; }
-
-    public List<Item>? Items { get; set; }
+    public List<ObjectId>? ItemsId { get; set; }
     public bool IsDeleted { get; set; } = false;
     public ObjectId Id { get; set; }
 }

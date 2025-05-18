@@ -21,11 +21,10 @@ public class CreateCustomerSteps
     private readonly IMongoDbContext<Customer> _mongoDbContext = new MongoDbContext<Customer>();
     private readonly IMongoDbContext<Country> _mongoDbContextCountry = new MongoDbContext<Country>();
     private readonly IMongoDbContext<Currency> _mongoDbContextCurrency = new MongoDbContext<Currency>();
-    private ICountryApi? _countryApi;
+    private ICountryController? _countryApi;
     private Guid _countryId;
-    private ICurrencyApi? _currencyApi;
-    private Guid _currencyId;
-    private ICustomerApi? _customerApi;
+    private ICurrencyController? _currencyApi;
+    private ICustomerController? _customerApi;
     private CreateUpdateCustomerDto? _customerDto;
 
     [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
@@ -36,38 +35,16 @@ public class CreateCustomerSteps
     {
         var jwtToken = await UserLogin.Login(email, password);
         var httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1500);
-        _countryApi = RestService.For<ICountryApi>(httpClient);
-        _currencyApi = RestService.For<ICurrencyApi>(httpClient);
-        _customerApi = RestService.For<ICustomerApi>(httpClient);
+        _countryApi = RestService.For<ICountryController>(httpClient);
+        _currencyApi = RestService.For<ICurrencyController>(httpClient);
+        _customerApi = RestService.For<ICustomerController>(httpClient);
     }
 
-    [Given("The user created following currency and stored the currency id")]
-    public async Task GivenTheUserCreatedFollowingCurrencyAndStoredTheCurrencyId(Table table)
+    [Given(@"The user has following country ""(.*)""")]
+    public async Task GivenTheUserHasFollowingCountry(string country)
     {
-        var cur = table.CreateInstance<CurrencyDto>();
-        var currency = await _currencyApi!.Create(cur);
-        var currencyExists = await _mongoDbContextCurrency
-            .Collection.Find(x =>
-                x.CurrencyCode == currency.Data!.CurrencyCode && x.CreatedBy == currency.Data.CreatedBy
-            )
-            .FirstOrDefaultAsync();
-        Assert.That(currencyExists, Is.Not.EqualTo(null));
-        Assert.That(currencyExists.CurrencyCode, Is.EqualTo(cur.CurrencyCode));
-        _currencyId = currency.Data!.Id;
-    }
-
-    [Given("The user created following country and stored the country id")]
-    public async Task GivenTheUserCreatedFollowingCountryAndStoredTheCountryId(Table table)
-    {
-        var countryDto = table.CreateInstance<CreateCountryDto>();
-        countryDto.CurrencyId = _currencyId;
-        var country = await _countryApi!.Create(countryDto);
-        var countryExists = await _mongoDbContextCountry
-            .Collection.Find(x => x.Name == country.Data!.Name)
-            .FirstOrDefaultAsync();
-        Assert.That(countryExists, Is.Not.EqualTo(null));
-        Assert.That(countryExists.Name, Is.EqualTo(country.Data!.Name));
-        _countryId = country.Data.Id;
+        var countryResponse = await _countryApi!.GetByCode(country, cancellationToken: default);
+        _countryId = countryResponse.Data!.Id;
     }
 
     [Given("The user wants to create following customer")]
@@ -79,9 +56,9 @@ public class CreateCustomerSteps
     }
 
     [When("the user sends the customer creation request")]
-    public async Task WhenTheUserSendsTheCustomerCreationRequest()
+    public Task WhenTheUserSendsTheCustomerCreationRequest()
     {
-        await _customerApi!.Create(_customerDto!);
+        return _customerApi!.Create(_customerDto!);
     }
 
     [Then("the customer should be saved in the database")]
@@ -97,8 +74,6 @@ public class CreateCustomerSteps
     [AfterScenario("@CreateCustomer")]
     public async Task CleanUp()
     {
-        await _mongoDbContextCountry.Collection.DeleteOneAsync(x => x.Id == _countryId.ToObjectId());
-        await _mongoDbContextCurrency.Collection.DeleteOneAsync(x => x.Id == _currencyId.ToObjectId());
         await _mongoDbContext.Collection.DeleteOneAsync(x =>
             (x.CreatedBy == "OwnerUserTest" || x.CreatedBy == "ClientAdminTest" || x.CreatedBy == "OperatorTest")
             && x.Name == _customerDto!.Name

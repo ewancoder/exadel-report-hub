@@ -13,7 +13,7 @@ public sealed class CustomerImportController(IMediator mediator) : ControllerBas
     [HttpPost("bulk")]
     [ProducesResponseType(typeof(SuccessResponse<int>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse<int>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Bulk(
+    public async Task<ActionResult<SuccessResponse<int>>> Bulk(
         [Required] IFormFile file,
         CancellationToken ct)
     {

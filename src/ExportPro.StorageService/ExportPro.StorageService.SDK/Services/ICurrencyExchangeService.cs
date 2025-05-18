@@ -8,6 +8,9 @@ public interface ICurrencyExchangeService
         CurrencyExchangeModel currenyExchangeModel,
         CancellationToken cancellationToken = default
     );
-
     Task<bool> DateExists(string from, string date);
+    Task<double> ConvertTwoCurrencies(
+        CurrencyExchangeModel currenyExchangeModel,
+        CancellationToken cancellationToken = default
+    );
 }

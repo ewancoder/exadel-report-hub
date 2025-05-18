@@ -23,6 +23,7 @@
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1"/>
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\ExportPro.StorageService\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
         <ProjectReference Include="..\ExportPro.Export.CQRS\ExportPro.Export.CQRS.csproj"/>
         <ProjectReference Include="..\ExportPro.Export.Csv\ExportPro.Export.Csv.csproj"/>
         <ProjectReference Include="..\ExportPro.Export.Excel\ExportPro.Export.Excel.csproj"/>

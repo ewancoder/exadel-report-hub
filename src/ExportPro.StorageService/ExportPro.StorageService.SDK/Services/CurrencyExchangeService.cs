@@ -1,5 +1,4 @@
-﻿
-using System.Xml;
+﻿using System.Xml;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
 
@@ -7,9 +6,10 @@ namespace ExportPro.StorageService.SDK.Services;
 
 public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeService
 {
-   public async Task<double> ExchangeRate(
-    CurrencyExchangeModel currenyExchangeModel,
-    CancellationToken cancellationToken = default)
+    public async Task<double> ExchangeRate(
+        CurrencyExchangeModel currenyExchangeModel,
+        CancellationToken cancellationToken = default
+    )
     {
         var validDate = await GetLastValidDateAsync(currenyExchangeModel.From, currenyExchangeModel.Date);
         var dateString = validDate.ToString("yyyy-MM-dd");
@@ -59,5 +59,23 @@ public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeS
         }
 
         throw new InvalidOperationException("Could not find a valid exchange rate date within 7 days.");
+    }
+
+    public async Task<double> ConvertTwoCurrencies(
+        CurrencyExchangeModel currenyExchangeModel,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (currenyExchangeModel.From == currenyExchangeModel.To)
+            return (double)currenyExchangeModel.AmountFrom;
+        double exchangeRateToEuroFromSrcCurrency = 1.0;
+        double exchangeRateToEuroFromDestCurrency = 1.0;
+        if (currenyExchangeModel.From != "EUR")
+            exchangeRateToEuroFromSrcCurrency = await ExchangeRate(currenyExchangeModel, cancellationToken);
+        if (currenyExchangeModel.To == "EUR")
+            exchangeRateToEuroFromDestCurrency = await ExchangeRate(currenyExchangeModel, cancellationToken);
+        var amount =
+            currenyExchangeModel.AmountFrom * exchangeRateToEuroFromDestCurrency / exchangeRateToEuroFromSrcCurrency;
+        return (double)amount!;
     }
 }

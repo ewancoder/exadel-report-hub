@@ -52,11 +52,11 @@ public class GetItemsQueryHandler(
         var allItems = new List<Models.Models.Item>();
 
         // Add items from invoices
-        foreach (var invoice in invoices)
-        {
-            if (invoice.Items != null && invoice.Items.Any())
-                allItems.AddRange(invoice.Items);
-        }
+        // foreach (var invoice in invoices)
+        // {
+        //     if (invoice.ItemsId != null && invoice.ItemsId.Any())
+        //         allItems.AddRange(invoice.ItemsId);
+        // }
 
         // Add items from client
         if (client.Items != null && client.Items.Any())

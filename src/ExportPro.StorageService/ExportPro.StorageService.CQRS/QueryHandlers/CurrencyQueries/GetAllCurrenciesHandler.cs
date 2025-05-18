@@ -3,23 +3,25 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 
-public sealed record GetAllCurrenciesQuery(int Top, int Skip, OrderBy OrderBy) : IQuery<List<CurrencyResponse>>;
+public sealed record GetAllCurrenciesQuery(PaginationParameters PaginationParameters)
+    : IQuery<PaginatedList<CurrencyResponse>>;
 
 public sealed class GetAllCurrenciesHandler(ICurrencyRepository repository, IMapper mapper)
-    : IQueryHandler<GetAllCurrenciesQuery, List<CurrencyResponse>>
+    : IQueryHandler<GetAllCurrenciesQuery, PaginatedList<CurrencyResponse>>
 {
-    public async Task<BaseResponse<List<CurrencyResponse>>> Handle(
+    public async Task<BaseResponse<PaginatedList<CurrencyResponse>>> Handle(
         GetAllCurrenciesQuery request,
         CancellationToken cancellationToken
     )
     {
-        var currencies = await repository.GetPaginated(request.Top, request.Skip, request.OrderBy, cancellationToken);
-        var currency = currencies.Select(x => mapper.Map<CurrencyResponse>(x)).ToList();
-        return new SuccessResponse<List<CurrencyResponse>>(currency, "Currencies retrieved successfully");
+        var currencies = await repository.GetPaginated(request.PaginationParameters, cancellationToken);
+        return new SuccessResponse<PaginatedList<CurrencyResponse>>(currencies, "Currencies retrieved successfully");
     }
 }

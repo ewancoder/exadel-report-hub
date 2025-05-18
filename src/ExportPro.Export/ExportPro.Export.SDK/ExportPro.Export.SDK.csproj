@@ -8,9 +8,12 @@
 
     <ItemGroup>
         <PackageReference Include="ExportPro.Common.Shared" Version="1.0.29" />
-        <PackageReference Include="ExportPro.StorageService.SDK" Version="1.0.15" />
         <PackageReference Include="Refit" Version="8.0.0"/>
         <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\ExportPro.StorageService\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
     </ItemGroup>
 
 </Project>

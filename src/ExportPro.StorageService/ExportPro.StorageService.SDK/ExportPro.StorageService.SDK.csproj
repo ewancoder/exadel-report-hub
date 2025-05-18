@@ -6,18 +6,16 @@
         <Nullable>enable</Nullable>
         <PackageId>ExportPro.StorageService.SDK</PackageId>
         <Authors>Exadel-Group-3</Authors>
-        <Version>1.0.10</Version>
+        <Version>1.0.22</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.25"/>
         <PackageReference Include="ExportPro.Export.Job.Utilities" Version="1.0.3" />
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0-preview1"/>
-        <PackageReference Include="Refit" Version="8.0.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1"/>
+        <PackageReference Include="Refit" Version="8.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj"/>
+      <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
+      <ProjectReference Include="..\ExportPro.StorageService.Models\ExportPro.StorageService.Models.csproj" />
     </ItemGroup>
-
 </Project>

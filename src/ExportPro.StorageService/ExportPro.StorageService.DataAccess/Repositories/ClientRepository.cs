@@ -3,8 +3,10 @@ using AutoMapper;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
@@ -12,17 +14,23 @@ using MongoDB.Driver;
 
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
-public sealed class ClientRepository(
-    IHttpContextAccessor httpContextAccessor,
-    ICollectionProvider collectionProvider,
-    IMapper mapper
-) : BaseRepository<Client>(collectionProvider), IClientRepository
+public sealed class ClientRepository(ICollectionProvider collectionProvider, IMapper mapper)
+    : BaseRepository<Client>(collectionProvider),
+        IClientRepository
 {
-    public Task<List<Client>> GetClients(int top, int skip, CancellationToken cancellationToken = default)
+    public Task<PaginatedList<ClientResponse>> GetClients(
+        PaginationParameters paginationParameters,
+        CancellationToken cancellationToken = default
+    )
     {
-        var clients = Collection.Find(c => !c.IsDeleted);
-        var paginated = clients.Skip(skip).Limit(top).ToListAsync(cancellationToken);
-        return paginated;
+        var filter = Builders<Client>.Filter.Eq(x => x.IsDeleted, false);
+        var clients = Collection.Find(filter).ToList();
+        var clientsResponse = clients.Select(x => mapper.Map<ClientResponse>(x)).ToList();
+        var paginatedList = clientsResponse.ToPaginatedList(
+            paginationParameters.PageNumber,
+            paginationParameters.PageSize
+        );
+        return Task.FromResult(paginatedList);
     }
 
     public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)
@@ -51,7 +59,6 @@ public sealed class ClientRepository(
         {
             item.Id = ObjectId.GenerateNewId();
             item.CreatedAt = DateTime.UtcNow;
-            item.CreatedBy = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)!.Value;
         }
 
         var update = Builders<Client>.Update.PushEach(x => x.Items, items);
@@ -154,7 +161,6 @@ public sealed class ClientRepository(
         client!.Plans?.Add(plans);
         plans.Amount = ind;
         client.UpdatedAt = DateTime.UtcNow;
-        client.UpdatedBy = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
         await UpdateOneAsync(client, cancellationToken);
         return plans;
     }
@@ -197,7 +203,6 @@ public sealed class ClientRepository(
             item.Id = ObjectId.GenerateNewId();
         plan.items = items;
 
-        plan.UpdatedBy = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
         plan.UpdatedAt = DateTime.UtcNow;
         var filter = Builders<Client>.Filter.And(
             Builders<Client>.Filter.Eq(c => c.Id, client.Id),
@@ -221,15 +226,19 @@ public sealed class ClientRepository(
         return planResponse;
     }
 
-    public async Task<List<PlansResponse>> GetClientPlans(
+    public async Task<PaginatedList<PlansResponse>> GetClientPlans(
         ObjectId clientId,
-        int top,
-        int skip,
+        PaginationParameters filters,
         CancellationToken cancellationToken = default
     )
     {
         var client = await GetOneAsync(x => x.Id == clientId && !x.IsDeleted, cancellationToken);
-        var plans = client!.Plans!.Skip(skip).Take(top).Select(x => mapper.Map<PlansResponse>(x)).ToList();
-        return plans;
+        List<PlansResponse> plans = new();
+        foreach (var plan in client.Plans)
+        {
+            plans.Add(mapper.Map<PlansResponse>(plan));
+        }
+        var clientPlans = plans.ToPaginatedList(filters.PageNumber, filters.PageSize);
+        return clientPlans;
     }
 }

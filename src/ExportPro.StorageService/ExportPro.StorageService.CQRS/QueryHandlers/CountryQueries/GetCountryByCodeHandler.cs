@@ -22,7 +22,7 @@ public sealed class GetAllCurrenciesHandler(ICountryRepository repository, IMapp
 
         var countryResp = mapper.Map<CountryDto>(country);
         return countryResp == null
-            ? new NotFoundResponse<CountryDto>("Currency not found.")
-            : new SuccessResponse<CountryDto>(countryResp, "Currecy found successfully.");
+            ? new NotFoundResponse<CountryDto>("Country not found.")
+            : new SuccessResponse<CountryDto>(countryResp, "Country found successfully.");
     }
 }

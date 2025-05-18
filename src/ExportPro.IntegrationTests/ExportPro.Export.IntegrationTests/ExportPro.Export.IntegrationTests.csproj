@@ -10,14 +10,28 @@
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.2"/>
+        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.31" />
+        <PackageReference Include="ExportPro.StorageService.SDK" Version="1.0.20" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
         <PackageReference Include="NUnit" Version="4.2.2"/>
         <PackageReference Include="NUnit.Analyzers" Version="4.4.0"/>
         <PackageReference Include="NUnit3TestAdapter" Version="4.6.0"/>
+        <PackageReference Include="SpecFlow" Version="3.9.74" />
+        <PackageReference Include="SpecFlow.NUnit" Version="3.9.74" />
     </ItemGroup>
 
     <ItemGroup>
         <Using Include="NUnit.Framework"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="TechTalk.SpecFlow">
+        <HintPath>..\..\..\..\..\.nuget\packages\specflow\3.9.74\lib\netstandard2.0\TechTalk.SpecFlow.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ExportPro.Shared.IntegrationTests\ExportPro.Shared.IntegrationTests.csproj" />
     </ItemGroup>
 
 </Project>

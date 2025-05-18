@@ -11,5 +11,5 @@ public sealed class ItemResponse : AuditModel
     public double Price { get; set; }
     public Guid? CustomerId { get; set; }
     public Status? Status { get; set; }
-    public Guid CurrencyId { get; set; } //maybe can be made into enum as well?
+    public string Currency { get; set; } //maybe can be made into enum as well?
 }
