@@ -8,7 +8,6 @@ using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
-using Microsoft.Extensions.Logging;
 using ILogger = Serilog.ILogger;
 
 namespace ExportPro.Export.CQRS.Queries;

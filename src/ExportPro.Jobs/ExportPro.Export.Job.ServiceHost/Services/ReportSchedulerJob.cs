@@ -36,12 +36,6 @@ public sealed class ReportSchedulerJob(
 
         var jwtTokenDto = await authAPi.LoginAsync(login);
         var jwtToken = jwtTokenDto.AccessToken;
-
-        foreach (var pref in preferences)
-        {
-            if (!IsTimeToSend(pref))
-                continue;
-
             var baseUrlForexport =
                 Environment.GetEnvironmentVariable("DockerForReport") ?? configuration["ExportReportURI"];
             HttpClient httpClient = new()
@@ -51,6 +45,12 @@ public sealed class ReportSchedulerJob(
 
             httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
             IReportExportApi reportExportApi = RestService.For<IReportExportApi>(httpClient);
+
+        foreach (var pref in preferences)
+        {
+            if (!IsTimeToSend(pref))
+                continue;
+
             var reportResponse = await reportExportApi.GetStatisticsAsync(
                                 pref.ReportFormat,
                                 pref.ClientId.ToGuid(),
