@@ -34,14 +34,16 @@ public sealed class GetInvoiceByIdHandler(
         var customerCurrency = await GetCustomerCurrency(invoice.CustomerId, cancellationToken);
         logger.Debug("Customer Currency: {@customerCurrency}", customerCurrency);
         List<ItemDtoForInvoice> items = new();
+        int cnt = 0;
         foreach (var item in invoice.ItemsId)
         {
             var itemClient = await clientRepository.GetOneAsync(
                 x => x.Id == invoice.ClientId && !x.IsDeleted,
                 cancellationToken
             );
+            logger.Debug("Item Client: {@itemClient} cnt: {cnt}", itemClient, cnt++);
             var itemResp = itemClient!.Items.FirstOrDefault(x => x.Id == item);
-            logger.Debug("Item: {@itemResp}", itemResp);
+            logger.Debug("Item: {@itemResp }", itemResp);
             var itemCurrency = await currencyRepository.GetOneAsync(
                 x => x.Id == itemResp.CurrencyId && !x.IsDeleted,
                 cancellationToken

@@ -11,6 +11,7 @@ using ExportPro.StorageService.SDK.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
+using Serilog;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
@@ -25,6 +26,7 @@ public sealed class CreateInvoiceHandler(
     IHttpContextAccessor httpContext,
     ICountryRepository countryRepository,
     ICustomerRepository customerRepository,
+    ILogger logger,
     //i need to use this manually because it is not validating automatically
     IValidator<CurrencyExchangeModel> validator
 ) : ICommandHandler<CreateInvoiceCommand, InvoiceDto>
@@ -34,27 +36,35 @@ public sealed class CreateInvoiceHandler(
         CancellationToken cancellationToken
     )
     {
+        logger.Information("Invoice starting to be created.");
         Currency currencyResp = await GetCustomerCurrency(request, cancellationToken);
+        logger.Debug("customer currency retrieved @{currency}", currencyResp.CurrencyCode);
         var invoice = mapper.Map<Invoice>(request.CreateInvoiceDto);
+        logger.Debug("invoice mapped @{invoice}", invoice);
         invoice.Amount = 0;
         var client = await clientRepository.GetOneAsync(
             x => x.Id == invoice.ClientId && !x.IsDeleted,
             cancellationToken
         );
+        logger.Debug("client retrieved @{client}", client);
         List<ItemDtoForInvoice> items = new();
         foreach (var i in invoice.ItemsId!)
         {
             var item = client!.Items!.FirstOrDefault(x => x.Id == i)!;
+            logger.Debug("item retrieved @{item}", item);
             var currency = await currencyRepository.GetOneAsync(
                 x => x.Id == item.CurrencyId && !x.IsDeleted,
                 cancellationToken
             );
+            logger.Debug("currency retrieved of item @{currency}", currency);
             ItemDtoForInvoice dto = mapper.Map<ItemDtoForInvoice>(item);
             dto.Currency = currency?.CurrencyCode;
+
             items.Add(dto);
         }
         var invoiceDto = mapper.Map<InvoiceDto>(invoice);
         invoiceDto.Items = items;
+        logger.Debug("invoiceDto mapped @{invoice}", invoiceDto);
         invoiceDto.Currency = currencyResp.CurrencyCode;
         foreach (var i in invoiceDto.Items)
         {
