@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Text;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 
 namespace ExportPro.Export.CQRS.Queries;
@@ -10,7 +11,7 @@ public class DowloadLogByDateRangeQueryHandler(IConfiguration configuration)
 {
     public async Task<byte[]?> Handle(DownloadLogByDateRangeQuery request, CancellationToken cancellationToken)
     {
-        Dictionary<string, string> combinedLogs = new Dictionary<string, string>();
+        var combinedLogs = new Dictionary<string, string>();
         for (var i = request.startDate; i <= request.endDate; i = i.AddDays(1))
         {
             var format = i.ToString("yyyyMMdd");
@@ -23,12 +24,13 @@ public class DowloadLogByDateRangeQueryHandler(IConfiguration configuration)
                 combinedLogs.Add(i.ToString(), content);
             }
         }
+
         var combinedText = string.Join(
             Environment.NewLine + "-----" + Environment.NewLine,
             combinedLogs.Select(kv => $"{kv.Key}{Environment.NewLine}{kv.Value}")
         );
         if (combinedText.Length == 0)
             return null;
-        return System.Text.Encoding.UTF8.GetBytes(combinedText);
+        return Encoding.UTF8.GetBytes(combinedText);
     }
 }

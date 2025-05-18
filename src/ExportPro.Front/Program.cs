@@ -1,10 +1,10 @@
+using Blazored.LocalStorage;
+using ExportPro.Front;
+using ExportPro.Front.Helper;
+using ExportPro.Front.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using ExportPro.Front;
-using ExportPro.Front.Services;
-using ExportPro.Front.Helper;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -21,7 +21,7 @@ builder.Services.AddAuthorizationCore();
 // ? Register HttpClient to talk to backend API
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7067") // ?? your API base URL
+    BaseAddress = new Uri("https://localhost:7067"), // ?? your API base URL
 });
 
 // ? ApiHelper that uses the above HttpClient

@@ -3,12 +3,6 @@ using Refit;
 
 public class StorageServiceApi : IStorageServiceApi
 {
-    public IClientController Client { get; }
-    public ICurrencyController Currency { get; }
-    public IInvoiceController Invoice { get; }
-    public ICountryController Country { get; }
-    public ICustomerController Customer { get; }
-
     public StorageServiceApi(HttpClient http, RefitSettings? settings = null)
     {
         Client = RestService.For<IClientController>(http, settings);
@@ -17,4 +11,10 @@ public class StorageServiceApi : IStorageServiceApi
         Country = RestService.For<ICountryController>(http, settings);
         Customer = RestService.For<ICustomerController>(http, settings);
     }
+
+    public IClientController Client { get; }
+    public ICurrencyController Currency { get; }
+    public IInvoiceController Invoice { get; }
+    public ICountryController Country { get; }
+    public ICustomerController Customer { get; }
 }

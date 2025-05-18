@@ -2,6 +2,7 @@
 using ExportPro.Common.Shared.Models;
 
 namespace ExportPro.Auth.SDK.DTOs;
+
 public class UserDto
 {
     public Guid Id { get; set; }

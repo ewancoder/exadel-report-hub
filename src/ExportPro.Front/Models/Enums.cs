@@ -1,13 +1,14 @@
 ﻿namespace ExportPro.Front.Models;
+
 public enum UserRole
 {
     Owner,
     ClientAdmin,
-    Operator
+    Operator,
 }
 
 public enum Role
 {
     None,
-    SuperAdmin
+    SuperAdmin,
 }

@@ -3,7 +3,6 @@ using AutoMapper;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.Export.Job.Utilities.Helpers;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.Responses;
@@ -29,9 +28,7 @@ public sealed class UpdateReportPreferenceHandler(
         var preference = await repository.GetByIdAsync(request.dto.Id.ToObjectId(), cancellationToken);
 
         if (preference is null)
-        {
             return new NotFoundResponse<ReportPreferenceResponse> { Messages = ["Report preference not found."] };
-        }
 
         string cronExpression;
         try

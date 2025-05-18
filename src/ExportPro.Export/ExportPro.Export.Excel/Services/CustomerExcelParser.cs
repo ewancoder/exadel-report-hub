@@ -1,7 +1,7 @@
 ﻿using ClosedXML.Excel;
+using ExportPro.Export.Excel.Constants;
 using ExportPro.Export.SDK.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
-using ExportPro.Export.Excel.Constants;
 
 namespace ExportPro.Export.Excel.Services;
 
@@ -12,7 +12,7 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
         CustomerColumns.Name,
         CustomerColumns.Email,
         CustomerColumns.Address,
-        CustomerColumns.CountryId
+        CustomerColumns.CountryId,
     ];
 
     public List<CreateUpdateCustomerDto> Parse(Stream excelStream)
@@ -25,8 +25,10 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
         return ExtractCustomersFromWorksheet(worksheet, columnMap);
     }
 
-    private List<CreateUpdateCustomerDto> ExtractCustomersFromWorksheet(IXLWorksheet ws,
-        Dictionary<string, int> columnMap)
+    private List<CreateUpdateCustomerDto> ExtractCustomersFromWorksheet(
+        IXLWorksheet ws,
+        Dictionary<string, int> columnMap
+    )
     {
         var customers = ProcessRows(ws, columnMap);
 
@@ -43,12 +45,10 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
 
     private Dictionary<string, int> MapHeaderColumns(IXLRow headerRow)
     {
-        return headerRow.Cells()
+        return headerRow
+            .Cells()
             .Where(c => RequiredColumns.Contains(c.GetString().Trim(), StringComparer.OrdinalIgnoreCase))
-            .ToDictionary(
-                c => c.GetString().Trim(),
-                c => c.Address.ColumnNumber,
-                StringComparer.OrdinalIgnoreCase);
+            .ToDictionary(c => c.GetString().Trim(), c => c.Address.ColumnNumber, StringComparer.OrdinalIgnoreCase);
     }
 
     private void ValidateRequiredColumns(IReadOnlyDictionary<string, int> columnMap)
@@ -58,8 +58,10 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
             throw new InvalidDataException($"Missing columns: {string.Join(", ", missingColumns)}");
     }
 
-    private List<CreateUpdateCustomerDto> ProcessRows(IXLWorksheet worksheet,
-        IReadOnlyDictionary<string, int> columnMap)
+    private List<CreateUpdateCustomerDto> ProcessRows(
+        IXLWorksheet worksheet,
+        IReadOnlyDictionary<string, int> columnMap
+    )
     {
         List<CreateUpdateCustomerDto> customers = [];
 
@@ -90,10 +92,12 @@ public sealed class CustomerExcelParser : ICustomerExcelParser
             Name = name,
             Email = email,
             Address = addr,
-            CountryId = countryId
+            CountryId = countryId,
         };
     }
 
-    private static bool AllBlank(params string?[] values) =>
-        values.All(string.IsNullOrWhiteSpace);
+    private static bool AllBlank(params string?[] values)
+    {
+        return values.All(string.IsNullOrWhiteSpace);
+    }
 }

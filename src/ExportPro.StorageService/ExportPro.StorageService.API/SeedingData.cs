@@ -1,13 +1,7 @@
-using System.Threading.Channels;
-using AutoMapper;
-using ExportPro.Common.Shared.Extensions;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Models;
-using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Refit;
-using MongoDB.Driver;
-using MongoDB.Driver.Core;
 using Refit;
 using ILogger = Serilog.ILogger;
 
@@ -22,7 +16,7 @@ public class SeedingData(
 {
     public async Task SeedCountries()
     {
-        PaginationParameters paginationParameters = new PaginationParameters() { PageNumber = 1, PageSize = 100 };
+        var paginationParameters = new PaginationParameters { PageNumber = 1, PageSize = 100 };
         var countriesList = await countryRepository.GetAllPaginatedAsync(paginationParameters, CancellationToken.None);
         var cnt = countriesList.Items.Count;
         logger.Information("Countries count: {Count}", cnt);
@@ -52,6 +46,7 @@ public class SeedingData(
                 var countryId = await countryRepository.AddOneAsync(country, CancellationToken.None);
                 logger.Debug($"Seeding country: {name} Cioc {cioc} Currency: {currency} Id: {countryId}");
             }
+
             logger.Information("Countries count: {Count}", cnt);
         }
     }

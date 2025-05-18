@@ -23,6 +23,7 @@ public sealed class DownloadTodaysLogQueryHandler(IHttpContextAccessor iContextA
             Log.Information("Log file not found User: {userId}", userId);
             return null;
         }
+
         Log.Information("Log file found, reading content User: {userId}", userId);
         return File.ReadAllBytesAsync(logPath, cancellationToken)!;
     }

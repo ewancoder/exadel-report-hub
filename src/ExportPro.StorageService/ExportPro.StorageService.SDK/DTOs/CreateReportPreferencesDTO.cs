@@ -11,5 +11,6 @@ public record CreateReportPreferencesDTO
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ReportFormat ReportFormat { get; set; }
+
     public required ReportScheduleDto Schedule { get; set; }
 }

@@ -7,7 +7,6 @@ using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.Responses;
 
-
 namespace ExportPro.StorageService.CQRS.CommandHandlers.ClientCommands;
 
 public sealed record SoftDeleteClientCommand(Guid ClientId) : ICommand<ClientResponse>, IPermissionedRequest

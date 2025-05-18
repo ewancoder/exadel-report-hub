@@ -2,11 +2,8 @@
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Enums;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
-using MediatR;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
 

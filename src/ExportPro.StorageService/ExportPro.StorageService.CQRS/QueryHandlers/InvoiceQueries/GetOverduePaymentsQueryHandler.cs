@@ -85,7 +85,7 @@ public sealed class GetOverduePaymentsQueryHandler(
                 clientCurrency.CurrencyCode
             );
 
-            double invoiceCurrencyExchangeRateToEuro = 1.0;
+            var invoiceCurrencyExchangeRateToEuro = 1.0;
             if (invoiceCurrency.CurrencyCode != "EUR")
             {
                 invoiceCurrencyExchangeRateToEuro = await currencyExchangeService.ExchangeRate(
@@ -100,14 +100,12 @@ public sealed class GetOverduePaymentsQueryHandler(
                 );
             }
 
-            double clientCurrencyRate = 1.0;
+            var clientCurrencyRate = 1.0;
             if (clientCurrency.CurrencyCode != "EUR")
-            {
                 clientCurrencyRate = await currencyExchangeService.ExchangeRate(
                     new CurrencyExchangeModel { Date = invoice.IssueDate, From = clientCurrency.CurrencyCode },
                     cancellationToken
                 );
-            }
             var convertedAmount = (double)(invoice.Amount! * clientCurrencyRate / invoiceCurrencyExchangeRateToEuro)!;
             logger.Debug(
                 "Converted amount for invoice {InvoiceId} to client currency {ClientCurrency}: {ConvertedAmount}",
@@ -128,7 +126,7 @@ public sealed class GetOverduePaymentsQueryHandler(
         var result = new OverduePaymentsResponse
         {
             OverdueInvoicesCount = overdueInvoices.Count,
-            TotalOverdueAmount = (double?)totalAmount,
+            TotalOverdueAmount = totalAmount,
         };
 
         logger.Information("Successfully handled GetOverduePaymentsQuery for ClientId: {ClientId}", request.ClientId);

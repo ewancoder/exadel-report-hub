@@ -20,7 +20,7 @@ public static class AppBuilderExtensions
                 {
                     var env = hostContext.HostingEnvironment;
 
-                    var relativePath =Path.Combine("Settings", "serilogsettings.json");
+                    var relativePath = Path.Combine("Settings", "serilogsettings.json");
 
                     var fullPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, relativePath));
 
@@ -34,7 +34,7 @@ public static class AppBuilderExtensions
                             + File.Exists(Path.Combine(env.ContentRootPath, "Settings", "serilogsettings.json"))
                     );
 
-                    configBuilder.AddJsonFile(fullPath, optional: false, reloadOnChange: true);
+                    configBuilder.AddJsonFile(fullPath, false, true);
                     configBuilder.AddEnvironmentVariables();
                 }
             );

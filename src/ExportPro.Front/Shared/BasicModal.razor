@@ -1,14 +1,15 @@
 ﻿@if (Display)
 {
-    string wideclass = "";
-    if(wide)
+    var wideclass = "";
+    if (wide)
     {
         wideclass = "wide";
     }
+
     <div class="modal-backdrop show"></div>
 
     <div class="modal fade show" id="exampleModal" tableindex="-1"
-    role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:block">
+         role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:block">
         <div class="modal-dialog @wideclass" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -30,13 +31,35 @@
 }
 
 @code {
-    [Parameter] public string Title { get; set; } = "Confirm";
-    [Parameter] public RenderFragment ChildContent { get; set; }
-    [Parameter] public EventCallback OnConfirm { get; set; }
-    [Parameter] public EventCallback OnCancel { get; set; }
-    [Parameter] public bool wide { get; set; }
-    [Parameter] public string ButtonName { get; set; } = "Confirm";
+
+    [Parameter]
+    public string Title { get; set; } = "Confirm";
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public bool wide { get; set; }
+
+    [Parameter]
+    public string ButtonName { get; set; } = "Confirm";
+
     private bool Display { get; set; }
-    public void ShowModal() => Display = true;
-    public void HideModal() => Display = false;
+
+    public void ShowModal()
+    {
+        Display = true;
+    }
+
+    public void HideModal()
+    {
+        Display = false;
+    }
+
 }

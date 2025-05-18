@@ -6,5 +6,4 @@ public class Result<T>
     public string? Message { get; set; }
     public int ApiState { get; set; }
     public bool IsSuccess { get; set; }
-
 }

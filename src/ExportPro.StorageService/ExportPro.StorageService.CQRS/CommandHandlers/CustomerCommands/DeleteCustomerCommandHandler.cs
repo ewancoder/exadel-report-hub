@@ -12,7 +12,7 @@ public sealed record DeleteCustomerCommand(Guid Id) : ICommand<bool>, IPermissio
     public List<Guid>? ClientIds { get; init; } = [];
     public Resource Resource { get; init; } = Resource.Customers;
     public CrudAction Action { get; init; } = CrudAction.Delete;
-};
+}
 
 public sealed class DeleteCustomerCommandHandler(ICustomerRepository repository)
     : ICommandHandler<DeleteCustomerCommand, bool>

@@ -15,7 +15,7 @@ public sealed class CurrencyExchangeServiceValidator : AbstractValidator<Currenc
                     var currenyExchangeModel = new CurrencyExchangeModel
                     {
                         From = to,
-                        
+
                         Date = new DateTime(2024, 04, 17),
                     };
                     try
@@ -38,7 +38,7 @@ public sealed class CurrencyExchangeServiceValidator : AbstractValidator<Currenc
                     var currenyExchangeModel = new CurrencyExchangeModel
                     {
                         From = from,
-                        
+
                         Date = new DateTime(2024, 04, 17),
                     };
                     try

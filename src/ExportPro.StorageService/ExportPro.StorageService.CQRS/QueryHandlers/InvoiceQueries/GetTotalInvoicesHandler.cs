@@ -10,6 +10,7 @@ using MongoDB.Driver;
 namespace ExportPro.StorageService.CQRS.QueryHandlers.InvoiceQueries;
 
 public sealed record GetTotalInvoicesQuery(TotalInvoicesDto InvoicesDto) : IQuery<long>;
+
 public sealed class GetTotalInvoicesHandler(IInvoiceRepository invoiceRepository)
     : IQueryHandler<GetTotalInvoicesQuery, long>
 {
@@ -24,7 +25,6 @@ public sealed class GetTotalInvoicesHandler(IInvoiceRepository invoiceRepository
         var count = await _invoiceRepository.CountAsync(filter, cancellationToken);
 
         if (count == 0)
-        {
             return new BaseResponse<long>
             {
                 Data = 0,
@@ -32,7 +32,6 @@ public sealed class GetTotalInvoicesHandler(IInvoiceRepository invoiceRepository
                 ApiState = HttpStatusCode.OK,
                 Messages = ["No invoices issued in selected period."],
             };
-        }
 
         return new BaseResponse<long>
         {

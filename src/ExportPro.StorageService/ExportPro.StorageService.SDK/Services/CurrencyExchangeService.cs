@@ -42,6 +42,33 @@ public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeS
         return true;
     }
 
+    public async Task<double> ConvertTwoCurrencies(
+        CurrencyExchangeModel currenyExchangeModel,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (currenyExchangeModel.From == currenyExchangeModel.To)
+            return (double)currenyExchangeModel.AmountFrom;
+        var exchangeRateToEuroFromSrcCurrency = 1.0;
+        var exchangeRateToEuroFromDestCurrency = 1.0;
+        if (currenyExchangeModel.From != "EUR")
+        {
+            var currencyMoodel = new CurrencyExchangeModel
+            {
+                Date = currenyExchangeModel.Date,
+                From = currenyExchangeModel.From,
+                To = "EUR",
+                AmountFrom = currenyExchangeModel.AmountFrom,
+            };
+            exchangeRateToEuroFromSrcCurrency = await ExchangeRate(currencyMoodel, cancellationToken);
+        }
+        if (currenyExchangeModel.To != "EUR")
+            exchangeRateToEuroFromDestCurrency = await ExchangeRate(currenyExchangeModel, cancellationToken);
+        var amount =
+            currenyExchangeModel.AmountFrom * exchangeRateToEuroFromDestCurrency / exchangeRateToEuroFromSrcCurrency;
+        return (double)amount!;
+    }
+
     private async Task<DateTime> GetLastValidDateAsync(string currencyCode, DateTime date)
     {
         var currentDate = date;
@@ -53,7 +80,7 @@ public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeS
             currentDate = currentDate.AddDays(-2);
 
         // check for holidays by verifying data exists
-        for (int attempts = 0; attempts < 7; attempts++)
+        for (var attempts = 0; attempts < 7; attempts++)
         {
             var formatted = currentDate.ToString("yyyy-MM-dd");
             if (await DateExists(currencyCode, formatted))
@@ -63,23 +90,5 @@ public sealed class CurrencyExchangeService(IECBApi ecbApi) : ICurrencyExchangeS
         }
 
         throw new InvalidOperationException("Could not find a valid exchange rate date within 7 days.");
-    }
-
-    public async Task<double> ConvertTwoCurrencies(
-        CurrencyExchangeModel currenyExchangeModel,
-        CancellationToken cancellationToken = default
-    )
-    {
-        if (currenyExchangeModel.From == currenyExchangeModel.To)
-            return (double)currenyExchangeModel.AmountFrom;
-        double exchangeRateToEuroFromSrcCurrency = 1.0;
-        double exchangeRateToEuroFromDestCurrency = 1.0;
-        if (currenyExchangeModel.From != "EUR")
-            exchangeRateToEuroFromSrcCurrency = await ExchangeRate(currenyExchangeModel, cancellationToken);
-        if (currenyExchangeModel.To != "EUR")
-            exchangeRateToEuroFromDestCurrency = await ExchangeRate(currenyExchangeModel, cancellationToken);
-        var amount =
-            currenyExchangeModel.AmountFrom * exchangeRateToEuroFromDestCurrency / exchangeRateToEuroFromSrcCurrency;
-        return (double)amount!;
     }
 }

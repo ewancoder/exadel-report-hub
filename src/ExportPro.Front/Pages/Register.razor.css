@@ -29,9 +29,10 @@
 }
 
 .login-logo:hover {
-     transform: scale(1.05) rotate(1deg);
-     filter: drop-shadow(0 0 10px rgba(0, 193, 181, 0.6));
+    transform: scale(1.05) rotate(1deg);
+    filter: drop-shadow(0 0 10px rgba(0, 193, 181, 0.6));
 }
+
 button + button {
     margin-top: 0.75rem;
 }

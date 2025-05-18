@@ -4,7 +4,6 @@ using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 
@@ -19,7 +18,7 @@ public sealed record GetClientPlansQuery(Guid ClientId, PaginationParameters pag
     public Resource Resource => Resource.Plans;
 
     public CrudAction Action => CrudAction.Read;
-};
+}
 
 public sealed class GetClientsPlansQueryHandler(IClientRepository clientRepository)
     : IQueryHandler<GetClientPlansQuery, PaginatedList<PlansResponse>>

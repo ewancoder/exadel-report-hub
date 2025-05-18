@@ -12,6 +12,7 @@ public sealed class Customer : AuditModel, IModel
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId CountryId { get; set; }
+
     public bool IsDeleted { get; set; } = false;
     public ObjectId Id { get; set; }
 }

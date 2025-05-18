@@ -27,7 +27,6 @@ public sealed class GetTotalRevenueHandler(
         );
 
         if (invoices == null || invoices.Count == 0)
-        {
             return new BaseResponse<double>
             {
                 Data = 0,
@@ -35,7 +34,6 @@ public sealed class GetTotalRevenueHandler(
                 ApiState = HttpStatusCode.OK,
                 Messages = ["No invoices issued in selected period."],
             };
-        }
 
         double totalInClientCurrency = 0;
 
@@ -47,14 +45,12 @@ public sealed class GetTotalRevenueHandler(
             );
 
             if (invoiceCurrency == null || clientCurrency == null)
-            {
                 return new BadRequestResponse<double> { Messages = ["Currency not found."] };
-            }
 
             var invoiceCurrencyCode = invoiceCurrency.CurrencyCode;
             var clientCurrencyCode = clientCurrency.CurrencyCode;
 
-            double amount = invoice.Amount ?? 0;
+            var amount = invoice.Amount ?? 0;
 
             if (invoiceCurrencyCode == clientCurrencyCode)
             {
@@ -62,38 +58,34 @@ public sealed class GetTotalRevenueHandler(
                 continue;
             }
 
-            double invoiceToEuro = 1.0;
+            var invoiceToEuro = 1.0;
             if (invoiceCurrencyCode != "EUR")
             {
                 var toEuroModel = new CurrencyExchangeModel { Date = invoice.IssueDate, From = invoiceCurrencyCode };
                 await validator.ValidateAndThrowAsync(toEuroModel, cancellationToken);
                 invoiceToEuro = await exchangeService.ExchangeRate(toEuroModel, cancellationToken);
                 if (invoiceToEuro == 0)
-                {
                     return new BadRequestResponse<double>
                     {
                         Messages = [$"Currency {invoiceCurrencyCode} is not supported by ECB."],
                     };
-                }
             }
 
-            double euroToClient = 1.0;
+            var euroToClient = 1.0;
             if (clientCurrencyCode != "EUR")
             {
                 var fromEuroModel = new CurrencyExchangeModel { Date = invoice.IssueDate, From = clientCurrencyCode };
                 await validator.ValidateAndThrowAsync(fromEuroModel, cancellationToken);
-                double clientToEuro = await exchangeService.ExchangeRate(fromEuroModel, cancellationToken);
+                var clientToEuro = await exchangeService.ExchangeRate(fromEuroModel, cancellationToken);
                 if (clientToEuro == 0)
-                {
                     return new BadRequestResponse<double>
                     {
                         Messages = [$"Currency {clientCurrencyCode} is not supported by ECB."],
                     };
-                }
                 euroToClient = 1 / clientToEuro;
             }
 
-            double converted = amount * (1 / invoiceToEuro) * euroToClient;
+            var converted = amount * (1 / invoiceToEuro) * euroToClient;
             totalInClientCurrency += converted;
         }
 

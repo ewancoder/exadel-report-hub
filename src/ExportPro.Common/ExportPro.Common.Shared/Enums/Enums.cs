@@ -1,12 +1,10 @@
-﻿
-
-namespace ExportPro.Common.Shared.Enums;
+﻿namespace ExportPro.Common.Shared.Enums;
 
 public enum UserRole
 {
     Owner,
     ClientAdmin,
-    Operator
+    Operator,
 }
 
 public enum CrudAction
@@ -14,7 +12,7 @@ public enum CrudAction
     Create,
     Read,
     Update,
-    Delete
+    Delete,
 }
 
 public enum Resource
@@ -25,13 +23,12 @@ public enum Resource
     Invoices,
     Customers,
     Plans,
-    Reports
+    Reports,
 }
 
 public enum Role
 {
     None,
     SuperAdmin,
-    JobAdmin
+    JobAdmin,
 }
-

@@ -1,7 +1,5 @@
 ﻿using ExportPro.Common.Shared.Library;
 using ExportPro.StorageService.CQRS.QueryHandlers.CurrencyQueries;
-using ExportPro.StorageService.Models.Enums;
-using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
@@ -18,15 +16,23 @@ public class CurrencyController(IMediator mediator) : ControllerBase, ICurrencyC
     public Task<BaseResponse<CurrencyResponse>> GetByCode(
         [FromRoute] string currencyCode,
         CancellationToken cancellationToken = default
-    ) => mediator.Send(new GetCurrencyByCodeQuery(currencyCode), cancellationToken);
+    )
+    {
+        return mediator.Send(new GetCurrencyByCodeQuery(currencyCode), cancellationToken);
+    }
 
     [HttpGet("{id}")]
-    public Task<BaseResponse<CurrencyResponse>> GetById([FromRoute] Guid id, CancellationToken cancellationToken) =>
-        mediator.Send(new GetCurrencyByIdQuery(id), cancellationToken);
+    public Task<BaseResponse<CurrencyResponse>> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        return mediator.Send(new GetCurrencyByIdQuery(id), cancellationToken);
+    }
 
     [HttpGet]
     public Task<BaseResponse<PaginatedList<CurrencyResponse>>> GetAll(
         [FromQuery] PaginationParameters paginationParameters,
         CancellationToken cancellationToken = default
-    ) => mediator.Send(new GetAllCurrenciesQuery(paginationParameters), cancellationToken);
+    )
+    {
+        return mediator.Send(new GetAllCurrenciesQuery(paginationParameters), cancellationToken);
+    }
 }

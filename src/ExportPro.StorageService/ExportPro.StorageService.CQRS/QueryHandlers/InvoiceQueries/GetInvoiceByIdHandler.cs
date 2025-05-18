@@ -4,11 +4,10 @@ using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
+using ExportPro.Common.Shared.Models;
 using ExportPro.Common.Shared.Refit;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
-using ExportPro.StorageService.SDK.Refit;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using Serilog;
@@ -47,8 +46,10 @@ public sealed class GetInvoiceByIdHandler(
             x => x.Id == invoice.ClientId && !x.IsDeleted,
             cancellationToken
         );
+        logger.Debug("Client found: {@Client}", client);
+        logger.Debug("Checking Permission");
         var permission = await aclApi.CheckPermissionAsync(
-            new Common.Shared.Models.CheckPermissionRequest
+            new CheckPermissionRequest
             {
                 ClientId = client?.Id.ToGuid(),
                 UserId = TokenHelper.GetUserId(httpContextAccessor.HttpContext?.User).ToGuid(),
@@ -62,7 +63,7 @@ public sealed class GetInvoiceByIdHandler(
         var customerCurrency = await GetCustomerCurrency(invoice.CustomerId, cancellationToken);
         logger.Debug("Customer Currency: {@customerCurrency}", customerCurrency);
         List<ItemDtoForInvoice> items = new();
-        int cnt = 0;
+        var cnt = 0;
         foreach (var item in invoice.ItemsId)
         {
             var itemClient = await clientRepository.GetOneAsync(
@@ -81,6 +82,7 @@ public sealed class GetInvoiceByIdHandler(
             itemDto.Currency = itemCurrency!.CurrencyCode;
             items.Add(itemDto);
         }
+
         var dto = new InvoiceDto
         {
             Id = invoice.Id.ToGuid(),

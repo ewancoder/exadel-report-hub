@@ -1,16 +1,14 @@
-﻿using Microsoft.VisualBasic;
-using System.Net;
-
+﻿using System.Net;
 
 namespace ExportPro.Common.Shared.Library;
 
 public class BadRequestResponse : BaseResponse
 {
-   public BadRequestResponse()
-   {
+    public BadRequestResponse()
+    {
         ApiState = HttpStatusCode.BadRequest;
         IsSuccess = false;
-   }
+    }
 }
 
 public class BadRequestResponse<T> : BaseResponse<T>
@@ -27,4 +25,3 @@ public class BadRequestResponse<T> : BaseResponse<T>
         Messages?.Add(message);
     }
 }
-

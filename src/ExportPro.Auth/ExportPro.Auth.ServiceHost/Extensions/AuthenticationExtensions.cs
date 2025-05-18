@@ -10,64 +10,68 @@ namespace ExportPro.Auth.ServiceHost.Extensions;
 
 public static class AuthenticationExtensions
 {
-    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddJwtAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
+        services
+            .AddAuthentication(options =>
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings?.Issuer,
-                ValidAudience = jwtSettings?.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Secret ?? string.Empty)),
-                ClockSkew = TimeSpan.Zero
-            };
-
-            options.Events = new JwtBearerEvents
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
             {
-                OnTokenValidated = async context =>
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    var userRepository = context.HttpContext.RequestServices.GetRequiredService<UserRepository>();
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings?.Issuer,
+                    ValidAudience = jwtSettings?.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtSettings?.Secret ?? string.Empty)
+                    ),
+                    ClockSkew = TimeSpan.Zero,
+                };
 
-                    var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier);
-
-                    if (userIdClaim == null)
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
                     {
-                        context.Fail("Missing claims");
-                        return;
-                    }
+                        var userRepository = context.HttpContext.RequestServices.GetRequiredService<UserRepository>();
 
-                    var userId = new ObjectId(userIdClaim.Value);
-                    var user = await userRepository.GetByIdAsync(userId);
+                        var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier);
 
-                    if (user == null)
-                    {
-                        context.Fail("User not found");
-                        return;
-                    }
+                        if (userIdClaim == null)
+                        {
+                            context.Fail("Missing claims");
+                            return;
+                        }
 
-                    //if (!context.HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
-                    //{
-                    //    context.Fail("Refresh token missing");
-                    //    return;
-                    //}
+                        var userId = new ObjectId(userIdClaim.Value);
+                        var user = await userRepository.GetByIdAsync(userId);
 
-                    //var token = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
-                }
-            };
+                        if (user == null)
+                        {
+                            context.Fail("User not found");
+                        }
 
-        });
+                        //if (!context.HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+                        //{
+                        //    context.Fail("Refresh token missing");
+                        //    return;
+                        //}
+
+                        //var token = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
+                    },
+                };
+            });
 
         return services;
     }

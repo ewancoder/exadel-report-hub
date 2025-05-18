@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ExportPro.StorageService.API\Controllers\" />
+        <Folder Include="ExportPro.StorageService.API\Controllers\"/>
     </ItemGroup>
 
 </Project>

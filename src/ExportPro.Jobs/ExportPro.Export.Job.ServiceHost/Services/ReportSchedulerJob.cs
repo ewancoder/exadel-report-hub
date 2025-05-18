@@ -1,4 +1,5 @@
-﻿using ExportPro.Auth.SDK.DTOs;
+﻿using System.Net.Http.Headers;
+using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Export.Job.ServiceHost.Interfaces;
@@ -23,7 +24,7 @@ public sealed class ReportSchedulerJob(
         var baseurl = Environment.GetEnvironmentVariable("DockerForAuth") ?? configuration["AuthURI"];
         HttpClient client = new() { BaseAddress = new Uri(baseurl!) };
 
-        IAuth authAPi = RestService.For<IAuth>(client);
+        var authAPi = RestService.For<IAuth>(client);
         UserRegisterDto user = new()
         {
             Email = "G10@gmail.com",
@@ -45,8 +46,8 @@ public sealed class ReportSchedulerJob(
                 BaseAddress = new Uri(baseUrlForexport!), //localhost:5294"),
             };
 
-            httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
-            IReportExportApi reportExportApi = RestService.For<IReportExportApi>(httpClient);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+            var reportExportApi = RestService.For<IReportExportApi>(httpClient);
             var reportResponse = await reportExportApi.GetStatisticsAsync(
                 pref.ReportFormat,
                 pref.ClientId.ToGuid(),
@@ -67,13 +68,11 @@ public sealed class ReportSchedulerJob(
             var contentType = reportResponse.Content!.Headers.ContentType?.MediaType ?? mimeType;
             var content = await reportResponse.Content.ReadAsByteArrayAsync(context.CancellationToken);
             var subject = $"Scheduled Report - {DateTime.UtcNow:MMMM dd, yyyy}";
-            var body = $"Dear user,\n\nPlease find your scheduled report attached.";
+            var body = "Dear user,\n\nPlease find your scheduled report attached.";
             var userEmail = pref.Email;
 
             if (!string.IsNullOrWhiteSpace(userEmail))
-            {
                 await emailService.SendAsync(userEmail, subject, body, content, fileName, contentType);
-            }
         }
     }
 

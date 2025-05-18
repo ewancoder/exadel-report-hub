@@ -8,7 +8,6 @@ using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Refit;
 using ExportPro.StorageService.SDK.Responses;
 using MediatR;
-using Microsoft.Extensions.Logging;
 using ILogger = Serilog.ILogger;
 
 namespace ExportPro.Export.CQRS.Queries;
@@ -43,10 +42,9 @@ public sealed class GenerateReportQueryHandler(
         logger.Debug("Invoices: {@invoices}", invoices);
         var (items, plans) = await FetchItemsAndPlansAsync(clientId, cancellationToken);
 
-        int overdueCnt = 0;
+        var overdueCnt = 0;
         double? overdueAmt = null;
         if (clientId != Guid.Empty)
-        {
             try
             {
                 var overdueResp = await storageApi.Invoice.GetOverduePayments(
@@ -66,7 +64,6 @@ public sealed class GenerateReportQueryHandler(
                 overdueCnt = 0;
                 overdueAmt = 0;
             }
-        }
 
         var reportContent = await RetrieveClientNameAsync(request, clientId, invoices, items, plans, cancellationToken);
 
@@ -143,7 +140,7 @@ public sealed class GenerateReportQueryHandler(
         await Task.WhenAll(itemsTask, plansTask);
         var itemsResult = await itemsTask;
         var plansResult = await plansTask;
-        return (itemsResult.Data?.Items?.Cast<ItemResponse>().ToList() ?? [], plansResult.Data?.Items ?? []);
+        return ((itemsResult.Data?.Items).ToList() ?? [], plansResult.Data?.Items ?? []);
     }
 
     private static ReportFileDto CreateReportFileDto(

@@ -1,4 +1,6 @@
-﻿namespace ExportPro.Export.Job.Utilities.Helpers;
+﻿using System.Globalization;
+
+namespace ExportPro.Export.Job.Utilities.Helpers;
 
 public static class CronToTextHelper
 {
@@ -44,7 +46,7 @@ public static class CronToTextHelper
         if (int.TryParse(minute, out var min) && int.TryParse(hour, out var hr))
         {
             var time = new TimeOnly(hr, min);
-            var formattedTime = time.ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+            var formattedTime = time.ToString("hh:mm tt", CultureInfo.InvariantCulture);
 
             if (dayOfMonth == "*" && (dayOfWeek == "?" || dayOfWeek == "*"))
                 return $"Every day at {formattedTime}";
@@ -56,10 +58,8 @@ public static class CronToTextHelper
                 return $"Every {readableDay} at {formattedTime}";
             }
 
-            if (int.TryParse(dayOfMonth, out int dom))
-            {
+            if (int.TryParse(dayOfMonth, out var dom))
                 return $"Every month on the {Ordinal(dom)} at {formattedTime}";
-            }
 
             return $"At {formattedTime}";
         }

@@ -1,6 +1,4 @@
-﻿using ExportPro.Common.Models.MongoDB;
-
-namespace ExportPro.StorageService.SDK.Responses;
+﻿namespace ExportPro.StorageService.SDK.Responses;
 
 public sealed class CurrencyResponse
 {

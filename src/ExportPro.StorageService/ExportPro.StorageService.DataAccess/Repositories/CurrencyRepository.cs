@@ -2,7 +2,6 @@
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
@@ -23,10 +22,7 @@ public sealed class CurrencyRepository(ICollectionProvider collectionProvider, I
         var filter = Builders<Currency>.Filter.Eq(x => x.IsDeleted, false);
         var currencies = await Collection.Find(filter).ToListAsync(cancellationToken);
         var currency = currencies.Select(mapper.Map<CurrencyResponse>).ToList();
-        return currency.ToPaginatedList(
-            pageNumber: paginationParameters.PageNumber,
-            pageSize: paginationParameters.PageSize
-        );
+        return currency.ToPaginatedList(paginationParameters.PageNumber, paginationParameters.PageSize);
     }
 
     public Task<Currency?> GetCurrencyCodeById(ObjectId id)

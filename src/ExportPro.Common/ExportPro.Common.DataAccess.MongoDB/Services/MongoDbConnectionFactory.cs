@@ -11,13 +11,21 @@ public class MongoDbConnectionFactory : IMongoDbConnectionFactory
 
     public MongoDbConnectionFactory(IConfiguration configuration)
     {
-        var connectionString = Environment.GetEnvironmentVariable("MongoDbDocker") ?? configuration.GetConnectionString("MongoDB");
+        var connectionString =
+            Environment.GetEnvironmentVariable("MongoDbDocker") ?? configuration.GetConnectionString("MongoDB");
         var databaseName = configuration["MongoDB:DatabaseName"] ?? "ExportProDb";
 
         _client = new MongoClient(connectionString);
         _database = _client.GetDatabase(databaseName);
     }
 
-    public IMongoDatabase GetDatabase() => _database;
-    public IMongoClient GetClient() => _client;
+    public IMongoDatabase GetDatabase()
+    {
+        return _database;
+    }
+
+    public IMongoClient GetClient()
+    {
+        return _client;
+    }
 }

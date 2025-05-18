@@ -1,7 +1,7 @@
-﻿using Blazored.LocalStorage;
-using ExportPro.Front.Models;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Net.Http.Headers;
+using Blazored.LocalStorage;
+using ExportPro.Front.Models;
 
 namespace ExportPro.Front.Helper;
 
@@ -20,9 +20,7 @@ public class ApiHelper
     {
         var token = await _localStorage.GetItemAsync<string>("accessToken");
         if (!string.IsNullOrWhiteSpace(token))
-        {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        }
     }
 
     public async Task<Result<T>> GetAsync<T>(string url)
@@ -32,7 +30,7 @@ public class ApiHelper
         var response = await _httpClient.GetAsync(url);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<Result<T>>()
-               ?? throw new InvalidOperationException("Response was null");
+            ?? throw new InvalidOperationException("Response was null");
     }
 
     public async Task<Result<TResponse>> PostAsync<TRequest, TResponse>(string url, TRequest data)
@@ -42,7 +40,7 @@ public class ApiHelper
         var response = await _httpClient.PostAsJsonAsync(url, data);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<Result<TResponse>>()
-               ?? throw new InvalidOperationException("Response was null");
+            ?? throw new InvalidOperationException("Response was null");
     }
 
     public async Task<Result<TResponse>> PutAsync<TRequest, TResponse>(string url, TRequest data)
@@ -52,7 +50,7 @@ public class ApiHelper
         var response = await _httpClient.PutAsJsonAsync(url, data);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<Result<TResponse>>()
-               ?? throw new InvalidOperationException("Response was null");
+            ?? throw new InvalidOperationException("Response was null");
     }
 
     public async Task DeleteAsync(string url)

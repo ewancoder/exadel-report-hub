@@ -10,5 +10,4 @@ public interface IECBApi
 
     [Get("/D.{from}.EUR.SP00.A?startPeriod={date}&endPeriod={date}")]
     Task<HttpResponseMessage> DataExists([AliasAs("from")] string from, [AliasAs("date")] string date);
-    
 }

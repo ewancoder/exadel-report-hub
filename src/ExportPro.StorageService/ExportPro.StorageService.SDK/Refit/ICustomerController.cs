@@ -21,7 +21,7 @@ public interface ICustomerController
         CancellationToken cancellationToken = default
     );
 
-    [Post("/api/Customer/CreateBulk")]
+    [Post("/api/Customer/bulk")]
     Task<BaseResponse<int>> CreateBulk(
         [Body] List<CreateUpdateCustomerDto> customers,
         CancellationToken cancellationToken = default

@@ -10,12 +10,13 @@ using ExportPro.StorageService.SDK.PaginationParams;
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CustomerQueries;
 
 public sealed record GetPaginatedCustomersQuery(int PageNumber = 1, int PageSize = 10)
-    : IQuery<PaginatedListDto<CustomerDto>>, IPermissionedRequest
+    : IQuery<PaginatedListDto<CustomerDto>>,
+        IPermissionedRequest
 {
     public List<Guid>? ClientIds => null;
     public Resource Resource => Resource.Customers;
     public CrudAction Action => CrudAction.Read;
-};
+}
 
 public sealed class GetPaginatedCustomersQueryHandler(ICustomerRepository repository)
     : IQueryHandler<GetPaginatedCustomersQuery, PaginatedListDto<CustomerDto>>

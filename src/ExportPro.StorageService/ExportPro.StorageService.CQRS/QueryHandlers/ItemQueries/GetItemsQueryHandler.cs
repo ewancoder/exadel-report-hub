@@ -4,6 +4,8 @@ using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
+using ExportPro.StorageService.Models.Models;
+using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.ItemQueries;
@@ -36,7 +38,7 @@ public class GetItemsQueryHandler(
             };
 
         // Get all invoices for this client
-        var parameters = new ExportPro.StorageService.SDK.PaginationParams.PaginationParameters
+        var parameters = new PaginationParameters
         {
             PageNumber = 1,
             PageSize = 1000, // Large enough to get all invoices
@@ -49,7 +51,7 @@ public class GetItemsQueryHandler(
             .ToList();
 
         // Collect items from invoices
-        var allItems = new List<Models.Models.Item>();
+        var allItems = new List<Item>();
 
         // Add items from invoices
         // foreach (var invoice in invoices)

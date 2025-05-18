@@ -1,7 +1,6 @@
 ﻿using ClosedXML.Excel;
 using ExportPro.Export.SDK.DTOs;
 using ExportPro.Export.SDK.Interfaces;
-using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 
 namespace ExportPro.Export.Excel.Services;
 
@@ -91,9 +90,9 @@ public sealed class ExcelReportGenerator : IReportGenerator
         ws.Cell(startRow + 1, 2).Value = "Amount";
         ws.Cell(startRow + 1, 3).Value = "Client Currency";
         ws.Cell(startRow + 2, 1).Value = data.OverdueInvoicesCount;
-        ws.Cell(startRow + 2, 2).Value = (
-            data.TotalOverdueAmount.HasValue ? data.TotalOverdueAmount.Value.ToString("N2") : "—"
-        );
+        ws.Cell(startRow + 2, 2).Value = data.TotalOverdueAmount.HasValue
+            ? data.TotalOverdueAmount.Value.ToString("N2")
+            : "—";
         ws.Cell(startRow + 2, 3).Value = data.ClientCurrencyCode;
     }
 }

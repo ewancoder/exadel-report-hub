@@ -9,5 +9,6 @@ public interface IReportExportApi
     Task<ApiResponse<HttpContent>> GetStatisticsAsync(
         [Query] ReportFormat format,
         [Query] Guid? clientId = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

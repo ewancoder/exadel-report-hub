@@ -1,5 +1,4 @@
-﻿using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
-using ExportPro.StorageService.SDK.PaginationParams;
+﻿using ExportPro.StorageService.SDK.PaginationParams;
 
 namespace ExportPro.StorageService.SDK.ModelFilters;
 
@@ -9,6 +8,7 @@ public class InvoiceFilter : PaginationParameters
     public required DateOnly EndDate { get; set; }
     public CustomerFilter? Customer { get; set; }
 }
+
 public class CustomerFilter
 {
     public string? Name { get; set; }

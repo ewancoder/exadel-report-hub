@@ -34,6 +34,7 @@ public interface IInvoiceController
         [Query] int pageSize = 10,
         CancellationToken cancellationToken = default
     );
+
     Task<BaseResponse<long>> GetTotalInvoices(
         [Query] TotalInvoicesDto query,
         CancellationToken cancellationToken = default

@@ -1,14 +1,11 @@
-﻿using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.DTOs;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
-using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -33,10 +30,9 @@ public sealed class ClientRepository(ICollectionProvider collectionProvider, IMa
         return Task.FromResult(paginatedList);
     }
 
-    public Task<List<Client>> GetClientsByIdsAsync(
+    public async Task<PaginatedList<Client>> GetClientsByIdsAsync(
         List<ObjectId> clientIds,
-        int top,
-        int skip,
+        PaginationParameters paginationParameters,
         CancellationToken cancellationToken = default
     )
     {
@@ -45,7 +41,8 @@ public sealed class ClientRepository(ICollectionProvider collectionProvider, IMa
             Builders<Client>.Filter.Eq(c => c.IsDeleted, false)
         );
 
-        return Collection.Find(filter).Skip(skip).Limit(top).ToListAsync(cancellationToken);
+        var list = await Collection.Find(filter).ToListAsync(cancellationToken);
+        return list.ToPaginatedList(paginationParameters.PageNumber, paginationParameters.PageSize);
     }
 
     public Task<bool> HigherThanMaxSize(int skip, CancellationToken cancellationToken = default)
@@ -250,10 +247,13 @@ public sealed class ClientRepository(ICollectionProvider collectionProvider, IMa
         var client = await GetOneAsync(x => x.Id == clientId && !x.IsDeleted, cancellationToken);
         List<PlansResponse> plans = new();
         foreach (var plan in client.Plans)
-        {
             plans.Add(mapper.Map<PlansResponse>(plan));
-        }
         var clientPlans = plans.ToPaginatedList(filters.PageNumber, filters.PageSize);
         return clientPlans;
+    }
+
+    public Task<List<Client>> GetAllClientsAsync(int top, int skip, CancellationToken cancellationToken = default)
+    {
+        return Collection.Find(c => !c.IsDeleted).Skip(skip).Limit(top).ToListAsync(cancellationToken);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using ExportPro.Common.DataAccess.MongoDB.Interfaces;
-using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
@@ -13,5 +12,6 @@ public interface ICurrencyRepository : IRepository<Currency>
         PaginationParameters paginationParameters,
         CancellationToken cancellationToken = default
     );
+
     Task<Currency?> GetCurrencyCodeById(ObjectId id);
 }

@@ -20,9 +20,9 @@ public class PositiveClientOperationsSteps(FeatureContext featureContext)
 {
     private static readonly IMongoDbContext<Client> _mongoDbContext = new MongoDbContext<Client>();
     private static Guid _clientId;
+    private readonly IConfiguration _config = LoadingConfig.LoadConfig();
     private IClientController? _clientApi;
     private ClientDto? _clientDto;
-    private readonly IConfiguration _config = LoadingConfig.LoadConfig();
 
     [Given(@"The ""(.*)"" user is logged in with email and password and has necessary permissions")]
     public async Task GivenTheUserIsLoggedInWithEmailAndPasswordAndHasNecessaryPermissions(string user)

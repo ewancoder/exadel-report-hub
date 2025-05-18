@@ -12,12 +12,14 @@ using Microsoft.AspNetCore.Http;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 
-public sealed record UpdateInvoiceCommand(Guid Id, CreateInvoiceDto InvoiceDto) : ICommand<InvoiceResponse>, IPermissionedRequest
+public sealed record UpdateInvoiceCommand(Guid Id, CreateInvoiceDto InvoiceDto)
+    : ICommand<InvoiceResponse>,
+        IPermissionedRequest
 {
     public List<Guid>? ClientIds { get; init; } = [InvoiceDto.ClientId];
     public Resource Resource { get; init; } = Resource.Invoices;
     public CrudAction Action { get; init; } = CrudAction.Update;
-};
+}
 
 public sealed class UpdateInvoiceHandler(
     IHttpContextAccessor httpContext,

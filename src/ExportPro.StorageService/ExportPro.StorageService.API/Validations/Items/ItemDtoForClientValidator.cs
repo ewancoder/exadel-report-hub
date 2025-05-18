@@ -1,5 +1,4 @@
-﻿using ExportPro.StorageService.Models.Enums;
-using ExportPro.StorageService.SDK.DTOs;
+﻿using ExportPro.StorageService.SDK.DTOs;
 using FluentValidation;
 
 namespace ExportPro.StorageService.API.Validations.Items;

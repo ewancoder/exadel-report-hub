@@ -1,5 +1,4 @@
-﻿using ExportPro.Auth.SDK.Models;
-using ExportPro.AuthService.Services;
+﻿using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Helpers;
@@ -9,12 +8,14 @@ using MongoDB.Bson;
 
 namespace ExportPro.Auth.CQRS.Commands;
 
-public record GrantUserRoleCommand(ObjectId UserId, ObjectId ClientId, UserRole Role) : ICommand<bool>, IPermissionedRequest
+public record GrantUserRoleCommand(ObjectId UserId, ObjectId ClientId, UserRole Role)
+    : ICommand<bool>,
+        IPermissionedRequest
 {
     public List<Guid>? ClientIds => [ClientId.ToGuid()];
     public Resource Resource => Resource.Users;
     public CrudAction Action => CrudAction.Create;
-};
+}
 
 public class GrantUserRoleCommandHandler(IACLService aclService) : ICommandHandler<GrantUserRoleCommand, bool>
 {

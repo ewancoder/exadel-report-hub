@@ -10,7 +10,12 @@ using Microsoft.AspNetCore.Http;
 namespace ExportPro.Auth.CQRS.Queries;
 
 public record GetCurrentUserQuery : IQuery<UserDto>;
-public sealed class GetCurrentUserQueryHandler(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, IACLService aclService) : IQueryHandler<GetCurrentUserQuery, UserDto>
+
+public sealed class GetCurrentUserQueryHandler(
+    IHttpContextAccessor httpContextAccessor,
+    IUserRepository userRepository,
+    IACLService aclService
+) : IQueryHandler<GetCurrentUserQuery, UserDto>
 {
     public async Task<BaseResponse<UserDto>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
     {
@@ -25,13 +30,15 @@ public sealed class GetCurrentUserQueryHandler(IHttpContextAccessor httpContextA
             return new NotFoundResponse<UserDto>("User not found.");
 
         var clientRoles = await aclService.GetAccessibleUserRolesAsync(dbUser.Id, cancellationToken);
-        var clientRoleDtos = clientRoles?
-            .Select(cr => new UserClientRolesDTO
-            {
-                ClientId = cr.ClientId.ToGuid(),
-                Role = cr.Role,
-                UserId = cr.UserId.ToGuid()
-            }).ToList() ?? [];
+        var clientRoleDtos =
+            clientRoles
+                ?.Select(cr => new UserClientRolesDTO
+                {
+                    ClientId = cr.ClientId.ToGuid(),
+                    Role = cr.Role,
+                    UserId = cr.UserId.ToGuid(),
+                })
+                .ToList() ?? [];
 
         var userDto = new UserDto
         {
@@ -44,4 +51,3 @@ public sealed class GetCurrentUserQueryHandler(IHttpContextAccessor httpContextA
         return new SuccessResponse<UserDto>(userDto);
     }
 }
-

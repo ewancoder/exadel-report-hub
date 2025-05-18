@@ -1,5 +1,7 @@
 {
   "stepAssemblies": [
-    { "assembly": "ExportPro.Shared.IntegrationTests" }
+    {
+      "assembly": "ExportPro.Shared.IntegrationTests"
+    }
   ]
 }

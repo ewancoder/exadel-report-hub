@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 
 namespace ExportPro.Front.Services;
 
@@ -34,7 +34,6 @@ public sealed class AuthStateProvider(IJSRuntime js) : AuthenticationStateProvid
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
     }
 
-
     private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
     {
         var claims = new List<Claim>();
@@ -46,9 +45,7 @@ public sealed class AuthStateProvider(IJSRuntime js) : AuthenticationStateProvid
             return claims;
 
         foreach (var kvp in keyValuePairs)
-        {
             claims.Add(new Claim(kvp.Key, kvp.Value.ToString() ?? ""));
-        }
 
         return claims;
     }
@@ -57,12 +54,14 @@ public sealed class AuthStateProvider(IJSRuntime js) : AuthenticationStateProvid
     {
         switch (base64.Length % 4)
         {
-            case 2: base64 += "=="; break;
-            case 3: base64 += "="; break;
+            case 2:
+                base64 += "==";
+                break;
+            case 3:
+                base64 += "=";
+                break;
         }
 
         return Convert.FromBase64String(base64);
     }
 }
-
-

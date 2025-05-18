@@ -13,7 +13,7 @@ public sealed record GetPlanQuery(Guid PlanId) : IQuery<PlansResponse>, IPermiss
     public List<Guid>? ClientIds => null;
     public Resource Resource => Resource.Plans;
     public CrudAction Action => CrudAction.Read;
-};
+}
 
 public sealed class GetPlanQueryHandler(IClientRepository clientRepository) : IQueryHandler<GetPlanQuery, PlansResponse>
 {

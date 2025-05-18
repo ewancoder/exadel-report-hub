@@ -1,7 +1,7 @@
 ﻿using ExportPro.Common.Shared.Enums;
-using MongoDB.Bson;
 
 namespace ExportPro.Common.Shared.Models;
+
 public class CheckPermissionRequest
 {
     public Guid? UserId { get; set; }

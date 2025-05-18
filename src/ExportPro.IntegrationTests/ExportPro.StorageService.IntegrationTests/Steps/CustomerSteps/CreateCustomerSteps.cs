@@ -1,10 +1,7 @@
-﻿using ExportPro.Common.Shared.Extensions;
-using ExportPro.Shared.IntegrationTests.Auth;
+﻿using ExportPro.Shared.IntegrationTests.Auth;
 using ExportPro.Shared.IntegrationTests.Helpers;
 using ExportPro.Shared.IntegrationTests.MongoDbContext;
 using ExportPro.StorageService.Models.Models;
-using ExportPro.StorageService.SDK.DTOs;
-using ExportPro.StorageService.SDK.DTOs.CountryDTO;
 using ExportPro.StorageService.SDK.DTOs.CustomerDTO;
 using ExportPro.StorageService.SDK.Refit;
 using MongoDB.Driver;
@@ -43,7 +40,7 @@ public class CreateCustomerSteps
     [Given(@"The user has following country ""(.*)""")]
     public async Task GivenTheUserHasFollowingCountry(string country)
     {
-        var countryResponse = await _countryApi!.GetByCode(country, cancellationToken: default);
+        var countryResponse = await _countryApi!.GetByCode(country, default);
         _countryId = countryResponse.Data!.Id;
     }
 

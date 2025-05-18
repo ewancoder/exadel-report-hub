@@ -21,33 +21,49 @@ public class CustomerController(IMediator mediator) : ControllerBase, ICustomerC
     public Task<BaseResponse<CustomerResponse>> Create(
         [FromBody] CreateUpdateCustomerDto customerDto,
         CancellationToken cancellationToken
-    ) => mediator.Send(new CreateCustomerCommand(customerDto), cancellationToken);
+    )
+    {
+        return mediator.Send(new CreateCustomerCommand(customerDto), cancellationToken);
+    }
 
     [HttpPost("bulk")]
     public Task<BaseResponse<int>> CreateBulk(
         [FromBody] List<CreateUpdateCustomerDto> customers,
         CancellationToken cancellationToken
-    ) => mediator.Send(new CreateCustomersCommand(customers), cancellationToken);
+    )
+    {
+        return mediator.Send(new CreateCustomersCommand(customers), cancellationToken);
+    }
 
     [HttpPut("{id}")]
     public Task<BaseResponse<CustomerResponse>> Update(
         [FromRoute] Guid id,
         [FromBody] CreateUpdateCustomerDto customerDto,
         CancellationToken cancellationToken
-    ) => mediator.Send(new UpdateCustomerCommand(id, customerDto), cancellationToken);
+    )
+    {
+        return mediator.Send(new UpdateCustomerCommand(id, customerDto), cancellationToken);
+    }
 
     [HttpDelete("{id}")]
-    public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken) =>
-        mediator.Send(new DeleteCustomerCommand(id), cancellationToken);
+    public Task<BaseResponse<bool>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        return mediator.Send(new DeleteCustomerCommand(id), cancellationToken);
+    }
 
     [HttpGet("{id}")]
-    public Task<BaseResponse<CustomerDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken) =>
-        mediator.Send(new GetCustomerByIdQuery(id.ToObjectId()), cancellationToken);
+    public Task<BaseResponse<CustomerDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        return mediator.Send(new GetCustomerByIdQuery(id.ToObjectId()), cancellationToken);
+    }
 
     [HttpGet]
     public Task<BaseResponse<PaginatedListDto<CustomerDto>>> GetAll(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default
-    ) => mediator.Send(new GetPaginatedCustomersQuery(pageNumber, pageSize), cancellationToken);
+    )
+    {
+        return mediator.Send(new GetPaginatedCustomersQuery(pageNumber, pageSize), cancellationToken);
+    }
 }

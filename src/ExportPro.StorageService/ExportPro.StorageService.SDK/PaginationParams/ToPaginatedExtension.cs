@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace ExportPro.StorageService.SDK.PaginationParams;
+﻿namespace ExportPro.StorageService.SDK.PaginationParams;
 
 public static class ToPaginatedExtension
 {
@@ -8,6 +6,6 @@ public static class ToPaginatedExtension
     {
         var count = list.Count;
         list = list.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-        return new PaginatedList<T>(items: list, count: count, pageNumber: pageNumber, pageSize: pageSize);
+        return new PaginatedList<T>(list, count, pageNumber, pageSize);
     }
 }

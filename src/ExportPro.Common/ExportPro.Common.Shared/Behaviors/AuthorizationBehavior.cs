@@ -7,31 +7,35 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Refit;
 
-
-
 namespace ExportPro.Common.Shared.Behaviors;
+
 public class AuthorizationBehavior<TRequest, TResponse>(
     IACLSharedApi permissionChecker,
-    IHttpContextAccessor httpContextAccessor) : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : notnull
+    IHttpContextAccessor httpContextAccessor
+) : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
 {
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken
+    )
     {
         if (request is IPermissionedRequest permissionedRequest)
         {
-            var user = httpContextAccessor.HttpContext?.User ?? throw new UnauthorizedAccessException("User context not found.");
+            var user =
+                httpContextAccessor.HttpContext?.User
+                ?? throw new UnauthorizedAccessException("User context not found.");
             var url = "https://localhost:7067";
             var jwtToken = httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
 
-            HttpClient httpClient = new HttpClient()
-            {
-                BaseAddress = new Uri(url)
-            };
+            var httpClient = new HttpClient { BaseAddress = new Uri(url) };
 
             if (!string.IsNullOrEmpty(jwtToken))
-            {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken.Replace("Bearer ", ""));
-            }
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                    "Bearer",
+                    jwtToken.Replace("Bearer ", "")
+                );
 
             var refitSettings = new RefitSettings
             {
@@ -41,7 +45,7 @@ public class AuthorizationBehavior<TRequest, TResponse>(
                         PropertyNameCaseInsensitive = true,
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     }
-                )
+                ),
             };
 
             permissionChecker = RestService.For<IACLSharedApi>(httpClient, refitSettings);
@@ -51,19 +55,21 @@ public class AuthorizationBehavior<TRequest, TResponse>(
                 user,
                 async (userId, clientId, resource, action, ct) =>
                 {
-                    var response = await permissionChecker.CheckPermissionAsync(new CheckPermissionRequest
-                    {
-                        UserId = userId,
-                        ClientId = clientId,
-                        Resource = resource,
-                        Action = action
-                    });
+                    var response = await permissionChecker.CheckPermissionAsync(
+                        new CheckPermissionRequest
+                        {
+                            UserId = userId,
+                            ClientId = clientId,
+                            Resource = resource,
+                            Action = action,
+                        }
+                    );
                     return response.Data;
                 },
-                cancellationToken);
+                cancellationToken
+            );
         }
 
         return await next(cancellationToken);
     }
 }
-

@@ -3,8 +3,6 @@ using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.Models.Models;
-using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
 using ExportPro.StorageService.SDK.PaginationParams;
 using ExportPro.StorageService.SDK.Responses;
 
@@ -32,16 +30,17 @@ public class GetClientItemsQueryHandler(
 
         var clientItems = items.Items!;
         List<ItemResponse> itemsDto = new();
-        for (int i = 0; i < clientItems.Count; i++)
+        for (var i = 0; i < clientItems.Count; i++)
         {
             var currency = await currencyRepository.GetOneAsync(
                 x => x.Id == clientItems[i].CurrencyId && !x.IsDeleted,
                 cancellationToken
             );
-            ItemResponse dto = mapper.Map<ItemResponse>(clientItems[i]);
+            var dto = mapper.Map<ItemResponse>(clientItems[i]);
             dto.Currency = currency?.CurrencyCode;
             itemsDto.Add(dto);
         }
+
         return new SuccessResponse<PaginatedList<ItemResponse>>(
             itemsDto.ToPaginatedList(pageSize: request.Parameters.PageSize, pageNumber: request.Parameters.PageNumber),
             "Client items retrieved successfully"

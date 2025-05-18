@@ -1,4 +1,5 @@
 ﻿namespace ExportPro.Front.Models;
+
 public class UserClientRolesDTO
 {
     public Guid ClientId { get; set; }

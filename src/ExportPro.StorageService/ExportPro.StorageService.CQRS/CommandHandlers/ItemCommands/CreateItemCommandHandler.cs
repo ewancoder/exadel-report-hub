@@ -24,7 +24,7 @@ public sealed record CreateItemCommand(
     public List<Guid>? ClientIds { get; init; } = [ClientId];
     public Resource Resource { get; init; } = Resource.Items;
     public CrudAction Action { get; init; } = CrudAction.Create;
-};
+}
 
 public sealed class CreateItemCommandHandler(IHttpContextAccessor httpContext, IClientRepository clientRepository)
     : ICommandHandler<CreateItemCommand, Guid>

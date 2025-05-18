@@ -12,7 +12,7 @@ public sealed record DeleteItemCommand(Guid ItemId, Guid ClientId) : ICommand<bo
     public List<Guid>? ClientIds { get; init; } = [ClientId];
     public Resource Resource { get; init; } = Resource.Items;
     public CrudAction Action { get; init; } = CrudAction.Delete;
-};
+}
 
 public sealed class DeleteItemCommandHandler(IClientRepository repository) : ICommandHandler<DeleteItemCommand, bool>
 {

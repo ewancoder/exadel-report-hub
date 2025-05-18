@@ -100,7 +100,7 @@ public sealed class GenerateInvoicePdfQueryHandler(
         dest.CurrencyCode = currencyCode;
         dest.CustomerName = customer;
         dest.Items = items
-            .Select(i => new PdfItemExportDto()
+            .Select(i => new PdfItemExportDto
             {
                 Name = i.Name,
                 Price = i.Price,

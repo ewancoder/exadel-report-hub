@@ -65,11 +65,6 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
         return await Collection.Find(filter).AnyAsync(cancellationToken);
     }
 
-    public Task<List<Invoice>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<List<Invoice>> GetInvoicesInDateRangeAsync(DateTime startDate, DateTime endDate)
     {
         return await Collection.Find(x => x.IssueDate >= startDate && x.IssueDate <= endDate).ToListAsync();
@@ -78,5 +73,10 @@ public sealed class InvoiceRepository(ICollectionProvider collectionProvider)
     public async Task<long> CountAsync(FilterDefinition<Invoice> filter, CancellationToken cancellationToken)
     {
         return await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+    }
+
+    public Task<List<Invoice>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

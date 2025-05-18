@@ -8,12 +8,15 @@ using MongoDB.Driver;
 namespace ExportPro.StorageService.DataAccess.Repositories;
 
 public sealed class ReportPreferenceRepository(ICollectionProvider collectionProvider)
-    : BaseRepository<ReportPreference>(collectionProvider), IReportPreference
+    : BaseRepository<ReportPreference>(collectionProvider),
+        IReportPreference
 {
-    public async Task<List<ReportPreference>> GetAllByClientIdAsync(ObjectId clientId, CancellationToken cancellationToken)
+    public async Task<List<ReportPreference>> GetAllByClientIdAsync(
+        ObjectId clientId,
+        CancellationToken cancellationToken
+    )
     {
-        return await Collection.Find(x => x.ClientId == clientId && !x.IsDeleted)
-            .ToListAsync(cancellationToken);
+        return await Collection.Find(x => x.ClientId == clientId && !x.IsDeleted).ToListAsync(cancellationToken);
     }
 
     public async Task<List<ReportPreference>> GetAllPreferences(CancellationToken cancellationToken)

@@ -7,13 +7,18 @@ namespace ExportPro.Front.Pages;
 
 public partial class Register : ComponentBase
 {
-    [Inject] private NavigationManager Nav { get; set; } = default!;
-    [Inject] private HttpClient httpClient { get; set; } = default!;
-    [Inject] private ILocalStorageService localStorage { get; set; } = default!;
-
     private ApiHelper? apiHelper;
 
-    private RegisterModel registerModel = new();
+    private readonly RegisterModel registerModel = new();
+
+    [Inject]
+    private NavigationManager Nav { get; set; } = default!;
+
+    [Inject]
+    private HttpClient httpClient { get; set; } = default!;
+
+    [Inject]
+    private ILocalStorageService localStorage { get; set; } = default!;
 
     protected override void OnInitialized()
     {
@@ -30,7 +35,6 @@ public partial class Register : ComponentBase
             var result = await apiHelper.PostAsync<RegisterModel, object>("api/Auth/register", registerModel);
             if (result.IsSuccess)
                 NavigateToLogin();
-
         }
         catch (Exception ex)
         {
@@ -38,5 +42,8 @@ public partial class Register : ComponentBase
         }
     }
 
-    private void NavigateToLogin() => Nav.NavigateTo("/login");
+    private void NavigateToLogin()
+    {
+        Nav.NavigateTo("/login");
+    }
 }

@@ -9,5 +9,4 @@ public sealed class ItemDtoForClient
     public required double Price { get; set; }
     public Status Status { get; set; }
     public Guid CurrencyId { get; set; } //maybe can be made into enum as well?
-    public string CurrencyName { get; set; } = string.Empty;
 }

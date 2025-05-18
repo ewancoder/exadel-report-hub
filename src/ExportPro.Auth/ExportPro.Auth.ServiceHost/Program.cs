@@ -78,4 +78,5 @@ using (var scope = app.Services.CreateScope())
         var register = await authService.RegisterAsync(user);
     }
 }
+
 app.Run();

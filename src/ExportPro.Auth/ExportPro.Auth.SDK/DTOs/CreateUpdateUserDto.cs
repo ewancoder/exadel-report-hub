@@ -1,7 +1,7 @@
-﻿
-using ExportPro.Common.Shared.Enums;
+﻿using ExportPro.Common.Shared.Enums;
 
 namespace ExportPro.Auth.SDK.DTOs;
+
 public record CreateUpdateUserDTO
 {
     public string? Username { get; set; }
@@ -10,4 +10,3 @@ public record CreateUpdateUserDTO
     public UserRole? Role { get; set; }
     public Guid? ClientId { get; set; }
 }
-

@@ -1,9 +1,10 @@
 ﻿using ExportPro.Auth.CQRS.Commands;
+using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Common.Shared.Library;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using ExportPro.Auth.SDK.DTOs;
-using ExportPro.Common.Shared.Library;
+
 namespace ExportPro.Auth.ServiceHost.Controllers;
 
 [Produces("application/json")]
@@ -34,7 +35,7 @@ public class AuthController(IMediator mediator) : ControllerBase
             {
                 Messages = response.Messages,
                 ApiState = response.ApiState,
-                Data = null
+                Data = null,
             };
 
         SetRefreshTokenCookie(response.Data);
@@ -72,11 +73,15 @@ public class AuthController(IMediator mediator) : ControllerBase
 
     private void SetRefreshTokenCookie(AuthResponseDto authResponse)
     {
-        Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            Expires = authResponse.ExpiresAt
-        });
+        Response.Cookies.Append(
+            "refreshToken",
+            authResponse.RefreshToken,
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = authResponse.ExpiresAt,
+            }
+        );
     }
 }

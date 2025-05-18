@@ -1,4 +1,5 @@
 ﻿namespace ExportPro.Front.Models;
+
 public class UserDto
 {
     public Guid Id { get; set; }

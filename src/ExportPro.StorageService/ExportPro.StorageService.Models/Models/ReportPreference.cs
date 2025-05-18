@@ -6,8 +6,6 @@ namespace ExportPro.StorageService.Models.Models;
 
 public sealed class ReportPreference : AuditModel, IModel
 {
-    public ObjectId Id { get; set; }
-
     public required ObjectId UserId { get; set; }
 
     public required string Email { get; set; }
@@ -25,4 +23,5 @@ public sealed class ReportPreference : AuditModel, IModel
     public bool IsEnabled { get; set; } = true;
 
     public bool IsDeleted { get; set; } = false;
+    public ObjectId Id { get; set; }
 }

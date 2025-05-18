@@ -60,6 +60,5 @@ public class UpdateInvoiceValidator : AbstractValidator<UpdateInvoiceCommand>
                     )
                     .WithMessage("The Client Id does not exist");
             });
-     
     }
 }

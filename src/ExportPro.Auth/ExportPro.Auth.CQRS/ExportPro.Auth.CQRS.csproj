@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
-    <ProjectReference Include="..\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj" />
-    <ProjectReference Include="..\ExportPro.AuthService\ExportPro.AuthService.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj"/>
+        <ProjectReference Include="..\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj"/>
+        <ProjectReference Include="..\ExportPro.AuthService\ExportPro.AuthService.csproj"/>
+    </ItemGroup>
 
 </Project>

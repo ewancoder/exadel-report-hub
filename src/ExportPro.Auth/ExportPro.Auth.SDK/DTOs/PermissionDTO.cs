@@ -1,5 +1,4 @@
-﻿using ExportPro.Auth.SDK.Models;
-using ExportPro.Common.Shared.Enums;
+﻿using ExportPro.Common.Shared.Enums;
 using MongoDB.Bson;
 
 namespace ExportPro.Auth.SDK.DTOs;
@@ -12,4 +11,3 @@ public class PermissionDTO
     public CrudAction Action { get; set; }
     public Resource? Resource { get; set; }
 }
-

@@ -1,6 +1,4 @@
-﻿
-
-using ExportPro.AuthService.Repositories;
+﻿using ExportPro.AuthService.Repositories;
 using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Helpers;
@@ -10,15 +8,15 @@ using MongoDB.Bson;
 
 namespace ExportPro.Auth.CQRS.Commands;
 
-
-public record DeleteUserClientRole(ObjectId UserId): ICommand<bool>, IPermissionedRequest
+public record DeleteUserClientRole(ObjectId UserId) : ICommand<bool>, IPermissionedRequest
 {
     public List<Guid>? ClientIds => null;
     public Resource Resource => Resource.Users;
     public CrudAction Action => CrudAction.Delete;
-};
+}
 
-public class DeleteUserClientRolesCommandHandler(IUserRepository userRepository, IACLService aclService) : ICommandHandler<DeleteUserClientRole, bool>
+public class DeleteUserClientRolesCommandHandler(IUserRepository userRepository, IACLService aclService)
+    : ICommandHandler<DeleteUserClientRole, bool>
 {
     public async Task<BaseResponse<bool>> Handle(DeleteUserClientRole request, CancellationToken cancellationToken)
     {
@@ -26,10 +24,9 @@ public class DeleteUserClientRolesCommandHandler(IUserRepository userRepository,
         if (user == null)
             return new NotFoundResponse<bool>("User not found.");
         var clientRoles = await aclService.GetAccessibleUserRolesAsync(request.UserId, cancellationToken);
-        if(clientRoles == null)
+        if (clientRoles == null)
             return new NotFoundResponse<bool>("User roles not found.");
         await aclService.DeleteAllRoles(request.UserId, cancellationToken);
         return new SuccessResponse<bool>(true, "User roles deleted successfully.");
     }
 }
-

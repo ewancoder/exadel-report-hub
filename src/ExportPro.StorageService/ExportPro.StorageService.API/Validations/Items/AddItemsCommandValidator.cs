@@ -1,7 +1,6 @@
 ﻿using ExportPro.Common.Shared.Extensions;
 using ExportPro.StorageService.CQRS.CommandHandlers.ItemCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.SDK.Refit;
 using FluentValidation;
 
 namespace ExportPro.StorageService.API.Validations.Items;

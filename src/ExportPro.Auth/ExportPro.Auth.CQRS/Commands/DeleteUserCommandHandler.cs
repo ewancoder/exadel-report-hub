@@ -3,7 +3,7 @@ using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
-using ExportPro.Common.Shared.Refit;
+
 namespace ExportPro.Auth.CQRS.Commands;
 
 public record DeleteUserCommand(Guid Id) : ICommand<bool>;
@@ -21,4 +21,3 @@ public class DeleteUserCommandHandler(IUserRepository userRepository, IACLServic
         return new SuccessResponse<bool>(true, "User deleted successfully");
     }
 }
-

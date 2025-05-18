@@ -14,6 +14,7 @@ public sealed class Invoice : AuditModel, IModel
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId CurrencyId { get; set; }
+
     public Status? PaymentStatus { get; set; }
     public string? BankAccountNumber { get; set; }
 
@@ -22,6 +23,7 @@ public sealed class Invoice : AuditModel, IModel
 
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId CustomerId { get; set; }
+
     public List<ObjectId>? ItemsId { get; set; }
     public bool IsDeleted { get; set; } = false;
     public ObjectId Id { get; set; }

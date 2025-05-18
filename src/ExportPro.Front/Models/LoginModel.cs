@@ -2,7 +2,7 @@
 
 namespace ExportPro.Front.Models;
 
-    public class LoginModel
+public class LoginModel
 {
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress(ErrorMessage = "Invalid email")]

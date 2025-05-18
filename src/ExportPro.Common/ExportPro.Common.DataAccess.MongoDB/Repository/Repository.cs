@@ -9,8 +9,8 @@ namespace ExportPro.Common.DataAccess.MongoDB.Repository;
 public abstract class BaseRepository<TDocument> : IRepository<TDocument>
     where TDocument : IModel
 {
-    private readonly ICollectionProvider _collectionProvider;
     private readonly Lazy<IMongoCollection<TDocument>> _collectionAccessor;
+    private readonly ICollectionProvider _collectionProvider;
     private readonly FilterDefinitionBuilder<TDocument> _fdb;
 
     protected BaseRepository(ICollectionProvider collectionProvider)
@@ -32,7 +32,10 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument>
         return entity;
     }
 
-    public virtual async Task<ICollection<TDocument>> AddManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken = default)
+    public virtual async Task<ICollection<TDocument>> AddManyAsync(
+        ICollection<TDocument> entities,
+        CancellationToken cancellationToken = default
+    )
     {
         await Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
         return entities;
@@ -45,12 +48,13 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument>
         return entity;
     }
 
-    public virtual async Task<ICollection<TDocument>> UpdateManyAsync(ICollection<TDocument> entities, CancellationToken cancellationToken = default)
+    public virtual async Task<ICollection<TDocument>> UpdateManyAsync(
+        ICollection<TDocument> entities,
+        CancellationToken cancellationToken = default
+    )
     {
         foreach (var entity in entities)
-        {
             await UpdateOneAsync(entity, cancellationToken);
-        }
         return entities;
     }
 
@@ -60,7 +64,10 @@ public abstract class BaseRepository<TDocument> : IRepository<TDocument>
         return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public virtual async Task<TDocument> GetOneAsync(Expression<Func<TDocument, bool>> filter, CancellationToken cancellationToken = default)
+    public virtual async Task<TDocument> GetOneAsync(
+        Expression<Func<TDocument, bool>> filter,
+        CancellationToken cancellationToken = default
+    )
     {
         return await Collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }

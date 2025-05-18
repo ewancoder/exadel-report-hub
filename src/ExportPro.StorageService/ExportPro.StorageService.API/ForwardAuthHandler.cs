@@ -10,8 +10,10 @@ public class ForwardAuthHeaderHandler(IHttpContextAccessor accessor) : Delegatin
     /// <param name="request">The request message to send.</param>
     /// <param name="cancellationToken">A cancellation token to cancel operation.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-        CancellationToken cancellationToken)
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken
+    )
     {
         var incoming = accessor.HttpContext?.Request.Headers.Authorization.FirstOrDefault();
 

@@ -1,26 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <TargetFramework>net9.0</TargetFramework>
-	  <PackageId>ExportPro.Common.DataAccess.MongoDB</PackageId>
-	  <Authors>Exadel-Group-3</Authors>
-	  <Version>1.0.3</Version>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
-	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <PackageId>ExportPro.Common.DataAccess.MongoDB</PackageId>
+        <Authors>Exadel-Group-3</Authors>
+        <Version>1.0.3</Version>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ExportPro.Common.Models.MongoDB" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3" />
-    <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ExportPro.Common.Models.MongoDB" Version="1.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.3"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3"/>
+        <PackageReference Include="MongoDB.Driver" Version="3.3.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj"/>
+    </ItemGroup>
 
- 
 
 </Project>

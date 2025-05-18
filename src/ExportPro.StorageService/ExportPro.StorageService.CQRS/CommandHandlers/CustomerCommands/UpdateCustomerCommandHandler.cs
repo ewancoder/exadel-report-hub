@@ -12,14 +12,16 @@ using Microsoft.AspNetCore.Http;
 
 namespace ExportPro.StorageService.CQRS.CommandHandlers.CustomerCommands;
 
-public sealed record UpdateCustomerCommand(Guid Id, CreateUpdateCustomerDto Customer) : ICommand<CustomerResponse>, IPermissionedRequest
+public sealed record UpdateCustomerCommand(Guid Id, CreateUpdateCustomerDto Customer)
+    : ICommand<CustomerResponse>,
+        IPermissionedRequest
 {
     public List<Guid>? ClientIds => [];
 
     public Resource Resource => Resource.Customers;
 
     public CrudAction Action => CrudAction.Update;
-};
+}
 
 public sealed class UpdateCustomerCommandHandler(
     IHttpContextAccessor httpContext,

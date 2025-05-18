@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Shared.IntegrationTests.Auth;
 using ExportPro.Shared.IntegrationTests.Helpers;
@@ -20,24 +21,24 @@ namespace ExportPro.Export.IntegrationTests.Steps;
 public class InvoiceExportSteps
 {
     private readonly IMongoDbContext<Invoice> _mongoDbContext = new MongoDbContext<Invoice>();
+    private readonly IMongoDbContext<Client> _mongoDbContextClient = new MongoDbContext<Client>();
     private readonly IMongoDbContext<Country> _mongoDbContextCountry = new MongoDbContext<Country>();
     private readonly IMongoDbContext<Currency> _mongoDbContextCurrency = new MongoDbContext<Currency>();
     private readonly IMongoDbContext<Customer> _mongoDbContextCustomer = new MongoDbContext<Customer>();
-    private readonly IMongoDbContext<Client> _mongoDbContextClient = new MongoDbContext<Client>();
-    private HttpResponseMessage _invoicepdf;
-    private ICountryController _countryController;
-    private ICurrencyController _currencyController;
-    private ICustomerController _customerController;
-    private IInvoiceController _invoiceController;
     private IClientController _clientController;
-    private IInvoiceExport _invoiceExport;
-    private CreateInvoiceDto _invoiceDto;
+    private Guid _clientId;
+    private ICountryController _countryController;
     private Guid _countryId;
+    private ICurrencyController _currencyController;
     private Guid _currencyId;
     private Guid _currencyIdForItem;
+    private ICustomerController _customerController;
     private Guid _customerId;
-    private Guid _clientId;
+    private IInvoiceController _invoiceController;
+    private CreateInvoiceDto _invoiceDto;
+    private IInvoiceExport _invoiceExport;
     private Guid _invoiceId;
+    private HttpResponseMessage _invoicepdf;
 
     [Given(@"The user is logged in with email '(.*)' and password '(.*)' and has necessary permissions")]
     public async Task GivenTheUserIsLoggedInWithEmailAndPasswordAndHasNecessaryPermissions(
@@ -45,9 +46,9 @@ public class InvoiceExportSteps
         string password
     )
     {
-        string jwtToken = await UserLogin.Login(email, password);
-        string jwtTokenForClient = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
-        HttpClient httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1200);
+        var jwtToken = await UserLogin.Login(email, password);
+        var jwtTokenForClient = await UserLogin.Login("SuperAdminTest@gmail.com", "SuperAdminTest2@");
+        var httpClient = HttpClientForRefit.GetHttpClient(jwtToken, 1200);
         var httpClientForClient = HttpClientForRefit.GetHttpClient(jwtTokenForClient, 1500);
         _countryController = RestService.For<ICountryController>(httpClient);
         _currencyController = RestService.For<ICurrencyController>(httpClient);
@@ -57,10 +58,10 @@ public class InvoiceExportSteps
             new RefitSettings
             {
                 ContentSerializer = new SystemTextJsonContentSerializer(
-                    new System.Text.Json.JsonSerializerOptions
+                    new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true,
-                        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     }
                 ),
             }
@@ -129,7 +130,7 @@ public class InvoiceExportSteps
     [Given("The user created following customer and stored the customer id")]
     public async Task GivenTheUserCreatedFollowingCustomerAndStoredTheCustomerId(Table table)
     {
-        CreateUpdateCustomerDto customerDto = table.CreateInstance<CreateUpdateCustomerDto>();
+        var customerDto = table.CreateInstance<CreateUpdateCustomerDto>();
         customerDto.CountryId = _countryId;
         var customer = await _customerController.Create(customerDto);
         var customerExists = await _mongoDbContextCustomer
@@ -154,7 +155,7 @@ public class InvoiceExportSteps
     [Given("the invoice contains the following items")]
     public Task GivenTheInvoiceContainsTheFollowingItems(Table table)
     {
-        List<ItemDtoForClient> items = new List<ItemDtoForClient>();
+        var items = new List<ItemDtoForClient>();
         ItemDtoForClient item = new()
         {
             Name = table.Rows[0]["Name"],

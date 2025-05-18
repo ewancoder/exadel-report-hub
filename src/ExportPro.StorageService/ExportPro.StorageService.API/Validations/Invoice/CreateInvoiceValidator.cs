@@ -1,8 +1,6 @@
 ﻿using ExportPro.Common.Shared.Extensions;
 using ExportPro.StorageService.CQRS.CommandHandlers.InvoiceCommands;
 using ExportPro.StorageService.DataAccess.Interfaces;
-using ExportPro.StorageService.SDK.DTOs.InvoiceDTO;
-using ExportPro.StorageService.SDK.PaginationParams;
 using FluentValidation;
 
 namespace ExportPro.StorageService.Api.Validations.Invoice;

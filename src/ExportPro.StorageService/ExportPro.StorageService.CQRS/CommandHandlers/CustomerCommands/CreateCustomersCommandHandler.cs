@@ -20,10 +20,7 @@ public sealed class CreateCustomersCommandHandler(
     IMapper mapper
 ) : ICommandHandler<CreateCustomersCommand, int>
 {
-    public async Task<BaseResponse<int>> Handle(
-        CreateCustomersCommand request,
-        CancellationToken cancellationToken
-    )
+    public async Task<BaseResponse<int>> Handle(CreateCustomersCommand request, CancellationToken cancellationToken)
     {
         var validationResult = await ValidateCustomersAsync(request, cancellationToken);
 
@@ -67,7 +64,8 @@ public sealed class CreateCustomersCommandHandler(
 
         ValidateRequiredFields(customerDto, errors);
 
-        if (errors.Count > 0) return errors;
+        if (errors.Count > 0)
+            return errors;
 
         await ValidateCountryExistsAsync(customerDto.CountryId, errors, cancellationToken);
         ValidateEmailFormat(customerDto.Email, errors);

@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ExportPro.StorageService.SDK.DTOs;
+﻿namespace ExportPro.StorageService.SDK.DTOs;
 
 public class CurrencyDto
 {

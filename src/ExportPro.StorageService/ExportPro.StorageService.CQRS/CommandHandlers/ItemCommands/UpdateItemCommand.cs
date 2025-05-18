@@ -15,7 +15,7 @@ public sealed record UpdateItemCommand(Guid ClientId, Item Item) : ICommand<bool
     public List<Guid>? ClientIds { get; init; } = [ClientId];
     public Resource Resource { get; init; } = Resource.Items;
     public CrudAction Action { get; init; } = CrudAction.Update;
-};
+}
 
 public sealed class UpdateItemCommandHandler(IClientRepository repository) : ICommandHandler<UpdateItemCommand, bool>
 {

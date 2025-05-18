@@ -1,19 +1,16 @@
 ﻿using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading;
 using ExportPro.Common.Shared.Exceptions;
 using ExportPro.Common.Shared.Library;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace ExportPro.Common.Shared.Middlewares;
 
 public class ErrorHandlingMiddleware
 {
-    private readonly RequestDelegate _next;
     private readonly ILogger<ErrorHandlingMiddleware> _logger;
+    private readonly RequestDelegate _next;
 
     public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
     {
@@ -43,9 +40,7 @@ public class ErrorHandlingMiddleware
                 context.Response.StatusCode = (int)HttpStatusCode.UnprocessableEntity;
                 var validationResponse = new ValidationFailedResponse();
                 foreach (var item in validationException.Failures)
-                {
                     validationResponse.Messages?.Add($"{item.Key} {item.Value}");
-                }
                 return context.Response.WriteAsync(JsonSerializer.Serialize(validationResponse));
             case FluentValidation.ValidationException validationException:
                 context.Response.StatusCode = (int)HttpStatusCode.UnprocessableEntity;

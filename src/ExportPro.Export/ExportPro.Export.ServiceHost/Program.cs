@@ -4,8 +4,11 @@ using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Behaviors;
 using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Middlewares;
+using ExportPro.Common.Shared.Refit;
 using ExportPro.Export.ServiceHost.Extensions;
+using ExportPro.Export.ServiceHost.Infrastructure;
 using MediatR;
+using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +25,18 @@ builder.Services.AddCommonRegistrations();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
+builder
+    .Services.AddRefitClient<IACLSharedApi>(
+        new RefitSettings { ContentSerializer = new SystemTextJsonContentSerializer() }
+    )
+    .ConfigureHttpClient(
+        (sp, client) =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            client.BaseAddress = new Uri(config["Refit:authUrl"]);
+        }
+    )
+    .AddHttpMessageHandler<ForwardAuthHeaderHandler>();
 
 // MediatR behavior
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));

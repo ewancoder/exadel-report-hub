@@ -3,8 +3,6 @@ using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.SDK.DTOs.CountryDTO;
-using ExportPro.StorageService.SDK.Responses;
-using MediatR;
 
 namespace ExportPro.StorageService.CQRS.QueryHandlers.CountryQueries;
 

@@ -12,11 +12,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\ExportPro.Auth\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj" />
-      <ProjectReference Include="..\..\ExportPro.Auth\ExportPro.AuthService\ExportPro.AuthService.csproj" />
-      <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
-      <ProjectReference Include="..\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj" />
-      <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
+        <ProjectReference Include="..\..\ExportPro.Auth\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj"/>
+        <ProjectReference Include="..\..\ExportPro.Auth\ExportPro.AuthService\ExportPro.AuthService.csproj"/>
+        <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj"/>
+        <ProjectReference Include="..\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj"/>
+        <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj"/>
     </ItemGroup>
 </Project>
 

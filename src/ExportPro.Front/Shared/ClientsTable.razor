@@ -16,9 +16,17 @@
 
 
 @code {
-    [Parameter] public IEnumerable<Client> ClientsList { get; set; }
-    [Parameter] public EventCallback<int> ServiceParamsMethod { get; set; }
-    [Parameter] public EventCallback<int> ServiceResultParamsMethod { get; set; }
-    [Parameter] public EventCallback<Guid> OnSelect { get; set; }
-}
 
+    [Parameter]
+    public IEnumerable<Client> ClientsList { get; set; }
+
+    [Parameter]
+    public EventCallback<int> ServiceParamsMethod { get; set; }
+
+    [Parameter]
+    public EventCallback<int> ServiceResultParamsMethod { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnSelect { get; set; }
+
+}

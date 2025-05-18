@@ -1,6 +1,4 @@
-﻿
-
-using ExportPro.Auth.SDK.DTOs;
+﻿using ExportPro.Auth.SDK.DTOs;
 using ExportPro.AuthService.Repositories;
 using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Enums;
@@ -18,9 +16,13 @@ public record GetAllUsersQuery : IQuery<List<UserDto>>, IPermissionedRequest
     public List<Guid>? ClientIds => [];
     public Resource Resource => Resource.Users;
     public CrudAction Action => CrudAction.Read;
-};
+}
 
-public class GetAllUsersQueryHandler(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, IACLService aclService) : IQueryHandler<GetAllUsersQuery, List<UserDto>>
+public class GetAllUsersQueryHandler(
+    IHttpContextAccessor httpContextAccessor,
+    IUserRepository userRepository,
+    IACLService aclService
+) : IQueryHandler<GetAllUsersQuery, List<UserDto>>
 {
     public async Task<BaseResponse<List<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
@@ -34,7 +36,7 @@ public class GetAllUsersQueryHandler(IHttpContextAccessor httpContextAccessor, I
         if (users == null)
             return new BadRequestResponse<List<UserDto>>("Users not found.");
 
-        if (role == Common.Shared.Enums.Role.None)
+        if (role == Role.None)
         {
             var userId = TokenHelper.GetUserId(user);
             var userRoles = await aclService.GetAccessibleUserRolesAsync(userId, cancellationToken);
@@ -50,26 +52,28 @@ public class GetAllUsersQueryHandler(IHttpContextAccessor httpContextAccessor, I
 
         foreach (var u in users)
         {
-            var clientRoles = await aclService.GetAccessibleUserRolesAsync(u.Id, cancellationToken); 
-            var clientRoleDtos = clientRoles?
-                .Select(cr => new UserClientRolesDTO
-                {
-                    ClientId = cr.ClientId.ToGuid(),
-                    Role = cr.Role,
-                    UserId = cr.UserId.ToGuid()
-                }).ToList() ?? [];
+            var clientRoles = await aclService.GetAccessibleUserRolesAsync(u.Id, cancellationToken);
+            var clientRoleDtos =
+                clientRoles
+                    ?.Select(cr => new UserClientRolesDTO
+                    {
+                        ClientId = cr.ClientId.ToGuid(),
+                        Role = cr.Role,
+                        UserId = cr.UserId.ToGuid(),
+                    })
+                    .ToList() ?? [];
 
-            userDtos.Add(new UserDto
-            {
-                Id = u.Id.ToGuid(),
-                Username = u.Username,
-                Email = u.Email,
-                ClientRoles = clientRoleDtos
-            });
+            userDtos.Add(
+                new UserDto
+                {
+                    Id = u.Id.ToGuid(),
+                    Username = u.Username,
+                    Email = u.Email,
+                    ClientRoles = clientRoleDtos,
+                }
+            );
         }
 
         return new SuccessResponse<List<UserDto>>(userDtos);
-
     }
 }
-
