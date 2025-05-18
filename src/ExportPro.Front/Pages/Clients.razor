@@ -1,7 +1,92 @@
 ﻿@page "/clients"
 
+@if (IsProcessing)
+{
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+}
+else
+{
+    <div class="card shadow border-0 mt-4">
+        <div class="card-header bg-black bg-gradient m-lg-0 py-3">
+            <div class=" = "row>
+                <div class="col-12 text-center">
+                    <h2 class="text-white py-2">Clients List</h2>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row pb3">
+                <div class="col-12 text-end">
+                    <button class="btn btn-large btn-dark">Create New Client</button>
+                </div>
+            </div>
+            @if(ClientsList.IsSuccess && ClientsList.Data != null && ClientsList.Data.Any())
+            {
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var client in ClientsList.Data)
+                        {
+                            <tr>
+                                <td>@client.Name</td>
+                                <td>@client.Description</td>
+                                <td>
+                                    <button class="btn btn-primary">Edit</button>
+                                    <button class="btn btn-dark">View Users</button>
+                                    <button class="btn btn-danger">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <h4>No clients found.</h4>
+                </div>
+            }
+        </div>
+
+    </div>
+}
 
 
 @code {
+    public bool IsProcessing { get; set; } = false;
+    [Inject] private HttpClient httpClient { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
+    [Inject] private ILocalStorageService LocalStorage { get; set; } = default!;
+    private ApiHelper? apiHelper;
+    private Result<IEnumerable<ClientResponse>> ClientsList { get; set; } = new Result<IEnumerable<ClientResponse>>
+        {
+            IsSuccess = true,
+            Data = new List<ClientResponse>()
+        };
 
+    protected override async Task OnInitializedAsync()
+    {
+        apiHelper = new ApiHelper(httpClient, LocalStorage);
+        IsProcessing = true;
+        await LoadClients();
+        IsProcessing = false;
+
+    }
+
+    private async Task LoadClients()
+    {
+        var clients = await apiHelper.GetAsync<Result<IEnumerable<ClientResponse>>>("api/client");
+    }
 }
