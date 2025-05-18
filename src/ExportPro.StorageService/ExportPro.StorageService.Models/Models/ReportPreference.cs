@@ -20,6 +20,8 @@ public sealed class ReportPreference : AuditModel, IModel
 
     public bool IsDelivered { get; set; }
 
+    public ObjectId ClientCurrencyId { get; set; }
+
     public bool IsEnabled { get; set; } = true;
 
     public bool IsDeleted { get; set; } = false;

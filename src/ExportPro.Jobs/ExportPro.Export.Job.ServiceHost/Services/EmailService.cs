@@ -9,29 +9,22 @@ public sealed class EmailService(SmtpSettings settings) : IEmailService
 {
     private readonly SmtpSettings _settings = settings;
 
-    public async Task SendAsync(
-        string to,
-        string subject,
-        string body,
-        byte[]? attachment = null,
-        string? fileName = null,
-        string? contentType = null
-    )
+    public async Task SendAsync(EmailSendDto dto)
     {
         using var message = new MailMessage
         {
             From = new MailAddress(_settings.From),
-            Subject = subject,
-            Body = body,
+            Subject = dto.Subject,
+            Body = dto.Body,
             IsBodyHtml = false,
         };
 
-        message.To.Add(to);
+        message.To.Add(dto.To);
 
-        if (attachment != null && fileName != null)
+        if (dto.Attachment != null && dto.FileName != null)
         {
-            var stream = new MemoryStream(attachment);
-            var att = new Attachment(stream, fileName, contentType ?? "application/octet-stream");
+            var stream = new MemoryStream(dto.Attachment);
+            var att = new Attachment(stream, dto.FileName, dto.ContentType ?? "application/octet-stream");
             message.Attachments.Add(att);
         }
 

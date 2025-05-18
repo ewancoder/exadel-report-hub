@@ -1,12 +1,13 @@
-﻿using System.Net.Http.Headers;
-using ExportPro.Auth.SDK.DTOs;
+﻿using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Interfaces;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Export.Job.ServiceHost.DTOs;
 using ExportPro.Export.Job.ServiceHost.Interfaces;
 using ExportPro.StorageService.DataAccess.Interfaces;
 using ExportPro.StorageService.Models.Enums;
 using ExportPro.StorageService.Models.Models;
 using ExportPro.StorageService.SDK.Refit;
+using Microsoft.Extensions.Options;
 using Quartz;
 using Refit;
 
@@ -15,44 +16,47 @@ namespace ExportPro.Export.Job.ServiceHost.Services;
 public sealed class ReportSchedulerJob(
     IReportPreference reportRepository,
     IEmailService emailService,
-    IConfiguration configuration
+    IConfiguration configuration,
+    IOptions<ServiceAccountSettings> serviceAccountOptions
 ) : IJob
 {
+    private readonly ServiceAccountSettings _serviceAccount = serviceAccountOptions.Value;
     public async Task Execute(IJobExecutionContext context)
     {
         var preferences = await reportRepository.GetAllPreferences(context.CancellationToken);
         var baseurl = Environment.GetEnvironmentVariable("DockerForAuth") ?? configuration["AuthURI"];
         HttpClient client = new() { BaseAddress = new Uri(baseurl!) };
 
-        var authAPi = RestService.For<IAuth>(client);
-        UserRegisterDto user = new()
+        IAuth authAPi = RestService.For<IAuth>(client);
+        var login = new UserLoginDto
         {
-            Email = "G10@gmail.com",
-            Username = "GPPP",
-            Password = "G10@gmail.com",
+            Email = _serviceAccount.Email,
+            Password = _serviceAccount.Password
         };
 
-        UserLoginDto login = new() { Email = user.Email, Password = user.Password };
         var jwtTokenDto = await authAPi.LoginAsync(login);
         var jwtToken = jwtTokenDto.AccessToken;
-        foreach (var pref in preferences)
-        {
-            if (!IsTimeToSend(pref))
-                continue;
             var baseUrlForexport =
                 Environment.GetEnvironmentVariable("DockerForReport") ?? configuration["ExportReportURI"];
             HttpClient httpClient = new()
             {
-                BaseAddress = new Uri(baseUrlForexport!), //localhost:5294"),
+                BaseAddress = new Uri(baseUrlForexport!),
             };
 
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-            var reportExportApi = RestService.For<IReportExportApi>(httpClient);
+            httpClient.DefaultRequestHeaders.Authorization = new("Bearer", jwtToken);
+            IReportExportApi reportExportApi = RestService.For<IReportExportApi>(httpClient);
+
+        foreach (var pref in preferences)
+        {
+            if (!IsTimeToSend(pref))
+                continue;
+
             var reportResponse = await reportExportApi.GetStatisticsAsync(
-                pref.ReportFormat,
-                pref.ClientId.ToGuid(),
-                context.CancellationToken
-            );
+                                pref.ReportFormat,
+                                pref.ClientId.ToGuid(),
+                                pref.ClientCurrencyId.ToGuid(),
+                                context.CancellationToken
+                            );
 
             if (!reportResponse.IsSuccessStatusCode)
                 continue;
@@ -61,18 +65,28 @@ public sealed class ReportSchedulerJob(
             {
                 ReportFormat.Xlsx => ("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
                 ReportFormat.Csv => ("csv", "text/csv"),
-                _ => ("dat", "application/octet-stream"), // fallback
+                _ => ("dat", "application/octet-stream"),
             };
-
+            var httpResponse = reportResponse.Content;
             var fileName = $"report_{DateTime.UtcNow:yyyyMMddHHmm}.{extension}";
-            var contentType = reportResponse.Content!.Headers.ContentType?.MediaType ?? mimeType;
-            var content = await reportResponse.Content.ReadAsByteArrayAsync(context.CancellationToken);
+            var content = await httpResponse.Content.ReadAsByteArrayAsync(context.CancellationToken);
+            var contentType = httpResponse.Content.Headers.ContentType?.MediaType ?? mimeType;
             var subject = $"Scheduled Report - {DateTime.UtcNow:MMMM dd, yyyy}";
-            var body = "Dear user,\n\nPlease find your scheduled report attached.";
+            var body = $"Dear user,\n\nPlease find your scheduled report attached.";
             var userEmail = pref.Email;
 
             if (!string.IsNullOrWhiteSpace(userEmail))
-                await emailService.SendAsync(userEmail, subject, body, content, fileName, contentType);
+            {
+                await emailService.SendAsync(new EmailSendDto
+                {
+                    To = userEmail,
+                    Subject = subject,
+                    Body = body,
+                    Attachment = content,
+                    FileName = fileName,
+                    ContentType = contentType
+                });
+            }
         }
     }
 

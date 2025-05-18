@@ -44,6 +44,7 @@ public sealed class UpdateReportPreferenceHandler(
         }
 
         preference.ReportFormat = request.dto.ReportFormat;
+        preference.ClientCurrencyId = request.dto.ClientCurrencyId.ToObjectId();
         preference.Email = request.dto.Email;
         preference.CronExpression = cronExpression;
         preference.HumanReadableCronExpression = CronToTextHelper.ToReadableText(cronExpression);

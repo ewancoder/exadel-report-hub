@@ -1,5 +1,4 @@
 using ExportPro.Auth.CQRS.Commands;
-using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.ServiceHost.Extensions;
 using ExportPro.AuthService.Behaviors;
 using ExportPro.AuthService.Repositories;
@@ -22,6 +21,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddScoped<ExportProMongoContext>();
+builder.Services.AddDataSeeders();
 builder.Services.AddScoped<ICollectionProvider, DefaultCollectionProvider>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LocalAuthorizationBehavior<,>));
 builder.Services.AddScoped<IACLRepository, ACLRepository>();
@@ -50,6 +50,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    await app.SeedDataAsync();
 }
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
@@ -59,24 +60,5 @@ app.UseCors("AllowWasm");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-using (var scope = app.Services.CreateScope())
-{
-    var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
-    var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-
-    UserRegisterDto user = new()
-    {
-        Email = "G10@gmail.com",
-        Username = "GPPP",
-        Password = "G10@gmail.com",
-    };
-
-    var userExistence = await userRepository.GetByEmailAsync(user.Email);
-
-    if (userExistence == null)
-    {
-        var register = await authService.RegisterAsync(user);
-    }
-}
 
 app.Run();

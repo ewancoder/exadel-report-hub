@@ -10,4 +10,5 @@ public record UpdateReportPreferenceDTO
     public required string Email { get; set; }
     public required ReportScheduleDto Schedule { get; set; }
     public bool IsEnabled { get; set; }
+    public Guid ClientCurrencyId { get; set; }
 }

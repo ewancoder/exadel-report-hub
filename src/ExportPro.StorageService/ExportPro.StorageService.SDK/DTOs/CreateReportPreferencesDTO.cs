@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using ExportPro.Export.Job.Utilities.Helpers;
 using ExportPro.StorageService.Models.Enums;
 
@@ -11,6 +11,6 @@ public record CreateReportPreferencesDTO
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ReportFormat ReportFormat { get; set; }
-
+    public Guid ClientCurrencyId { get; set; }
     public required ReportScheduleDto Schedule { get; set; }
 }

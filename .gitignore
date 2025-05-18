@@ -369,3 +369,4 @@ src/.idea/
 */.idea/*
 src/ExportPro/ExportPro.IntegrationTests/ExportPro.Export.IntegrationTests/.idea
 src/ExportPro/ExportPro.IntegrationTests/ExportPro.StorageService.IntegrationTests/.idea
+/src/ExportPro.StorageService/ExportPro.StorageService.CQRS/QueryHandlers/InvoiceQueries/GetOverduePaymentsQueryHandler.cs
