@@ -35,7 +35,7 @@ public sealed class ReportSchedulerJob(
         };
 
         var jwtTokenDto = await authAPi.LoginAsync(login);
-        var jwtToken = jwtTokenDto.AccessToken;
+        var jwtToken = jwtTokenDto.Data.AccessToken;
             var baseUrlForexport =
                 Environment.GetEnvironmentVariable("DockerForReport") ?? configuration["ExportReportURI"];
             HttpClient httpClient = new()
