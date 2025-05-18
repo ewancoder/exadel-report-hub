@@ -8,7 +8,7 @@ namespace ExportPro.Common.Shared.Refit
     public interface IACLSharedApi
     {
         [Post("/api/permissions/check")]
-        Task<BaseResponse<bool>> CheckPermissionAsync(CheckPermissionRequest request);
+        Task<BaseResponse<bool>> CheckPermissionAsync(   CheckPermissionRequest request);
 
         [Get("/api/permissions/user-clients")]
         Task<BaseResponse<List<Guid>>> GetUserClientsAsync(CancellationToken cancellationToken = default);
