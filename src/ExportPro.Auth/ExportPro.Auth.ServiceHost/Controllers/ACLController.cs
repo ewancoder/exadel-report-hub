@@ -1,19 +1,18 @@
 ﻿using ExportPro.Auth.CQRS.Commands;
 using ExportPro.Auth.CQRS.Queries;
 using ExportPro.Auth.SDK.DTOs;
-using ExportPro.Auth.SDK.Models;
-using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 namespace ExportPro.Auth.ServiceHost.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/permissions")]
     public class ACLController(IMediator mediator) : ControllerBase
     {
