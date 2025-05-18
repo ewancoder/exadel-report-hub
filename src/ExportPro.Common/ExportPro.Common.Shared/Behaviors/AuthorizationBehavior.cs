@@ -1,11 +1,8 @@
-﻿using ExportPro.Common.Shared.Enums;
-using ExportPro.Common.Shared.Extensions;
-using ExportPro.Common.Shared.Helpers;
+﻿using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Models;
 using ExportPro.Common.Shared.Refit;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using System.Text.Json;
 
 
 
@@ -13,57 +10,29 @@ namespace ExportPro.Common.Shared.Behaviors;
 public class AuthorizationBehavior<TRequest, TResponse>(
     IACLSharedApi permissionChecker,
     IHttpContextAccessor httpContextAccessor) : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : notnull
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         if (request is IPermissionedRequest permissionedRequest)
         {
-            var user = (httpContextAccessor.HttpContext?.User) ?? throw new UnauthorizedAccessException("User context not found.");
-            var userRole = TokenHelper.GetUserRole(user);
-            if(userRole == Role.JobAdmin)
-                return await next(cancellationToken);
-            if (userRole == Role.SuperAdmin &&
-                (permissionedRequest.Resource == Resource.Clients || permissionedRequest.Resource == Resource.Users))
-            {
-                return await next(cancellationToken);
-            }
-            var userId = TokenHelper.GetUserId(user);
+            var user = httpContextAccessor.HttpContext?.User ?? throw new UnauthorizedAccessException("User context not found.");
 
-            if (permissionedRequest.ClientIds != null && permissionedRequest.ClientIds.Count != 0)
-            {
-                foreach (var clientId in permissionedRequest.ClientIds)
+            await PermissionEvaluator.EnsureHasPermissionAsync(
+                permissionedRequest,
+                user,
+                async (userId, clientId, resource, action, ct) =>
                 {
-                    var hasPermission = await permissionChecker.CheckPermissionAsync(new Models.CheckPermissionRequest
+                    var response = await permissionChecker.CheckPermissionAsync(new CheckPermissionRequest
                     {
-                        UserId = userId.ToGuid(),
+                        UserId = userId,
                         ClientId = clientId,
-                        Resource = permissionedRequest.Resource,
-                        Action = permissionedRequest.Action
+                        Resource = resource,
+                        Action = action
                     });
-
-                    if (!hasPermission.Data)
-                    {
-                        throw new UnauthorizedAccessException(
-                            $"No permission for client {clientId} - Action: {permissionedRequest.Action}, Resource: {permissionedRequest.Resource}");
-                    }
-                }
-            }
-            else
-            {
-                var hasPermission = await permissionChecker.CheckPermissionAsync(new Models.CheckPermissionRequest
-                {
-                    UserId = userId.ToGuid(),
-                    ClientId = default,
-                    Resource = permissionedRequest.Resource,
-                    Action = permissionedRequest.Action
-                });
-
-                if (!hasPermission.Data)
-                {
-                    throw new UnauthorizedAccessException(
-                        $"No permission - Action: {permissionedRequest.Action}, Resource: {permissionedRequest.Resource}");
-                }
-            }
+                    return response.Data;
+                },
+                cancellationToken);
         }
 
         return await next(cancellationToken);

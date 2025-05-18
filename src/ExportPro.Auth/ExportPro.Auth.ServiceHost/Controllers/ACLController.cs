@@ -1,19 +1,18 @@
 ﻿using ExportPro.Auth.CQRS.Commands;
 using ExportPro.Auth.CQRS.Queries;
 using ExportPro.Auth.SDK.DTOs;
-using ExportPro.Auth.SDK.Models;
-using ExportPro.AuthService.Services;
 using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 namespace ExportPro.Auth.ServiceHost.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/permissions")]
     public class ACLController(IMediator mediator) : ControllerBase
     {
@@ -23,8 +22,8 @@ namespace ExportPro.Auth.ServiceHost.Controllers
              mediator.Send(new HasPermissionQuery((Guid)request.UserId, request.ClientId, request.Resource, request.Action));
 
         [HttpGet("{userId}/{clientId}")]
-        public Task<BaseResponse<List<PermissionDTO>>> GetPermissions([FromRoute]string userId, [FromRoute] string clientId) =>
-             mediator.Send(new GetUserClientPermissionsQuery(userId, clientId));
+        public Task<BaseResponse<List<PermissionDTO>>> GetPermissions([FromRoute]Guid userId, [FromRoute] Guid clientId) =>
+             mediator.Send(new GetUserClientPermissionsQuery(userId.ToObjectId(), clientId.ToObjectId()));
         
         [HttpPost("grant/{userId}/{clientId}/{role}")]
         public Task<BaseResponse<bool>> GrantPermission([FromRoute] Guid clientId, [FromRoute] Guid userId, [FromRoute] UserRole role) =>

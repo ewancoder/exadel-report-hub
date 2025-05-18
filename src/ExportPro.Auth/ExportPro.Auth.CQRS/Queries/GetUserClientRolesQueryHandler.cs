@@ -1,6 +1,8 @@
 ﻿using ExportPro.Auth.SDK.Models;
 using ExportPro.AuthService.Services;
+using ExportPro.Common.Shared.Enums;
 using ExportPro.Common.Shared.Extensions;
+using ExportPro.Common.Shared.Helpers;
 using ExportPro.Common.Shared.Library;
 using ExportPro.Common.Shared.Mediator;
 using ExportPro.Common.Shared.Models;
@@ -9,7 +11,12 @@ using Microsoft.AspNetCore.Http;
 namespace ExportPro.Auth.CQRS.Queries;
 
 
-public record GetUserClientRolesQuery : IQuery<List<UserClientRolesDTO>>;
+public record GetUserClientRolesQuery : IQuery<List<UserClientRolesDTO>>, IPermissionedRequest
+{
+    public List<Guid>? ClientIds => null;
+    public Resource Resource => Resource.Users;
+    public CrudAction Action => CrudAction.Read;
+};
 
 public sealed class GetUserClientRolesQueryHandler(IACLService aCLService, IHttpContextAccessor httpContextAccessor) : IQueryHandler<GetUserClientRolesQuery, List<UserClientRolesDTO>>
 {
