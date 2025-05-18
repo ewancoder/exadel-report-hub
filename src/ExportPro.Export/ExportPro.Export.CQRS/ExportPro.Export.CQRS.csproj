@@ -9,7 +9,7 @@
     <ItemGroup>
         <PackageReference Include="ClosedXML" Version="0.104.2" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
-        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.29" />
+        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.31" />
     </ItemGroup>
 
     <ItemGroup>
