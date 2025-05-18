@@ -135,8 +135,11 @@ public sealed class GenerateReportQueryHandler(
         if (clientId == Guid.Empty)
             return ([], []);
         var parameters = new PaginationParameters { PageNumber = 1, PageSize = 1000 };
+
         var itemsTask = storageApi.Client.GetClientItems(clientId, parameters, cancellationToken);
+        logger.Debug("ItemsTask: {@ItemsTask}", itemsTask);
         var plansTask = storageApi.Client.GetClientPlans(clientId, parameters, cancellationToken);
+        logger.Debug("PlansTask: {@PlansTask}", plansTask);
         await Task.WhenAll(itemsTask, plansTask);
         var itemsResult = await itemsTask;
         var plansResult = await plansTask;

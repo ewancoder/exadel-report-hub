@@ -13,10 +13,16 @@
 
   <ItemGroup>
     <PackageReference Include="ExportPro.Common.Shared" Version="1.0.29" />
-    <PackageReference Include="ExportPro.StorageService.DataAccess" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.14.0" />
     <PackageReference Include="Quartz.Serialization.Json" Version="3.14.0" />
+    <PackageReference Include="Refit" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ExportPro.Auth\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj" />
+    <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
+    <ProjectReference Include="..\..\ExportPro.StorageService\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>
