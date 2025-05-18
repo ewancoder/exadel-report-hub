@@ -31,6 +31,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    await app.SeedDataAsync();
 }
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
