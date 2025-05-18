@@ -67,7 +67,7 @@ public class ClientController(IMediator mediator) : ControllerBase, IClientContr
     public Task<BaseResponse<ClientResponse>> SoftDeleteClient(
         [FromRoute] Guid clientId,
         CancellationToken cancellationToken = default
-    ) => mediator.Send(new SoftDeleteClientCommand(clientId.ToObjectId()), cancellationToken);
+    ) => mediator.Send(new SoftDeleteClientCommand(clientId), cancellationToken);
 
     [HttpGet("{clientId}/items")]
     [SwaggerOperation(Summary = "Get all items of a client")]

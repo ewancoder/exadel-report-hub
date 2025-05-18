@@ -30,6 +30,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using ExportPro.Export.ServiceHost.Infrastructure;
 using System.Buffers.Text;
+using ExportPro.Common.Shared.Filters;
 using ExportPro.StorageService.API;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,7 +39,6 @@ builder
     .Services.AddControllers(options =>
     {
         options.Filters.Add<ApiResponseStatusCodeFilter>();
-        options.Filters.Add<PermissionFilter>();
         options.Filters.Add<ValidateModelStateAttribute>();
     }).AddJsonOptions(opts =>
     {

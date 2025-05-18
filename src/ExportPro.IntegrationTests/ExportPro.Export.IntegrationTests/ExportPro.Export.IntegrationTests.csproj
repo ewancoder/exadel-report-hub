@@ -31,6 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj" />
       <ProjectReference Include="..\ExportPro.Shared.IntegrationTests\ExportPro.Shared.IntegrationTests.csproj" />
     </ItemGroup>
 

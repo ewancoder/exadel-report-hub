@@ -1,6 +1,11 @@
-﻿using ExportPro.Common.Shared.Config;
+﻿using ExportPro.Common.DataAccess.MongoDB.Configurations;
+using ExportPro.Common.DataAccess.MongoDB.Interfaces;
+using ExportPro.Common.DataAccess.MongoDB.Services;
+using ExportPro.Common.Shared.Behaviors;
+using ExportPro.Common.Shared.Config;
 using ExportPro.Common.Shared.Middlewares;
 using ExportPro.Export.ServiceHost.Extensions;
+using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 

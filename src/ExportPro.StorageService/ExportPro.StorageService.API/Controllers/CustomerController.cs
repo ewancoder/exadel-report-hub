@@ -24,7 +24,6 @@ public class CustomerController(IMediator mediator) : ControllerBase, ICustomerC
     ) => mediator.Send(new CreateCustomerCommand(customerDto), cancellationToken);
 
     [HttpPost("bulk")]
-    [HasPermission(Resource.Customers, CrudAction.Create)]
     public Task<BaseResponse<int>> CreateBulk(
         [FromBody] List<CreateUpdateCustomerDto> customers,
         CancellationToken cancellationToken
@@ -44,6 +43,7 @@ public class CustomerController(IMediator mediator) : ControllerBase, ICustomerC
     [HttpGet("{id}")]
     public Task<BaseResponse<CustomerDto>> GetById([FromRoute] Guid id, CancellationToken cancellationToken) =>
         mediator.Send(new GetCustomerByIdQuery(id.ToObjectId()), cancellationToken);
+
     [HttpGet]
     public Task<BaseResponse<PaginatedListDto<CustomerDto>>> GetAll(
         [FromQuery] int pageNumber = 1,
