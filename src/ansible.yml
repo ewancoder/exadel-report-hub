@@ -1,52 +1,55 @@
-# ANSIBLE_SSH_ARGS="-o StrictHostKeyChecking=no" ansible-playbook -i <ip_addr>, ansible.yaml --ask-pass
 ---
-- name: Updating the system
+- name: Prepare server, deploy docker-compose
   hosts: all
   gather_facts: true
   become: true
   vars:
     ansible_user: adminuser
-  tasks:
-    - name: Perform a dist-upgrade
+
+  pre_tasks:
+    - name: Update apt cache and upgrade packages
       ansible.builtin.apt:
+        update_cache: yes
         upgrade: dist
-        update_cache: true
-    - name: Check if a reboot is required
+
+    - name: Check if reboot is required
       ansible.builtin.stat:
         path: /var/run/reboot-required
-        get_checksum: false
       register: reboot_required_file
-    - name: Reboot the server
+
+    - name: Reboot server if needed
       ansible.builtin.reboot:
         reboot_timeout: 600
-      when: reboot_required_file.stat.exists == true
-    - name  : Remove dependencies that are no longer required
-      ansible.builtin.apt:
-        autoremove: true
-    - name: Git Clone
-      git:
-        repo: https://github.com/ewancoder/exadel-report-hub.git
-        dest: /exadel/
-    - name: Ensure repo is on latest ForHosting branch
-      git:
-        repo: https://github.com/ewancoder/exadel-report-hub.git
-        dest: /exadel/
-        version: ForHosting
-        force: true
-        update: yes
+      when: reboot_required_file.stat.exists
 
-- name: Installing Docker
-  hosts: all
-  gather_facts: true
-  become: true
-  roles:
-    - geerlingguy.docker
-  vars:
-    ansible_user: adminuser
-  tasks: 
-    - name: Docker compose up
+    - name: Remove unneeded packages
+      ansible.builtin.apt:
+        autoremove: yes
+
+  tasks:
+    - name: Create directory for docker-compose.yml
+      ansible.builtin.file:
+        path: /exadel/src
+        state: directory
+        mode: '0755'
+
+    - name: Download docker-compose.yml from GitHub raw URL
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/ewancoder/exadel-report-hub/refs/heads/HostingForLastPresent/src/docker-compose.yml
+        dest: /exadel/src/docker-compose.yml
+        mode: '0644'
+        force: yes
+
+    - name: Install Docker using geerlingguy.docker role
+      import_role:
+        name: geerlingguy.docker
+
+    - name: Run docker compose up
       community.docker.docker_compose_v2:
         project_src: /exadel/src
         files:
           - /exadel/src/docker-compose.yml
-      register: output
+      register: docker_compose_result
+
+    - debug:
+        var: docker_compose_result
