@@ -1,5 +1,7 @@
 ﻿@page "/clients"
 
+<DeleteClientModal @ref="DeleteClientModalRef" OnDelete="DeleteClient"/>
+
 @if (IsProcessing)
 {
     <div id="app">
@@ -51,7 +53,7 @@ else
                                     @if (CurrentUser?.Role == Role.SuperAdmin)
                                     {
                                         <button class="btn btn-primary" @onclick="() => OpenEditClientModal(client.Id)">Edit</button>
-                                        <button class="btn btn-danger">Delete</button>
+                                        <button class="btn btn-danger" @onclick="() => OpenDeleteClientModal(client.Id, client.Name)">Delete</button>
                                     }
                                     else
                                     {
@@ -96,6 +98,7 @@ else
         };
 
     private ClientUpsertModal? ClientModalRef;
+    private DeleteClientModal? DeleteClientModalRef;
     private ClientUpsertRequest EditableClient { get; set; }
     private string ModalTitle = "Create Client";
     private string ButtonName = "Save";
@@ -159,4 +162,24 @@ else
         await LoadClients();
         StateHasChanged();
     }
+
+    private async Task DeleteClient(Guid clientId)
+    {
+        await JS.InvokeVoidAsync("HideModal", "clientUpsertModal");
+        var res = await apiHelper.DeleteAsync<ClientResponse>($"api/client/{clientId}");
+        if (res.IsSuccess)
+        {
+            await JS.ToastrSucess("Client deleted.");
+            await LoadClients();
+        }
+    }
+
+    private async Task OpenDeleteClientModal(Guid clientId, string clientName)
+    {
+        if (DeleteClientModalRef != null)
+        {
+            await DeleteClientModalRef.Show(clientId, clientName);
+        }
+    }
 }
+ 

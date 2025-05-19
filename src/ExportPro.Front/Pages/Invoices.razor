@@ -1,4 +1,5 @@
-﻿@page "/invoices"
+﻿
+@page "/invoices"
 @using ExportPro.Front.Models
 @inject HttpClient httpClient
 @inject ILocalStorageService LocalStorage
@@ -20,7 +21,12 @@ else if (CurrentUser?.Role != Role.SuperAdmin)
         <div class="card-header bg-black text-white text-center py-3">
             <h3>Invoices</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
+            <div class="row pb3">
+                    <div class="col-12 text-start">
+                        <button class="btn btn-large btn-dark">Create New Invoice</button>
+                    </div>
+            </div>
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="startDate">Start Date</label>
@@ -57,6 +63,17 @@ else if (CurrentUser?.Role != Role.SuperAdmin)
                             <td>@invoice.Amount?.ToString("F2")</td>
                             <td>@invoice.ClientCurrencyName</td>
                             <td>@invoice.PaymentStatus</td>
+                            <td>                              
+                                @if (CurrentUser.ClientRoles.Any(cr => cr.ClientId == invoice.ClientId && cr.Role == UserRole.Owner))
+                                {
+                                    <button class="btn btn-primary">Edit</button>
+                                    <button class="btn btn-danger">Delete</button>
+                                })
+                                @if (CurrentUser.ClientRoles.Any(cr => cr.ClientId == invoice.ClientId && cr.Role == UserRole.ClientAdmin))
+                                {
+                                    <button class="btn btn-primary">Edit</button>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -66,7 +83,7 @@ else if (CurrentUser?.Role != Role.SuperAdmin)
 }
 else
 {
-    <p>You do not have access to view invoices.</p>
+    <p>You do not have access to view this endpoint.</p>
 }
 
 @code {

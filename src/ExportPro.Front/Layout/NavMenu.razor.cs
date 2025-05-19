@@ -62,7 +62,6 @@ public partial class NavMenu : IDisposable
     private async Task Logout()
     {
         await localStorageService.RemoveItemAsync("accessToken");
-        await localStorageService.RemoveItemAsync("refreshToken");
         await localStorageService.RemoveItemAsync("expiresAt");
 
 
