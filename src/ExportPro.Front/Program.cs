@@ -23,7 +23,10 @@ builder.Services.AddScoped(sp => new HttpClient
 
 builder.Services.AddScoped<ApiHelper>();
 
+builder.Services.AddScoped<UserStateService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
-
+var host = builder.Build();
+var userState = host.Services.GetRequiredService<UserStateService>();
+await userState.InitializeAsync();
 
 await builder.Build().RunAsync();

@@ -9,35 +9,46 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <EditForm Model="ClientModel" OnValidSubmit="HandleInternalSubmit">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    <div class="mb-3">
-                        <label for="clientName" class="form-label">Name</label>
-                        <InputText id="clientName" class="form-control" @bind-Value="ClientModel.Name" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="clientDescription" class="form-label">Description</label>
-                        <InputTextArea id="clientDescription" class="form-control" @bind-Value="ClientModel.Description" />
-                    </div>
-                </EditForm>
+                @if (internalModel != null)
+                {
+                    <EditForm Model="ClientModel" OnValidSubmit="HandleInternalSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="mb-3">
+                            <label for="clientName" class="form-label">Name</label>
+                            <InputText id="clientName" class="form-control" @bind-Value="internalModel .Name" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientDescription" class="form-label">Description</label>
+                            <InputTextArea id="clientDescription" class="form-control" @bind-Value="internalModel .Description" />
+                        </div>
+                    </EditForm>
+                }
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-dark">@ButtonName</button>
+                <button type="submit" class="btn btn-dark" @onclick="HandleInternalSubmit">@ButtonName</button>
             </div>
         </div>
     </div>
 </div>
 
 @code {
+    private ClientUpsertRequest internalModel = new();
+
+    [Parameter]
+    public ClientUpsertRequest? ClientModel
+    {
+        get => internalModel;
+        set => internalModel = value ?? new ClientUpsertRequest();
+    }
+
     [Parameter] public string ModalTitle { get; set; } = string.Empty;
     [Parameter] public string ButtonName { get; set; } = string.Empty;
-    [Parameter] public ClientUpsertRequest ClientModel { get; set; }
     [Parameter] public EventCallback<ClientUpsertRequest> OnValidSubmit { get; set; }
 
     private async Task HandleInternalSubmit()
     {
-        await OnValidSubmit.InvokeAsync(ClientModel);
+        await OnValidSubmit.InvokeAsync(internalModel);
     }
 }

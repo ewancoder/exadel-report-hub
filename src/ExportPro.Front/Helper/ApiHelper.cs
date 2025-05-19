@@ -55,6 +55,16 @@ public class ApiHelper
                ?? throw new InvalidOperationException("Response was null");
     }
 
+    public async Task<Result<TResponse>> PatchAsync<TRequest, TResponse>(string url, TRequest data)
+    {
+        await AttachAuthHeaderAsync();
+
+        var response = await _httpClient.PatchAsJsonAsync(url, data);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<Result<TResponse>>()
+               ?? throw new InvalidOperationException("Response was null");
+    }
+
     public async Task<Result<TResponse>> DeleteAsync<TResponse>(string url)
     {
         await AttachAuthHeaderAsync();

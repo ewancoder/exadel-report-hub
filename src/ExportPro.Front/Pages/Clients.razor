@@ -1,6 +1,9 @@
 ﻿@page "/clients"
+@inject UserStateService UserState
 
 <DeleteClientModal @ref="DeleteClientModalRef" OnDelete="DeleteClient"/>
+<ClientUpsertModal @ref="ClientModalRef" OnValidSubmit="HandleClientSubmit" ModalTitle="@ModalTitle" ButtonName="@ButtonName" ClientModel="EditableClient" />
+<CreateUserModal @ref="CreateUserModalRef" OnValidSubmit="HandleUserRegister" ModalTitle="@ModalTitle" ButtonName="@ButtonName"/>
 
 @if (IsProcessing)
 {
@@ -27,7 +30,7 @@ else
                 @if (CurrentUser?.Role == Role.SuperAdmin)
                 {
                     <div class="col-12 text-start">
-                        <button class="btn btn-large btn-dark" @onclick="()=> OpenCreateClientModal()">Create New Client</button>
+                        <button class="btn btn-large btn-dark m-3" @onclick="()=> OpenCreateClientModal()">Create New Client</button>
                     </div>
                 }
             </div>
@@ -49,9 +52,10 @@ else
                                 <td>@client.Description</td>
                                 <td>
 
-                                    <button class="btn btn-dark">View Users</button>
+                                    <button class="btn btn-dark p-1 m-1">View Users</button>
                                     @if (CurrentUser?.Role == Role.SuperAdmin)
                                     {
+                                        <button class="btn btn-secondary" @onclick="() =>OpenRegisterUserModal(client.Id) ">Create User</button>
                                         <button class="btn btn-primary" @onclick="() => OpenEditClientModal(client.Id)">Edit</button>
                                         <button class="btn btn-danger" @onclick="() => OpenDeleteClientModal(client.Id, client.Name)">Delete</button>
                                     }
@@ -61,7 +65,7 @@ else
                                         {
                                             if (role.ClientId == client.Id && role.Role == UserRole.Owner)
                                             {
-                                                <button class="btn btn-primary" @onclick="() => OpenEditClientModal(client.Id)">Edit</button>
+                                                <button class="btn btn-primary p-1" @onclick="() => OpenEditClientModal(client.Id)">Edit</button>
                                             }
                                         }
                                     }
@@ -99,16 +103,22 @@ else
 
     private ClientUpsertModal? ClientModalRef;
     private DeleteClientModal? DeleteClientModalRef;
+    private CreateUserModal? CreateUserModalRef;
     private ClientUpsertRequest EditableClient { get; set; }
     private string ModalTitle = "Create Client";
     private string ButtonName = "Save";
+
+    protected override async Task OnInitializedAsync()
+    {
+        apiHelper = new ApiHelper(httpClient, LocalStorage);
+        var result = await apiHelper.GetAsync<UserDto>("api/user/current");
+        CurrentUser = result.Data;
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            apiHelper = new ApiHelper(httpClient, LocalStorage);
-            var result = await apiHelper.GetAsync<UserDto>("api/user/current");
             await LoadClients();
             IsProcessing = false;
             StateHasChanged();
@@ -117,7 +127,24 @@ else
 
     private async Task LoadClients()
     {
-        var clients = await apiHelper.GetAsync<IEnumerable<ClientResponse>>("api/client");
+        var response = await apiHelper.GetAsync<PaginatedList<ClientResponse>>("api/client");
+
+        if (response != null && response.IsSuccess && response.Data != null)
+        {
+            ClientsList = new Result<IEnumerable<ClientResponse>>
+                {
+                    IsSuccess = true,
+                    Data = response.Data.Items // Assuming `PaginatedList<T>` has `Items`
+                };
+        }
+        else
+        {
+            ClientsList = new Result<IEnumerable<ClientResponse>>
+                {
+                    IsSuccess = false,
+                    Data = Enumerable.Empty<ClientResponse>()
+                };
+        }
     }
 
     private async Task OpenCreateClientModal()
@@ -126,6 +153,11 @@ else
         ModalTitle = "Create Client";
         ButtonName = "Create";
         await JS.InvokeVoidAsync("ShowModal", "clientUpsertModal");
+    }
+
+    private async Task OpenRegisterUserModal(Guid clientId)
+    {
+        await CreateUserModalRef.Show(clientId);
     }
 
     private async Task OpenEditClientModal(Guid clientId)
@@ -151,7 +183,7 @@ else
         }
         else
         {
-            var resp = await apiHelper.PutAsync<ClientUpsertRequest, ClientResponse>($"api/client/{client.Id}", client);
+            var resp = await apiHelper.PatchAsync<ClientUpsertRequest, ClientResponse>($"api/client/{client.Id}", client);
             if (resp.IsSuccess)
             {
                 await JS.ToastrSucess($"Client {client.Name} updated.");
@@ -180,6 +212,28 @@ else
         {
             await DeleteClientModalRef.Show(clientId, clientName);
         }
+    }
+
+    private async Task HandleUserRegister(CreateUpdateUserDTO user)
+    {
+        var mappedUser = new UserDtoInt
+            {
+                Username = user.Username,
+                Email = user.Email,
+                Password = user.Password,
+                Role = (int?)user.Role,
+                ClientId = user.ClientId
+            };
+        var result = await apiHelper.PostAsync<UserDtoInt, Guid>("api/user", mappedUser);
+        if (result.IsSuccess)
+        {
+            await JS.ToastrSucess($"User {user.Username} created.");
+        }
+        else
+        {
+            await JS.ToastrError($"Failed to create user {user.Username}.");
+        }
+        await JS.InvokeVoidAsync("HideModal", "userUpsertModal");
     }
 }
  

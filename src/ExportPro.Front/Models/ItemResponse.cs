@@ -1,9 +1,5 @@
-﻿using ExportPro.Common.Models.MongoDB;
-using ExportPro.StorageService.Models.Enums;
-
-namespace ExportPro.StorageService.SDK.Responses;
-
-public sealed class ItemResponse : AuditModel
+﻿namespace ExportPro.Front.Models;
+public sealed class ItemResponse
 {
     public required Guid Id { get; set; }
     public string? Name { get; set; }
@@ -11,5 +7,6 @@ public sealed class ItemResponse : AuditModel
     public double Price { get; set; }
     public Guid? CustomerId { get; set; }
     public Status? Status { get; set; }
-    public Guid CurrencyId { get; set; } 
+    public Guid CurrencyId { get; set; }
 }
+

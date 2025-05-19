@@ -12,34 +12,53 @@ public partial class NavMenu : IDisposable
 {
     [Inject] private ApiHelper ApiHelper { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
-    [Inject] private HttpClient httpClient { get; set; }
+    [Inject] private HttpClient httpClient { get; set; } = default!;
     [Inject] private ILocalStorageService localStorageService { get; set; } = default!;
     [Inject] private NavigationManager NavMan { get; set; } = default!;
+    [Inject] private UserStateService UserState { get; set; } = default!;
 
-    private UserDto? CurrentUser;
     private bool collapseNavMenu = true;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         ApiHelper = new ApiHelper(httpClient, localStorageService);
+        await TrySetUserFromToken();
+
         AuthProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+        UserState.OnChange += StateHasChanged;
+
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //UserState.OnChange += StateHasChanged;
+
+        await TrySetUserFromToken();
+    }
     private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
     {
         var authState = await task;
-        var user = authState.User;
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            await TrySetUserFromToken();
+        }
+        else
+        {
+            await UserState.SetUser(null);
+        }
+    }
 
-        if (user.Identity?.IsAuthenticated == true && CurrentUser == null)
+    private async Task TrySetUserFromToken()
+    {
+        if (UserState.CurrentUser == null)
         {
             try
             {
                 var result = await ApiHelper.GetAsync<UserDto>("api/user/current");
-                if (result is not null && result.IsSuccess)
+                if (result.IsSuccess)
                 {
-                    CurrentUser = result.Data;
-                    StateHasChanged();
+                    await UserState.SetUser(result.Data);
                 }
             }
             catch (Exception ex)
@@ -47,11 +66,6 @@ public partial class NavMenu : IDisposable
                 Console.WriteLine("Failed to load current user: " + ex.Message);
             }
         }
-    }
-
-    public void Dispose()
-    {
-        AuthProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
     }
 
     private void ToggleNavMenu()
@@ -62,8 +76,10 @@ public partial class NavMenu : IDisposable
     private async Task Logout()
     {
         await localStorageService.RemoveItemAsync("accessToken");
+        await localStorageService.RemoveItemAsync("refreshToken");
         await localStorageService.RemoveItemAsync("expiresAt");
 
+        await UserState.SetUser(null);
 
         if (AuthProvider is AuthStateProvider auth)
         {
@@ -71,5 +87,11 @@ public partial class NavMenu : IDisposable
         }
 
         NavMan.NavigateTo("/login", forceLoad: true);
+    }
+
+    public void Dispose()
+    {
+        AuthProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+        UserState.OnChange -= StateHasChanged;
     }
 }
