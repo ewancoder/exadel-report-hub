@@ -1,0 +1,38 @@
+﻿.login-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(to bottom, #002f3d, #00c1b5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.login-page {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    background: white;
+    border-radius: 70px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.login-logo {
+    width: 180px;
+    margin-bottom: 1.5rem;
+    transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.login-logo:hover {
+    transform: scale(1.05) rotate(1deg);
+    filter: drop-shadow(0 0 10px rgba(0, 193, 181, 0.6));
+}
+
+button + button {
+    margin-top: 0.75rem;
+}

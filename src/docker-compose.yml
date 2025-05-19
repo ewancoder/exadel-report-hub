@@ -1,4 +1,17 @@
 services:
+  api-gateway:
+    container_name: ocelot
+    image: giorgaaa/exportproocelot:latest
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.Gateway/ExportPro.Gateway.ServiceHost/Dockerfile
+    depends_on:
+      - authservice
+      - storageservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "1200:8080"
   mongodb:
     container_name: ExportProDb
     image: mongo
@@ -6,10 +19,12 @@ services:
       - "27017:27017"
     volumes:
       - /data/db    
-
   authservice:
     container_name: authservice
     image: giorgaaa/exportpro.authservice:latest
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.Auth/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDbDocker=mongodb://ExportProDb:27017
@@ -21,9 +36,120 @@ services:
   storageservice:
     container_name: storageservice
     image: giorgaaa/exportpro.storageservice:latest
+    # build:
+    #   context: .
+      # dockerfile: ExportPro.StorageService/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Development  
+      - MongoDbDocker=mongodb://ExportProDb:27017
+      - DockerForAuthUrl=http://authservice:8080
     ports:
       - "1500:8080"
     depends_on:
       - authservice
+  exportservice:
+    container_name: exportservice
+    image: giorgaaa/exportpro.export
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.Export/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=mongodb://ExportProDb:27017
+      - StorageUrl=http://storageservice:8080
+      - DockerForAuthUrl=http://authservice:8080
+
+    ports:
+      - "2000:8080"
+    depends_on:
+      - authservice
+      - storageservice
+      - mongodb
+      - exportproseq
+    # volumes:
+    #   - type: bind
+    #     # source: C:/Logs/
+    #     source: /home/randoma/logs_exadel
+    #     target: "/app/Logs"
+  exportproseq:
+    image: datalust/seq:latest
+    container_name: exportproseq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 8081:80
+  jobservice:
+    image: giorgaaa/exportpro.jobs
+    container_name: jobservice
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.Jobs/ExportPro.Export.Job.ServiceHost/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=mongodb://ExportProDb:27017
+      - DockerForReport=http://exportservice:8080
+      - DockerForAuth=http://authservice:8080
+    ports:
+      - "2500:8080"
+    depends_on:
+      - authservice
+      - exportservice
+  front:
+    image: giorgaaa/exportprofront:latest
+    container_name: front
+    # build:
+    #   context: ./ExportPro.Front/
+    #   dockerfile: ./Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "1000:80"
+    depends_on:
+      - exportservice
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+    - '--config.file=/etc/prometheus/prometheus.yml'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8082:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    network_mode: "host"
+    pid: "host"
+    volumes:
+      - /:/host:ro
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.systemd'
+      - '--collector.stat'
+    ports:
+      - "9100:9100"
+volumes:
+  prometheus_data:
+  grafana_data:

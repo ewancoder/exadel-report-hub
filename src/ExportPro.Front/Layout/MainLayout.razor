@@ -1,0 +1,32 @@
+﻿@inherits LayoutComponentBase
+@inject UserStateService UserState
+<div class="page">
+    <NavMenu />
+
+    <main>
+        <article class="content px-4">
+            @if (!userLoaded)
+            {
+                <div class="text-center text-white p-3">Loading user...</div>
+            }
+            else
+            {
+                @Body
+            }
+        </article>
+    </main>
+</div>
+@code{
+    private bool userLoaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserState.CurrentUser == null)
+        {
+            await UserState.InitializeAsync();
+        }
+
+        userLoaded = true;
+    }
+}
+

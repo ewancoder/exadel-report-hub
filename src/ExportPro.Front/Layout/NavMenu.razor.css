@@ -1,0 +1,95 @@
+.navbar-toggler {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.top-row {
+    min-height: 3.5rem;
+    background: #002f3d;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+.nav-logo {
+    padding: 1.5rem 0;
+    background-color: #002f3d;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+    .nav-logo img.logo {
+        height: 1.8rem;
+        width: auto;
+        margin: 0 auto;
+        display: block;
+    }
+
+.nav-scrollable {
+    height: 100vh;
+    overflow-y: auto;
+    background: linear-gradient(to bottom, #002f3d, #00c1b5);
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item {
+    font-size: 0.95rem;
+    padding-bottom: 0.5rem;
+}
+
+    .nav-item:first-of-type {
+        padding-top: 1rem;
+    }
+
+    .nav-item:last-of-type {
+        padding-bottom: 1rem;
+    }
+
+    .nav-item ::deep a {
+        color: white;
+        border-radius: 4px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        gap: 0.75rem;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+    }
+
+        .nav-item ::deep a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-item ::deep a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+.nav-link i {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-label {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+@media (min-width: 641px) {
+    .navbar-toggler {
+        display: none;
+    }
+
+    .collapse {
+        display: block;
+    }
+}

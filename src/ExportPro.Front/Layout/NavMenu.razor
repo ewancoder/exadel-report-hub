@@ -1,0 +1,58 @@
+﻿@if (UserState.CurrentUser != null)
+{
+    <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+        <div class="sidebar d-flex flex-column h-100 justify-content-between">
+
+            <div>
+                <div class="nav-logo text-center py-4">
+                    <a href="home">
+                        <img src="Exadel_logo_new.png" alt="Logo" class="logo" />
+                    </a>
+                </div>
+
+                <div class="text-center d-md-none pb-2">
+                    <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+
+                <nav class="nav flex-column">
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link d-flex align-items-center" href="home">
+                            <i class="bi bi-speedometer2"></i>
+                            <span class="nav-label">Dashboard</span>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link d-flex align-items-center" href="clients">
+                            <i class="bi bi-people"></i>
+                            <span class="nav-label">Clients</span>
+                        </NavLink>
+                    </div>
+                    @if (UserState.CurrentUser?.Role != Role.SuperAdmin)
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link d-flex align-items-center" href="items">
+                                <i class="bi bi-box"></i>
+                                <span class="nav-label">Items</span>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link d-flex align-items-center" href="invoices">
+                                <i class="bi bi-receipt"></i>
+                                <span class="nav-label">Invoices</span>
+                            </NavLink>
+                        </div>
+                    }
+                </nav>
+            </div>
+
+            <div class="nav-item px-3 pb-3">
+                <button class="btn btn-outline-light w-100" @onclick="Logout">
+                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                </button>
+            </div>
+
+        </div>
+    </div>
+}

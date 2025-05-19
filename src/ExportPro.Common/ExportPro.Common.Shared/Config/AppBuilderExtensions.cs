@@ -9,29 +9,35 @@ public static class AppBuilderExtensions
     public static IHostBuilder UseSharedSerilogAndConfiguration(this IHostBuilder builder)
     {
         builder
-            .UseSerilog((ctx, lc) =>
-            {
-                lc.ReadFrom.Configuration(ctx.Configuration);
-            })
-.ConfigureAppConfiguration((hostContext, configBuilder) =>
-{
-    var env = hostContext.HostingEnvironment;
+            .UseSerilog(
+                (ctx, lc) =>
+                {
+                    lc.ReadFrom.Configuration(ctx.Configuration);
+                }
+            )
+            .ConfigureAppConfiguration(
+                (hostContext, configBuilder) =>
+                {
+                    var env = hostContext.HostingEnvironment;
 
-    var relativePath = @"..\..\ExportPro.Common\ExportPro.Common.Shared\Settings\serilogsettings.json";
-    var fullPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, relativePath));
+                    var relativePath = Path.Combine("Settings", "serilogsettings.json");
 
-    Console.WriteLine("CONFIG DEBUG: Loading Serilog settings from: " +
-    Path.Combine(env.ContentRootPath, "Settings", "serilogsettings.json"));
+                    var fullPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, relativePath));
 
-    Console.WriteLine("Does config file exist? " +
-        File.Exists(Path.Combine(env.ContentRootPath, "Settings", "serilogsettings.json")));
+                    Console.WriteLine(
+                        "CONFIG DEBUG: Loading Serilog settings from: "
+                            + Path.Combine(env.ContentRootPath, "Settings", "serilogsettings.json")
+                    );
 
-    configBuilder.AddJsonFile(fullPath, optional: false, reloadOnChange: true);
-    configBuilder.AddEnvironmentVariables();
-});
+                    Console.WriteLine(
+                        "Does config file exist? "
+                            + File.Exists(Path.Combine(env.ContentRootPath, "Settings", "serilogsettings.json"))
+                    );
 
+                    configBuilder.AddJsonFile(fullPath, false, true);
+                    configBuilder.AddEnvironmentVariables();
+                }
+            );
         return builder;
     }
 }
-
-

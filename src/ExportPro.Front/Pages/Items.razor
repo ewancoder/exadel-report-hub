@@ -1,0 +1,205 @@
+﻿@page "/items"
+@inject UserStateService UserState
+
+<ItemUpsertModal @ref="ItemUpsertModalRef" ModalTitle="Create New Item" ButtonName="Create Item" OnValidSubmit="HandleItemCreation" Currencies="Currencies" Clients="Clients" />
+
+@if (IsProcessing)
+{
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+}
+else
+{
+    <div class="card shadow border-0 mt-4">
+        <div class="card-header bg-black bg-gradient m-lg-0 py-3">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 class="text-white py-2">All Items</h2>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row pb3">
+                @if (
+            UserState.CurrentUser?.Role != Role.SuperAdmin &&
+            UserState.CurrentUser?.ClientRoles?.Any(cr => cr.Role == UserRole.Operator) != true
+            )
+                {
+                    <div class="col-12 text-start">
+                        <button class="btn btn-large btn-dark m-3" @onclick="()=> OpenCreateModal()">Create New Item</button>
+                    </div>
+                }
+            </div>
+            @if (ItemsByClient.SelectMany(x => x.Value).Any())
+            {
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Currency</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ItemsByClient.SelectMany(x => x.Value))
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>@item.Description</td>
+                                <td>@item.Price.ToString("F2")</td>
+                                <td>@item.Currency</td>
+                                <td>@item.Status</td>
+                                <td>
+                                    <button class="btn btn-primary" @onclick="() => OpenEditItemModal(item.Id)">Edit</button>
+                                    <button class="btn btn-danger" @onclick="() => OpenDeleteItemModal(item.Id, item.Name)">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+}
+
+
+@code {
+    private List<UserRoleResponse> UserRoles = new();
+    [Inject] private HttpClient Http { get; set; } = default!;
+    [Inject] private ApiHelper ApiHelper { get; set; } = default!;
+    [Inject] private ILocalStorageService LocalStorage { get; set; } = default!;
+    private bool IsProcessing { get; set; } = true;
+    private ItemUpsertModal ItemUpsertModalRef { get; set; } = default!;
+    private DeleteItemModal DeleteItemModalRef { get; set; } = default!;
+    private List<ClientDto> Clients = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsProcessing = true;
+        ApiHelper = new ApiHelper(Http, LocalStorage);
+        await LoadUserRoles();
+        await LoadItemsForUserRoles();
+        await LoadCurrencies();
+        await LoadClients();
+        StateHasChanged();
+        IsProcessing = false;
+    }
+
+    private async Task LoadUserRoles()
+    {
+        var response = await Http.GetFromJsonAsync<Result<List<UserRoleResponse>>>("api/permissions/user-roles");
+        if (response?.IsSuccess == true)
+        {
+            UserRoles = response.Data;
+        }
+    }
+
+    private Dictionary<Guid, List<ItemDto>> ItemsByClient = new();
+
+    private async Task LoadItemsForUserRoles()
+    {
+        foreach (var role in UserRoles)
+        {
+            if (!ItemsByClient.ContainsKey(role.ClientId))
+            {
+                var result = await ApiHelper.GetAsync<PaginatedList<ItemDto>>($"api/client/{role.ClientId}/items");
+                if (result?.IsSuccess == true)
+                {
+                    ItemsByClient[role.ClientId] = result.Data.Items;
+
+                }
+            }
+        }
+    }
+
+    private async Task OpenEditItemModal(Guid itemId)
+    {
+        foreach (var kvp in ItemsByClient)
+        {
+            var item = kvp.Value.FirstOrDefault(i => i.Id == itemId);
+            if (item != null)
+            {
+                Guid clientId = kvp.Key;
+                await ItemUpsertModalRef.Show(item, clientId);
+                break;
+            }
+        }
+    }
+
+    private async Task OpenDeleteItemModal(Guid itemId, string itemName)
+    {
+        foreach (var kvp in ItemsByClient)
+        {
+            var item = kvp.Value.FirstOrDefault(i => i.Id == itemId);
+            if (item != null)
+            {
+                Guid clientId = kvp.Key;
+                await DeleteItemModalRef.Show(item.Id,item.Name, clientId);
+                break;
+            }
+        }
+    }
+    private async Task OpenCreateModal()
+    {
+        await ItemUpsertModalRef.ShowCreateModal(Clients);
+    }
+    private async Task OpenEditModal()
+    {
+        var clientId = UserState.CurrentUser?.ClientRoles?.FirstOrDefault(cr => cr.Role != UserRole.Operator)?.ClientId;
+        if (clientId.HasValue)
+        {
+            await ItemUpsertModalRef.Show(new ItemDto(), clientId.Value);
+        }
+    }
+
+    private async Task HandleItemCreation(ItemInsertRequest request)
+    {
+        if (request != null)
+        {
+            var resp = await ApiHelper.PatchAsync<Item, Guid>($"api/client/{request.ClientId}/item", request.Item);
+            if (resp.IsSuccess)
+            {
+                await LoadItemsForUserRoles();
+                StateHasChanged();
+                await ItemUpsertModalRef.Hide();
+            }
+        }
+     }
+
+    private List<CurrencyDto> Currencies = new();
+
+    private async Task LoadCurrencies()
+    {
+        var result = await ApiHelper.GetAsync<PaginatedList<CurrencyDto>>("api/currency");
+        if (result?.IsSuccess == true)
+        {
+            Currencies = result.Data.Items;
+        }
+    }
+
+    private async Task LoadClients()
+    {
+        var result = await ApiHelper.GetAsync<List<Guid>>("api/permissions/user-clients");
+        if (result.IsSuccess)
+        {
+            var clientList = new List<ClientDto>();
+
+            foreach (var id in result.Data)
+            {
+                var clientInfo = await ApiHelper.GetAsync<ClientResponse>($"api/client/{id}");
+                if (clientInfo.IsSuccess && clientInfo.Data != null)
+                    clientList.Add(new ClientDto { Id = clientInfo.Data.Id, Name = clientInfo.Data.Name });
+            }
+
+            Clients = clientList;
+        }
+    }
+}
+

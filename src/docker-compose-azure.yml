@@ -1,0 +1,28 @@
+services:
+  api-gateway:
+    container_name: ocelot
+    image: giorgaaa/exportproocelot:latest
+    depends_on:
+      - authservice
+      - storageservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "1200:8080"
+  authservice:
+    container_name: authservice
+    image: giorgaaa/exportpro.authservice:latest
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=${MongoDbDocker}
+    ports:
+      - "5000:8080"
+     
+  storageservice:
+    container_name: storageservice
+    image: giorgaaa/exportpro.storageservice:latest
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=${MongoDbDocker}
+    ports:
+      - "1500:8080"

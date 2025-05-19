@@ -1,0 +1,71 @@
+﻿@using ExportPro.Front.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="modal fade" id="userUpsertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="userModalLabel">@ModalTitle</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm Model="internalModel" OnValidSubmit="OnRegister">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <InputText id="username" class="form-control" @bind-Value="internalModel.Username" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <InputText id="email" class="form-control" @bind-Value="internalModel.Email" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <InputText id="password" type="password" class="form-control" @bind-Value="internalModel.Password" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <InputSelect id="role" class="form-select" @bind-Value="internalModel.Role">
+                            <option value="">Select Role</option>
+                            @foreach (var role in Enum.GetValues<UserRole>())
+                            {
+                                <option value="@role">@role</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-dark">@ButtonName</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CreateUpdateUserDTO internalModel = new();
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    [Parameter] public string ModalTitle { get; set; } = string.Empty;
+    [Parameter] public string ButtonName { get; set; } = string.Empty;
+    [Parameter] public EventCallback<CreateUpdateUserDTO> OnValidSubmit { get; set; }
+
+    public async Task Show(Guid clientId)
+    {
+        internalModel = new CreateUpdateUserDTO { ClientId = clientId };
+        await JS.InvokeVoidAsync("ShowModal", "userUpsertModal");
+        StateHasChanged();
+    }
+
+    private async Task OnRegister()
+    {
+        await OnValidSubmit.InvokeAsync(internalModel);
+        await JS.InvokeVoidAsync("HideModal", "userUpsertModal");
+    }
+}

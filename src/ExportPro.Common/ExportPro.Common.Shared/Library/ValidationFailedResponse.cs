@@ -1,17 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 
-namespace ExportPro.Common.Shared.Library
+namespace ExportPro.Common.Shared.Library;
+
+public class ValidationFailedResponse : BaseResponse
 {
-    class ValidationFailedResponse: BaseResponse
+    public ValidationFailedResponse()
     {
-        public ValidationFailedResponse()
-        {
-            ApiState = System.Net.HttpStatusCode.UnprocessableEntity;
-            IsSuccess = false;
-        }
+        Errors = new Dictionary<string, string[]>();
     }
+
+    public ValidationFailedResponse(Dictionary<string, string[]> errors)
+    {
+        ApiState = HttpStatusCode.UnprocessableEntity;
+        IsSuccess = false;
+        Errors = errors;
+    }
+
+    public Dictionary<string, string[]> Errors { get; set; }
 }

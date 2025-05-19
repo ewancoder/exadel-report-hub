@@ -1,0 +1,223 @@
+﻿
+@page "/invoices"
+@using ExportPro.Front.Models
+@using System.Text.Json
+@inject HttpClient httpClient
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthProvider
+
+
+
+<InvoiceUpsertModal @ref="invoiceUpsertModalRef"
+ModalTitle="Create New Invoice"
+ButtonName="Create Invoice"
+OnValidSubmit="HandleInvoiceSubmit"
+OnCustomerCreate="HandleCustomerSubmit"
+Clients="Clients"
+Currencies="Currencies"
+Countries="Countries"/>
+@if (IsProcessing)
+{
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+}
+else if (CurrentUser?.Role != Role.SuperAdmin)
+{
+    <div class="card shadow border-0 mt-4">
+        <div class="card-header bg-black text-white text-center py-3">
+            <h3>Invoices</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="row pb3">
+                <div class="col-12 text-start">
+                    <button class="btn btn-large btn-dark" @onclick="()=>OpenInvoiceModal()">Create New Invoice</button>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="startDate">Start Date</label>
+                    <InputDate @bind-Value="StartDate" class="form-control" id="startDate" />
+                </div>
+                <div class="col-md-4">
+                    <label for="endDate">End Date</label>
+                    <InputDate @bind-Value="EndDate" class="form-control" id="endDate" />
+                </div>
+                <div class="col-md-4">
+                    <label for="customer">Customer</label>
+                    <InputText @bind-Value="CustomerFilter" class="form-control" id="customer" />
+                </div>
+            </div>
+
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Invoice Number</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Amount</th>
+                        <th>Currency</th>
+                        <th>Customer</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in InvoicesListWithCustomer)
+                    {
+                        var invoice = item.Invoice;
+                        <tr>
+                            <td>@invoice.InvoiceNumber</td>
+                            <td>@invoice.IssueDate.ToShortDateString()</td>
+                            <td>@invoice.DueDate.ToShortDateString()</td>
+                            <td>@invoice.Amount?.ToString("F2")</td>
+                            <td>@invoice.ClientCurrencyName</td>
+                            <td>@item.Customer?.Name</td>
+                            <td>@invoice.PaymentStatus</td>
+                            <td>
+                                @if (CurrentUser.ClientRoles.Any(cr => cr.ClientId == invoice.ClientId && cr.Role == UserRole.Owner))
+                                {
+                                    <button class="btn btn-primary">Edit</button>
+                                    <button class="btn btn-danger">Delete</button>
+                                }
+                                else if (CurrentUser.ClientRoles.Any(cr => cr.ClientId == invoice.ClientId && cr.Role == UserRole.ClientAdmin))
+                                {
+                                    <button class="btn btn-primary">Edit</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <p>You do not have access to view this endpoint.</p>
+}
+
+@code {
+    private CustomerResponse customerResponse = new();
+    private List<InvoiceDtoWithCustomer> InvoicesListWithCustomer = new();
+    private List<InvoiceDto> InvoicesList = new();
+    private List<InvoiceDto> FilteredInvoices => InvoicesList
+        .Where(i => (!StartDate.HasValue || i.IssueDate >= StartDate.Value)
+                 && (!EndDate.HasValue || i.IssueDate <= EndDate.Value)
+                 && (string.IsNullOrWhiteSpace(CustomerFilter) || (i.CustomerName?.Contains(CustomerFilter, StringComparison.OrdinalIgnoreCase) ?? false)))
+        .ToList();
+    private List<CountryDto> Countries = new();
+
+    public bool IsProcessing { get; set; } = true;
+    private DateTime? StartDate;
+    private DateTime? EndDate;
+    private string? CustomerFilter;
+    private UserDto? CurrentUser;
+    private ApiHelper? apiHelper;
+    private InvoiceUpsertModal invoiceUpsertModalRef;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        apiHelper = new ApiHelper(httpClient, LocalStorage);
+        var result = await apiHelper.GetAsync<UserDto>("api/user/current");
+        CurrentUser = result.Data;
+        await LoadInvoices();
+        await LoadCurrencies();
+        await LoadClients();
+        await LoadCountries();
+        IsProcessing = false;
+        StateHasChanged();
+    }
+    private async Task LoadCountries()
+    {
+        var response = await apiHelper.GetAsync<PaginatedList<CountryDto>>("api/country");
+        if (response?.IsSuccess == true)
+        {
+            Countries = response.Data.Items.ToList();
+        }
+    }
+
+    private async Task LoadInvoices()
+    {
+        var invoiceResult = await apiHelper.GetAsync<PaginatedList<InvoiceDto>>("api/invoice");
+        if (invoiceResult.IsSuccess && invoiceResult.Data is not null)
+        {
+            InvoicesList = invoiceResult.Data.Items.ToList();
+
+            foreach (var invoice in InvoicesList)
+            {
+                CustomerResponse? customer = null;
+                if (invoice.CustomerId != null)
+                {
+                    var customerResult = await apiHelper.GetAsync<CustomerResponse>($"api/customer/{invoice.CustomerId}");
+                    if (customerResult.IsSuccess)
+                        customer = customerResult.Data;
+                }
+
+                InvoicesListWithCustomer.Add(new InvoiceDtoWithCustomer
+                    {
+                        Invoice = invoice,
+                        Customer = customer
+                    });
+            }
+        }
+    }
+    private async Task HandleInvoiceSubmit(InvoiceDto invoice)
+    {
+        var result = await apiHelper.PostAsync<InvoiceDto, InvoiceResponse>("api/invoice", invoice);
+        if (result.IsSuccess)
+        {
+            await LoadInvoices();
+            await invoiceUpsertModalRef.Hide();
+        }
+    }
+
+    private async Task HandleCustomerSubmit(CustomerCreateRequest customer)
+    {
+        var str = JsonSerializer.Serialize(customer);
+        var result = await apiHelper.PostAsync<CustomerCreateRequest, CustomerResponse>("api/customer", customer);
+        if (result.IsSuccess)
+        {
+            await JS.ToastrSucess("customer added.");
+            await LoadInvoices();
+        }
+    }
+
+    private async Task OpenInvoiceModal()
+    {
+        await invoiceUpsertModalRef.Show(Currencies, Countries , Clients);
+    }
+
+    private List<CurrencyDto> Currencies = new();
+    private List<ClientDto> Clients = new();
+
+    private async Task LoadCurrencies()
+    {
+        var result = await apiHelper.GetAsync<PaginatedList<CurrencyDto>>("api/currency");
+        if (result?.IsSuccess == true)
+            Currencies = result.Data.Items;
+    }
+
+    private async Task LoadClients()
+    {
+        var result = await apiHelper.GetAsync<List<Guid>>("api/permissions/user-clients");
+        if (result.IsSuccess)
+        {
+            var list = new List<ClientDto>();
+            foreach (var id in result.Data)
+            {
+                var clientResp = await apiHelper.GetAsync<ClientResponse>($"api/client/{id}");
+                if (clientResp.IsSuccess && clientResp.Data != null)
+                    list.Add(new ClientDto { Id = clientResp.Data.Id, Name = clientResp.Data.Name });
+            }
+            Clients = list;
+        }
+    }
+
+
+}
+

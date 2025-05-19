@@ -19,5 +19,9 @@ jobs:
           run: dotnet restore ./src/ExportPro.sln
         - name: Build Project
           run: dotnet build ./src/ExportPro.sln --no-restore
+        - name: Staring Docker compose
+          run: |
+            docker compose -f ./src/docker-compose-integration.yml up -d --build
+            sleep 10 
         - name: Testing Project
           run: dotnet test ./src/ExportPro.sln --no-restore --no-build --verbosity normal

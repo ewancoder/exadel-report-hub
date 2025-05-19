@@ -2,10 +2,10 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using ExportPro.Auth.SDK.DTOs;
 using ExportPro.Auth.SDK.Models;
 using ExportPro.AuthService.Configuration;
 using Microsoft.Extensions.Options;
-using ExportPro.Auth.SDK.DTOs;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ExportPro.AuthService.Services;
@@ -15,7 +15,7 @@ public class JwtTokenService(IOptions<JwtSettings> jwtOptions) : IJwtTokenServic
     private readonly JwtSettings _jwtSettings = jwtOptions.Value;
 
     /// <summary>
-    /// Generates a JWT token for the given user.
+    ///     Generates a JWT token for the given user.
     /// </summary>
     /// <param name="user">The user to generate the token for.</param>
     /// <returns>A response containing the generated token, the user's username, and the token's expiration date.</returns>
@@ -30,7 +30,7 @@ public class JwtTokenService(IOptions<JwtSettings> jwtOptions) : IJwtTokenServic
             Expires = expiresAt,
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -40,12 +40,12 @@ public class JwtTokenService(IOptions<JwtSettings> jwtOptions) : IJwtTokenServic
         {
             AccessToken = tokenHandler.WriteToken(token),
             Username = user.Username,
-            ExpiresAt = expiresAt
+            ExpiresAt = expiresAt,
         };
     }
 
     /// <summary>
-    /// Generates a secure random refresh token.
+    ///     Generates a secure random refresh token.
     /// </summary>
     /// <returns>A secure random refresh token.</returns>
     public string GenerateRefreshToken()

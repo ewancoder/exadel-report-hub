@@ -1,6 +1,4 @@
-﻿
-using System.Net;
-
+﻿using System.Net;
 
 namespace ExportPro.Common.Shared.Library;
 
@@ -13,4 +11,3 @@ public class SuccessResponse : BaseResponse
         IsSuccess = true;
     }
 }
-

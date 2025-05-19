@@ -1,15 +1,13 @@
-﻿
+﻿using System.Net;
 
-namespace ExportPro.Common.Shared.Library
+namespace ExportPro.Common.Shared.Library;
+
+internal class InternalServiceFailedResponse : BaseResponse
 {
-    class InternalServiceFailedResponse: BaseResponse
+    public InternalServiceFailedResponse(Exception ex)
     {
-        public InternalServiceFailedResponse(Exception ex)
-        {
-            ApiState = System.Net.HttpStatusCode.InternalServerError;
-            Messages = [ex.Message];
-            IsSuccess = false;
-
-        }
+        ApiState = HttpStatusCode.InternalServerError;
+        Messages = [ex.Message];
+        IsSuccess = false;
     }
 }
