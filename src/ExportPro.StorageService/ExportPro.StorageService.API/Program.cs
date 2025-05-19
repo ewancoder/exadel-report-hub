@@ -35,10 +35,7 @@ builder
         options.Filters.Add<ApiResponseStatusCodeFilter>();
         options.Filters.Add<ValidateModelStateAttribute>();
     })
-    .AddJsonOptions(opts =>
-    {
-        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    })
+    
     .AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Program>());
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
