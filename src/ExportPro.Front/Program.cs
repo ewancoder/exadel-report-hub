@@ -1,10 +1,10 @@
+using Blazored.LocalStorage;
+using ExportPro.Front;
+using ExportPro.Front.Helper;
+using ExportPro.Front.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using ExportPro.Front;
-using ExportPro.Front.Services;
-using ExportPro.Front.Helper;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -15,11 +15,7 @@ builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddAuthorizationCore();
 
-
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri("http://localhost:1200") 
-});
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://ocelot:8080") });
 
 builder.Services.AddScoped<ApiHelper>();
 
