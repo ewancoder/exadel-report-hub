@@ -6,23 +6,25 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <PackageId>ExportPro.Export.Job.ServiceHost</PackageId>
         <Authors>Exadel-Group-3</Authors>
-        <Version>1.0.2</Version>
+        <Version>2.0.0</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ExportPro.Common.Shared" Version="1.0.29"/>
+        <PackageReference Include="ExportPro.Auth.SDK" Version="2.0.0" />
+        <PackageReference Include="ExportPro.Common.Models.MongoDB" Version="2.0.0" />
+        <PackageReference Include="ExportPro.Common.Shared" Version="2.0.0" />
+        <PackageReference Include="ExportPro.StorageService.DataAccess" Version="2.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
         <PackageReference Include="Quartz.Extensions.Hosting" Version="3.14.0"/>
         <PackageReference Include="Quartz.Serialization.Json" Version="3.14.0"/>
         <PackageReference Include="Refit" Version="8.0.0"/>
+        <PackageReference Include="Serilog" Version="4.3.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+        <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\ExportPro.Auth\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj"/>
-        <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj"/>
-        <ProjectReference Include="..\..\ExportPro.StorageService\ExportPro.StorageService.DataAccess\ExportPro.StorageService.DataAccess.csproj"/>
-    </ItemGroup>
-
+ 
 </Project>

@@ -14,9 +14,20 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddSwaggerForOcelot(builder.Configuration);
-
+var fronturl=Environment.GetEnvironmentVariable("FrontendUrl") ?? "https://localhost:7107";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWasm", policy =>
+    {
+        policy
+            .WithOrigins(fronturl)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 var app = builder.Build();
-
+app.UseCors("AllowWasm");
 app.UseSwaggerForOcelotUI(
     opt => { },
     uiOpt =>

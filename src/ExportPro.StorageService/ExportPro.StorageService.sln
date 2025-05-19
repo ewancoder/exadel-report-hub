@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.Tests", "ExportPro.StorageService.Tests\ExportPro.StorageService.Tests.csproj", "{59BE5F22-4E87-42B2-BEB8-12226E5858B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportPro.StorageService.Validations", "ExportPro.StorageService.Validations\ExportPro.StorageService.Validations.csproj", "{4A0B1D24-47AE-408D-A922-408D26F289CE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,10 +45,6 @@ Global
 		{59BE5F22-4E87-42B2-BEB8-12226E5858B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59BE5F22-4E87-42B2-BEB8-12226E5858B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59BE5F22-4E87-42B2-BEB8-12226E5858B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A0B1D24-47AE-408D-A922-408D26F289CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A0B1D24-47AE-408D-A922-408D26F289CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A0B1D24-47AE-408D-A922-408D26F289CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A0B1D24-47AE-408D-A922-408D26F289CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
