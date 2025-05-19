@@ -1,5 +1,102 @@
 ﻿@page "/invoices"
+@using ExportPro.Front.Models
+@inject HttpClient httpClient
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthProvider
+
+@if (IsProcessing)
+{
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+}
+else if (CurrentUser?.Role != Role.SuperAdmin)
+{
+    <div class="card shadow border-0 mt-4">
+        <div class="card-header bg-black text-white text-center py-3">
+            <h3>Invoices</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="startDate">Start Date</label>
+                    <InputDate @bind-Value="StartDate" class="form-control" id="startDate" />
+                </div>
+                <div class="col-md-4">
+                    <label for="endDate">End Date</label>
+                    <InputDate @bind-Value="EndDate" class="form-control" id="endDate" />
+                </div>
+                <div class="col-md-4">
+                    <label for="customer">Customer</label>
+                    <InputText @bind-Value="CustomerFilter" class="form-control" id="customer" />
+                </div>
+            </div>
+
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Invoice Number</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Amount</th>
+                        <th>Currency</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var invoice in FilteredInvoices)
+                    {
+                        <tr>
+                            <td>@invoice.InvoiceNumber</td>
+                            <td>@invoice.IssueDate.ToShortDateString()</td>
+                            <td>@invoice.DueDate.ToShortDateString()</td>
+                            <td>@invoice.Amount?.ToString("F2")</td>
+                            <td>@invoice.ClientCurrencyName</td>
+                            <td>@invoice.PaymentStatus</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <p>You do not have access to view invoices.</p>
+}
 
 @code {
+    private List<InvoiceDto> InvoicesList = new();
+    private List<InvoiceDto> FilteredInvoices => InvoicesList
+        .Where(i => (!StartDate.HasValue || i.IssueDate >= StartDate.Value)
+                 && (!EndDate.HasValue || i.IssueDate <= EndDate.Value)
+                 && (string.IsNullOrWhiteSpace(CustomerFilter) || (i.CustomerName?.Contains(CustomerFilter, StringComparison.OrdinalIgnoreCase) ?? false)))
+        .ToList();
 
+    public bool IsProcessing { get; set; } = true;
+    private DateTime? StartDate;
+    private DateTime? EndDate;
+    private string? CustomerFilter;
+    private UserDto? CurrentUser;
+    private ApiHelper? apiHelper;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            apiHelper = new ApiHelper(httpClient, LocalStorage);
+            CurrentUser = (await apiHelper.GetAsync<UserDto>("api/user/current")).Data;
+
+            var result = await apiHelper.GetAsync<IEnumerable<InvoiceDto>>("api/invoice");
+            if (result.IsSuccess && result.Data is not null)
+                InvoicesList = result.Data.ToList();
+
+            IsProcessing = false;
+            StateHasChanged();
+        }
+    }
 }

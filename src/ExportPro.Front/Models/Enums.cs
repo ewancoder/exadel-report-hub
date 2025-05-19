@@ -11,3 +11,10 @@ public enum Role
     None,
     SuperAdmin
 }
+
+public enum Status
+{
+    Paid,
+    Unpaid
+}
+
