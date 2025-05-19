@@ -6,6 +6,7 @@ public static class IJSRuntimeExtension
 {
     public static async Task ToastrSucess(this IJSRuntime js, string message)
     {
+        
         await js.InvokeVoidAsync("ShowToastr","success", message);
     }
 
@@ -13,5 +14,6 @@ public static class IJSRuntimeExtension
     {
         await js.InvokeVoidAsync("ShowToastr","error", message);
     }
+
 }
 
