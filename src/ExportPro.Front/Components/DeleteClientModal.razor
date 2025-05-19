@@ -1,0 +1,39 @@
+﻿<div class="modal fade" id="clientDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Delete Client</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h3>Are you sure you want to delete client <strong>@ClientName</strong>?</h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-dark" @onclick="ConfirmDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback<Guid> OnDelete { get; set; }
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    private Guid CurrentClientId;
+    public string ClientName { get; set; } = string.Empty;
+
+    public async Task Show(Guid clientId, string name)
+    {
+        CurrentClientId = clientId;
+        ClientName = name;
+        await JS.InvokeVoidAsync("ShowModal", "clientDeleteModal");
+        StateHasChanged();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        await OnDelete.InvokeAsync(CurrentClientId);
+        await JS.InvokeVoidAsync("HideModal", "clientDeleteModal");
+    }
+}

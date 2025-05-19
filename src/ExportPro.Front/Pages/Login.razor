@@ -1,24 +1,22 @@
 ﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
 @inject NavigationManager Nav
 
 <div class="login-wrapper">
     <div class="login-page">
         <EditForm Model="@login" OnValidSubmit="HandleLogin">
-            <DataAnnotationsValidator/>
-            <ValidationSummary/>
-
-            <img src="Exadel_logo_new.png" alt="Exadel Logo" class="login-logo"/>
+            <img src="Exadel_logo_new.png" alt="Exadel Logo" class="login-logo" />
 
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <InputText @bind-Value="login.Email" id="email" class="form-control"/>
-                <ValidationMessage For="@(() => login.Email)"/>
+                <InputText @bind-Value="login.Email" id="email" class="form-control" />
+                <ValidationMessage For="@(() => login.Email)" />
             </div>
 
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <InputText @bind-Value="login.Password" id="password" type="password" class="form-control"/>
-                <ValidationMessage For="@(() => login.Password)"/>
+                <InputText @bind-Value="login.Password" id="password" type="password" class="form-control" />
+                <ValidationMessage For="@(() => login.Password)" />
             </div>
 
             <button type="submit" class="btn btn-dark w-100">Log In</button>

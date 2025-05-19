@@ -1,0 +1,54 @@
+﻿@using ExportPro.Front.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="modal fade" id="clientUpsertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">@ModalTitle</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (internalModel != null)
+                {
+                    <EditForm Model="ClientModel" OnValidSubmit="HandleInternalSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="mb-3">
+                            <label for="clientName" class="form-label">Name</label>
+                            <InputText id="clientName" class="form-control" @bind-Value="internalModel .Name" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientDescription" class="form-label">Description</label>
+                            <InputTextArea id="clientDescription" class="form-control" @bind-Value="internalModel .Description" />
+                        </div>
+                    </EditForm>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-dark" @onclick="HandleInternalSubmit">@ButtonName</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ClientUpsertRequest internalModel = new();
+
+    [Parameter]
+    public ClientUpsertRequest? ClientModel
+    {
+        get => internalModel;
+        set => internalModel = value ?? new ClientUpsertRequest();
+    }
+
+    [Parameter] public string ModalTitle { get; set; } = string.Empty;
+    [Parameter] public string ButtonName { get; set; } = string.Empty;
+    [Parameter] public EventCallback<ClientUpsertRequest> OnValidSubmit { get; set; }
+
+    private async Task HandleInternalSubmit()
+    {
+        await OnValidSubmit.InvokeAsync(internalModel);
+    }
+}

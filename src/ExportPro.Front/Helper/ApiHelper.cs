@@ -15,10 +15,10 @@ public class ApiHelper
         _httpClient = httpClient;
         _localStorage = localStorage;
     }
-
     private async Task AttachAuthHeaderAsync()
     {
         var token = await _localStorage.GetItemAsync<string>("accessToken");
+
         if (!string.IsNullOrWhiteSpace(token))
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
@@ -53,11 +53,24 @@ public class ApiHelper
             ?? throw new InvalidOperationException("Response was null");
     }
 
-    public async Task DeleteAsync(string url)
+    public async Task<Result<TResponse>> PatchAsync<TRequest, TResponse>(string url, TRequest data)
+    {
+        await AttachAuthHeaderAsync();
+
+        var response = await _httpClient.PatchAsJsonAsync(url, data);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<Result<TResponse>>()
+               ?? throw new InvalidOperationException("Response was null");
+    }
+
+    public async Task<Result<TResponse>> DeleteAsync<TResponse>(string url)
     {
         await AttachAuthHeaderAsync();
 
         var response = await _httpClient.DeleteAsync(url);
         response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<Result<TResponse>>()
+               ?? throw new InvalidOperationException("Response was null");
     }
 }
+

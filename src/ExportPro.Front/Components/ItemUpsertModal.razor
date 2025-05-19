@@ -1,0 +1,141 @@
+﻿@using ExportPro.Front.Models
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components
+
+<div class="modal fade" id="itemUpsertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="itemModalLabel">@ModalTitle</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (internalModel?.Item != null)
+                {
+                    <EditForm Model="internalModel" OnValidSubmit="HandleInternalSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="mb-3">
+                            <label for="itemName" class="form-label">Name</label>
+                            <InputText id="itemName" class="form-control" @bind-Value="internalModel.Item.Name" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="itemDescription" class="form-label">Description</label>
+                            <InputTextArea id="itemDescription" class="form-control" @bind-Value="internalModel.Item.Description" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="itemPrice" class="form-label">Price</label>
+                            <InputNumber id="itemPrice" class="form-control" @bind-Value="internalModel.Item.Price" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="itemCurrency" class="form-label">Currency</label>
+                            <InputSelect id="itemCurrency" class="form-select" @bind-Value="internalModel.Item.CurrencyId">
+                                <option value="">Select Currency</option>
+                                @foreach (var currency in Currencies)
+                                {
+                                    <option value="@currency.Id">@currency.CurrencyCode</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="mb-3">
+                            <label for="itemStatus" class="form-label">Status</label>
+                            <InputSelect id="itemStatus" class="form-select" @bind-Value="internalModel.Item.Status">
+                                <option value="@Status.Unpaid">Unpaid</option>
+                                <option value="@Status.Paid">Paid</option>
+                            </InputSelect>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientSelect" class="form-label">Client</label>
+                            <InputSelect id="clientSelect" class="form-select" @bind-Value="internalModel.ClientId">
+                                <option value="">Select Client</option>
+                                @foreach (var client in Clients)
+                                {
+                                    <option value="@client.Id">@client.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </EditForm>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-dark" @onclick="HandleInternalSubmit">@ButtonName</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ItemInsertRequest internalModel = new();
+    [Parameter] public List<ClientDto> Clients { get; set; } = new();
+    [Parameter]
+    public ItemInsertRequest? ItemModel
+    {
+        get => internalModel;
+        set => internalModel = value ?? new ItemInsertRequest();
+    }
+
+    private Guid ClientId { get; set; } = Guid.Empty;
+
+    [Parameter] public string ModalTitle { get; set; } = "Edit Item";
+    [Parameter] public string ButtonName { get; set; } = "Save";
+    [Parameter] public EventCallback<ItemInsertRequest> OnValidSubmit { get; set; }
+    [Parameter] public List<CurrencyDto> Currencies { get; set; } = new();
+    [Inject] private ApiHelper ApiHelper { get; set; }
+    [Inject] private HttpClient Http { get; set; } = default!;
+    [Inject] private ILocalStorageService LocalStorage { get; set; } = default!;
+
+    public async Task Show(ItemDto itemDto, Guid clientId)
+    {
+        var currency = await GetCurrencyByCodeAsync(itemDto.Currency);
+        internalModel = new ItemInsertRequest
+            {
+                ClientId = clientId,
+                Item = new Item
+                {
+                    Name = itemDto.Name,
+                    Description = itemDto.Description,
+                    Price = itemDto.Price,
+                    CurrencyId = currency?.Id ?? Guid.Empty,
+                    Status = itemDto.Status
+                }
+            };
+
+        ClientId = clientId;
+
+        await JS.InvokeVoidAsync("ShowModal", "itemUpsertModal");
+    }
+
+    public async Task ShowCreateModal(List<ClientDto> clients)
+    {
+        Clients = clients;
+
+        internalModel = new ItemInsertRequest
+            {
+                ClientId = clients.FirstOrDefault()?.Id ?? Guid.Empty,
+                Item = new Item()
+            };
+
+        await JS.InvokeVoidAsync("ShowModal", "itemUpsertModal");
+    }
+
+
+    public async Task Hide()
+    {
+        await JS.InvokeVoidAsync("HideModal", "itemUpsertModal");
+    }
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    private async Task HandleInternalSubmit()
+    {
+        await OnValidSubmit.InvokeAsync(internalModel);
+    }
+
+    public async Task<CurrencyDto?> GetCurrencyByCodeAsync(string currencyCode)
+    {
+        var ApiHelper = new ApiHelper(Http, LocalStorage);
+        var response = await ApiHelper.GetAsync<CurrencyDto>($"api/currency/name/{currencyCode}");
+        return response.IsSuccess ? response.Data : null;
+    }
+}
