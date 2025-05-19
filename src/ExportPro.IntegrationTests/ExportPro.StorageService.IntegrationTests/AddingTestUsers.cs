@@ -1,7 +1,7 @@
 ﻿using ExportPro.Shared.IntegrationTests.Auth;
 using TechTalk.SpecFlow;
 
-namespace ExportPro.Shared.IntegrationTests;
+namespace ExportPro.StorageService.IntegrationTests;
 
 [Binding]
 public static class AddingTestUsers

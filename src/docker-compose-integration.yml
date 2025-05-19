@@ -1,0 +1,94 @@
+services:
+  api-gateway:
+    container_name: ocelot
+    image: giorgaaa/exportproocelotintegrationtest
+    # build:?
+    #   context: .
+    #   dockerfile: ExportPro.Gateway/ExportPro.Gateway.ServiceHost/Dockerfile
+    depends_on:
+      - authservice
+      - storageservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "1200:8080"
+  mongodb:
+    container_name: ExportProDb
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - /data/db    
+  authservice:
+    container_name: authservice
+    image: giorgaaa/authserviceintegrationtest
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.Auth/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=mongodb://ExportProDb:27017
+    ports:
+      - "5000:8080"
+    depends_on:
+      - mongodb
+     
+  storageservice:
+    container_name: storageservice
+    image: giorgaaa/storageserviceintegrationtest
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.StorageService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development  
+      - MongoDbDocker=mongodb://ExportProDb:27017
+    ports:
+      - "1500:8080"
+    depends_on:
+      - authservice
+  exportservice:
+    container_name: exportservice
+    image: giorgaaa/exportprointegrationtest
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.Export/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=mongodb://ExportProDb:27017
+      - StorageUrl=http://storageservice:8080
+    ports:
+      - "2000:8080"
+    depends_on:
+      - authservice
+      - storageservice
+      - mongodb
+      - exportproseq
+    # volumes:
+    #   - type: bind
+    #     # source: C:/Logs/
+    #     source: /home/randoma/logs_exadel
+    #     target: "/app/Logs"
+  exportproseq:
+    image: datalust/seq:latest
+    container_name: exportproseq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 8081:80
+  jobservice:
+    image: giorgaaa/jobserviceintegrationtest
+    container_name: jobservice
+    # build:
+    #   context: .
+    #   dockerfile: ExportPro.Jobs/ExportPro.Export.Job.ServiceHost/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbDocker=mongodb://ExportProDb:27017
+      - DockerForReport=http://exportservice:8080
+      - DockerForAuth=http://authservice:8080
+    ports:
+      - "2500:8080"
+    depends_on:
+      - authservice
+      - exportservice

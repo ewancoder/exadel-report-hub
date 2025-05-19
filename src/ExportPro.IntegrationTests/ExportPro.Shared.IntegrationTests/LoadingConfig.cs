@@ -8,7 +8,7 @@ public static class LoadingConfig
     {
         return new ConfigurationBuilder()
             .SetBasePath(Path.Combine(Directory.GetCurrentDirectory()))
-            .AddJsonFile("appsettings.json", false, true)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
     }
 }
