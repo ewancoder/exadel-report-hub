@@ -1,3 +1,4 @@
+# ANSIBLE_SSH_ARGS="-o StrictHostKeyChecking=no" ansible-playbook -i <ip_addr>, ansible.yaml --ask-pass
 ---
 - name: Prepare server, deploy docker-compose
   hosts: all

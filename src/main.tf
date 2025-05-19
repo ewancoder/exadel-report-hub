@@ -48,7 +48,7 @@ resource "azurerm_network_security_group" "example" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_ranges     = [2000,8081,1200,27017]
+    destination_port_ranges     = [2000,8081,1200,27017,1000]
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
