@@ -73,4 +73,10 @@ public class ACLController(IMediator mediator) : ControllerBase
     {
         return mediator.Send(new DeleteUserClientRole(userId.ToObjectId()));
     }
+
+    [HttpGet("{clientId}/users")]
+    public Task<BaseResponse<List<UserInfo>>> GetClientUsers([FromRoute] Guid clientId)
+    {
+        return mediator.Send(new GetClientUsers(clientId));
+    }
 }

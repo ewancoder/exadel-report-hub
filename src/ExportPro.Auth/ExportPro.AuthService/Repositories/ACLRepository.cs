@@ -1,7 +1,9 @@
-﻿using ExportPro.Auth.SDK.Models;
+﻿using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Auth.SDK.Models;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.DataAccess.MongoDB.Repository;
 using ExportPro.Common.Shared.Enums;
+using ExportPro.Common.Shared.Extensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -23,6 +25,12 @@ public class ACLRepository(ICollectionProvider collectionProvider)
     public Task<List<UserClientRoles>> GetUserRolesAsync(ObjectId userId, CancellationToken cancellationToken = default)
     {
         return Collection.Find(x => x.UserId == userId).ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Guid>> GetClientUsers(ObjectId clientId, CancellationToken cancellationToken = default)
+    {
+        var client = await Collection.Find(x => x.ClientId == clientId).ToListAsync(cancellationToken);
+        return client.Select(x => x.UserId.ToGuid()).ToList();
     }
 
     public Task RemoveUserClientRoleAsync(

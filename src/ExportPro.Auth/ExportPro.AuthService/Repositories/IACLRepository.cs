@@ -1,4 +1,5 @@
-﻿using ExportPro.Auth.SDK.Models;
+﻿using ExportPro.Auth.SDK.DTOs;
+using ExportPro.Auth.SDK.Models;
 using ExportPro.Common.DataAccess.MongoDB.Interfaces;
 using ExportPro.Common.Shared.Enums;
 using MongoDB.Bson;
@@ -14,6 +15,7 @@ public interface IACLRepository : IRepository<UserClientRoles>
     );
 
     Task<List<UserClientRoles>> GetUserRolesAsync(ObjectId userId, CancellationToken cancellationToken = default);
+    Task<List<Guid>> GetClientUsers(ObjectId clientId, CancellationToken cancellationToken = default);
     Task RemoveUserClientRoleAsync(ObjectId userId, ObjectId clientId, CancellationToken cancellationToken = default);
 
     Task<bool> UpdateUserClientRoleAsync(
