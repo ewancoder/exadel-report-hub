@@ -26,7 +26,7 @@ public class AuthorizationBehavior<TRequest, TResponse>(
             var user =
                 httpContextAccessor.HttpContext?.User
                 ?? throw new UnauthorizedAccessException("User context not found.");
-            var url = "https://localhost:7067";
+            var url = Environment.GetEnvironmentVariable("DockerForAuthUrl")?? "http://authservice:8080";
             var jwtToken = httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
 
             var httpClient = new HttpClient { BaseAddress = new Uri(url) };

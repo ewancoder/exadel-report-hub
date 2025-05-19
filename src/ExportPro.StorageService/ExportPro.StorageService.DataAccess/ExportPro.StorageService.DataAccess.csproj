@@ -4,16 +4,20 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>ExportPro.StorageService.DataAccess</PackageId>
+        <Authors>Exadel-Group-3</Authors>
+        <Version>2.0.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="14.0.0"/>
+        <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="2.0.0" />
+        <PackageReference Include="ExportPro.Common.Shared" Version="2.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.DataAccess.MongoDB\ExportPro.Common.DataAccess.MongoDB.csproj"/>
-        <ProjectReference Include="..\..\ExportPro.Common\ExportPro.Common.Shared\ExportPro.Common.Shared.csproj"/>
-        <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj"/>
+      <ProjectReference Include="..\ExportPro.StorageService.SDK\ExportPro.StorageService.SDK.csproj" />
     </ItemGroup>
 
 </Project>

@@ -25,6 +25,7 @@ builder.Services.AddCommonRegistrations();
 builder.Services.AddSingleton<IMongoDbConnectionFactory, MongoDbConnectionFactory>();
 builder.Services.AddSingleton<ICollectionProvider, DefaultCollectionProvider>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
+var baseurl = Environment.GetEnvironmentVariable("DockerForAuthUrl") ?? builder.Configuration["Refit:authUrl"];
 builder
     .Services.AddRefitClient<IACLSharedApi>(
         new RefitSettings { ContentSerializer = new SystemTextJsonContentSerializer() }
@@ -33,7 +34,7 @@ builder
         (sp, client) =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
-            client.BaseAddress = new Uri(config["Refit:authUrl"]);
+            client.BaseAddress = new Uri(baseurl);
         }
     )
     .AddHttpMessageHandler<ForwardAuthHeaderHandler>();

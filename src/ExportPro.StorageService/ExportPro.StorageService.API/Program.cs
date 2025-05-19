@@ -60,7 +60,7 @@ builder
     })
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:7067/"; // if using identity server or Auth0
+        options.Authority = "http://authservice:8080/"; // if using identity server or Auth0
         options.RequireHttpsMetadata = false; // optional for local dev
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -81,6 +81,10 @@ builder
         c.BaseAddress = new Uri(builder.Configuration["Refit:appurl"] ?? string.Empty);
     });
 builder.Services.AddTransient<ForwardAuthHeaderHandler>();
+
+var baseurl=Environment.GetEnvironmentVariable("DockerForAuthUrl") ?? builder.Configuration["Refit:authUrl"];
+if(Environment.GetEnvironmentVariable("DockerForAuthUrl") !=null)
+    Console.Write(baseurl);
 builder
     .Services.AddRefitClient<IACLSharedApi>(
         new RefitSettings
@@ -94,7 +98,7 @@ builder
         (sp, client) =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
-            client.BaseAddress = new Uri(config["Refit:authUrl"]);
+            client.BaseAddress = new Uri(baseurl);
         }
     )
     .AddHttpMessageHandler<ForwardAuthHeaderHandler>();

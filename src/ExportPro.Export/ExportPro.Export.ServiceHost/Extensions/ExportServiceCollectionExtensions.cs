@@ -104,7 +104,7 @@ public static class ExportServiceCollectionExtensions
             .AddAuthentication(o => o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(o =>
             {
-                o.Authority = "https://localhost:7067/";
+                o.Authority = "http://authservice:8080/";
                 o.RequireHttpsMetadata = false;
                 o.TokenValidationParameters = new TokenValidationParameters
                 {

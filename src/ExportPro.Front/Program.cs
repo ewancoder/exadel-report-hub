@@ -21,7 +21,7 @@ builder.Services.AddAuthorizationCore();
 // ? Register HttpClient to talk to backend API
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7067"), // ?? your API base URL
+    BaseAddress = new Uri("http://authservice:8080"), // ?? your API base URL
 });
 
 // ? ApiHelper that uses the above HttpClient

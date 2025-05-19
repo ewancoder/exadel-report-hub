@@ -10,12 +10,14 @@ using ExportPro.StorageService.SDK.Refit;
 using Microsoft.Extensions.Options;
 using Quartz;
 using Refit;
+using ILogger = Serilog.ILogger;
 
 namespace ExportPro.Export.Job.ServiceHost.Services;
 
 public sealed class ReportSchedulerJob(
     IReportPreference reportRepository,
     IEmailService emailService,
+    ILogger logger,
     IConfiguration configuration,
     IOptions<ServiceAccountSettings> serviceAccountOptions
 ) : IJob
@@ -24,7 +26,9 @@ public sealed class ReportSchedulerJob(
     public async Task Execute(IJobExecutionContext context)
     {
         var preferences = await reportRepository.GetAllPreferences(context.CancellationToken);
+        logger.Debug("starting job");
         var baseurl = Environment.GetEnvironmentVariable("DockerForAuth") ?? configuration["AuthURI"];
+        logger.Debug("docker auth uri: {0}", baseurl);
         HttpClient client = new() { BaseAddress = new Uri(baseurl!) };
 
         IAuth authAPi = RestService.For<IAuth>(client);
@@ -35,6 +39,7 @@ public sealed class ReportSchedulerJob(
         };
 
         var jwtTokenDto = await authAPi.LoginAsync(login);
+        logger.Debug("jwt token: {0}", jwtTokenDto.Data.AccessToken);
         var jwtToken = jwtTokenDto.Data.AccessToken;
             var baseUrlForexport =
                 Environment.GetEnvironmentVariable("DockerForReport") ?? configuration["ExportReportURI"];
@@ -50,7 +55,8 @@ public sealed class ReportSchedulerJob(
         {
             if (!IsTimeToSend(pref))
                 continue;
-
+    logger.Debug("sending preferences for {0}", pref);
+    logger.Debug("email: {0}", pref.Email);
             var reportResponse = await reportExportApi.GetStatisticsAsync(
                                 pref.ReportFormat,
                                 pref.ClientId.ToGuid(),
