@@ -24,6 +24,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Prometheus;
 using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,7 +36,6 @@ builder
         options.Filters.Add<ApiResponseStatusCodeFilter>();
         options.Filters.Add<ValidateModelStateAttribute>();
     })
-    
     .AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Program>());
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -79,8 +79,8 @@ builder
     });
 builder.Services.AddTransient<ForwardAuthHeaderHandler>();
 
-var baseurl=Environment.GetEnvironmentVariable("DockerForAuthUrl") ?? builder.Configuration["Refit:authUrl"];
-if(Environment.GetEnvironmentVariable("DockerForAuthUrl") !=null)
+var baseurl = Environment.GetEnvironmentVariable("DockerForAuthUrl") ?? builder.Configuration["Refit:authUrl"];
+if (Environment.GetEnvironmentVariable("DockerForAuthUrl") != null)
     Console.Write(baseurl);
 builder
     .Services.AddRefitClient<IACLSharedApi>(
@@ -111,6 +111,7 @@ builder.Services.AddScoped<ICurrencyExchangeService, CurrencyExchangeService>();
 builder.Services.AddCQRS();
 builder.Services.AddScoped<SeedingData>();
 var app = builder.Build();
+app.UseHttpMetrics();
 using (var scope = app.Services.CreateScope())
 {
     var repo = scope.ServiceProvider.GetRequiredService<ICountryRepository>();
@@ -132,5 +133,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapMetrics();
 app.Run();

@@ -8,6 +8,7 @@ using ExportPro.Common.Shared.Refit;
 using ExportPro.Export.ServiceHost.Extensions;
 using ExportPro.Export.ServiceHost.Infrastructure;
 using MediatR;
+using Prometheus;
 using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +44,7 @@ builder
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
 var app = builder.Build();
+app.UseHttpMetrics();
 
 // Middleware
 app.UseMiddleware<ErrorHandlingMiddleware>();
@@ -58,5 +60,5 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 app.MapControllers();
-
+app.MapMetrics();
 app.Run();

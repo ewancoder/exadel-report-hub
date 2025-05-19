@@ -9,6 +9,7 @@ using ExportPro.Common.DataAccess.MongoDB.Services;
 using ExportPro.Common.Shared.Extensions;
 using ExportPro.Common.Shared.Middlewares;
 using MediatR;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +46,7 @@ builder.Services.AddMediatR(cfg =>
 });
 builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
-
+app.UseHttpMetrics();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -60,5 +61,5 @@ app.UseCors("AllowWasm");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
+app.MapMetrics();
 app.Run();

@@ -101,41 +101,26 @@ namespace ExportPro.StorageService.IntegrationTests.Features.CustomerFeatures
         testRunner.Given(string.Format("The user is logged in with email \'{0}\' and password \'{1}\' and has necessary permi" +
                             "ssions", email, password), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
-                            "CurrencyCode"});
-                table6.AddRow(new string[] {
-                            "EUR"});
 #line 6
-        testRunner.And("The user created following currency and stored the currency id", ((string)(null)), table6, "And ");
+        testRunner.And("The user has following country \"USA\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Name",
-                            "Code",
-                            "CurrencyId"});
-                table7.AddRow(new string[] {
-                            "TestUsa####TESTCUSTOMER###",
-                            "TESTCOUNTRYCODECode",
-                            "temp"});
-#line 9
-        testRunner.And("The user created following country and stored the country id", ((string)(null)), table7, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
                             "CountryId",
                             "Name",
                             "Email",
                             "Address"});
-                table8.AddRow(new string[] {
+                table2.AddRow(new string[] {
                             "temp",
                             "TESTUSER####TESTCUSTOMER",
                             "TESTUSER####TESTCUSTOMER@gmail.com",
                             "BERRLIN"});
-#line 12
-        testRunner.And("The user wants to create following customer", ((string)(null)), table8, "And ");
+#line 7
+        testRunner.And("The user wants to create following customer", ((string)(null)), table2, "And ");
 #line hidden
-#line 15
+#line 10
         testRunner.When("the user sends the customer creation request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 16
+#line 11
         testRunner.Then("the customer should be saved in the database", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

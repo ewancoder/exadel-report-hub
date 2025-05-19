@@ -564,6 +564,19 @@
       "SwaggerKey": "AuthService"
     },
     {
+      "DownstreamPathTemplate": "/api/permissions/{clientId}/users",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "authservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/permissions/{clientId}/users",
+      "UpstreamHttpMethod": [ "Get" ],
+      "SwaggerKey": "AuthService"
+    },
+    {
     "DownstreamPathTemplate": "/api/user",
     "DownstreamScheme": "http",
     "DownstreamHostAndPorts": [

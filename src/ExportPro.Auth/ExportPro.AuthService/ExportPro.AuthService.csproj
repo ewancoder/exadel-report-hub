@@ -11,10 +11,14 @@
 
     <ItemGroup>
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
-        <PackageReference Include="ExportPro.Auth.SDK" Version="2.0.0" />
+
         <PackageReference Include="ExportPro.Common.DataAccess.MongoDB" Version="2.0.0" />
         <PackageReference Include="MediatR" Version="12.5.0"/>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ExportPro.Auth.SDK\ExportPro.Auth.SDK.csproj" />
     </ItemGroup>
 
 

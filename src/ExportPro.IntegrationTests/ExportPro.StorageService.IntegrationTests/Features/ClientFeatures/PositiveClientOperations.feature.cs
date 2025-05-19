@@ -77,10 +77,10 @@ namespace ExportPro.StorageService.IntegrationTests.Features.ClientFeatures
         
         public virtual void FeatureBackground()
         {
-#line 3
-        #line hidden
 #line 4
-            testRunner.Given("The \"SuperAdmin\" user is logged in with email and password and has necessary perm" +
+    #line hidden
+#line 5
+        testRunner.Given("The \"SuperAdmin\" user is logged in with email and password and has necessary perm" +
                     "issions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
@@ -94,8 +94,8 @@ namespace ExportPro.StorageService.IntegrationTests.Features.ClientFeatures
                     "CreateClient"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("The user creates a client", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 6
-        this.ScenarioInitialize(scenarioInfo);
+#line 8
+    this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -104,8 +104,8 @@ namespace ExportPro.StorageService.IntegrationTests.Features.ClientFeatures
             else
             {
                 this.ScenarioStart();
-#line 3
-        this.FeatureBackground();
+#line 4
+    this.FeatureBackground();
 #line hidden
                 TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
                             "Name",
@@ -113,14 +113,14 @@ namespace ExportPro.StorageService.IntegrationTests.Features.ClientFeatures
                 table1.AddRow(new string[] {
                             "TestClient",
                             "Test Client"});
-#line 7
-            testRunner.And("The user has a client with name and description", ((string)(null)), table1, "And ");
+#line 9
+        testRunner.And("The user has a client with name and description", ((string)(null)), table1, "And ");
 #line hidden
-#line 10
-            testRunner.When("the user sends the client creation request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 12
+        testRunner.When("the user sends the client creation request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 11
-            testRunner.Then("the client should be saved in the database", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 13
+        testRunner.Then("the client should be saved in the database", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -135,8 +135,8 @@ namespace ExportPro.StorageService.IntegrationTests.Features.ClientFeatures
                     "DeleteClient"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("The user wants to delete a client", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 13
-        this.ScenarioInitialize(scenarioInfo);
+#line 16
+    this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -145,14 +145,14 @@ namespace ExportPro.StorageService.IntegrationTests.Features.ClientFeatures
             else
             {
                 this.ScenarioStart();
-#line 3
-        this.FeatureBackground();
+#line 4
+    this.FeatureBackground();
 #line hidden
-#line 14
-            testRunner.When("The user sends a delete request with client id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 17
+        testRunner.When("The user sends a delete request with client id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 15
-            testRunner.Then("The client should be deleted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 18
+        testRunner.Then("The client should be deleted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
